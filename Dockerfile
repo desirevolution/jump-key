@@ -1,3 +1,5 @@
+LABEL org.opencontainers.image.source=https://github.com/desirevolution/jump-key
+
 FROM nginxinc/nginx-unprivileged:alpine
 
 COPY ./public /app
