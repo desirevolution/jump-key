@@ -1,0 +1,16 @@
+[
+  {
+    "category": "Web",
+    "icon": "home",
+    "services": [
+      { "name": "JumpKey", "url": "https://github.com/desirevolution/jump-key", "icon": "jump-key.png" }
+    ]
+  },
+  {
+    "category": "Icons",
+    "icon": "box",
+    "services": [
+      { "name": "Lucide Icons", "url": "https://lucide.dev/icons/", "icon": "image" }
+    ]
+  }
+]

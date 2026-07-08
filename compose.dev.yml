@@ -1,0 +1,7 @@
+services:
+  jump-key:
+    build: .
+    volumes:
+      - ./services.example.json:/app/services.json
+    ports:
+      - "8080:8080"
