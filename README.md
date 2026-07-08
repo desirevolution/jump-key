@@ -1,8 +1,8 @@
-<h1 align="center">JumpKey</h1>
-
 <p align="center">
   <img src="./public/jump-key.png" alt="logo" width="80" height="80" />
 </p>
+
+<h1 align="center">JumpKey</h1>
 
 ###  A minimalist, keyboard-driven application startpage. Navigate and launch your web apps instantly without a mouse. 
 
