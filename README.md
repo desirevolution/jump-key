@@ -1,4 +1,5 @@
-# <img src="./public/jump-key.png" alt="logo" width="40" height="40" align="center" />JumpKey
+<img src="./public/jump-key.png" alt="logo" width="40" height="40" align="center" />
+#JumpKey
 
 # Screenshots
 
