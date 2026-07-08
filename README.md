@@ -17,6 +17,6 @@ Copy/adjust [compose.yml](compose.yml) and [services.json](services.example.json
 docker compose up -d
 ```
 
-## Disclaimer
+# Disclaimer
 Project was build with AI support. I am a lazy dev...
 
