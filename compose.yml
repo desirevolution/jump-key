@@ -1,0 +1,7 @@
+services:
+  jump-key:
+    image: ghcr.io/desirevolution/jump-key:latest
+    volumes:
+      - ./services.example.json:/app/services.json
+    ports:
+      - "8080:8080"
