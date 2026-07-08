@@ -4,7 +4,7 @@
 
 <h1 align="center">JumpKey</h1>
 
-###  A minimalist, keyboard-driven application startpage. Navigate and launch your web apps instantly without a mouse. 
+####  A minimalist, keyboard-driven application startpage. Navigate and launch your web apps instantly without a mouse. 
 
 ## Screenshots
 
