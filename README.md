@@ -1,10 +1,12 @@
+<h1 align="center">JumpKey</h1>
+
 <p align="center">
   <img src="./public/jump-key.png" alt="logo" width="80" height="80" />
 </p>
 
-# JumpKey
+###  A minimalist, keyboard-driven application startpage. Navigate and launch your web apps instantly without a mouse. 
 
-# Screenshots
+## Screenshots
 
 <p align="center">
   <img src="./screenshots/screenshot_1.png" alt="screenshot1" width="450" />
@@ -13,7 +15,7 @@
   <img src="./screenshots/screenshot_4.png" alt="screenshot4" width="450" />
 </p>
 
-# Quick Start
+## Quick Start
 
 Copy/adjust [compose.yml](compose.yml) and [services.json](services.example.json) and run
 
@@ -21,6 +23,6 @@ Copy/adjust [compose.yml](compose.yml) and [services.json](services.example.json
 docker compose up -d
 ```
 
-# Disclaimer
+## Disclaimer
 Project was build with AI support. I am a lazy dev...
 
