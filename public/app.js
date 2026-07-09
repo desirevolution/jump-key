@@ -4,6 +4,7 @@ const translations = {
   de: {
     helpHint: "Drücke [?] für Hotkey-Hilfe",
     helpTitle: "Tastatur-Kurzbefehle",
+    helpExit: "Klicke irgendwohin oder drücke eine Taste zum Schließen.",
     searchPlaceholder: "Service suchen...",
     close: "Schließen",
     noServices: "Keine Services gefunden.",
@@ -22,6 +23,7 @@ const translations = {
   en: {
     helpHint: "Press [?] for hotkey help",
     helpTitle: "Keyboard Shortcuts",
+    helpExit: "Click anywhere or press a key to close it.",
     searchPlaceholder: "Search services...",
     close: "Close",
     noServices: "No services found.",
@@ -432,7 +434,7 @@ class DashboardApp extends LitElement {
           </div>
           
           <div class="text-[11px] text-slate-500 text-center mt-6">
-            Klicke irgendwohin oder drücke eine Taste zum Schließen.
+             ${this.t('helpExit')}
           </div>
         </div>
       </div>
