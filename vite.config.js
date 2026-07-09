@@ -15,30 +15,20 @@ export default defineConfig({
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.endsWith('/services.json'),
-            handler: 'NetworkFirst', // Tries network, falls back to cache
+            handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'api-services-cache',
-              plugins: [
-                {
-                  cacheWillUpdate: async ({ response }) => {
-                    if (response && response.status === 200) {
-                      return response;
-                    }
-                    return null; 
-                  }
-                }
-              ],
+              cacheableResponse: {
+                statuses: [200] // Only save to cache if background fetch succeeds cleanly
+              },
               expiration: {
-                maxEntries: 10,
-                maxAgeSeconds: 60 * 60 * 24 // 1 day
+                maxEntries: 1,
+                maxAgeSeconds: 60 * 60 * 24 * 7
               }
             }
           }
         ],
-        // If an offline user hits a navigation route, fallback immediately to index.html
-        navigateFallback: '/index.html'
       },
-      
       // Your Web App Manifest info
       manifest: {
         name: 'JumpKey Dashboard',
