@@ -63,6 +63,25 @@ Create a file named `services.json` in your root directory and format it as foll
 ]
 ```
 
+#### Configuration Options
+
+##### Category Properties
+
+| Property | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `category` | String | **Yes** | The display heading for the group. |
+| `icon` | String | No | A Lucide icon string identifier (e.g., `"code-2"`) **OR** a local filename for an image placed inside your `./icons/` folder (e.g., `"tv.png"`). |
+| `categoryKey` | String | No | A custom single-character hotkey to open this category. **If omitted, the application automatically maps the first available unique letter from the category name.** |
+| `services` | Array | **Yes** | An array containing the service items belonging to this category. |
+
+##### Service Properties
+
+| Property | Type | Required | Description |
+| :--- | :--- | :--- | :--- |
+| `name` | String | **Yes** | The title of the bookmark. |
+| `url` | String | **Yes** | The target website URL (automatically opens in a new browser tab). |
+| `icon` | String | No | A Lucide icon name or local filename matching an image in `./icons/`. |
+| `key` | String | No | A custom single-character hotkey to trigger the link once its parent category view is open. **If omitted, the application automatically determines a fallback letter from the name.** |
 
 ## Disclaimer
 Project was build with AI support. I am a lazy dev...
