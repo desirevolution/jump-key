@@ -23,6 +23,47 @@ Copy/adjust [compose.yml](compose.yml) and [services.json](services.example.json
 docker compose up -d
 ```
 
+## Configuration
+
+The application fetches its dashboard data dynamically from `./services.json`. This file organizes your bookmarks into separate categories and individual services, while configuring your keyboard navigation layout automatically.
+
+## Sample Structure
+
+Create a file named `services.json` in your root directory and format it as follows:
+
+```json
+[
+  {
+    "category": "Development",
+    "icon": "code-2",
+    "services": [
+      {
+        "name": "GitHub",
+        "url": "[https://github.com](https://github.com)",
+        "icon": "github"
+      },
+      {
+        "name": "Vercel",
+        "url": "[https://vercel.com](https://vercel.com)",
+        "icon": "triangle",
+        "key": "v"
+      }
+    ]
+  },
+  {
+    "category": "Entertainment",
+    "icon": "tv.png",
+    "services": [
+      {
+        "name": "YouTube",
+        "url": "[https://youtube.com](https://youtube.com)"
+      }
+    ]
+  }
+]
+```
+
+
 ## Disclaimer
 Project was build with AI support. I am a lazy dev...
 
