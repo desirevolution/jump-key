@@ -1,8 +1,10 @@
 const CACHE = 'jumpkey-v1';
-const PRECACHE = ['/', '/jump-key.png', '/jump-key.ico', '/manifest.json'];
+const PRECACHE = ['/', '/index.html', '/jump-key.ico', '/manifest.json'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(PRECACHE)));
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(PRECACHE))
+  );
   self.skipWaiting();
 });
 
@@ -18,12 +20,16 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
 
-  // services.json: network-first, cache fallback (config updates propagate when online)
+  if (url.protocol === 'chrome-extension:') return;
+
   if (url.pathname.endsWith('/services.json')) {
     e.respondWith(
       fetch(e.request)
         .then(res => {
-          caches.open(CACHE).then(c => c.put(e.request, res.clone()));
+          if (res.ok) {
+            const resClone = res.clone();
+            caches.open(CACHE).then(c => c.put(e.request, resClone));
+          }
           return res;
         })
         .catch(() => caches.match(e.request))
@@ -31,12 +37,22 @@ self.addEventListener('fetch', e => {
     return;
   }
 
-  // CDN + local assets: cache-first
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match('/index.html') || caches.match('/'))
+    );
+    return;
+  }
+
   e.respondWith(
     caches.match(e.request).then(cached => {
       if (cached) return cached;
+
       return fetch(e.request).then(res => {
-        if (res.ok) caches.open(CACHE).then(c => c.put(e.request, res.clone()));
+        if (res.ok && e.request.method === 'GET') {
+          const resClone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, resClone));
+        }
         return res;
       });
     })
