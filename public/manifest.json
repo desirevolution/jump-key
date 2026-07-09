@@ -1,0 +1,17 @@
+{
+  "name": "JumpKey",
+  "short_name": "JumpKey",
+  "description": "Keyboard-driven service dashboard",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "/icons/jump-key.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
