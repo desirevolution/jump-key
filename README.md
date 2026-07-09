@@ -27,7 +27,7 @@ docker compose up -d
 
 The application fetches its dashboard data dynamically from `./services.json`. This file organizes your bookmarks into separate categories and individual services, while configuring your keyboard navigation layout automatically.
 
-## Sample Structure
+#### Sample Structure
 
 Create a file named `services.json` in your root directory and format it as follows:
 
