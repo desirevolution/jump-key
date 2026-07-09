@@ -7,28 +7,30 @@ export default defineConfig({
     tailwindcss(),
     VitePWA({
       registerType: 'autoUpdate',
-      injectRegister: 'inline', // Automatically registers the worker in your index.html
+      injectRegister: 'inline',
       
-      // Workbox configuration block
       workbox: {
-        // Automatically find and precache ALL generated JS/CSS/HTML chunks in /dist
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json}'],
         
-        // Define runtime routing strategies (fixes your proxy and JSON endpoints)
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.endsWith('/services.json'),
             handler: 'NetworkFirst', // Tries network, falls back to cache
             options: {
               cacheName: 'api-services-cache',
+              plugins: [
+                {
+                  cacheWillUpdate: async ({ response }) => {
+                    if (response && response.status === 200) {
+                      return response;
+                    }
+                    return null; 
+                  }
+                }
+              ],
               expiration: {
                 maxEntries: 10,
                 maxAgeSeconds: 60 * 60 * 24 // 1 day
-              },
-              cacheableResponse: {
-                // IMPORTANT: Only cache standard successes (200). 
-                // Proxy errors like 502, 503, 504 are strictly ignored and trigger the offline fallback!
-                statuses: [200] 
               }
             }
           }
