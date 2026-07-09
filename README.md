@@ -39,12 +39,12 @@ Create a file named `services.json` in your root directory and format it as foll
     "services": [
       {
         "name": "GitHub",
-        "url": "[https://github.com](https://github.com)",
+        "url": "https://github.com",
         "icon": "github"
       },
       {
         "name": "Vercel",
-        "url": "[https://vercel.com](https://vercel.com)",
+        "url": "https://vercel.com",
         "icon": "triangle",
         "key": "v"
       }
@@ -56,7 +56,7 @@ Create a file named `services.json` in your root directory and format it as foll
     "services": [
       {
         "name": "YouTube",
-        "url": "[https://youtube.com](https://youtube.com)"
+        "url": "https://youtube.com"
       }
     ]
   }
