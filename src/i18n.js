@@ -25,6 +25,7 @@ export const translations = {
     searchEnginePreviewPrefix: "Suche auf", // <-- Neu
     searchEnginePreviewFor: "nach", // <-- Neu
     searchEngineEnterQuery: "Suchbegriff eingeben...", // <-- Neu
+    searchEnginesMobileButton: "Suchmaschinen", // <-- Neu
   },
   en: {
     helpHint: "Press [?] for hotkey help",
@@ -51,6 +52,7 @@ export const translations = {
     searchEnginePreviewPrefix: "Search on", // <-- Neu
     searchEnginePreviewFor: "for", // <-- Neu
     searchEngineEnterQuery: "Enter search term...", // <-- Neu
+    searchEnginesMobileButton: "Search engines", // <-- Neu
   },
 };
 

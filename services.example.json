@@ -1,46 +1,50 @@
 {
   "categories": [
     {
-      "category": "Web",
-      "icon": "home",
+      "category": "Development",
+      "categoryKey": "d",
+      "icon": "code",
       "services": [
         {
-          "name": "JumpKey",
-          "url": "https://github.com/desirevolution/jump-key",
-          "icon": "jump-key.png"
+          "name": "GitHub",
+          "url": "https://github.com",
+          "key": "g",
+          "icon": "git-branch"
+        },
+        {
+          "name": "Local Host",
+          "url": "http://localhost:8080",
+          "key": "l",
+          "icon": "globe"
         }
       ]
     },
     {
-      "category": "Icons",
-      "icon": "box",
+      "category": "Monitoring",
+      "categoryKey": "m",
+      "icon": "activity",
       "services": [
         {
-          "name": "Lucide Icons",
-          "url": "https://lucide.dev/icons/",
-          "icon": "image"
+          "name": "Grafana",
+          "url": "https://grafana.example.com",
+          "key": "g",
+          "icon": "trending-up"
         }
       ]
     }
   ],
   "searchEngines": [
     {
-      "prefix": "g",
       "name": "Google",
+      "prefix": "g",
       "url": "https://www.google.com/search?q=%s",
       "icon": "search"
     },
     {
-      "prefix": "yt",
-      "name": "YouTube",
-      "url": "https://www.youtube.com/results?search_query=%s",
-      "icon": "youtube"
-    },
-    {
-      "prefix": "gh",
-      "name": "GitHub",
-      "url": "https://github.com/search?q=%s",
-      "icon": "github"
+      "name": "Wikipedia",
+      "prefix": "w",
+      "url": "https://en.wikipedia.org/wiki/Special:Search?search=%s",
+      "icon": "book-open"
     }
   ]
 }
