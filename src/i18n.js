@@ -11,13 +11,20 @@ export const translations = {
     categories: "Kategorien",
     services: "Services",
     back: "Zurück",
-    confirmReset: "Möchtest du die Liste der häufig genutzten Services wirklich zurücksetzen?",
+    confirmReset:
+      "Möchtest du die Liste der häufig genutzten Services wirklich zurücksetzen?",
     hkSearch: "Suche öffnen",
     hkFavs: "Direkt-Favorit aufrufen",
     hkCat: "Kategorie-Hotkeys aktivieren",
     hkService: "Service innerhalb einer Kategorie aufrufen",
     hkReset: "Zurück zur Hauptübersicht / Abbrechen",
-    hkToggleView: "Ansichtsmodus wechseln (Kategorie / Grid)" // <-- Added
+    hkToggleView: "Ansichtsmodus wechseln (Kategorie / Grid)",
+
+    // --- Suchmaschinen-spezifische Keys ---
+    searchEnginesTitle: "Unterstützte Suchmaschinen:", // <-- Neu
+    searchEnginePreviewPrefix: "Suche auf", // <-- Neu
+    searchEnginePreviewFor: "nach", // <-- Neu
+    searchEngineEnterQuery: "Suchbegriff eingeben...", // <-- Neu
   },
   en: {
     helpHint: "Press [?] for hotkey help",
@@ -37,15 +44,21 @@ export const translations = {
     hkCat: "Activate category hotkeys",
     hkService: "Launch service inside active category",
     hkReset: "Back to main overview / Cancel",
-    hkToggleView: "Toggle View Mode (Category / Grid)" // <-- Added
-  }
+    hkToggleView: "Toggle View Mode (Category / Grid)",
+
+    // --- Search Engine specific Keys ---
+    searchEnginesTitle: "Supported Search Engines:", // <-- Neu
+    searchEnginePreviewPrefix: "Search on", // <-- Neu
+    searchEnginePreviewFor: "for", // <-- Neu
+    searchEngineEnterQuery: "Enter search term...", // <-- Neu
+  },
 };
 
 export function t(lang, key) {
-  return translations[lang]?.[key] ?? translations['en'][key] ?? key;
+  return translations[lang]?.[key] ?? translations["en"][key] ?? key;
 }
 
 export function detectLang() {
-  const browserLang = navigator.language.split('-')[0];
-  return translations[browserLang] ? browserLang : 'en';
+  const browserLang = navigator.language.split("-")[0];
+  return translations[browserLang] ? browserLang : "en";
 }

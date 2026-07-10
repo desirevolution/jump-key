@@ -3,7 +3,11 @@
     "category": "Web",
     "icon": "message-square",
     "services": [
-      { "name": "JumpKey", "url": "https://github.com/desirevolution/jump-key", "icon": "house" }
+      {
+        "name": "JumpKey",
+        "url": "https://github.com/desirevolution/jump-key",
+        "icon": "house"
+      }
     ]
   }
 ]
