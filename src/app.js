@@ -15,6 +15,7 @@ class DashboardApp extends LitElement {
     searchQuery:     { type: String },
     showSearch:      { type: Boolean },
     showHelp:        { type: Boolean },
+    isGridView:      { type: Boolean }, // <-- Added property
     selectedIndex:   { type: Number },
     timeString:      { type: String },
     dateString:      { type: String },
@@ -32,6 +33,7 @@ class DashboardApp extends LitElement {
     this.searchQuery     = '';
     this.showSearch      = false;
     this.showHelp        = false;
+    this.isGridView      = JSON.parse(localStorage.getItem('dashboard_grid_view')) || false; // <-- Loaded from storage
     this.selectedIndex   = 0;
     this.timeString      = '';
     this.dateString      = '';
@@ -94,6 +96,15 @@ class DashboardApp extends LitElement {
     this.searchQuery       = '';
     this.selectedIndex     = 0;
     if (updateHistory && window.history.state?.view === 'category') window.history.back();
+  }
+
+  toggleViewMode() {
+    this.isGridView = !this.isGridView;
+    localStorage.setItem('dashboard_grid_view', JSON.stringify(this.isGridView));
+    this.resetInput(true);
+    this.updateComplete.then(() => {
+    import('lucide').then(({ createIcons, icons }) => createIcons({ icons }));
+  });
   }
 
   startResetTimer(duration = 3000) {
@@ -169,12 +180,21 @@ class DashboardApp extends LitElement {
     if (e.key === 'Escape')              { this.resetInput(true); return; }
     if (e.key === '?')                   { e.preventDefault(); this.showHelp = true; return; }
     if (e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); this.openSearch(); return; }
+    
+    // Bind 'v' key to toggle layouts when no category is actively opened
+    if (e.key.toLowerCase() === '#' && !this.activeCategoryKey) {
+      e.preventDefault();
+      this.toggleViewMode();
+      return;
+    }
+
     if (e.key.length !== 1) return;
 
     const key = e.key.toLowerCase();
 
     if (!this.activeCategoryKey) {
-      if (/^[0-9]$/.test(key)) {
+      // Direct favorites can only be run via 1-0 hotkeys if we are NOT in full grid view mode
+      if (/^[0-9]$/.test(key) && !this.isGridView) {
         const favService = getTopFavorites(this.categories, this.favorites).find(s => s.key === key);
         if (favService) { this.currentInput = key.toUpperCase(); this.trackClick(favService, true); return; }
       }
@@ -238,6 +258,17 @@ class DashboardApp extends LitElement {
           </div>
         </div>
         <div class="flex items-center gap-3 font-mono">
+
+<button @click="${this.toggleViewMode}"
+        class="p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-slate-300 transition-colors shadow-md group"
+        title="${this.t('hkToggleView')} [#]">
+  ${this.isGridView ? html`
+    <i data-lucide="rows-2" class="w-5 h-5 group-hover:text-indigo-400 transition-colors"></i>
+  ` : html`
+    <i data-lucide="layout-grid" class="w-5 h-5 group-hover:text-indigo-400 transition-colors"></i>
+  `}
+</button>
+
           <button @click="${this.openSearch}"
                   class="p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-slate-300 transition-colors shadow-md group"
                   title="Suche [Space]">
@@ -256,11 +287,19 @@ class DashboardApp extends LitElement {
     if (!this.showHelp) return '';
     const shortcuts = [
       { keys: ['Space'],          desc: this.t('hkSearch') },
-      { keys: ['1', '↓', '0'],   desc: this.t('hkFavs') },
+      { keys: ['#'],              desc: this.t('hkToggleView') }, // <-- Added
+    ];
+    
+    if (!this.isGridView) {
+      shortcuts.push({ keys: ['1', '↓', '0'], desc: this.t('hkFavs') });
+    }
+
+    shortcuts.push(
       { keys: ['A-Z'],            desc: this.t('hkCat') },
       { keys: ['A-Z'],            desc: this.t('hkService'), context: true },
-      { keys: ['ESC'],            desc: this.t('hkReset') },
-    ];
+      { keys: ['ESC'],            desc: this.t('hkReset') }
+    );
+
     return html`
       <div @click="${() => this.showHelp = false}"
            class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn p-4">
@@ -344,8 +383,9 @@ class DashboardApp extends LitElement {
     `;
   }
 
+  // --- 1. Unified Favorites Template ---
   templateFavorites(favs) {
-    if (favs.length === 0) return '';
+    if (favs.length === 0 || this.isGridView) return '';
     return html`
       <div>
         <div class="flex items-center justify-between mb-3">
@@ -355,18 +395,20 @@ class DashboardApp extends LitElement {
             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i> ${this.t('resetFavs')}
           </button>
         </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4">
+        <div class="grid grid-cols-1 gap-3 sm:gap-4" style="grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));">
           ${favs.map(s => html`
             <button @click="${() => this.trackClick(s, true)}"
-                    class="flex items-center gap-4 p-4 bg-gradient-to-br from-slate-800 to-slate-800/40 border border-slate-700 hover:border-amber-500/50 rounded-xl text-left group active:scale-[0.98] transition-all relative min-w-0">
+                    class="group text-left flex items-center gap-4 w-full p-4 sm:p-5 bg-slate-800 border border-slate-700 hover:border-indigo-500 rounded-xl transition-all active:scale-[0.98] relative min-w-0">
               <div class="shrink-0 flex items-center justify-center">
-                ${this.renderIcon(s.icon, 'w-12 h-12 text-amber-400')}
+                ${this.renderIcon(s.icon, 'w-12 h-12 text-indigo-400')}
               </div>
-              <div class="overflow-hidden pr-6 grow min-w-0">
-                <span class="font-semibold text-slate-200 block group-hover:text-white text-sm sm:text-base leading-tight break-words">${s.name}</span>
-                <span class="text-xs text-slate-500 truncate block mt-1">${s.url.replace('https://', '')}</span>
+              <div class="overflow-hidden pr-8 grow min-w-0">
+                <h3 class="text-sm sm:text-base font-semibold text-slate-200 group-hover:text-white leading-tight break-words">${s.name}</h3>
+                <p class="text-xs text-slate-500 truncate block mt-1">${s.url.replace('https://', '')}</p>
               </div>
-              <kbd class="absolute top-4 right-4 px-1.5 py-0.5 font-bold font-mono text-lg bg-slate-900 text-slate-400 border border-slate-700/50 rounded hidden sm:inline">${s.key}</kbd>
+              <kbd class="absolute top-4 right-4 px-2 py-0.5 font-bold font-mono text-xs sm:text-sm text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline">
+                ${s.key}
+              </kbd>	    
             </button>
           `)}
         </div>
@@ -374,6 +416,7 @@ class DashboardApp extends LitElement {
     `;
   }
 
+  // --- 2. Unified Primary Categories List Template ---
   templateCategoriesList() {
     return html`
       <div>
@@ -381,24 +424,59 @@ class DashboardApp extends LitElement {
         <div class="grid grid-cols-1 gap-3 sm:gap-4" style="grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));">
           ${this.categories.map(cat => html`
             <button @click="${e => this.handleCategoryUISelection(cat, e)}"
-                    class="flex items-center justify-between p-4 sm:p-5 bg-slate-800 border border-slate-700 rounded-xl hover:border-indigo-500 transition-all text-left group active:scale-[0.98] min-w-0">
-              <div class="flex items-center gap-3 overflow-hidden min-w-0 grow">
-                <div class="p-2 bg-slate-900/50 rounded-lg group-hover:text-indigo-400 transition-colors flex items-center justify-center shrink-0">
-                  ${this.renderIcon(cat.icon, 'w-6 h-6')}
-                </div>
-                <span class="text-sm sm:text-base font-semibold text-slate-200 group-hover:text-white leading-tight break-words pr-1">${cat.category}</span>
+                    class="group text-left flex items-center gap-4 w-full p-4 sm:p-5 bg-slate-800 border border-slate-700 hover:border-indigo-500 rounded-xl transition-all active:scale-[0.98] relative min-w-0">
+              <div class="shrink-0 flex items-center justify-center">
+                ${this.renderIcon(cat.icon, 'w-12 h-12 text-indigo-400')}
               </div>
-              <div class="flex items-center gap-2 shrink-0 ml-auto">
-                <span class="text-xs text-slate-500 font-mono">
-                  ${cat.services?.length ?? 0} <span class="hidden sm:inline">${this.t('services')}</span>
-                </span>
-                <kbd class="px-2 py-0.5 font-bold font-mono text-lg text-indigo-400 bg-slate-900 border border-indigo-500/30 rounded hidden sm:inline">
-                  ${cat.categoryKey?.toUpperCase() ?? ''}
-                </kbd>
+              <div class="overflow-hidden pr-8 grow min-w-0">
+                <h3 class="text-sm sm:text-base font-semibold text-slate-200 group-hover:text-white leading-tight break-words">${cat.category}</h3>
+                <p class="text-xs text-slate-500 block mt-1">
+                  ${cat.services?.length ?? 0} ${this.t('services')}
+                </p>
               </div>
+              <kbd class="absolute top-4 right-4 px-2 py-0.5 font-bold font-mono text-lg sm:text-sm text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline">
+                ${cat.categoryKey?.toUpperCase() ?? ''}
+              </kbd>
             </button>
           `)}
         </div>
+      </div>
+    `;
+  }
+
+  // --- 3. Unified All-in-One Full Grid View Template ---
+  templateFullGridView() {
+    return html`
+      <div class="animate-fadeIn space-y-5">
+        ${this.categories.map(cat => html`
+          <div class="border-b border-slate-800/40 pb-5 last:border-0">
+            <div class="flex items-center gap-3 mb-3">
+              <kbd class="px-2 py-0.5 font-bold font-mono text-xs text-indigo-400 bg-slate-900 border border-indigo-500/30 rounded">
+                ${cat.categoryKey?.toUpperCase() ?? ''}
+              </kbd>
+              ${cat.icon ? this.renderIcon(cat.icon, 'w-4 h-4 text-indigo-400/80') : ''}
+              <h2 class="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider">${cat.category}</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 gap-3 sm:gap-4" style="grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));">
+              ${(cat.services ?? []).map(service => html`
+                <button @click="${() => this.trackClick(service)}"
+                        class="group text-left flex items-center gap-4 w-full p-4 sm:p-5 bg-slate-800 border border-slate-700 hover:border-indigo-500 rounded-xl transition-all active:scale-[0.98] relative min-w-0">
+                  <div class="shrink-0 flex items-center justify-center">
+                    ${this.renderIcon(service.icon, 'w-12 h-12 text-indigo-400')}
+                  </div>
+                  <div class="overflow-hidden pr-8 grow min-w-0">
+                    <h3 class="text-sm sm:text-base font-semibold text-slate-200 group-hover:text-white leading-tight break-words">${service.name}</h3>
+                    <p class="text-xs text-slate-500 truncate block mt-1">${service.url.replace('https://', '')}</p>
+                  </div>
+                  <kbd class="absolute top-4 right-4 px-2 py-0.5 font-bold font-mono text-lg sm:text-sm text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline">
+                    ${service.key?.toUpperCase() ?? ''}
+                  </kbd>
+                </button>
+              `)}
+            </div>
+          </div>
+        `)}
       </div>
     `;
   }
@@ -450,10 +528,12 @@ class DashboardApp extends LitElement {
       ${this.templateHelpModal()}
       ${this.templateSearchModal(filteredServices)}
       ${showMain ? html`
-        <div class="animate-fadeIn space-y-8 sm:space-y-10">
-          ${this.templateFavorites(favs)}
-          ${this.templateCategoriesList()}
-        </div>
+        ${this.isGridView ? this.templateFullGridView() : html`
+          <div class="animate-fadeIn space-y-8 sm:space-y-10">
+            ${this.templateFavorites(favs)}
+            ${this.templateCategoriesList()}
+          </div>
+        `}
       ` : ''}
       ${this.templateServicesGrid(activeGroup)}
     `;

@@ -16,7 +16,8 @@ export const translations = {
     hkFavs: "Direkt-Favorit aufrufen",
     hkCat: "Kategorie-Hotkeys aktivieren",
     hkService: "Service innerhalb einer Kategorie aufrufen",
-    hkReset: "Zurück zur Hauptübersicht / Abbrechen"
+    hkReset: "Zurück zur Hauptübersicht / Abbrechen",
+    hkToggleView: "Ansichtsmodus wechseln (Kategorie / Grid)" // <-- Added
   },
   en: {
     helpHint: "Press [?] for hotkey help",
@@ -35,7 +36,8 @@ export const translations = {
     hkFavs: "Launch direct favorite",
     hkCat: "Activate category hotkeys",
     hkService: "Launch service inside active category",
-    hkReset: "Back to main overview / Cancel"
+    hkReset: "Back to main overview / Cancel",
+    hkToggleView: "Toggle View Mode (Category / Grid)" // <-- Added
   }
 };
 
