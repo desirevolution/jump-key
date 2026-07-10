@@ -2,7 +2,7 @@ services:
   jump-key:
     image: ghcr.io/desirevolution/jump-key:latest
     volumes:
-      - ./services.example.json:/app/services.json
-      - ./public/icons:/app/icons
+      - ./config:/app/config
+      - ./icons:/app/icons
     ports:
       - "8080:8080"

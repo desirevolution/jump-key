@@ -16,7 +16,7 @@ export default defineConfig({
       injectRegister: "inline",
 
       injectManifest: {
-        globPatterns: ["**/*.{js,css,html,ico,png,svg,json}"],
+        globPatterns: ["**/*.{js,css,html,ico,png,svg}"],
       },
 
       manifest: {

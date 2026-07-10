@@ -68,12 +68,16 @@ registerRoute(
 // Offline -> Cache verwenden
 //
 registerRoute(
-  ({ url }) => url.pathname.endsWith("/services.json"),
+  ({ url }) => url.pathname.endsWith("/config/services.json"),
 
   new NetworkFirst({
     cacheName: "services-v1",
 
     networkTimeoutSeconds: 3,
+
+    fetchOptions: {
+      cache: 'reload',
+    },
 
     plugins: [
       // Nur 200 im Cache speichern

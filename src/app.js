@@ -63,7 +63,7 @@ class DashboardApp extends LitElement {
   async connectedCallback() {
     super.connectedCallback();
     try {
-      const res = await fetch("./services.json");
+      const res = await fetch("./config/services.json");
       const data = await res.json();
       localStorage.setItem("services-cache", JSON.stringify(data));
       this.categories = generateShortcuts(data.categories || data); // Abwärtskompatibel halten

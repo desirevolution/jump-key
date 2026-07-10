@@ -2,6 +2,7 @@ services:
   jump-key:
     build: .
     volumes:
-      - ./services.example.json:/app/services.json
+      - ./config:/app/config
+      - ./icons:/app/icons
     ports:
       - "8080:8080"

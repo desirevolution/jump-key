@@ -34,13 +34,13 @@
       "prefix": "yt",
       "name": "YouTube",
       "url": "https://www.youtube.com/results?search_query=%s",
-      "icon": "youtube"
+      "icon": "video"
     },
     {
       "prefix": "gh",
       "name": "GitHub",
       "url": "https://github.com/search?q=%s",
-      "icon": "github"
+      "icon": "git-branch"
     }
   ]
 }
