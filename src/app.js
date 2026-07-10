@@ -14,7 +14,7 @@ class DashboardApp extends LitElement {
 
   static properties = {
     categories: { type: Array },
-    searchEngines: { type: Array },
+    searchEngines: { type: Array }, // <-- Hinzugefügt für Custom Quick-Search
     activeCategoryKey: { type: String },
     currentInput: { type: String },
     isInvalidInput: { type: Boolean },
@@ -22,7 +22,7 @@ class DashboardApp extends LitElement {
     searchQuery: { type: String },
     showSearch: { type: Boolean },
     showHelp: { type: Boolean },
-    isGridView: { type: Boolean },
+    isGridView: { type: Boolean }, // <-- Added property
     selectedIndex: { type: Number },
     timeString: { type: String },
     dateString: { type: String },
@@ -33,7 +33,7 @@ class DashboardApp extends LitElement {
   constructor() {
     super();
     this.categories = [];
-    this.searchEngines = [];
+    this.searchEngines = []; // <-- Initialisiert
     this.activeCategoryKey = "";
     this.currentInput = "";
     this.isInvalidInput = false;
@@ -42,7 +42,7 @@ class DashboardApp extends LitElement {
     this.showSearch = false;
     this.showHelp = false;
     this.isGridView =
-      JSON.parse(localStorage.getItem("dashboard_grid_view")) || false;
+      JSON.parse(localStorage.getItem("dashboard_grid_view")) || false; // <-- Loaded from storage
     this.selectedIndex = 0;
     this.timeString = "";
     this.dateString = "";
@@ -66,8 +66,9 @@ class DashboardApp extends LitElement {
       const res = await fetch("./services.json");
       const data = await res.json();
       localStorage.setItem("services-cache", JSON.stringify(data));
-      this.categories = generateShortcuts(data.categories || data);
-      this.searchEngines = data.searchEngines || [];
+      this.categories = generateShortcuts(data.categories || data); // Abwärtskompatibel halten
+      this.searchEngines = data.searchEngines || []; // <-- Suchmaschinen laden
+      console.error(data);
     } catch {
       const cached = localStorage.getItem("services-cache");
       if (cached) {
@@ -219,6 +220,7 @@ class DashboardApp extends LitElement {
         e.preventDefault();
         const queryTrimmed = this.searchQuery.trim();
 
+        // Command Mode mit ':' abfangen und ausführen
         if (queryTrimmed.startsWith(":")) {
           const commandString = queryTrimmed.substring(1).trim();
           const firstSpaceIndex = commandString.indexOf(" ");
@@ -247,6 +249,7 @@ class DashboardApp extends LitElement {
           }
         }
 
+        // Standard-Fallback für reguläre Services
         if (filtered[this.selectedIndex])
           this.trackClick(filtered[this.selectedIndex]);
         return;
@@ -276,6 +279,7 @@ class DashboardApp extends LitElement {
       return;
     }
 
+    // Bind '#' key to toggle layouts when no category is actively opened
     if (e.key.toLowerCase() === "#" && !this.activeCategoryKey) {
       e.preventDefault();
       this.toggleViewMode();
@@ -287,6 +291,7 @@ class DashboardApp extends LitElement {
     const key = e.key.toLowerCase();
 
     if (!this.activeCategoryKey) {
+      // Direct favorites can only be run via 1-0 hotkeys if we are NOT in full grid view mode
       if (/^[0-9]$/.test(key) && !this.isGridView) {
         const favService = getTopFavorites(
           this.categories,
@@ -347,9 +352,9 @@ class DashboardApp extends LitElement {
           alt=""
           class="${extraClass} object-contain"
           @error="${(e) => {
-            e.target.style.display = "none";
-            e.target.nextElementSibling.style.display = "block";
-          }}"
+               e.target.style.display = "none";
+               e.target.nextElementSibling.style.display = "block";
+             }}"
         />
         <i data-lucide="globe" class="${extraClass} hidden"></i>
       `;
@@ -441,11 +446,11 @@ class DashboardApp extends LitElement {
     if (!this.showHelp) return "";
     const shortcuts = [
       { keys: ["Space"], desc: this.t("hkSearch") },
-      { keys: ["#"], desc: this.t("hkToggleView") },
+      { keys: ["#"], desc: this.t("hkToggleView") }, // <-- Added
     ];
 
     if (!this.isGridView) {
-      shortcuts.push({ keys: ["1", "–", "0"], desc: this.t("hkFavs") });
+      shortcuts.push({ keys: ["1", "↓", "0"], desc: this.t("hkFavs") });
     }
 
     shortcuts.push(
@@ -549,22 +554,22 @@ class DashboardApp extends LitElement {
           class="bg-slate-800 border border-slate-700 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden mx-4 flex flex-col max-h-[80vh]"
         >
           <div
-            class="p-4 border-b border-slate-700 flex items-center gap-2 sm:gap-3 shrink-0"
+            class="p-4 border-b border-slate-700 flex items-center gap-3 shrink-0"
           >
-            <i data-lucide="search" class="text-slate-400 w-5 h-5 shrink-0"></i>
+            <i data-lucide="search" class="text-slate-400 w-5 h-5"></i>
 
             <form
               @submit="${(e) => {
-                e.preventDefault();
-                this.handleKeyDown({
-                  key: "Enter",
-                  preventDefault: () => {},
-                  ctrlKey: false,
-                  altKey: false,
-                  metaKey: false,
-                });
-              }}"
-              class="w-full m-0 p-0 min-w-0 flex-1"
+              e.preventDefault();
+              this.handleKeyDown({
+                key: "Enter",
+                preventDefault: () => {},
+                ctrlKey: false,
+                altKey: false,
+                metaKey: false,
+              });
+            }}"
+              class="w-full m-0 p-0"
             >
               <input
                 id="searchInput"
@@ -578,70 +583,48 @@ class DashboardApp extends LitElement {
               />
             </form>
 
-            <!-- Neuer Button: Jetzt mit i18n Übersetzung -->
-            ${
-              this.searchEngines.length > 0
-                ? html`
-                    <button
-                      @click="${() => {
-                      this.searchQuery = ":";
-                      this.querySelector("#searchInput")?.focus();
-                    }}"
-                      class="text-xs font-mono font-bold bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-400 px-2 py-1.5 rounded-lg border border-indigo-500/30 shrink-0 sm:hidden flex items-center gap-1 active:scale-95 transition-all"
-                      title="${this.t("searchEnginesTitle")}"
-                    >
-                      <span class="text-[10px] uppercase opacity-80"
-                        >${this.t("searchEnginesMobileButton")}</span
-                      >
-                    </button>
-                  `
-                : ""
-            }
-
             <button
               @click="${() => this.resetInput(true)}"
-              class="text-xs text-slate-400 bg-slate-700/60 hover:bg-slate-700 px-2.5 py-1.5 rounded-lg shrink-0"
+              class="text-xs text-slate-400 bg-slate-700 px-2 py-1 rounded sm:hidden"
             >
               ${this.t("close")}
             </button>
           </div>
-          <div class="overflow-y-auto p-2 space-y-1 grow min-w-0">
+          <div class="overflow-y-auto p-2 space-y-1 grow">
             ${
               showAllEngines
                 ? html`
                     <div
-                      class="px-2 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 font-mono flex justify-between items-center"
+                      class="px-2 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 font-mono"
                     >
-                      <span>${this.t("searchEnginesTitle")}</span>
+                      ${this.t("searchEnginesTitle")}
                     </div>
                     ${this.searchEngines.map(
-                      (engine) => html`
-                        <button
-                          @click="${() => {
-                        this.searchQuery = `:${engine.prefix} `;
-                        this.querySelector("#searchInput")?.focus();
-                      }}"
-                          class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-700/40 text-slate-300 font-mono text-sm text-left transition-colors min-w-0"
+                (engine) => html`
+                  <button
+                    @click="${() => {
+                  this.searchQuery = `:${engine.prefix} `;
+                  this.querySelector("#searchInput")?.focus();
+                }}"
+                    class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-700/40 text-slate-300 font-mono text-sm text-left transition-colors"
+                  >
+                    <div class="flex items-center gap-3">
+                      ${this.renderIcon(engine.icon, "w-5 h-5 text-indigo-400")}
+                      <div>
+                        <span class="font-bold text-white">${engine.name}</span>
+                        <span class="text-xs text-slate-500 ml-2"
+                          >(${engine.url})</span
                         >
-                          <div class="flex items-center gap-3 min-w-0 flex-1">
-                            ${this.renderIcon(engine.icon, "w-5 h-5 text-indigo-400 shrink-0")}
-                            <div class="min-w-0 truncate">
-                              <span class="font-bold text-white"
-                                >${engine.name}</span
-                              >
-                              <span class="text-xs text-slate-500 ml-2 truncate"
-                                >(${engine.url})</span
-                              >
-                            </div>
-                          </div>
-                          <kbd
-                            class="px-2 py-0.5 font-bold font-mono text-xs text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow shrink-0 ml-2"
-                          >
-                            :${engine.prefix}
-                          </kbd>
-                        </button>
-                      `,
-                    )}
+                      </div>
+                    </div>
+                    <kbd
+                      class="px-2 py-0.5 text-xs font-bold text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow"
+                    >
+                      :${engine.prefix}
+                    </kbd>
+                  </button>
+                `,
+              )}
                   `
                 : ""
             }
@@ -650,36 +633,33 @@ class DashboardApp extends LitElement {
                 ? html`
                     <button
                       @click="${() => {
-                        if (searchTermsPreview) {
-                          const finalUrl = matchedEngine.url.replace(
-                            "%s",
-                            encodeURIComponent(searchTermsPreview),
-                          );
-                          window.open(finalUrl, "_blank");
-                          this.resetInput(true);
-                        }
-                      }}"
-                      class="w-full flex items-center justify-between p-4 rounded-xl bg-indigo-600/20 border border-indigo-500 text-slate-200 mb-3 font-mono text-sm text-left active:scale-[0.98] transition-all min-w-0"
+                if (searchTermsPreview) {
+                  const finalUrl = matchedEngine.url.replace(
+                    "%s",
+                    encodeURIComponent(searchTermsPreview),
+                  );
+                  window.open(finalUrl, "_blank");
+                  this.resetInput(true);
+                }
+              }}"
+                      class="w-full flex items-center justify-between p-4 rounded-xl bg-indigo-600/20 border border-indigo-500 text-slate-200 mb-3 font-mono text-sm text-left active:scale-[0.98] transition-all"
                     >
-                      <div class="flex items-center gap-3 min-w-0 flex-1">
+                      <div class="flex items-center gap-3 min-w-0 grow">
                         ${this.renderIcon(matchedEngine.icon, "w-6 h-6 text-indigo-400 shrink-0")}
-                        <div class="min-w-0 flex-1 pr-2">
-                          <div class="truncate text-xs sm:text-sm">
-                            ${this.t("searchEnginePreviewPrefix")}
-                            <span class="font-bold text-white"
-                              >${matchedEngine.name}</span
-                            >
-                            ${this.t("searchEnginePreviewFor")}:
-                          </div>
-                          <div
-                            class="text-indigo-300 italic truncate text-xs sm:text-sm mt-0.5"
+                        <div class="truncate text-xs sm:text-sm">
+                          ${this.t("searchEnginePreviewPrefix")}
+                          <span class="font-bold text-white"
+                            >${matchedEngine.name}</span
                           >
-                            "${searchTermsPreview || this.t("searchEngineEnterQuery")}"
-                          </div>
+                          ${this.t("searchEnginePreviewFor")}:
+                          <br class="sm:hidden" />
+                          <span class="text-indigo-300 italic"
+                            >"${searchTermsPreview || this.t("searchEngineEnterQuery")}"</span
+                          >
                         </div>
                       </div>
                       <span
-                        class="text-xs font-mono bg-indigo-600 px-2 py-0.5 rounded shadow text-white hidden sm:inline shrink-0"
+                        class="text-xs font-mono bg-indigo-600 px-2 py-0.5 rounded shadow text-white hidden sm:inline"
                         >Enter</span
                       >
                     </button>
@@ -692,25 +672,22 @@ class DashboardApp extends LitElement {
                     (s, i) => html`
                       <button
                         @click="${() => this.trackClick(s)}"
-                        class="w-full flex items-center justify-between p-3 rounded-xl transition-all text-left min-w-0
-                               ${i === this.selectedIndex ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/30 text-slate-300"}
-                               active:bg-indigo-600 active:text-white"
+                        class="w-full flex items-center justify-between p-3 rounded-xl transition-all text-left
+                             ${i === this.selectedIndex ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/30 text-slate-300"}
+                             active:bg-indigo-600 active:text-white"
                       >
-                        <div
-                          class="flex items-center gap-3 min-w-0 flex-1 pr-2"
-                        >
-                          ${this.renderIcon(s.icon, "w-6 h-6 text-indigo-400 shrink-0")}
-                          <div class="min-w-0 flex-1 truncate">
-                            <span class="font-medium text-slate-200"
+                        <div class="flex items-center gap-3">
+                          ${this.renderIcon(s.icon, "w-6 h-6")}
+                          <div>
+                            <span class="font-medium block sm:inline"
                               >${s.name}</span
                             >
-                            <span
-                              class="text-xs opacity-60 ml-1.5 font-mono inline-block truncate max-w-[120px] sm:max-w-[200px] align-bottom"
+                            <span class="text-xs opacity-60 sm:ml-1"
                               >(${s.category})</span
                             >
                           </div>
                         </div>
-                        ${i === this.selectedIndex ? html`<span class="text-xs font-mono bg-indigo-700 px-2 py-0.5 rounded shadow shrink-0 hidden sm:inline ml-2">Enter</span>` : ""}
+                        ${i === this.selectedIndex ? html`<span class="text-xs font-mono bg-indigo-700 px-2 py-0.5 rounded shadow hidden sm:inline">Enter</span>` : ""}
                       </button>
                     `,
                   )
@@ -860,32 +837,32 @@ class DashboardApp extends LitElement {
                 style="grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));"
               >
                 ${(cat.services ?? []).map(
-                  (service) => html`
-                    <button
-                      @click="${() => this.trackClick(service)}"
-                      class="group text-left flex items-center gap-4 w-full p-4 sm:p-5 bg-slate-800 border border-slate-700 hover:border-indigo-500 rounded-xl transition-all active:scale-[0.98] relative min-w-0"
-                    >
-                      <div class="shrink-0 flex items-center justify-center">
-                        ${this.renderIcon(service.icon, "w-12 h-12 text-indigo-400")}
-                      </div>
-                      <div class="overflow-hidden pr-8 grow min-w-0">
-                        <h3
-                          class="text-sm sm:text-base font-semibold text-slate-200 group-hover:text-white leading-tight break-words"
-                        >
-                          ${service.name}
-                        </h3>
-                        <p class="text-xs text-slate-500 truncate block mt-1">
-                          ${service.url.replace("https://", "")}
-                        </p>
-                      </div>
-                      <kbd
-                        class="px-2 py-0.5 font-bold font-mono text-lg text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline"
+                (service) => html`
+                  <button
+                    @click="${() => this.trackClick(service)}"
+                    class="group text-left flex items-center gap-4 w-full p-4 sm:p-5 bg-slate-800 border border-slate-700 hover:border-indigo-500 rounded-xl transition-all active:scale-[0.98] relative min-w-0"
+                  >
+                    <div class="shrink-0 flex items-center justify-center">
+                      ${this.renderIcon(service.icon, "w-12 h-12 text-indigo-400")}
+                    </div>
+                    <div class="overflow-hidden pr-8 grow min-w-0">
+                      <h3
+                        class="text-sm sm:text-base font-semibold text-slate-200 group-hover:text-white leading-tight break-words"
                       >
-                        ${service.key?.toUpperCase() ?? ""}
-                      </kbd>
-                    </button>
-                  `,
-                )}
+                        ${service.name}
+                      </h3>
+                      <p class="text-xs text-slate-500 truncate block mt-1">
+                        ${service.url.replace("https://", "")}
+                      </p>
+                    </div>
+                    <kbd
+                      class="px-2 py-0.5 font-bold font-mono text-lg text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline"
+                    >
+                      ${service.key?.toUpperCase() ?? ""}
+                    </kbd>
+                  </button>
+                `,
+              )}
               </div>
             </div>
           `,
@@ -923,23 +900,23 @@ class DashboardApp extends LitElement {
             (service) => html`
               <button
                 @click="${() => this.trackClick(service)}"
-                class="group text-left flex items-center gap-4 w-full p-4 sm:p-5 bg-slate-800 border border-slate-700 hover:border-indigo-500 rounded-xl transition-all active:scale-[0.98] relative min-w-0"
+                class="group text-left flex items-center gap-4 w-full p-4 sm:p-5 bg-slate-800 border border-indigo-500/20 hover:border-indigo-500 rounded-xl transition-all shadow-md active:scale-[0.98] relative min-w-0"
               >
                 <div class="shrink-0 flex items-center justify-center">
                   ${this.renderIcon(service.icon, "w-12 h-12 text-indigo-400")}
                 </div>
                 <div class="overflow-hidden pr-8 grow min-w-0">
                   <h3
-                    class="text-sm sm:text-base font-semibold text-slate-200 group-hover:text-white leading-tight break-words"
+                    class="text-sm sm:text-lg font-semibold text-slate-200 group-hover:text-white leading-tight break-words"
                   >
                     ${service.name}
                   </h3>
-                  <p class="text-xs text-slate-500 truncate block mt-1">
+                  <p class="text-xs text-slate-500 truncate mt-1">
                     ${service.url.replace("https://", "")}
                   </p>
                 </div>
                 <kbd
-                  class="px-2 py-0.5 font-bold font-mono text-lg text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline"
+                  class="absolute top-4 right-4 px-2 py-0.5 font-bold font-mono text-xs sm:text-sm bg-indigo-600 text-white rounded shadow shadow-indigo-500/50 hidden sm:inline"
                 >
                   ${service.key?.toUpperCase() ?? ""}
                 </kbd>
@@ -953,45 +930,36 @@ class DashboardApp extends LitElement {
 
   render() {
     const favs = getTopFavorites(this.categories, this.favorites);
-    const activeGroup = this.categories.find(
-      (c) => c.categoryKey === this.activeCategoryKey,
-    );
     const filteredServices = getFilteredServices(
       this.categories,
       this.searchQuery,
     );
+    const activeGroup = this.categories.find(
+      (c) => c.categoryKey === this.activeCategoryKey,
+    );
+    const showMain =
+      !this.activeCategoryKey && !this.showSearch && !this.showHelp;
 
     return html`
-      <div
-        class="min-h-screen bg-slate-900 text-slate-100 p-4 sm:p-8 md:p-12 selection:bg-indigo-500/30 font-sans"
-      >
-        <div class="max-w-6xl mx-auto">
-          ${this.templateHeader()}
-          ${
-            this.showSearch
-              ? this.templateSearchModal(filteredServices)
-              : html`
-                  <div class="space-y-10 sm:space-y-14">
-                    ${
-                    this.isGridView
-                      ? this.templateFullGridView()
-                      : html`
-                          ${
-                          this.activeCategoryKey
-                            ? this.templateServicesGrid(activeGroup)
-                            : html`
-                                ${this.templateFavorites(favs)}
-                                ${this.templateCategoriesList()}
-                              `
-                        }
-                        `
-                  }
-                  </div>
-                `
-          }
-          ${this.templateHelpModal()} ${this.templateKeyBadge()}
-        </div>
-      </div>
+      ${this.templateHeader()} ${this.templateKeyBadge()}
+      ${this.templateHelpModal()} ${this.templateSearchModal(filteredServices)}
+      ${
+        showMain
+          ? html`
+              ${
+          this.isGridView
+            ? this.templateFullGridView()
+            : html`
+                <div class="animate-fadeIn space-y-8 sm:space-y-10">
+                  ${this.templateFavorites(favs)}
+                  ${this.templateCategoriesList()}
+                </div>
+              `
+        }
+            `
+          : ""
+      }
+      ${this.templateServicesGrid(activeGroup)}
     `;
   }
 }
