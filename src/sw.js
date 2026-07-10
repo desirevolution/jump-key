@@ -71,12 +71,12 @@ registerRoute(
   ({ url }) => url.pathname.endsWith("/config/services.json"),
 
   new NetworkFirst({
-    cacheName: "services-v1",
+    cacheName: "services",
 
     networkTimeoutSeconds: 3,
 
     fetchOptions: {
-      cache: 'reload',
+      cache: "reload",
     },
 
     plugins: [
