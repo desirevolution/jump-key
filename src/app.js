@@ -406,7 +406,7 @@ class DashboardApp extends LitElement {
                 <h3 class="text-sm sm:text-base font-semibold text-slate-200 group-hover:text-white leading-tight break-words">${s.name}</h3>
                 <p class="text-xs text-slate-500 truncate block mt-1">${s.url.replace('https://', '')}</p>
               </div>
-              <kbd class="absolute top-4 right-4 px-2 py-0.5 font-bold font-mono text-xs sm:text-sm text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline">
+              <kbd class="px-2 py-0.5 font-bold font-mono text-lg text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline">
                 ${s.key}
               </kbd>	    
             </button>
@@ -434,7 +434,7 @@ class DashboardApp extends LitElement {
                   ${cat.services?.length ?? 0} ${this.t('services')}
                 </p>
               </div>
-              <kbd class="absolute top-4 right-4 px-2 py-0.5 font-bold font-mono text-lg sm:text-sm text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline">
+              <kbd class="px-2 py-0.5 font-bold font-mono text-lg text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline">
                 ${cat.categoryKey?.toUpperCase() ?? ''}
               </kbd>
             </button>
@@ -469,7 +469,7 @@ class DashboardApp extends LitElement {
                     <h3 class="text-sm sm:text-base font-semibold text-slate-200 group-hover:text-white leading-tight break-words">${service.name}</h3>
                     <p class="text-xs text-slate-500 truncate block mt-1">${service.url.replace('https://', '')}</p>
                   </div>
-                  <kbd class="absolute top-4 right-4 px-2 py-0.5 font-bold font-mono text-lg sm:text-sm text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline">
+                  <kbd class="px-2 py-0.5 font-bold font-mono text-lg text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline">
                     ${service.key?.toUpperCase() ?? ''}
                   </kbd>
                 </button>
