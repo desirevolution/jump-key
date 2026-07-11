@@ -43,9 +43,17 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
+            # main
             type=ref,event=branch
+            type=sha,prefix=sha-
+
+            # Release Tags
             type=semver,pattern={{version}}
-            type=raw,value=latest,enable={{is_default_branch}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+
+            # latest nur bei Releases
+            type=raw,value=latest,enable=${{ github.event_name == 'release' }}
 
       - name: Build and push
         id: push
