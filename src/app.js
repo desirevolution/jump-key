@@ -24,7 +24,7 @@ class DashboardApp extends LitElement {
     showConfigModal: { type: Boolean },
     isEditorConfigValid: { type: Boolean },
     isEditorConfigValid: { type: Boolean },
-    hasEditorConfigChanged: { type: Boolean },	  
+    hasEditorConfigChanged: { type: Boolean },
     activeCategoryKey: { type: String },
     currentInput: { type: String },
     isInvalidInput: { type: Boolean },
@@ -139,7 +139,6 @@ class DashboardApp extends LitElement {
             const isJsonValid = true;
             const isStructureValid = this.validateConfig(parsed);
             this.hasEditorConfigChanged = value !== this.originalConfigString;
-            console.error('changed = %o', this.hasEditorConfigChanged);
 
             this.isEditorConfigValid = isJsonValid && isStructureValid;
           } catch (err) {
@@ -238,34 +237,38 @@ class DashboardApp extends LitElement {
     }
   }
 
-validateConfig(jsonObj) {
-  // 1. Grundprüfung auf Objekt und Existenz der Haupt-Arrays
-  if (!jsonObj || typeof jsonObj !== 'object') return false;
+  validateConfig(jsonObj) {
+    // 1. Grundprüfung auf Objekt und Existenz der Haupt-Arrays
+    if (!jsonObj || typeof jsonObj !== "object") return false;
 
-  // 2. Prüfen, ob Kategorien existieren und mindestens eine vorhanden ist
-  const hasCategories = Array.isArray(jsonObj.categories) && jsonObj.categories.length > 0;
-  
-  // 3. Prüfen, ob Suchmaschinen existieren und mindestens eine vorhanden ist
-  const hasSearchEngines = Array.isArray(jsonObj.searchEngines) && jsonObj.searchEngines.length > 0;
+    // 2. Prüfen, ob Kategorien existieren und mindestens eine vorhanden ist
+    const hasCategories =
+      Array.isArray(jsonObj.categories) && jsonObj.categories.length > 0;
 
-  if (!hasCategories || !hasSearchEngines) return false;
+    // 3. Prüfen, ob Suchmaschinen existieren und mindestens eine vorhanden ist
+    const hasSearchEngines =
+      Array.isArray(jsonObj.searchEngines) && jsonObj.searchEngines.length > 0;
 
-  // 4. Optional: Tiefe Prüfung der Kategorien (z.B. ob 'categoryKey' existiert)
-  const isCategoriesValid = jsonObj.categories.every(cat => 
-    typeof cat.category === 'string' && 
-    typeof cat.categoryKey === 'string' &&
-    Array.isArray(cat.services)
-  );
+    if (!hasCategories || !hasSearchEngines) return false;
 
-  // 5. Optional: Prüfung der Suchmaschinen (z.B. ob 'prefix' und 'url' existieren)
-  const isSearchEnginesValid = jsonObj.searchEngines.every(engine => 
-    typeof engine.name === 'string' && 
-    typeof engine.prefix === 'string' && 
-    typeof engine.url === 'string'
-  );
+    // 4. Optional: Tiefe Prüfung der Kategorien (z.B. ob 'categoryKey' existiert)
+    const isCategoriesValid = jsonObj.categories.every(
+      (cat) =>
+        typeof cat.category === "string" &&
+        typeof cat.categoryKey === "string" &&
+        Array.isArray(cat.services),
+    );
 
-  return isCategoriesValid && isSearchEnginesValid;
-}
+    // 5. Optional: Prüfung der Suchmaschinen (z.B. ob 'prefix' und 'url' existieren)
+    const isSearchEnginesValid = jsonObj.searchEngines.every(
+      (engine) =>
+        typeof engine.name === "string" &&
+        typeof engine.prefix === "string" &&
+        typeof engine.url === "string",
+    );
+
+    return isCategoriesValid && isSearchEnginesValid;
+  }
 
   // --- Event handlers ---
 
@@ -305,14 +308,14 @@ validateConfig(jsonObj) {
     if (e.ctrlKey || e.altKey || e.metaKey) return;
 
     if (e.key === "Escape") {
-    if (this.showConfigModal) {
-      this.showConfigModal = false;
+      if (this.showConfigModal) {
+        this.showConfigModal = false;
+        return;
+      }
+      this.resetInput(true);
       return;
     }
-    this.resetInput(true);
-    return;
-  }
-	  
+
     if (this.showConfigModal) return; // Shortcuts sperren, wenn der Editor offen ist
 
     const filtered = getFilteredServices(this.categories, this.searchQuery);
@@ -526,13 +529,13 @@ validateConfig(jsonObj) {
         // 4. CLOSE MODAL
         this.showConfigModal = false;
 
-        alert(${this.t("editConfigSaveDone")});
+        alert(this.t("editConfigSaveDone"));
       } else {
-        alert(${this.t("editConfigSaveFailed")});
+        alert(this.t("editConfigSaveFailed"));
       }
     } catch (error) {
       console.error("WebDAV Error:", error);
-      alert(${this.t("editConfigSaveFailed")});
+      alert(this.t("editConfigSaveFailed"));
     }
   }
 
@@ -665,80 +668,81 @@ validateConfig(jsonObj) {
     `;
   }
 
-templateConfigModal() {
-  if (!this.showConfigModal) return "";
+  templateConfigModal() {
+    if (!this.showConfigModal) return "";
 
-  return html`
-    <style>
-      #editorContainer {
-        display: grid;
-        grid-template-rows: 1fr auto;
-        gap: 1em;
-        overflow: hidden;
-      }
-      .prism-code-editor {
-        border-radius: 0.4em;
-      }
-    </style>
+    return html`
+      <style>
+        #editorContainer {
+          display: grid;
+          grid-template-rows: 1fr auto;
+          gap: 1em;
+          overflow: hidden;
+        }
+        .prism-code-editor {
+          border-radius: 0.4em;
+        }
+      </style>
 
-    <div
-      @click="${() => (this.showConfigModal = false)}"
-      class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
-    >
       <div
-        @click="${(e) => e.stopPropagation()}"
-        class="bg-slate-800 border border-slate-700 w-full max-w-5xl rounded-2xl shadow-2xl p-6 flex flex-col h-[80vh]"
+        @click="${() => (this.showConfigModal = false)}"
+        class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
       >
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <i data-lucide="edit" class="text-indigo-400 w-5 h-5"></i>
-            ${this.t("editConfig")}
-          </h3>
+        <div
+          @click="${(e) => e.stopPropagation()}"
+          class="bg-slate-800 border border-slate-700 w-full max-w-5xl rounded-2xl shadow-2xl p-6 flex flex-col h-[80vh]"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <i data-lucide="edit" class="text-indigo-400 w-5 h-5"></i>
+              ${this.t("editConfig")}
+            </h3>
 
-          <div class="flex items-center gap-4">
-            ${this.isEditorConfigValid
-              ? html`<span class="text-xs font-mono px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${this.t("editConfigValid")}</span>`
-              : html`<span class="text-xs font-mono px-2 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 animate-pulse">${this.t("editConfigInvalid")}</span>`
-            }
-            
+            <div
+              class="p-2 rounded-lg border transition-all duration-300 ${
+    this.isEditorConfigValid
+      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+      : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+  }"
+              title="${this.isEditorConfigValid ? this.t("editConfigValid") : this.t("editConfigInvalid")}"
+            >
+              <i
+                data-lucide="${this.isEditorConfigValid ? "circle-check" : "triangle-alert"}"
+                class="w-5 h-5"
+              >
+              </i>
+            </div>
+          </div>
+
+          <div
+            id="editorContainer"
+            class="w-full grow rounded-xl overflow-hidden bg-slate-900 border ${this.isEditorConfigValid ? "border-slate-700 focus-within:border-indigo-500" : "border-rose-500 focus-within:border-rose-500"} transition-colors"
+          ></div>
+
+          <div class="flex justify-end gap-3 mt-4">
             <button
               @click="${() => (this.showConfigModal = false)}"
-              class="text-slate-400 hover:text-white bg-slate-700 hover:bg-slate-600 p-1.5 rounded-lg transition-colors"
+              class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-xl text-sm font-medium transition-colors"
             >
-              <i data-lucide="x" class="w-4 h-4"></i>
+              ${this.t("editConfigCancel")}
             </button>
-          </div>
-        </div>
 
-        <div
-          id="editorContainer"
-          class="w-full grow rounded-xl overflow-hidden bg-slate-900 border ${this.isEditorConfigValid ? "border-slate-700 focus-within:border-indigo-500" : "border-rose-500 focus-within:border-rose-500"} transition-colors"
-        ></div>
-
-        <div class="flex justify-end gap-3 mt-4">
-          <button
-            @click="${() => (this.showConfigModal = false)}"
-            class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-xl text-sm font-medium transition-colors"
-          >
-            ${this.t("editConfigCancel")}
-          </button>
-
-          <button
-            @click="${this.handleSaveConfig}"
-            ?disabled="${!this.isEditorConfigValid || !this.hasEditorConfigChanged}"
-            class="px-4 py-2 rounded-xl text-sm font-medium text-white transition-all ${
+            <button
+              @click="${this.handleSaveConfig}"
+              ?disabled="${!this.isEditorConfigValid || !this.hasEditorConfigChanged}"
+              class="px-4 py-2 rounded-xl text-sm font-medium text-white transition-all ${
               this.isEditorConfigValid && this.hasEditorConfigChanged
                 ? "bg-indigo-600 hover:bg-indigo-500 cursor-pointer"
                 : "bg-slate-700 text-slate-500 cursor-not-allowed opacity-50"
             }"
-          >
-            ${this.t("editConfigSave")}
-          </button>
+            >
+              ${this.t("editConfigSave")}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  `;
-}
+    `;
+  }
 
   templateHelpModal() {
     if (!this.showHelp) return "";
