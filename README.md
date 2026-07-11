@@ -21,7 +21,7 @@
 - **Configuration Validation**: Validate JSON before applying changes.
 - **Responsive User Interface**: Optimized for desktop and mobile devices.
 - **Localization Support**: Automatic language detection with internationalization support.
-- **Lucide Icons**: Use the Lucide icon set for services and actions.()
+- **Lucide Icons**: Use the Lucide icon set for services and actions.([https://lucide.dev/icons/](https://lucide.dev/icons/))
 - **Docker Ready**: Deploy using the included Docker Compose configuration.
 - **Lightweight Architecture**: Built with Lit for fast rendering and minimal resource usage.
 
@@ -94,9 +94,9 @@ The application is configured through the `config/services.json` file.
       "services": [
         {
           "name": "GitHub",
-          "url": "[https://github.com](https://github.com)",
+          "url": "https://github.com",
           "key": "g",
-          "icon": "github"
+          "icon": "github.png"
         },
         {
           "name": "Local Host",
@@ -113,7 +113,7 @@ The application is configured through the `config/services.json` file.
       "services": [
         {
           "name": "Grafana",
-          "url": "[https://grafana.example.com](https://grafana.example.com)",
+          "url": "https://grafana.example.com",
           "key": "g",
           "icon": "trending-up"
         }
@@ -124,13 +124,13 @@ The application is configured through the `config/services.json` file.
     {
       "name": "Google",
       "prefix": "g",
-      "url": "[https://www.google.com/search?q=%s](https://www.google.com/search?q=%s)",
+      "url": "https://www.google.com/search?q=%s",
       "icon": "search"
     },
     {
       "name": "Wikipedia",
       "prefix": "w",
-      "url": "[https://en.wikipedia.org/wiki/Special:Search?search=%s](https://en.wikipedia.org/wiki/Special:Search?search=%s)",
+      "url": "https://en.wikipedia.org/wiki/Special:Search?search=%s",
       "icon": "book-open"
     }
   ]
