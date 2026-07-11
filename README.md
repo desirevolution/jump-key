@@ -6,6 +6,10 @@
 
 ####  JumpKey — A minimalist, keyboard-driven local first PWA homepage for your services.
 
+<p align="center">
+  <img src="screenshots/screenshot_2.png" alt="Grid dashboard">
+</p>
+
 ## Features
 
 - **Keyboard-Centric Navigation**: Navigate categories and launch services using sequential keyboard shortcuts.
@@ -25,10 +29,21 @@
 ## Screenshots
 
 <p align="center">
-  <img src="./screenshots/screenshot_1.png" alt="screenshot1" width="450" />
-  <img src="./screenshots/screenshot_2.png" alt="screenshot2" width="450" />
-  <img src="./screenshots/screenshot_3.png" alt="screenshot3" width="450" />
-  <img src="./screenshots/screenshot_4.png" alt="screenshot4" width="450" />
+  <a href="screenshots/screenshot_1.png">
+    <img src="screenshots/screenshot_1.png" width="300">
+  </a>
+  <a href="screenshots/screenshot_3.png">
+    <img src="screenshots/screenshot_3.png" width="300">
+  </a>
+  <a href="screenshots/screenshot_4.png">
+    <img src="screenshots/screenshot_4.png" width="300">
+  </a>
+  <a href="screenshots/screenshot_5.png">
+    <img src="screenshots/screenshot_5.png" width="300">
+  </a>
+  <a href="screenshots/screenshot_6.png">
+    <img src="screenshots/screenshot_6.png" width="300">
+  </a>
 </p>
 
 ## Quick Start
