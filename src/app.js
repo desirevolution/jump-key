@@ -526,26 +526,20 @@ validateConfig(jsonObj) {
         // 4. CLOSE MODAL
         this.showConfigModal = false;
 
-        alert("Configuration saved successfully and backup created!");
+        alert(${this.t("editConfigSaveDone")});
       } else {
-        alert("Error saving the live configuration.");
+        alert(${this.t("editConfigSaveFailed")});
       }
     } catch (error) {
       console.error("WebDAV Error:", error);
-      alert("Saving failed. Could not connect to the server.");
+      alert(${this.t("editConfigSaveFailed")});
     }
   }
 
   // Speichern-Button Handler (nutzt den synchronisierten Instanz-Wert)
   async handleSaveConfig() {
-    try {
-      const parsedJson = JSON.parse(this.editorValue);
-      await this.saveConfiguration(parsedJson);
-    } catch (e) {
-      alert(
-        "Invalid JSON format! Please check your syntax (commas, brackets).",
-      );
-    }
+    const parsedJson = JSON.parse(this.editorValue);
+    await this.saveConfiguration(parsedJson);
   }
 
   // --- Templates ---
@@ -671,77 +665,80 @@ validateConfig(jsonObj) {
     `;
   }
 
-  templateConfigModal() {
-    if (!this.showConfigModal) return "";
+templateConfigModal() {
+  if (!this.showConfigModal) return "";
 
-    return html`
-      <style>
-        #editorContainer {
-          display: grid;
-          grid-template-rows: 1fr auto;
-          gap: 1em;
-          overflow: hidden;
-        }
-        .prism-code-editor {
-          border-radius: 0.4em;
-        }
-      </style>
+  return html`
+    <style>
+      #editorContainer {
+        display: grid;
+        grid-template-rows: 1fr auto;
+        gap: 1em;
+        overflow: hidden;
+      }
+      .prism-code-editor {
+        border-radius: 0.4em;
+      }
+    </style>
 
+    <div
+      @click="${() => (this.showConfigModal = false)}"
+      class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
+    >
       <div
-        class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
+        @click="${(e) => e.stopPropagation()}"
+        class="bg-slate-800 border border-slate-700 w-full max-w-5xl rounded-2xl shadow-2xl p-6 flex flex-col h-[80vh]"
       >
-        <div
-          class="bg-slate-800 border border-slate-700 w-full max-w-5xl rounded-2xl shadow-2xl p-6 flex flex-col h-[80vh]"
-        >
-          <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-              <i data-lucide="edit" class="text-indigo-400 w-5 h-5"></i>
-              ${this.t("editConfig")}
-            </h3>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <i data-lucide="edit" class="text-indigo-400 w-5 h-5"></i>
+            ${this.t("editConfig")}
+          </h3>
 
-            ${
-              this.isEditorConfigValid
-                ? html`<span
-                    class="text-xs font-mono px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                    >${this.t("editConfigValid")}</span
-                  >`
-                : html`<span
-                    class="text-xs font-mono px-2 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 animate-pulse"
-                    >${this.t("editConfigInvalid")}</span
-                  >`
+          <div class="flex items-center gap-4">
+            ${this.isEditorConfigValid
+              ? html`<span class="text-xs font-mono px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">${this.t("editConfigValid")}</span>`
+              : html`<span class="text-xs font-mono px-2 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 animate-pulse">${this.t("editConfigInvalid")}</span>`
             }
-          </div>
-
-          <div
-            id="editorContainer"
-            class="w-full grow rounded-xl overflow-hidden bg-slate-900 border ${this.isEditorConfigValid ? "border-slate-700 focus-within:border-indigo-500" : "border-rose-500 focus-within:border-rose-500"} transition-colors"
-          ></div>
-
-          <div class="flex justify-end gap-3 mt-4">
+            
             <button
               @click="${() => (this.showConfigModal = false)}"
-              class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-xl text-sm font-medium transition-colors"
+              class="text-slate-400 hover:text-white bg-slate-700 hover:bg-slate-600 p-1.5 rounded-lg transition-colors"
             >
-              Cancel
-            </button>
-
-            <button
-              @click="${this.handleSaveConfig}"
-              ?disabled="${!this.isEditorConfigValid || !this.hasEditorConfigChanged}"
-              class="px-4 py-2 rounded-xl text-sm font-medium text-white transition-all
-                     ${
-                       this.isEditorConfigValid && this.hasEditorConfigChanged
-                         ? "bg-indigo-600 hover:bg-indigo-500 cursor-pointer"
-                         : "bg-slate-700 text-slate-500 cursor-not-allowed opacity-50"
-                     }"
-            >
-              Save
+              <i data-lucide="x" class="w-4 h-4"></i>
             </button>
           </div>
         </div>
+
+        <div
+          id="editorContainer"
+          class="w-full grow rounded-xl overflow-hidden bg-slate-900 border ${this.isEditorConfigValid ? "border-slate-700 focus-within:border-indigo-500" : "border-rose-500 focus-within:border-rose-500"} transition-colors"
+        ></div>
+
+        <div class="flex justify-end gap-3 mt-4">
+          <button
+            @click="${() => (this.showConfigModal = false)}"
+            class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-xl text-sm font-medium transition-colors"
+          >
+            ${this.t("editConfigCancel")}
+          </button>
+
+          <button
+            @click="${this.handleSaveConfig}"
+            ?disabled="${!this.isEditorConfigValid || !this.hasEditorConfigChanged}"
+            class="px-4 py-2 rounded-xl text-sm font-medium text-white transition-all ${
+              this.isEditorConfigValid && this.hasEditorConfigChanged
+                ? "bg-indigo-600 hover:bg-indigo-500 cursor-pointer"
+                : "bg-slate-700 text-slate-500 cursor-not-allowed opacity-50"
+            }"
+          >
+            ${this.t("editConfigSave")}
+          </button>
+        </div>
       </div>
-    `;
-  }
+    </div>
+  `;
+}
 
   templateHelpModal() {
     if (!this.showHelp) return "";

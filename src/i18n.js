@@ -27,9 +27,13 @@ export const translations = {
     contextInCat: "In Kat",
     hkSearchEngines: "Suchmaschinen aktivieren (im Suchfeld)",
     hkNavigate: "Ergebnisse durchblättern (im Suchfeld)",
-    editConfig: "Edit configuration",
+    editConfig: "Konfiguration bearbeiten",
     editConfigValid: "Edit configuration",
     editConfigInvalid: "Edit configuration",
+    editConfigSave: "Edit configuration",
+    editConfigCancel: "Edit configuration",
+    editConfigSaveDone: "Edit configuration",
+    editConfigSaveFailed: "Edit configuration",
   },
   en: {
     helpHint: "Press [?] for hotkey help",
@@ -62,6 +66,10 @@ export const translations = {
     editConfig: "Edit configuration",
     editConfigValid: "Edit configuration",
     editConfigInvalid: "Edit configuration",
+    editConfigSave: "Edit configuration",
+    editConfigCancel: "Edit configuration",
+    editConfigSaveDone: "Edit configuration",
+    editConfigSaveFailed: "Edit configuration",
   },
 };
 
