@@ -232,56 +232,87 @@ class DashboardApp extends LitElement {
         this.resetInput(true);
         return;
       }
+
+      const queryTrimmed = this.searchQuery.trim();
+      const showAllEngines = queryTrimmed === ":";
+
+      // Suchmaschinen-Vorschau ermitteln (wie im Template)
+      let matchedEngine = null;
+      let searchTermsPreview = "";
+      if (queryTrimmed.startsWith(":") && !showAllEngines) {
+        const commandString = queryTrimmed.substring(1).trim();
+        const firstSpaceIndex = commandString.indexOf(" ");
+        const prefix =
+          firstSpaceIndex !== -1
+            ? commandString.substring(0, firstSpaceIndex)
+            : commandString;
+        searchTermsPreview =
+          firstSpaceIndex !== -1
+            ? commandString.substring(firstSpaceIndex + 1).trim()
+            : "";
+        matchedEngine = this.searchEngines.find(
+          (eng) => eng.prefix.toLowerCase() === prefix.toLowerCase(),
+        );
+      }
+
+      // Berechnen, wie viele Elemente INSGESAMT gerade gerendert werden
+      let totalItems = 0;
+      let engineItemsCount = showAllEngines ? this.searchEngines.length : 0;
+      let previewItemsCount = matchedEngine && searchTermsPreview ? 1 : 0; // Nur klickbar, wenn Suchbegriff da ist
+      let serviceItemsCount = !showAllEngines ? filtered.length : 0;
+
+      totalItems = engineItemsCount + previewItemsCount + serviceItemsCount;
+
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        this.selectedIndex = (this.selectedIndex + 1) % filtered.length;
-        this.scrollToSelected();
+        if (totalItems > 0) {
+          this.selectedIndex = (this.selectedIndex + 1) % totalItems;
+          this.scrollToSelected();
+        }
         return;
       }
       if (e.key === "ArrowUp") {
         e.preventDefault();
-        this.selectedIndex =
-          (this.selectedIndex - 1 + filtered.length) % filtered.length;
-        this.scrollToSelected();
+        if (totalItems > 0) {
+          this.selectedIndex =
+            (this.selectedIndex - 1 + totalItems) % totalItems;
+          this.scrollToSelected();
+        }
         return;
       }
 
       if (e.key === "Enter") {
         e.preventDefault();
-        const queryTrimmed = this.searchQuery.trim();
 
-        // Command Mode mit ':' abfangen und ausführen
-        if (queryTrimmed.startsWith(":")) {
-          const commandString = queryTrimmed.substring(1).trim();
-          const firstSpaceIndex = commandString.indexOf(" ");
-
-          let prefix =
-            firstSpaceIndex !== -1
-              ? commandString.substring(0, firstSpaceIndex)
-              : commandString;
-          let searchTerms =
-            firstSpaceIndex !== -1
-              ? commandString.substring(firstSpaceIndex + 1).trim()
-              : "";
-
-          const engine = this.searchEngines.find(
-            (e) => e.prefix.toLowerCase() === prefix.toLowerCase(),
-          );
-
-          if (engine && searchTerms) {
-            const finalUrl = engine.url.replace(
-              "%s",
-              encodeURIComponent(searchTerms),
-            );
-            window.open(finalUrl, "_blank");
-            this.resetInput(true);
-            return;
+        // 1. Fall: Alle Suchmaschinen werden angezeigt (Nutzer tippte ":")
+        if (showAllEngines) {
+          const selectedEngine = this.searchEngines[this.selectedIndex];
+          if (selectedEngine) {
+            this.searchQuery = `:${selectedEngine.prefix} `;
+            this.querySelector("#searchInput")?.focus();
           }
+          return;
         }
 
-        // Standard-Fallback für reguläre Services
-        if (filtered[this.selectedIndex])
-          this.trackClick(filtered[this.selectedIndex]);
+        // 2. Fall: Eine Suchmaschine wurde gematcht UND ausgewählt
+        if (matchedEngine && searchTermsPreview && this.selectedIndex === 0) {
+          const finalUrl = matchedEngine.url.replace(
+            "%s",
+            encodeURIComponent(searchTermsPreview),
+          );
+          window.open(finalUrl, "_blank");
+          this.resetInput(true);
+          return;
+        }
+
+        // 3. Fall: Regulärer Service ausgewählt (Index verschiebt sich, falls eine Vorschau oben drüber ist)
+        const actualServiceIndex =
+          matchedEngine && searchTermsPreview
+            ? this.selectedIndex - 1
+            : this.selectedIndex;
+        if (filtered[actualServiceIndex]) {
+          this.trackClick(filtered[actualServiceIndex]);
+        }
         return;
       }
       return;
@@ -492,7 +523,7 @@ class DashboardApp extends LitElement {
       { keys: ["A-Z"], desc: this.t("hkCat") },
       { keys: ["A-Z"], desc: this.t("hkService"), context: true },
       // NEU: Wichtige Funktionen, die bisher nicht dokumentiert waren
-      { keys: [":"], desc: this.t("hkSearchEngines") }, 
+      { keys: [":"], desc: this.t("hkSearchEngines") },
       { keys: ["↑", "↓"], desc: this.t("hkNavigate") },
       { keys: ["ESC"], desc: this.t("hkReset") },
     );
@@ -528,11 +559,20 @@ class DashboardApp extends LitElement {
                 >
                   <span class="text-sm text-slate-400">${item.desc}</span>
                   <div class="flex items-center gap-1 shrink-0">
-                    ${item.context
-                      ? html`<span class="text-[10px] bg-slate-900 px-1 py-0.5 rounded text-indigo-400 mr-1 uppercase font-bold">${this.t("contextInCat")}</span>`
-                      : ""}
+                    ${
+                      item.context
+                        ? html`<span
+                            class="text-[10px] bg-slate-900 px-1 py-0.5 rounded text-indigo-400 mr-1 uppercase font-bold"
+                            >${this.t("contextInCat")}</span
+                          >`
+                        : ""
+                    }
                     ${item.keys.map(
-                      (k) => html`<kbd class="px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs font-bold text-indigo-400 shadow shadow-black/40">${k}</kbd>`,
+                      (k) =>
+                        html`<kbd
+                          class="px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs font-bold text-indigo-400 shadow shadow-black/40"
+                          >${k}</kbd
+                        >`,
                     )}
                   </div>
                 </div>
@@ -645,7 +685,7 @@ class DashboardApp extends LitElement {
                       ></i>
 
                       <kbd
-                        class="px-1.5 py-0.5 text-xs font-mono font-bold bg-slate-900 border border-slate-700 text-indigo-400 rounded shadow shadow-black/40 group-hover:text-indigo-300 hidden md:block ml-2"
+                        class="px-1.5 py-0.5 text-xs font-mono font-bold bg-slate-900 border border-slate-700 text-indigo-400 rounded shadow shadow-black/40 group-hover:text-indigo-300 hidden md:block"
                       >
                         :
                       </kbd>
@@ -675,27 +715,29 @@ class DashboardApp extends LitElement {
                       ${this.t("searchEnginesTitle")}
                     </div>
                     ${this.searchEngines.map(
-                      (engine) => html`
+                      (engine, i) => html`
                         <button
                           @click="${() => {
                             this.searchQuery = `:${engine.prefix} `;
                             this.querySelector("#searchInput")?.focus();
                           }}"
-                          class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-700/40 text-slate-300 font-mono text-sm text-left transition-colors"
+                          class="w-full flex items-center justify-between p-3 rounded-xl font-mono text-sm text-left transition-colors
+                            ${i === this.selectedIndex ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/40 text-slate-300"}"
                         >
                           <div class="flex items-center gap-3">
-                            ${this.renderIcon(engine.icon, "w-5 h-5 text-indigo-400")}
+                            ${this.renderIcon(engine.icon, "w-5 h-5 " + (i === this.selectedIndex ? "text-white" : "text-indigo-400"))}
                             <div>
                               <span class="font-bold text-white"
                                 >${engine.name}</span
                               >
-                              <span class="text-xs text-slate-500 ml-2"
+                              <span
+                                class="text-xs ml-2 ${i === this.selectedIndex ? "text-indigo-200" : "text-slate-500"}"
                                 >(${engine.url})</span
                               >
                             </div>
                           </div>
                           <kbd
-                            class="px-2 py-0.5 text-base font-bold text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow hidden md:block"
+                            class="px-2 py-0.5 text-base font-bold rounded shadow ${i === this.selectedIndex ? "bg-indigo-700 text-white border-indigo-500" : "bg-slate-900 border border-slate-700 text-indigo-400"}"
                           >
                             :${engine.prefix}
                           </kbd>
@@ -706,23 +748,22 @@ class DashboardApp extends LitElement {
                 : ""
             }
             ${
-              matchedEngine && !showAllEngines
+              matchedEngine && !showAllEngines && searchTermsPreview
                 ? html`
                     <button
                       @click="${() => {
-                        if (searchTermsPreview) {
-                          const finalUrl = matchedEngine.url.replace(
-                            "%s",
-                            encodeURIComponent(searchTermsPreview),
-                          );
-                          window.open(finalUrl, "_blank");
-                          this.resetInput(true);
-                        }
+                        const finalUrl = matchedEngine.url.replace(
+                          "%s",
+                          encodeURIComponent(searchTermsPreview),
+                        );
+                        window.open(finalUrl, "_blank");
+                        this.resetInput(true);
                       }}"
-                      class="w-full flex items-center justify-between p-4 rounded-xl bg-indigo-600/20 border border-indigo-500 text-slate-200 mb-3 font-mono text-sm text-left active:scale-[0.98] transition-all"
+                      class="w-full flex items-center justify-between p-4 rounded-xl border font-mono text-sm text-left active:scale-[0.98] transition-all mb-3
+                        ${this.selectedIndex === 0 ? "search-item-active bg-indigo-600 border-indigo-500 text-white" : "bg-indigo-600/20 border-indigo-500 text-slate-200"}"
                     >
                       <div class="flex items-center gap-3 min-w-0 grow">
-                        ${this.renderIcon(matchedEngine.icon, "w-6 h-6 text-indigo-400 shrink-0")}
+                        ${this.renderIcon(matchedEngine.icon, "w-6 h-6 shrink-0 " + (this.selectedIndex === 0 ? "text-white" : "text-indigo-400"))}
                         <div class="truncate text-xs sm:text-sm">
                           ${this.t("searchEnginePreviewPrefix")}
                           <span class="font-bold text-white"
@@ -730,13 +771,14 @@ class DashboardApp extends LitElement {
                           >
                           ${this.t("searchEnginePreviewFor")}:
                           <br class="sm:hidden" />
-                          <span class="text-indigo-300 italic"
-                            >"${searchTermsPreview || this.t("searchEngineEnterQuery")}"</span
+                          <span
+                            class="italic ${this.selectedIndex === 0 ? "text-indigo-100" : "text-indigo-300"}"
+                            >"${searchTermsPreview}"</span
                           >
                         </div>
                       </div>
                       <span
-                        class="text-xs font-mono bg-indigo-600 px-2 py-0.5 rounded shadow text-white hidden sm:inline"
+                        class="text-xs font-mono px-2 py-0.5 rounded shadow text-white hidden sm:inline ${this.selectedIndex === 0 ? "bg-indigo-700" : "bg-indigo-600"}"
                         >Enter</span
                       >
                     </button>
@@ -745,13 +787,18 @@ class DashboardApp extends LitElement {
             }
             ${
               !showAllEngines
-                ? filteredServices.map(
-                    (s, i) => html`
+                ? filteredServices.map((s, i) => {
+                    // Wenn eine Suchmaschinen-Livevorschau aktiv ist, verschiebt sich der visuelle Index um +1
+                    const targetIndex =
+                      matchedEngine && searchTermsPreview ? i + 1 : i;
+                    const isActive = targetIndex === this.selectedIndex;
+
+                    return html`
                       <button
                         @click="${() => this.trackClick(s)}"
                         class="w-full flex items-center justify-between p-3 rounded-xl transition-all text-left
-                             ${i === this.selectedIndex ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/30 text-slate-300"}
-                             active:bg-indigo-600 active:text-white"
+                               ${isActive ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/30 text-slate-300"}
+                               active:bg-indigo-600 active:text-white"
                       >
                         <div class="flex items-center gap-3">
                           ${this.renderIcon(s.icon, "w-6 h-6")}
@@ -764,10 +811,10 @@ class DashboardApp extends LitElement {
                             >
                           </div>
                         </div>
-                        ${i === this.selectedIndex ? html`<span class="text-xs font-mono bg-indigo-700 px-2 py-0.5 rounded shadow hidden sm:inline">Enter</span>` : ""}
+                        ${isActive ? html`<span class="text-xs font-mono bg-indigo-700 px-2 py-0.5 rounded shadow hidden sm:inline">Enter</span>` : ""}
                       </button>
-                    `,
-                  )
+                    `;
+                  })
                 : ""
             }
             ${
