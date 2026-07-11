@@ -48,7 +48,7 @@
 
 ## Quick Start
 
-Copy/adjust ./[compose.yml](compose.yml) and ./config/[services.json](services.example.json) and put all your custome icon images in ./icon.
+Copy/adjust [compose.yml](compose.yml) and /config/[services.json](services.example.json) and put all your custome icon images in /icon.
 
 Then run:
 
