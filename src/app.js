@@ -600,36 +600,39 @@ class DashboardApp extends LitElement {
             </form>
 
             ${
-  showQuickTrigger
-    ? html`
-        <button
-          @click="${() => {
-      this.searchQuery = ":";
-      this.querySelector("#searchInput")?.focus();
-    }}"
-          class="flex items-center gap-2 pl-2.5 pr-1.5 py-1 bg-slate-850 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-full cursor-pointer transition-all duration-150 shrink-0 group shadow-md"
-          title="Suchmaschinen anzeigen"
-        >
-          <i
-            data-lucide="globe"
-            class="w-4 h-4 text-slate-400 group-hover:text-indigo-400 transition-colors"
-          ></i>
+              showQuickTrigger
+                ? html`
+                    <button
+                      @click="${() => {
+            this.searchQuery = ":";
+            this.querySelector("#searchInput")?.focus();
+          }}"
+                      class="flex items-center justify-center p-1.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-md cursor-pointer transition-all duration-150 shrink-0 group shadow-md"
+                      title="${this.t("searchEnginesShow")}"
+                    >
+                      <i
+                        data-lucide="globe"
+                        class="block w-4 h-4 text-slate-400 group-hover:text-indigo-400 transition-colors"
+                      ></i>
 
-          <kbd
-            class="px-1.5 py-0.5 text-xs font-mono font-bold bg-slate-900 border border-slate-700 text-indigo-400 rounded shadow shadow-black/40 group-hover:text-indigo-300"
-          >
-            :
-          </kbd>
-        </button>
-      `
-    : ""
-}
+                      <kbd
+                        class="px-1.5 py-0.5 text-xs font-mono font-bold bg-slate-900 border border-slate-700 text-indigo-400 rounded shadow shadow-black/40 group-hover:text-indigo-300 hidden md:block"
+                      >
+                        :
+                      </kbd>
+                    </button>
+                  `
+                : ""
+            }
 
             <button
               @click="${() => this.resetInput(true)}"
-              class="text-xs text-slate-400 bg-slate-700 px-2 py-1 rounded sm:hidden"
+              class="flex items-center justify-center p-1.5 bg-slate-850 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-md cursor-pointer transition-all duration-150 shrink-0 group shadow-md"
             >
-              ${this.t("close")}
+              <i
+                data-lucide="x"
+                class="block w-4 h-4 text-slate-400 group-hover:text-indigo-400 transition-colors"
+              ></i>
             </button>
           </div>
 

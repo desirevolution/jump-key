@@ -4,7 +4,6 @@ export const translations = {
     helpTitle: "Tastatur-Kurzbefehle",
     helpExit: "Klicke irgendwohin oder drücke eine Taste zum Schließen.",
     searchPlaceholder: "Service suchen...",
-    close: "Schließen",
     noServices: "Keine Services gefunden.",
     frequent: "Häufig genutzt",
     resetFavs: "Zurücksetzen",
@@ -20,7 +19,7 @@ export const translations = {
     hkReset: "Zurück zur Hauptübersicht / Abbrechen",
     hkToggleView: "Ansichtsmodus wechseln (Kategorie / Grid)",
 
-    // --- Suchmaschinen-spezifische Keys ---
+    searchEnginesShow: "Suchmaschinen anzeigen", // <-- Neu
     searchEnginesTitle: "Unterstützte Suchmaschinen:", // <-- Neu
     searchEnginePreviewPrefix: "Suche auf", // <-- Neu
     searchEnginePreviewFor: "nach", // <-- Neu
@@ -31,7 +30,6 @@ export const translations = {
     helpTitle: "Keyboard Shortcuts",
     helpExit: "Click anywhere or press a key to close it.",
     searchPlaceholder: "Search services...",
-    close: "Close",
     noServices: "No services found.",
     frequent: "Frequently used",
     resetFavs: "Reset",
@@ -47,6 +45,7 @@ export const translations = {
     hkToggleView: "Toggle View Mode (Category / Grid)",
 
     // --- Search Engine specific Keys ---
+    searchEnginesShow: "Show search engines", // <-- Neu
     searchEnginesTitle: "Supported Search Engines:", // <-- Neu
     searchEnginePreviewPrefix: "Search on", // <-- Neu
     searchEnginePreviewFor: "for", // <-- Neu
