@@ -51,6 +51,9 @@
 Copy/adjust [compose.yml](compose.yml) and [services.json](services.example.json) and run
 
 ```bash
+# caddy webdav container needs write access to the config directory
+chown -R  100 config
+
 docker compose up -d
 ```
 
