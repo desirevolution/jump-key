@@ -23,7 +23,7 @@ export default defineConfig({
         name: "JumpKey Dashboard",
         short_name: "JumpKey",
         theme_color: "#6366f1",
-
+        display: "standalone",
         icons: [
           {
             src: "/jump-key.png",
