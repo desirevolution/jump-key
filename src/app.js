@@ -7,6 +7,12 @@ import {
   getTopFavorites,
 } from "./shortcuts.js";
 
+// --- PRISM CODE EDITOR SETUP & LANGUAGE ---
+import { basicEditor } from "prism-code-editor/setups";
+import "prism-code-editor/prism/languages/json";
+import "prism-code-editor/layout.css";
+import "prism-code-editor/themes/night-owl.css";
+
 class DashboardApp extends LitElement {
   createRenderRoot() {
     return this;
@@ -14,7 +20,11 @@ class DashboardApp extends LitElement {
 
   static properties = {
     categories: { type: Array },
-    searchEngines: { type: Array }, // <-- Hinzugefügt für Custom Quick-Search
+    searchEngines: { type: Array },
+    showConfigModal: { type: Boolean },
+    isEditorConfigValid: { type: Boolean },
+    isEditorConfigValid: { type: Boolean },
+    hasEditorConfigChanged: { type: Boolean },
     activeCategoryKey: { type: String },
     currentInput: { type: String },
     isInvalidInput: { type: Boolean },
@@ -22,7 +32,7 @@ class DashboardApp extends LitElement {
     searchQuery: { type: String },
     showSearch: { type: Boolean },
     showHelp: { type: Boolean },
-    isGridView: { type: Boolean }, // <-- Added property
+    isGridView: { type: Boolean },
     selectedIndex: { type: Number },
     timeString: { type: String },
     dateString: { type: String },
@@ -33,7 +43,9 @@ class DashboardApp extends LitElement {
   constructor() {
     super();
     this.categories = [];
-    this.searchEngines = []; // <-- Initialisiert
+    this.searchEngines = [];
+    this.showConfigModal = false;
+    this.isEditorConfigValid = true;
     this.activeCategoryKey = "";
     this.currentInput = "";
     this.isInvalidInput = false;
@@ -42,7 +54,7 @@ class DashboardApp extends LitElement {
     this.showSearch = false;
     this.showHelp = false;
     this.isGridView =
-      JSON.parse(localStorage.getItem("dashboard_grid_view")) || false; // <-- Loaded from storage
+      JSON.parse(localStorage.getItem("dashboard_grid_view")) || false;
     this.selectedIndex = 0;
     this.timeString = "";
     this.dateString = "";
@@ -50,8 +62,14 @@ class DashboardApp extends LitElement {
     this.resetTimeout = null;
     this.lang = detectLang();
 
+    // Editor-Instanz & Wertspeicher deklarieren
+    this.editorInstance = null;
+    this.editorValue = "";
+
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
+    this.originalConfigString = "";
+    this.hasEditorConfigChanged = false;
   }
 
   t(key) {
@@ -66,8 +84,8 @@ class DashboardApp extends LitElement {
       const res = await fetch("./config/services.json");
       const data = await res.json();
       localStorage.setItem("services-cache", JSON.stringify(data));
-      this.categories = generateShortcuts(data.categories || data); // Abwärtskompatibel halten
-      this.searchEngines = data.searchEngines || []; // <-- Suchmaschinen laden
+      this.categories = generateShortcuts(data.categories || data);
+      this.searchEngines = data.searchEngines || [];
     } catch {
       const cached = localStorage.getItem("services-cache");
       if (cached) {
@@ -91,8 +109,45 @@ class DashboardApp extends LitElement {
     clearInterval(this.timeInterval);
   }
 
-  updated() {
+  updated(changedProperties) {
     createIcons({ icons });
+
+    // Wenn das Modal geöffnet wird, initialisieren wir den Editor im DOM-Container
+    if (this.showConfigModal && changedProperties.has("showConfigModal")) {
+      this.initEditor();
+    }
+  }
+
+  // --- Editor Initialisierung & Event Binding ---
+  initEditor() {
+    const container = this.querySelector("#editorContainer");
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    // The 'onUpdate' callback is the standard way to listen for changes
+    this.editorInstance = basicEditor(
+      container,
+      {
+        value: this.editorValue,
+        language: "json",
+        theme: "night-owl",
+        onUpdate: (value) => {
+          this.editorValue = value;
+          try {
+            const parsed = JSON.parse(value);
+            const isJsonValid = true;
+            const isStructureValid = this.validateConfig(parsed);
+            this.hasEditorConfigChanged = value !== this.originalConfigString;
+
+            this.isEditorConfigValid = isJsonValid && isStructureValid;
+          } catch (err) {
+            this.isEditorConfigValid = false;
+          }
+        },
+      },
+      () => console.log("Prism Code Editor mounted"),
+    );
   }
 
   // --- State helpers ---
@@ -106,18 +161,15 @@ class DashboardApp extends LitElement {
       minute: "2-digit",
     });
 
-    // Check if screen width is mobile (e.g., less than 640px matching Tailwind's sm breakpoint)
     const isMobile = window.matchMedia("(max-width: 639px)").matches;
 
     if (isMobile) {
-      // Short numeric format for mobile
       this.dateString = now.toLocaleDateString(locale, {
         day: "2-digit",
         month: "2-digit",
-        year: "numeric", // Or "2-digit" if you want it even shorter
+        year: "numeric",
       });
     } else {
-      // Long text format for desktop
       this.dateString = now.toLocaleDateString(locale, {
         weekday: "long",
         day: "numeric",
@@ -127,7 +179,6 @@ class DashboardApp extends LitElement {
   }
 
   resetInput(updateHistory = true) {
-    const wasSearchOpen = this.showSearch; // Prüfen, ob Suche offen war
     this.activeCategoryKey = "";
     this.currentInput = "";
     this.isInvalidInput = false;
@@ -186,10 +237,42 @@ class DashboardApp extends LitElement {
     }
   }
 
+  validateConfig(jsonObj) {
+    // 1. Grundprüfung auf Objekt und Existenz der Haupt-Arrays
+    if (!jsonObj || typeof jsonObj !== "object") return false;
+
+    // 2. Prüfen, ob Kategorien existieren und mindestens eine vorhanden ist
+    const hasCategories =
+      Array.isArray(jsonObj.categories) && jsonObj.categories.length > 0;
+
+    // 3. Prüfen, ob Suchmaschinen existieren und mindestens eine vorhanden ist
+    const hasSearchEngines =
+      Array.isArray(jsonObj.searchEngines) && jsonObj.searchEngines.length > 0;
+
+    if (!hasCategories || !hasSearchEngines) return false;
+
+    // 4. Optional: Tiefe Prüfung der Kategorien (z.B. ob 'categoryKey' existiert)
+    const isCategoriesValid = jsonObj.categories.every(
+      (cat) =>
+        typeof cat.category === "string" &&
+        typeof cat.categoryKey === "string" &&
+        Array.isArray(cat.services),
+    );
+
+    // 5. Optional: Prüfung der Suchmaschinen (z.B. ob 'prefix' und 'url' existieren)
+    const isSearchEnginesValid = jsonObj.searchEngines.every(
+      (engine) =>
+        typeof engine.name === "string" &&
+        typeof engine.prefix === "string" &&
+        typeof engine.url === "string",
+    );
+
+    return isCategoriesValid && isSearchEnginesValid;
+  }
+
   // --- Event handlers ---
 
   handlePopState(e) {
-    // Schließt entweder die Kategorie-Ansicht oder das Such-Modal basierend auf dem State
     if (!e.state?.view) {
       this.resetInput(false);
     } else if (e.state.view === "category") {
@@ -202,7 +285,6 @@ class DashboardApp extends LitElement {
     this.showHelp = false;
     this.showSearch = true;
     this.selectedIndex = 0;
-    // Push State für das Such-Modal hinzufügen
     window.history.pushState({ view: "search" }, "");
     setTimeout(() => this.querySelector("#searchInput")?.focus(), 100);
   }
@@ -225,6 +307,17 @@ class DashboardApp extends LitElement {
   handleKeyDown(e) {
     if (e.ctrlKey || e.altKey || e.metaKey) return;
 
+    if (e.key === "Escape") {
+      if (this.showConfigModal) {
+        this.showConfigModal = false;
+        return;
+      }
+      this.resetInput(true);
+      return;
+    }
+
+    if (this.showConfigModal) return; // Shortcuts sperren, wenn der Editor offen ist
+
     const filtered = getFilteredServices(this.categories, this.searchQuery);
 
     if (this.showSearch) {
@@ -236,7 +329,6 @@ class DashboardApp extends LitElement {
       const queryTrimmed = this.searchQuery.trim();
       const showAllEngines = queryTrimmed === ":";
 
-      // Suchmaschinen-Vorschau ermitteln (wie im Template)
       let matchedEngine = null;
       let searchTermsPreview = "";
       if (queryTrimmed.startsWith(":") && !showAllEngines) {
@@ -255,10 +347,9 @@ class DashboardApp extends LitElement {
         );
       }
 
-      // Berechnen, wie viele Elemente INSGESAMT gerade gerendert werden
       let totalItems = 0;
       let engineItemsCount = showAllEngines ? this.searchEngines.length : 0;
-      let previewItemsCount = matchedEngine && searchTermsPreview ? 1 : 0; // Nur klickbar, wenn Suchbegriff da ist
+      let previewItemsCount = matchedEngine && searchTermsPreview ? 1 : 0;
       let serviceItemsCount = !showAllEngines ? filtered.length : 0;
 
       totalItems = engineItemsCount + previewItemsCount + serviceItemsCount;
@@ -284,7 +375,6 @@ class DashboardApp extends LitElement {
       if (e.key === "Enter") {
         e.preventDefault();
 
-        // 1. Fall: Alle Suchmaschinen werden angezeigt (Nutzer tippte ":")
         if (showAllEngines) {
           const selectedEngine = this.searchEngines[this.selectedIndex];
           if (selectedEngine) {
@@ -294,7 +384,6 @@ class DashboardApp extends LitElement {
           return;
         }
 
-        // 2. Fall: Eine Suchmaschine wurde gematcht UND ausgewählt
         if (matchedEngine && searchTermsPreview && this.selectedIndex === 0) {
           const finalUrl = matchedEngine.url.replace(
             "%s",
@@ -305,7 +394,6 @@ class DashboardApp extends LitElement {
           return;
         }
 
-        // 3. Fall: Regulärer Service ausgewählt (Index verschiebt sich, falls eine Vorschau oben drüber ist)
         const actualServiceIndex =
           matchedEngine && searchTermsPreview
             ? this.selectedIndex - 1
@@ -340,7 +428,6 @@ class DashboardApp extends LitElement {
       return;
     }
 
-    // Bind '#' key to toggle layouts when no category is actively opened
     if (e.key.toLowerCase() === "#" && !this.activeCategoryKey) {
       e.preventDefault();
       this.toggleViewMode();
@@ -352,7 +439,6 @@ class DashboardApp extends LitElement {
     const key = e.key.toLowerCase();
 
     if (!this.activeCategoryKey) {
-      // Direct favorites can only be run via 1-0 hotkeys if we are NOT in full grid view mode
       if (/^[0-9]$/.test(key) && !this.isGridView) {
         const favService = getTopFavorites(
           this.categories,
@@ -399,6 +485,64 @@ class DashboardApp extends LitElement {
         }),
       10,
     );
+  }
+
+  // --- Backend Communication (WebDAV) ---
+
+  async saveConfiguration(updatedConfig) {
+    try {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+
+      // 1. SAVE BACKUP
+      const backupResponse = await fetch(
+        `/config/services.backup-${timestamp}.json`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedConfig),
+        },
+      );
+
+      if (!backupResponse.ok) {
+        throw new Error("Failed to create configuration backup.");
+      }
+
+      // 2. OVERWRITE LIVE CONFIGURATION
+      const response = await fetch("/config/services.json", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updatedConfig),
+      });
+
+      if (response.ok) {
+        // 3. UPDATE APP STATE
+        if (updatedConfig.categories) {
+          this.categories = generateShortcuts(updatedConfig.categories);
+        } else {
+          this.categories = generateShortcuts(updatedConfig);
+        }
+
+        if (updatedConfig.searchEngines) {
+          this.searchEngines = updatedConfig.searchEngines;
+        }
+
+        // 4. CLOSE MODAL
+        this.showConfigModal = false;
+
+        alert(this.t("editConfigSaveDone"));
+      } else {
+        alert(this.t("editConfigSaveFailed"));
+      }
+    } catch (error) {
+      console.error("WebDAV Error:", error);
+      alert(this.t("editConfigSaveFailed"));
+    }
+  }
+
+  // Speichern-Button Handler (nutzt den synchronisierten Instanz-Wert)
+  async handleSaveConfig() {
+    const parsedJson = JSON.parse(this.editorValue);
+    await this.saveConfiguration(parsedJson);
   }
 
   // --- Templates ---
@@ -462,18 +606,14 @@ class DashboardApp extends LitElement {
           >
             ${
               this.isGridView
-                ? html`
-                    <i
-                      data-lucide="rows-2"
-                      class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
-                    ></i>
-                  `
-                : html`
-                    <i
-                      data-lucide="layout-grid"
-                      class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
-                    ></i>
-                  `
+                ? html`<i
+                    data-lucide="rows-2"
+                    class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
+                  ></i>`
+                : html`<i
+                    data-lucide="layout-grid"
+                    class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
+                  ></i>`
             }
           </button>
           <button
@@ -486,6 +626,31 @@ class DashboardApp extends LitElement {
               class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
             ></i>
           </button>
+
+          <button
+            @click="${() => {
+              this.showConfigModal = true;
+              this.isEditorConfigValid = true;
+              this.hasEditorConfigChanged = false;
+              this.editorValue = JSON.stringify(
+                {
+                  categories: this.categories,
+                  searchEngines: this.searchEngines,
+                },
+                null,
+                2,
+              );
+              this.originalConfigString = this.editorValue;
+            }}"
+            class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md hidden md:block"
+            title="${this.t("editConfig")}"
+          >
+            <i
+              data-lucide="settings"
+              class="w-5 h-5 text-slate-400 group-hover:text-indigo-400 transition-colors"
+            ></i>
+          </button>
+
           <div class="text-center sm:text-right ml-2">
             <div
               class="text-2xl sm:text-4xl font-bold text-indigo-400 tracking-wider"
@@ -503,26 +668,97 @@ class DashboardApp extends LitElement {
     `;
   }
 
+  templateConfigModal() {
+    if (!this.showConfigModal) return "";
+
+    return html`
+      <style>
+        #editorContainer {
+          display: grid;
+          grid-template-rows: 1fr auto;
+          gap: 1em;
+          overflow: hidden;
+        }
+        .prism-code-editor {
+          border-radius: 0.4em;
+        }
+      </style>
+
+      <div
+        @click="${() => (this.showConfigModal = false)}"
+        class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
+      >
+        <div
+          @click="${(e) => e.stopPropagation()}"
+          class="bg-slate-800 border border-slate-700 w-full max-w-5xl rounded-2xl shadow-2xl p-6 flex flex-col h-[80vh]"
+        >
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <i data-lucide="edit" class="text-indigo-400 w-5 h-5"></i>
+              ${this.t("editConfig")}
+            </h3>
+
+            <div
+              class="p-2 rounded-lg border transition-all duration-300 ${
+                this.isEditorConfigValid
+                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                  : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+              }"
+              title="${this.isEditorConfigValid ? this.t("editConfigValid") : this.t("editConfigInvalid")}"
+            >
+              <i
+                data-lucide="${this.isEditorConfigValid ? "circle-check" : "triangle-alert"}"
+                class="w-5 h-5"
+              >
+              </i>
+            </div>
+          </div>
+
+          <div
+            id="editorContainer"
+            class="w-full grow rounded-xl overflow-hidden bg-slate-900 border ${this.isEditorConfigValid ? "border-slate-700 focus-within:border-indigo-500" : "border-rose-500 focus-within:border-rose-500"} transition-colors"
+          ></div>
+
+          <div class="flex justify-end gap-3 mt-4">
+            <button
+              @click="${() => (this.showConfigModal = false)}"
+              class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-xl text-sm font-medium transition-colors"
+            >
+              ${this.t("editConfigCancel")}
+            </button>
+
+            <button
+              @click="${this.handleSaveConfig}"
+              ?disabled="${!this.isEditorConfigValid || !this.hasEditorConfigChanged}"
+              class="px-4 py-2 rounded-xl text-sm font-medium text-white transition-all ${
+                this.isEditorConfigValid && this.hasEditorConfigChanged
+                  ? "bg-indigo-600 hover:bg-indigo-500 cursor-pointer"
+                  : "bg-slate-700 text-slate-500 cursor-not-allowed opacity-50"
+              }"
+            >
+              ${this.t("editConfigSave")}
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   templateHelpModal() {
     if (!this.showHelp) return "";
 
-    // Basis-Shortcuts, die immer auf der Hauptseite gelten
     const shortcuts = [
       { keys: ["Space"], desc: this.t("hkSearch") },
       { keys: ["#"], desc: this.t("hkToggleView") },
     ];
 
-    // Favoriten-Zahlen-Shortcut (nur im Listenmodus aktiv)
     if (!this.isGridView) {
-      // GEÄNDERT: "↓" durch Strich "-" ersetzt, um den Zahlenbereich 1 bis 0 (10) korrekt darzustellen
       shortcuts.push({ keys: ["1", "-", "0"], desc: this.t("hkFavs") });
     }
 
-    // Kategorien, Navigation und kontextbasierte Shortcuts
     shortcuts.push(
       { keys: ["A-Z"], desc: this.t("hkCat") },
       { keys: ["A-Z"], desc: this.t("hkService"), context: true },
-      // NEU: Wichtige Funktionen, die bisher nicht dokumentiert waren
       { keys: [":"], desc: this.t("hkSearchEngines") },
       { keys: ["↑", "↓"], desc: this.t("hkNavigate") },
       { keys: ["ESC"], desc: this.t("hkReset") },
@@ -642,7 +878,6 @@ class DashboardApp extends LitElement {
             class="p-4 border-b border-slate-700 flex items-center gap-3 shrink-0"
           >
             <i data-lucide="search" class="text-slate-400 w-5 h-5"></i>
-
             <form
               @submit="${(e) => {
                 e.preventDefault();
@@ -683,12 +918,10 @@ class DashboardApp extends LitElement {
                         data-lucide="globe"
                         class="block w-5 h-5 text-slate-400 group-hover:text-indigo-400 transition-colors"
                       ></i>
-
                       <kbd
                         class="px-2 py-0.5 text-xs font-mono font-bold bg-slate-900 border border-slate-700 text-indigo-400 rounded shadow shadow-black/40 group-hover:text-indigo-300 hidden md:block ml-2"
+                        >:</kbd
                       >
-                        :
-                      </kbd>
                     </button>
                   `
                 : ""
@@ -721,8 +954,7 @@ class DashboardApp extends LitElement {
                             this.searchQuery = `:${engine.prefix} `;
                             this.querySelector("#searchInput")?.focus();
                           }}"
-                          class="w-full flex items-center justify-between p-3 rounded-xl font-mono text-sm text-left transition-colors
-                            ${i === this.selectedIndex ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/40 text-slate-300"}"
+                          class="w-full flex items-center justify-between p-3 rounded-xl font-mono text-sm text-left transition-colors ${i === this.selectedIndex ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/40 text-slate-300"}"
                         >
                           <div class="flex items-center gap-3">
                             ${this.renderIcon(engine.icon, "w-5 h-5 " + (i === this.selectedIndex ? "text-white" : "text-indigo-400"))}
@@ -738,9 +970,8 @@ class DashboardApp extends LitElement {
                           </div>
                           <kbd
                             class="px-2 py-0.5 text-base font-bold rounded shadow ${i === this.selectedIndex ? "bg-indigo-700 text-white border-indigo-500" : "bg-slate-900 border border-slate-700 text-indigo-400"}"
+                            >:${engine.prefix}</kbd
                           >
-                            :${engine.prefix}
-                          </kbd>
                         </button>
                       `,
                     )}
@@ -759,8 +990,7 @@ class DashboardApp extends LitElement {
                         window.open(finalUrl, "_blank");
                         this.resetInput(true);
                       }}"
-                      class="w-full flex items-center justify-between p-4 rounded-xl border font-mono text-sm text-left active:scale-[0.98] transition-all mb-3
-                        ${this.selectedIndex === 0 ? "search-item-active bg-indigo-600 border-indigo-500 text-white" : "bg-indigo-600/20 border-indigo-500 text-slate-200"}"
+                      class="w-full flex items-center justify-between p-4 rounded-xl border font-mono text-sm text-left active:scale-[0.98] transition-all mb-3 ${this.selectedIndex === 0 ? "search-item-active bg-indigo-600 border-indigo-500 text-white" : "bg-indigo-600/20 border-indigo-500 text-slate-200"}"
                     >
                       <div class="flex items-center gap-3 min-w-0 grow">
                         ${this.renderIcon(matchedEngine.icon, "w-6 h-6 shrink-0 " + (this.selectedIndex === 0 ? "text-white" : "text-indigo-400"))}
@@ -788,7 +1018,6 @@ class DashboardApp extends LitElement {
             ${
               !showAllEngines
                 ? filteredServices.map((s, i) => {
-                    // Wenn eine Suchmaschinen-Livevorschau aktiv ist, verschiebt sich der visuelle Index um +1
                     const targetIndex =
                       matchedEngine && searchTermsPreview ? i + 1 : i;
                     const isActive = targetIndex === this.selectedIndex;
@@ -796,9 +1025,7 @@ class DashboardApp extends LitElement {
                     return html`
                       <button
                         @click="${() => this.trackClick(s)}"
-                        class="w-full flex items-center justify-between p-3 rounded-xl transition-all text-left
-                               ${isActive ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/30 text-slate-300"}
-                               active:bg-indigo-600 active:text-white"
+                        class="w-full flex items-center justify-between p-3 rounded-xl transition-all text-left ${isActive ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/30 text-slate-300"} active:bg-indigo-600 active:text-white"
                       >
                         <div class="flex items-center gap-3">
                           ${this.renderIcon(s.icon, "w-6 h-6")}
@@ -822,11 +1049,9 @@ class DashboardApp extends LitElement {
               filteredServices.length === 0 &&
               !matchedEngine &&
               !showAllEngines
-                ? html`
-                    <p class="text-center text-slate-500 text-sm py-4">
-                      ${this.t("noServices")}
-                    </p>
-                  `
+                ? html`<p class="text-center text-slate-500 text-sm py-4">
+                    ${this.t("noServices")}
+                  </p>`
                 : ""
             }
           </div>
@@ -835,7 +1060,6 @@ class DashboardApp extends LitElement {
     `;
   }
 
-  // --- 1. Unified Favorites Template ---
   templateFavorites(favs) {
     if (favs.length === 0 || this.isGridView) return "";
     return html`
@@ -879,9 +1103,8 @@ class DashboardApp extends LitElement {
                 </div>
                 <kbd
                   class="px-2 py-0.5 font-bold font-mono text-lg text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline"
+                  >${s.key}</kbd
                 >
-                  ${s.key}
-                </kbd>
               </button>
             `,
           )}
@@ -890,7 +1113,6 @@ class DashboardApp extends LitElement {
     `;
   }
 
-  // --- 2. Unified Primary Categories List Template ---
   templateCategoriesList() {
     return html`
       <div>
@@ -924,9 +1146,8 @@ class DashboardApp extends LitElement {
                 </div>
                 <kbd
                   class="px-2 py-0.5 font-bold font-mono text-lg text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline"
+                  >${cat.categoryKey?.toUpperCase() ?? ""}</kbd
                 >
-                  ${cat.categoryKey?.toUpperCase() ?? ""}
-                </kbd>
               </button>
             `,
           )}
@@ -935,7 +1156,6 @@ class DashboardApp extends LitElement {
     `;
   }
 
-  // --- 3. Unified All-in-One Full Grid View Template ---
   templateFullGridView() {
     return html`
       <div class="animate-fadeIn space-y-5">
@@ -945,9 +1165,8 @@ class DashboardApp extends LitElement {
               <div class="flex items-center gap-3 mb-3">
                 <kbd
                   class="px-2 py-0.5 font-bold font-mono text-xs text-indigo-400 bg-slate-900 border border-indigo-500/30 rounded hidden sm:block"
+                  >${cat.categoryKey?.toUpperCase() ?? ""}</kbd
                 >
-                  ${cat.categoryKey?.toUpperCase() ?? ""}
-                </kbd>
                 ${cat.icon ? this.renderIcon(cat.icon, "w-4 h-4 text-indigo-400/80") : ""}
                 <h2
                   class="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider"
@@ -981,9 +1200,8 @@ class DashboardApp extends LitElement {
                       </div>
                       <kbd
                         class="px-2 py-0.5 font-bold font-mono text-lg text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline"
+                        >${service.key?.toUpperCase() ?? ""}</kbd
                       >
-                        ${service.key?.toUpperCase() ?? ""}
-                      </kbd>
                     </button>
                   `,
                 )}
@@ -1041,9 +1259,8 @@ class DashboardApp extends LitElement {
                 </div>
                 <kbd
                   class="absolute top-4 right-4 px-2 py-0.5 font-bold font-mono text-xs sm:text-sm bg-indigo-600 text-white rounded shadow shadow-indigo-500/50 hidden sm:inline"
+                  >${service.key?.toUpperCase() ?? ""}</kbd
                 >
-                  ${service.key?.toUpperCase() ?? ""}
-                </kbd>
               </button>
             `,
           )}
@@ -1067,6 +1284,7 @@ class DashboardApp extends LitElement {
     return html`
       ${this.templateHeader()} ${this.templateKeyBadge()}
       ${this.templateHelpModal()} ${this.templateSearchModal(filteredServices)}
+      ${this.templateConfigModal()}
       ${
         showMain
           ? html`

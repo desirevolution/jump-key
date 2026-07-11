@@ -1,5 +1,6 @@
 services:
   jump-key-dev:
+    user: root
     build:
       context: .
       dockerfile: Dockerfile.dev

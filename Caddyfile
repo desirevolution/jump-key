@@ -1,0 +1,34 @@
+:8080 {
+    root * /app
+
+    @config path /config/*
+
+    route @config {
+        header Cache-Control "no-store"
+
+        @user_config {
+            path /config/services.json
+            header Remote-User ?*
+        }
+        rewrite @user_config /config/services.{http.request.header.Remote-User}.json
+
+        @user_backup {
+            path_regexp backup ^/config/services\.backup-(.+)\.json$
+            header Remote-User ?*
+        }
+        rewrite @user_backup /config/services.{http.request.header.Remote-User}.backup-{re.backup.1}.json
+
+        webdav {
+            root /app
+        }
+    }
+
+    @spa {
+        not path /config/*
+    }
+
+    route @spa {
+        try_files {path} /index.html
+        file_server
+    }
+}

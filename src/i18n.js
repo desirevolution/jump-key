@@ -27,6 +27,13 @@ export const translations = {
     contextInCat: "In Kat",
     hkSearchEngines: "Suchmaschinen aktivieren (im Suchfeld)",
     hkNavigate: "Ergebnisse durchblättern (im Suchfeld)",
+    editConfig: "Konfiguration bearbeiten",
+    editConfigValid: "Konfiguration ist gültig",
+    editConfigInvalid: "Konfiguration ist ungültig",
+    editConfigSave: "Speichern",
+    editConfigCancel: "Abbrechen",
+    editConfigSaveDone: "Änderungen wurden erfolgreich gespeichert",
+    editConfigSaveFailed: "Änderungen konnten nicht gespeichert werden",
   },
   en: {
     helpHint: "Press [?] for hotkey help",
@@ -56,6 +63,13 @@ export const translations = {
     contextInCat: "In Cat",
     hkSearchEngines: "Activate search engines (inside search input)",
     hkNavigate: "Navigate results (inside search input)",
+    editConfig: "Edit configuration",
+    editConfigValid: "Configurationi is valid",
+    editConfigInvalid: "Configuration is invalid",
+    editConfigSave: "Save",
+    editConfigCancel: "Cancel",
+    editConfigSaveDone: "Changes were saved successfully",
+    editConfigSaveFailed: "Changes could not be saved",
   },
 };
 
