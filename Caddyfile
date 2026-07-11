@@ -1,38 +1,34 @@
 :8080 {
     root * /app
 
-    # Volle Kontrolle über Cache-Header für JSON-Dateien im WebDAV-Ordner
-    route /config/*.json {
-        header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
+    @config path /config/*
+
+    route @config {
+        header Cache-Control "no-store"
+
+        @user_config {
+            path /config/services.json
+            header Remote-User ?*
+        }
+        rewrite @user_config /config/services.{http.request.header.Remote-User}.json
+
+        @user_backup {
+            path_regexp backup ^/config/services\.backup-(.+)\.json$
+            header Remote-User ?*
+        }
+        rewrite @user_backup /config/services.{http.request.header.Remote-User}.backup-{re.backup.1}.json
+
         webdav {
             root /app
         }
     }
 
-    # REWRITE LOGIK FÜR REMOTE-USER (Dein altes Nginx-Map)
-    @has_remote_user {
-        path /config/services.json
-        header Remote-User ?*
+    @spa {
+        not path /config/*
     }
-    rewrite @has_remote_user /config/services.{http.request.header.Remote-User}.json
 
-    @has_remote_user_backup {
-        path_regexp backup ^/config/services\.backup-(.+)\.json$
-        header Remote-User ?*
+    route @spa {
+        try_files {path} /index.html
+        file_server
     }
-    rewrite @has_remote_user_backup /config/services.{http.request.header.Remote-User}.backup-{re.backup.1}.json
-
-    # SPA-ROUTING (Exakt wie Nginx 'try_files $uri $uri/ /index.html')
-    # Caddy prüft: Existiert die Datei? Wenn nein, nimm die index.html
-    try_files {path} {path}/ /index.html
-
-    # Statische Dateien ausliefern (aktiv für alles, was try_files findet)
-    file_server
-
-    # Header global für HTML-Anfragen setzen (Cache-Control wie in Nginx)
-    @html_requests {
-        path /
-        path /index.html
-    }
-    header @html_requests Cache-Control "no-cache, must-revalidate"
 }
