@@ -23,6 +23,8 @@ class DashboardApp extends LitElement {
     searchEngines: { type: Array },
     showConfigModal: { type: Boolean },
     isEditorConfigValid: { type: Boolean },
+    isEditorConfigValid: { type: Boolean },
+    hasEditorConfigChanged: { type: Boolean },	  
     activeCategoryKey: { type: String },
     currentInput: { type: String },
     isInvalidInput: { type: Boolean },
@@ -66,6 +68,8 @@ class DashboardApp extends LitElement {
 
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
+    this.originalConfigString = "";
+    this.hasEditorConfigChanged = false;
   }
 
   t(key) {
@@ -114,38 +118,6 @@ class DashboardApp extends LitElement {
     }
   }
 
-  movePage(direction) {
-  const ta = this.editorInstance.textarea;
-  const lineHeight = 20; // adjust if your editor uses another line height
-  const linesPerPage = Math.floor(ta.clientHeight / lineHeight);
-
-  const value = ta.value;
-  let pos = ta.selectionStart;
-
-  for (let i = 0; i < linesPerPage; i++) {
-    if (direction > 0) {
-      const next = value.indexOf("\n", pos);
-      if (next === -1) {
-        pos = value.length;
-        break;
-      }
-      pos = next + 1;
-    } else {
-      const prev = value.lastIndexOf("\n", Math.max(0, pos - 2));
-      if (prev === -1) {
-        pos = 0;
-        break;
-      }
-      pos = prev;
-    }
-  }
-
-  ta.setSelectionRange(pos, pos);
-  ta.scrollTop += direction * ta.clientHeight;
-  ta.focus();
-}
-
-
   // --- Editor Initialisierung & Event Binding ---
   initEditor() {
     const container = this.querySelector("#editorContainer");
@@ -163,8 +135,13 @@ class DashboardApp extends LitElement {
         onUpdate: (value) => {
           this.editorValue = value;
           try {
-            JSON.parse(value);
-            this.isEditorConfigValid = true;
+            const parsed = JSON.parse(value);
+            const isJsonValid = true;
+            const isStructureValid = this.validateConfig(parsed);
+            this.hasEditorConfigChanged = value !== this.originalConfigString;
+            console.error('changed = %o', this.hasEditorConfigChanged);
+
+            this.isEditorConfigValid = isJsonValid && isStructureValid;
           } catch (err) {
             this.isEditorConfigValid = false;
           }
@@ -172,17 +149,6 @@ class DashboardApp extends LitElement {
       },
       () => console.log("Prism Code Editor mounted"),
     );
-this.editorInstance.keyCommandMap.PageDown = (e) => {
-  e.preventDefault();
-  this.movePage(1);
-  return true;
-};
-
-this.editorInstance.keyCommandMap.PageUp = (e) => {
-  e.preventDefault();
-  this.movePage(-1);
-  return true;
-};
   }
 
   // --- State helpers ---
@@ -272,6 +238,35 @@ this.editorInstance.keyCommandMap.PageUp = (e) => {
     }
   }
 
+validateConfig(jsonObj) {
+  // 1. Grundprüfung auf Objekt und Existenz der Haupt-Arrays
+  if (!jsonObj || typeof jsonObj !== 'object') return false;
+
+  // 2. Prüfen, ob Kategorien existieren und mindestens eine vorhanden ist
+  const hasCategories = Array.isArray(jsonObj.categories) && jsonObj.categories.length > 0;
+  
+  // 3. Prüfen, ob Suchmaschinen existieren und mindestens eine vorhanden ist
+  const hasSearchEngines = Array.isArray(jsonObj.searchEngines) && jsonObj.searchEngines.length > 0;
+
+  if (!hasCategories || !hasSearchEngines) return false;
+
+  // 4. Optional: Tiefe Prüfung der Kategorien (z.B. ob 'categoryKey' existiert)
+  const isCategoriesValid = jsonObj.categories.every(cat => 
+    typeof cat.category === 'string' && 
+    typeof cat.categoryKey === 'string' &&
+    Array.isArray(cat.services)
+  );
+
+  // 5. Optional: Prüfung der Suchmaschinen (z.B. ob 'prefix' und 'url' existieren)
+  const isSearchEnginesValid = jsonObj.searchEngines.every(engine => 
+    typeof engine.name === 'string' && 
+    typeof engine.prefix === 'string' && 
+    typeof engine.url === 'string'
+  );
+
+  return isCategoriesValid && isSearchEnginesValid;
+}
+
   // --- Event handlers ---
 
   handlePopState(e) {
@@ -308,6 +303,16 @@ this.editorInstance.keyCommandMap.PageUp = (e) => {
 
   handleKeyDown(e) {
     if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+    if (e.key === "Escape") {
+    if (this.showConfigModal) {
+      this.showConfigModal = false;
+      return;
+    }
+    this.resetInput(true);
+    return;
+  }
+	  
     if (this.showConfigModal) return; // Shortcuts sperren, wenn der Editor offen ist
 
     const filtered = getFilteredServices(this.categories, this.searchQuery);
@@ -627,19 +632,21 @@ this.editorInstance.keyCommandMap.PageUp = (e) => {
 
           <button
             @click="${() => {
-            this.showConfigModal = true;
-            this.isEditorConfigValid = true;
-            this.editorValue = JSON.stringify(
-              {
-                categories: this.categories,
-                searchEngines: this.searchEngines,
-              },
-              null,
-              2,
-            );
-          }}"
+              this.showConfigModal = true;
+              this.isEditorConfigValid = true;
+              this.hasEditorConfigChanged = false;
+              this.editorValue = JSON.stringify(
+                {
+                  categories: this.categories,
+                  searchEngines: this.searchEngines,
+                },
+                null,
+                2,
+              );
+              this.originalConfigString = this.editorValue;
+            }}"
             class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md"
-            title="Edit Configuration"
+            title="${this.t("editConfig")}"
           >
             <i
               data-lucide="settings"
@@ -670,16 +677,13 @@ this.editorInstance.keyCommandMap.PageUp = (e) => {
     return html`
       <style>
         #editorContainer {
-          height: 100%;
           display: grid;
+          grid-template-rows: 1fr auto;
+          gap: 1em;
+          overflow: hidden;
         }
         .prism-code-editor {
-          height: 100% !important;
-          border-radius: 0.75rem;
-          background-color: #0f172a !important; /* bg-slate-900 */
-          font-family:
-            ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          font-size: 0.875rem;
+          border-radius: 0.4em;
         }
       </style>
 
@@ -692,18 +696,18 @@ this.editorInstance.keyCommandMap.PageUp = (e) => {
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-bold text-white flex items-center gap-2">
               <i data-lucide="edit" class="text-indigo-400 w-5 h-5"></i>
-              Edit Configuration
+              ${this.t("editConfig")}
             </h3>
 
             ${
               this.isEditorConfigValid
                 ? html`<span
                     class="text-xs font-mono px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                    >Valid JSON</span
+                    >${this.t("editConfigValid")}</span
                   >`
                 : html`<span
                     class="text-xs font-mono px-2 py-1 rounded bg-rose-500/10 text-rose-400 border border-rose-500/20 animate-pulse"
-                    >Invalid JSON syntax</span
+                    >${this.t("editConfigInvalid")}</span
                   >`
             }
           </div>
@@ -723,10 +727,10 @@ this.editorInstance.keyCommandMap.PageUp = (e) => {
 
             <button
               @click="${this.handleSaveConfig}"
-              ?disabled="${!this.isEditorConfigValid}"
+              ?disabled="${!this.isEditorConfigValid || !this.hasEditorConfigChanged}"
               class="px-4 py-2 rounded-xl text-sm font-medium text-white transition-all
                      ${
-                       this.isEditorConfigValid
+                       this.isEditorConfigValid && this.hasEditorConfigChanged
                          ? "bg-indigo-600 hover:bg-indigo-500 cursor-pointer"
                          : "bg-slate-700 text-slate-500 cursor-not-allowed opacity-50"
                      }"
@@ -903,9 +907,9 @@ this.editorInstance.keyCommandMap.PageUp = (e) => {
                 ? html`
                     <button
                       @click="${() => {
-                    this.searchQuery = ":";
-                    this.querySelector("#searchInput")?.focus();
-                  }}"
+                        this.searchQuery = ":";
+                        this.querySelector("#searchInput")?.focus();
+                      }}"
                       class="flex items-center justify-center p-2 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-md cursor-pointer transition-all duration-150 shrink-0 group shadow-md"
                       title="${this.t("searchEnginesShow")}"
                     >
@@ -943,33 +947,33 @@ this.editorInstance.keyCommandMap.PageUp = (e) => {
                       ${this.t("searchEnginesTitle")}
                     </div>
                     ${this.searchEngines.map(
-                    (engine, i) => html`
-                      <button
-                        @click="${() => {
-                        this.searchQuery = `:${engine.prefix} `;
-                        this.querySelector("#searchInput")?.focus();
-                      }}"
-                        class="w-full flex items-center justify-between p-3 rounded-xl font-mono text-sm text-left transition-colors ${i === this.selectedIndex ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/40 text-slate-300"}"
-                      >
-                        <div class="flex items-center gap-3">
-                          ${this.renderIcon(engine.icon, "w-5 h-5 " + (i === this.selectedIndex ? "text-white" : "text-indigo-400"))}
-                          <div>
-                            <span class="font-bold text-white"
-                              >${engine.name}</span
-                            >
-                            <span
-                              class="text-xs ml-2 ${i === this.selectedIndex ? "text-indigo-200" : "text-slate-500"}"
-                              >(${engine.url})</span
-                            >
-                          </div>
-                        </div>
-                        <kbd
-                          class="px-2 py-0.5 text-base font-bold rounded shadow ${i === this.selectedIndex ? "bg-indigo-700 text-white border-indigo-500" : "bg-slate-900 border border-slate-700 text-indigo-400"}"
-                          >:${engine.prefix}</kbd
+                      (engine, i) => html`
+                        <button
+                          @click="${() => {
+                            this.searchQuery = `:${engine.prefix} `;
+                            this.querySelector("#searchInput")?.focus();
+                          }}"
+                          class="w-full flex items-center justify-between p-3 rounded-xl font-mono text-sm text-left transition-colors ${i === this.selectedIndex ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/40 text-slate-300"}"
                         >
-                      </button>
-                    `,
-                  )}
+                          <div class="flex items-center gap-3">
+                            ${this.renderIcon(engine.icon, "w-5 h-5 " + (i === this.selectedIndex ? "text-white" : "text-indigo-400"))}
+                            <div>
+                              <span class="font-bold text-white"
+                                >${engine.name}</span
+                              >
+                              <span
+                                class="text-xs ml-2 ${i === this.selectedIndex ? "text-indigo-200" : "text-slate-500"}"
+                                >(${engine.url})</span
+                              >
+                            </div>
+                          </div>
+                          <kbd
+                            class="px-2 py-0.5 text-base font-bold rounded shadow ${i === this.selectedIndex ? "bg-indigo-700 text-white border-indigo-500" : "bg-slate-900 border border-slate-700 text-indigo-400"}"
+                            >:${engine.prefix}</kbd
+                          >
+                        </button>
+                      `,
+                    )}
                   `
                 : ""
             }
@@ -978,13 +982,13 @@ this.editorInstance.keyCommandMap.PageUp = (e) => {
                 ? html`
                     <button
                       @click="${() => {
-                    const finalUrl = matchedEngine.url.replace(
-                      "%s",
-                      encodeURIComponent(searchTermsPreview),
-                    );
-                    window.open(finalUrl, "_blank");
-                    this.resetInput(true);
-                  }}"
+                        const finalUrl = matchedEngine.url.replace(
+                          "%s",
+                          encodeURIComponent(searchTermsPreview),
+                        );
+                        window.open(finalUrl, "_blank");
+                        this.resetInput(true);
+                      }}"
                       class="w-full flex items-center justify-between p-4 rounded-xl border font-mono text-sm text-left active:scale-[0.98] transition-all mb-3 ${this.selectedIndex === 0 ? "search-item-active bg-indigo-600 border-indigo-500 text-white" : "bg-indigo-600/20 border-indigo-500 text-slate-200"}"
                     >
                       <div class="flex items-center gap-3 min-w-0 grow">
@@ -1284,15 +1288,15 @@ this.editorInstance.keyCommandMap.PageUp = (e) => {
         showMain
           ? html`
               ${
-              this.isGridView
-                ? this.templateFullGridView()
-                : html`
-                    <div class="animate-fadeIn space-y-8 sm:space-y-10">
-                      ${this.templateFavorites(favs)}
-                      ${this.templateCategoriesList()}
-                    </div>
-                  `
-            }
+                this.isGridView
+                  ? this.templateFullGridView()
+                  : html`
+                      <div class="animate-fadeIn space-y-8 sm:space-y-10">
+                        ${this.templateFavorites(favs)}
+                        ${this.templateCategoriesList()}
+                      </div>
+                    `
+              }
             `
           : ""
       }

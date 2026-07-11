@@ -27,6 +27,9 @@ export const translations = {
     contextInCat: "In Kat",
     hkSearchEngines: "Suchmaschinen aktivieren (im Suchfeld)",
     hkNavigate: "Ergebnisse durchblättern (im Suchfeld)",
+    editConfig: "Edit configuration",
+    editConfigValid: "Edit configuration",
+    editConfigInvalid: "Edit configuration",
   },
   en: {
     helpHint: "Press [?] for hotkey help",
@@ -56,6 +59,9 @@ export const translations = {
     contextInCat: "In Cat",
     hkSearchEngines: "Activate search engines (inside search input)",
     hkNavigate: "Navigate results (inside search input)",
+    editConfig: "Edit configuration",
+    editConfigValid: "Edit configuration",
+    editConfigInvalid: "Edit configuration",
   },
 };
 
