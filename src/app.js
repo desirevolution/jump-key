@@ -474,18 +474,26 @@ class DashboardApp extends LitElement {
 
   templateHelpModal() {
     if (!this.showHelp) return "";
+
+    // Basis-Shortcuts, die immer auf der Hauptseite gelten
     const shortcuts = [
       { keys: ["Space"], desc: this.t("hkSearch") },
-      { keys: ["#"], desc: this.t("hkToggleView") }, // <-- Added
+      { keys: ["#"], desc: this.t("hkToggleView") },
     ];
 
+    // Favoriten-Zahlen-Shortcut (nur im Listenmodus aktiv)
     if (!this.isGridView) {
-      shortcuts.push({ keys: ["1", "↓", "0"], desc: this.t("hkFavs") });
+      // GEÄNDERT: "↓" durch Strich "-" ersetzt, um den Zahlenbereich 1 bis 0 (10) korrekt darzustellen
+      shortcuts.push({ keys: ["1", "-", "0"], desc: this.t("hkFavs") });
     }
 
+    // Kategorien, Navigation und kontextbasierte Shortcuts
     shortcuts.push(
       { keys: ["A-Z"], desc: this.t("hkCat") },
       { keys: ["A-Z"], desc: this.t("hkService"), context: true },
+      // NEU: Wichtige Funktionen, die bisher nicht dokumentiert waren
+      { keys: [":"], desc: this.t("hkSearchEngines") }, 
+      { keys: ["↑", "↓"], desc: this.t("hkNavigate") },
       { keys: ["ESC"], desc: this.t("hkReset") },
     );
 
@@ -520,8 +528,12 @@ class DashboardApp extends LitElement {
                 >
                   <span class="text-sm text-slate-400">${item.desc}</span>
                   <div class="flex items-center gap-1 shrink-0">
-                    ${item.context ? html`<span class="text-[10px] bg-slate-900 px-1 py-0.5 rounded text-indigo-400 mr-1 uppercase">In Cat</span>` : ""}
-                    ${item.keys.map((k) => html`<kbd class="px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs font-bold text-indigo-400 shadow shadow-black/40">${k}</kbd>`)}
+                    ${item.context
+                      ? html`<span class="text-[10px] bg-slate-900 px-1 py-0.5 rounded text-indigo-400 mr-1 uppercase font-bold">${this.t("contextInCat")}</span>`
+                      : ""}
+                    ${item.keys.map(
+                      (k) => html`<kbd class="px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs font-bold text-indigo-400 shadow shadow-black/40">${k}</kbd>`,
+                    )}
                   </div>
                 </div>
               `,
@@ -633,7 +645,7 @@ class DashboardApp extends LitElement {
                       ></i>
 
                       <kbd
-                        class="px-1.5 py-0.5 text-xs font-mono font-bold bg-slate-900 border border-slate-700 text-indigo-400 rounded shadow shadow-black/40 group-hover:text-indigo-300 hidden md:block"
+                        class="px-1.5 py-0.5 text-xs font-mono font-bold bg-slate-900 border border-slate-700 text-indigo-400 rounded shadow shadow-black/40 group-hover:text-indigo-300 hidden md:block ml-2"
                       >
                         :
                       </kbd>
@@ -683,7 +695,7 @@ class DashboardApp extends LitElement {
                             </div>
                           </div>
                           <kbd
-                            class="px-2 py-0.5 text-base font-bold text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow"
+                            class="px-2 py-0.5 text-base font-bold text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow hidden md:block"
                           >
                             :${engine.prefix}
                           </kbd>

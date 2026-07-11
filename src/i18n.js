@@ -24,6 +24,9 @@ export const translations = {
     searchEnginePreviewPrefix: "Suche auf", // <-- Neu
     searchEnginePreviewFor: "nach", // <-- Neu
     searchEngineEnterQuery: "Suchbegriff eingeben...", // <-- Neu
+    contextInCat: "In Kat",
+    hkSearchEngines: "Suchmaschinen aktivieren (im Suchfeld)",
+    hkNavigate: "Ergebnisse durchblättern (im Suchfeld)",
   },
   en: {
     helpHint: "Press [?] for hotkey help",
@@ -50,6 +53,9 @@ export const translations = {
     searchEnginePreviewPrefix: "Search on", // <-- Neu
     searchEnginePreviewFor: "for", // <-- Neu
     searchEngineEnterQuery: "Enter search term...", // <-- Neu
+    contextInCat: "In Cat",
+    hkSearchEngines: "Activate search engines (inside search input)",
+    hkNavigate: "Navigate results (inside search input)",
   },
 };
 
