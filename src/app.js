@@ -642,7 +642,7 @@ class DashboardApp extends LitElement {
               );
               this.originalConfigString = this.editorValue;
             }}"
-            class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md"
+            class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md hidden md:block"
             title="${this.t("editConfig")}"
           >
             <i
@@ -700,10 +700,10 @@ class DashboardApp extends LitElement {
 
             <div
               class="p-2 rounded-lg border transition-all duration-300 ${
-    this.isEditorConfigValid
-      ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-      : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-  }"
+                this.isEditorConfigValid
+                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                  : "bg-rose-500/10 text-rose-400 border-rose-500/20"
+              }"
               title="${this.isEditorConfigValid ? this.t("editConfigValid") : this.t("editConfigInvalid")}"
             >
               <i
@@ -731,10 +731,10 @@ class DashboardApp extends LitElement {
               @click="${this.handleSaveConfig}"
               ?disabled="${!this.isEditorConfigValid || !this.hasEditorConfigChanged}"
               class="px-4 py-2 rounded-xl text-sm font-medium text-white transition-all ${
-              this.isEditorConfigValid && this.hasEditorConfigChanged
-                ? "bg-indigo-600 hover:bg-indigo-500 cursor-pointer"
-                : "bg-slate-700 text-slate-500 cursor-not-allowed opacity-50"
-            }"
+                this.isEditorConfigValid && this.hasEditorConfigChanged
+                  ? "bg-indigo-600 hover:bg-indigo-500 cursor-pointer"
+                  : "bg-slate-700 text-slate-500 cursor-not-allowed opacity-50"
+              }"
             >
               ${this.t("editConfigSave")}
             </button>
