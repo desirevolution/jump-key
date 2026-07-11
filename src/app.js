@@ -600,21 +600,30 @@ class DashboardApp extends LitElement {
             </form>
 
             ${
-              showQuickTrigger
-                ? html`
-                    <button
-                      @click="${() => {
-                  this.searchQuery = ":";
-                  this.querySelector("#searchInput")?.focus();
-                }}"
-                      class="px-2 py-0.5 text-base font-mono font-bold bg-slate-900 border border-slate-700 text-indigo-400 rounded shadow shadow-black/40 active:scale-95 transition-transform"
-                      title="Suchmaschinen anzeigen"
-                    >
-                      :
-                    </button>
-                  `
-                : ""
-            }
+  showQuickTrigger
+    ? html`
+        <button
+          @click="${() => {
+      this.searchQuery = ":";
+      this.querySelector("#searchInput")?.focus();
+    }}"
+          class="flex items-center gap-2 pl-2.5 pr-1.5 py-1 bg-slate-850 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-full cursor-pointer transition-all duration-150 shrink-0 group shadow-md"
+          title="Suchmaschinen anzeigen"
+        >
+          <i
+            data-lucide="globe"
+            class="w-4 h-4 text-slate-400 group-hover:text-indigo-400 transition-colors"
+          ></i>
+
+          <kbd
+            class="px-1.5 py-0.5 text-xs font-mono font-bold bg-slate-900 border border-slate-700 text-indigo-400 rounded shadow shadow-black/40 group-hover:text-indigo-300"
+          >
+            :
+          </kbd>
+        </button>
+      `
+    : ""
+}
 
             <button
               @click="${() => this.resetInput(true)}"
@@ -637,9 +646,9 @@ class DashboardApp extends LitElement {
                       (engine) => html`
                         <button
                           @click="${() => {
-                      this.searchQuery = `:${engine.prefix} `;
-                      this.querySelector("#searchInput")?.focus();
-                    }}"
+                            this.searchQuery = `:${engine.prefix} `;
+                            this.querySelector("#searchInput")?.focus();
+                          }}"
                           class="w-full flex items-center justify-between p-3 rounded-xl hover:bg-slate-700/40 text-slate-300 font-mono text-sm text-left transition-colors"
                         >
                           <div class="flex items-center gap-3">
@@ -654,7 +663,7 @@ class DashboardApp extends LitElement {
                             </div>
                           </div>
                           <kbd
-                            class="px-2 py-0.5 text-xs font-bold text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow"
+                            class="px-2 py-0.5 text-base font-bold text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow"
                           >
                             :${engine.prefix}
                           </kbd>

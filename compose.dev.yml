@@ -1,8 +1,12 @@
 services:
-  jump-key:
-    build: .
+  jump-key-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
     volumes:
-      - ./config:/app/config
-      - ./icons:/app/icons
+      - .:/app
+      - /app/node_modules
+      - ./config:/app/public/config
+      - ./icons:/app/public/icons
     ports:
       - "8080:8080"
