@@ -1,4 +1,9 @@
-:8080 {
+{
+    auto_https off
+    order webdav before file_server
+}
+
+:80 {
     root * /app
 
     @config path /config/*
