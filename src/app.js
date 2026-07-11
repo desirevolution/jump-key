@@ -10,12 +10,8 @@ import {
 // --- PRISM CODE EDITOR SETUP & LANGUAGE ---
 import { basicEditor } from "prism-code-editor/setups";
 import "prism-code-editor/prism/languages/json";
-
-// CSS als Text/String laden, um Vite/Rolldown-Export-Fehler zu umgehen
-// Importing styles
 import "prism-code-editor/layout.css";
 import "prism-code-editor/themes/night-owl.css";
-//import editorTheme from "prism-code-editor/themes/tomorrow-night.css?inline";
 
 class DashboardApp extends LitElement {
   createRenderRoot() {
@@ -118,6 +114,38 @@ class DashboardApp extends LitElement {
     }
   }
 
+  movePage(direction) {
+  const ta = this.editorInstance.textarea;
+  const lineHeight = 20; // adjust if your editor uses another line height
+  const linesPerPage = Math.floor(ta.clientHeight / lineHeight);
+
+  const value = ta.value;
+  let pos = ta.selectionStart;
+
+  for (let i = 0; i < linesPerPage; i++) {
+    if (direction > 0) {
+      const next = value.indexOf("\n", pos);
+      if (next === -1) {
+        pos = value.length;
+        break;
+      }
+      pos = next + 1;
+    } else {
+      const prev = value.lastIndexOf("\n", Math.max(0, pos - 2));
+      if (prev === -1) {
+        pos = 0;
+        break;
+      }
+      pos = prev;
+    }
+  }
+
+  ta.setSelectionRange(pos, pos);
+  ta.scrollTop += direction * ta.clientHeight;
+  ta.focus();
+}
+
+
   // --- Editor Initialisierung & Event Binding ---
   initEditor() {
     const container = this.querySelector("#editorContainer");
@@ -144,6 +172,17 @@ class DashboardApp extends LitElement {
       },
       () => console.log("Prism Code Editor mounted"),
     );
+this.editorInstance.keyCommandMap.PageDown = (e) => {
+  e.preventDefault();
+  this.movePage(1);
+  return true;
+};
+
+this.editorInstance.keyCommandMap.PageUp = (e) => {
+  e.preventDefault();
+  this.movePage(-1);
+  return true;
+};
   }
 
   // --- State helpers ---
