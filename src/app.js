@@ -100,15 +100,30 @@ class DashboardApp extends LitElement {
   updateTime() {
     const locale = this.lang === "de" ? "de-DE" : "en-US";
     const now = new Date();
+
     this.timeString = now.toLocaleTimeString(locale, {
       hour: "2-digit",
       minute: "2-digit",
     });
-    this.dateString = now.toLocaleDateString(locale, {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-    });
+
+    // Check if screen width is mobile (e.g., less than 640px matching Tailwind's sm breakpoint)
+    const isMobile = window.matchMedia("(max-width: 639px)").matches;
+
+    if (isMobile) {
+      // Short numeric format for mobile
+      this.dateString = now.toLocaleDateString(locale, {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric", // Or "2-digit" if you want it even shorter
+      });
+    } else {
+      // Long text format for desktop
+      this.dateString = now.toLocaleDateString(locale, {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      });
+    }
   }
 
   resetInput(updateHistory = true) {
@@ -401,7 +416,7 @@ class DashboardApp extends LitElement {
             </h1>
             <button
               @click="${() => (this.showHelp = true)}"
-              class="text-xs text-slate-500 hover:text-indigo-400 font-mono mt-1 text-left flex items-center gap-1.5 transition-colors"
+              class="text-xs text-slate-500 hover:text-indigo-400 font-mono mt-1 text-left flex items-center gap-1.5 transition-colors hidden md:block"
             >
               <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
               ${this.t("helpHint")}
@@ -440,7 +455,7 @@ class DashboardApp extends LitElement {
               class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
             ></i>
           </button>
-          <div class="text-right ml-2">
+          <div class="text-center sm:text-right ml-2">
             <div
               class="text-2xl sm:text-4xl font-bold text-indigo-400 tracking-wider"
             >
@@ -604,9 +619,9 @@ class DashboardApp extends LitElement {
                 ? html`
                     <button
                       @click="${() => {
-            this.searchQuery = ":";
-            this.querySelector("#searchInput")?.focus();
-          }}"
+                        this.searchQuery = ":";
+                        this.querySelector("#searchInput")?.focus();
+                      }}"
                       class="flex items-center justify-center p-1.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-md cursor-pointer transition-all duration-150 shrink-0 group shadow-md"
                       title="${this.t("searchEnginesShow")}"
                     >
@@ -868,7 +883,7 @@ class DashboardApp extends LitElement {
             <div class="border-b border-slate-800/40 pb-5 last:border-0">
               <div class="flex items-center gap-3 mb-3">
                 <kbd
-                  class="px-2 py-0.5 font-bold font-mono text-xs text-indigo-400 bg-slate-900 border border-indigo-500/30 rounded"
+                  class="px-2 py-0.5 font-bold font-mono text-xs text-indigo-400 bg-slate-900 border border-indigo-500/30 rounded hidden sm:block"
                 >
                   ${cat.categoryKey?.toUpperCase() ?? ""}
                 </kbd>
