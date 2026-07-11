@@ -21,7 +21,7 @@
 - **Configuration Validation**: Validate JSON before applying changes.
 - **Responsive User Interface**: Optimized for desktop and mobile devices.
 - **Localization Support**: Automatic language detection with internationalization support.
-- **Lucide Icons**: Use the Lucide icon set for services and actions.
+- **Lucide Icons**: Use the Lucide icon set for services and actions.()
 - **Docker Ready**: Deploy using the included Docker Compose configuration.
 - **Lightweight Architecture**: Built with Lit for fast rendering and minimal resource usage.
 
@@ -48,7 +48,9 @@
 
 ## Quick Start
 
-Copy/adjust [compose.yml](compose.yml) and [services.json](services.example.json) and run
+Copy/adjust ./[compose.yml](compose.yml) and ./config/[services.json](services.example.json) and put all your custome icon images in ./icon.
+
+Then run:
 
 ```bash
 # caddy webdav container needs write access to the config directory
