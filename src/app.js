@@ -410,16 +410,16 @@ class DashboardApp extends LitElement {
               class="w-12 h-12 sm:w-16 sm:h-16 object-contain rounded-lg shadow-md cursor-pointer"
             />
           </a>
-          <div>
+          <div class="flex items-center gap-2">
             <h1 class="text-2xl sm:text-3xl font-bold tracking-tight">
               JumpKey
             </h1>
             <button
               @click="${() => (this.showHelp = true)}"
-              class="text-xs text-slate-500 hover:text-indigo-400 font-mono mt-1 text-left flex items-center gap-1.5 transition-colors hidden md:block"
+              class="text-slate-500 hover:text-indigo-400 transition-colors flex items-center alignment-baseline dynamic-icon hidden md:block"
+              title="${this.t("helpHint")}"
             >
-              <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
-              ${this.t("helpHint")}
+              <i data-lucide="help-circle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
             </button>
           </div>
         </div>
@@ -579,9 +579,11 @@ class DashboardApp extends LitElement {
 
     return html`
       <div
+        @click="${() => this.resetInput(true)}"
         class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-start justify-center pt-8 sm:pt-24 z-50 animate-fadeIn"
       >
         <div
+          @click="${(e) => e.stopPropagation()}"
           class="bg-slate-800 border border-slate-700 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden mx-4 flex flex-col max-h-[80vh]"
         >
           <div
