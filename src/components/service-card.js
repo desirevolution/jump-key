@@ -8,7 +8,7 @@ export class JkServiceCard extends LitElement {
 
   static properties = {
     name: { type: String },
-    url: { type: String },
+    subtitle: { type: String }, // Replaces "url" to support text definitions or URLs universally
     icon: { type: String },
     category: { type: String },
     badgeText: { type: String },
@@ -18,7 +18,7 @@ export class JkServiceCard extends LitElement {
   constructor() {
     super();
     this.name = "";
-    this.url = "";
+    this.subtitle = "";
     this.icon = "";
     this.category = "";
     this.badgeText = "";
@@ -35,10 +35,14 @@ export class JkServiceCard extends LitElement {
   }
 
   render() {
-    // Clean up URL preview string (e.g. remove https:// and www.)
-    const displayUrl = this.url
-      ? this.url.replace(/^https?:\/\/(www\.)?/, "")
-      : "";
+    // If the subtitle looks like a web address, clean up the preview string (remove https://, etc.)
+    // Otherwise, render the string (e.g., "5 Services") verbatim.
+    const isUrl =
+      this.subtitle &&
+      (this.subtitle.includes(".") || this.subtitle.includes("/"));
+    const displaySubtitle = isUrl
+      ? this.subtitle.replace(/^https?:\/\/(www\.)?/, "")
+      : this.subtitle || "";
 
     return html`
       <button
@@ -60,7 +64,7 @@ export class JkServiceCard extends LitElement {
           <span
             class="text-xs text-slate-400 truncate block font-mono opacity-80 group-hover:text-slate-300 transition-colors"
           >
-            ${displayUrl}
+            ${displaySubtitle}
           </span>
 
           ${

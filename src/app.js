@@ -657,15 +657,16 @@ class DashboardApp extends LitElement {
           ${this.t("favorites")}
         </h2>
         <div
-          class="grid gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(285px,1fr))]"
+          class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]"
         >
           ${favs.map(
             (service) => html`
               <jk-service-card
                 .name=${service.name}
-                .url=${service.url}
+                .subtitle=${service.url}
                 .icon=${service.icon}
                 .badgeText=${service.key}
+                .renderIcon=${(icon, cls) => this.renderIcon(icon, cls)}
                 @card-click=${() => this.trackClick(service)}
               ></jk-service-card>
             `,
@@ -677,45 +678,21 @@ class DashboardApp extends LitElement {
 
   templateCategoriesList() {
     return html`
-      <div>
-        <h2
-          class="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3"
-        >
-          ${this.t("categories")}
-        </h2>
-        <div
-          class="grid gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(285px,1fr))]"
-        >
-          ${this.categories.map(
-            (cat) => html`
-              <button
-                @click="${(e) => this.handleCategoryUISelection(cat, e)}"
-                class="group text-left flex items-center gap-4 w-full p-4 sm:p-5 bg-slate-800 border border-slate-700 hover:border-indigo-500 rounded-xl transition-all active:scale-[0.98] relative min-w-0"
-              >
-                <div class="shrink-0 flex items-center justify-center">
-                  <jk-icon
-                    .icon=${cat.icon}
-                    class="w-12 h-12 text-indigo-400"
-                  ></jk-icon>
-                </div>
-                <div class="overflow-hidden pr-8 grow min-w-0">
-                  <h3
-                    class="text-sm sm:text-base font-semibold text-slate-200 group-hover:text-white leading-tight break-words"
-                  >
-                    ${cat.category}
-                  </h3>
-                  <p class="text-xs text-slate-500 block mt-1">
-                    ${cat.services?.length ?? 0} ${this.t("services")}
-                  </p>
-                </div>
-                <kbd
-                  class="px-2 py-0.5 font-bold font-mono text-lg text-indigo-400 bg-slate-900 border border-slate-700 rounded shadow-md shadow-black/40 hidden sm:inline"
-                  >${cat.categoryKey?.toUpperCase() ?? ""}</kbd
-                >
-              </button>
-            `,
-          )}
-        </div>
+      <div
+        class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]"
+      >
+        ${this.categories.map(
+          (cat) => html`
+            <jk-service-card
+              .name=${cat.category}
+              .subtitle=${`${cat.services?.length ?? 0} Services`}
+              .icon=${cat.icon}
+              .badgeText=${cat.categoryKey}
+              .renderIcon=${(icon, cls) => this.renderIcon(icon, cls)}
+              @card-click=${() => (this.activeCategoryKey = cat.categoryKey)}
+            ></jk-service-card>
+          `,
+        )}
       </div>
     `;
   }
@@ -724,46 +701,46 @@ class DashboardApp extends LitElement {
     return html`
       <div class="animate-fadeIn space-y-5">
         ${this.categories.map(
-        (cat) => html`
-          <div class="border-b border-slate-800/40 pb-5 last:border-0">
-            <!-- Category Section Header -->
-            <div class="flex items-center gap-3 mb-3">
-              <kbd
-                class="px-2 py-0.5 font-bold font-mono text-xs text-indigo-400 bg-slate-900 border border-indigo-500/30 rounded hidden sm:block"
-              >
-                ${cat.categoryKey?.toUpperCase() ?? ""}
-              </kbd>
-              <jk-icon
-                .icon="${cat.icon}"
-                class="w-4 h-4 text-indigo-400/80"
-              ></jk-icon>
-              <h2
-                class="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider"
-              >
-                ${cat.category}
-              </h2>
-            </div>
+          (cat) => html`
+            <div class="border-b border-slate-800/40 pb-5 last:border-0">
+              <!-- Category Section Header -->
+              <div class="flex items-center gap-3 mb-3">
+                <kbd
+                  class="px-2 py-0.5 font-bold font-mono text-xs text-indigo-400 bg-slate-900 border border-indigo-500/30 rounded hidden sm:block"
+                >
+                  ${cat.categoryKey?.toUpperCase() ?? ""}
+                </kbd>
+                <jk-icon
+                  .icon="${cat.icon}"
+                  class="w-4 h-4 text-indigo-400/80"
+                ></jk-icon>
+                <h2
+                  class="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider"
+                >
+                  ${cat.category}
+                </h2>
+              </div>
 
-            <!-- Services Grid for this specific Category -->
-            <div
-              class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(285px,1fr))]"
-            >
-              ${(cat.services ?? []).map(
-                (service) => html`
-                  <jk-service-card
-                    .name=${service.name}
-                    .url=${service.url}
-                    .icon=${service.icon}
-                    .badgeText=${service.key}
-                    .renderIcon=${(icon, cls) => this.renderIcon(icon, cls)}
-                    @card-click=${() => this.trackClick(service)}
-                  ></jk-service-card>
-                `,
-              )}
+              <!-- Services Grid for this specific Category -->
+              <div
+                class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]"
+              >
+                ${(cat.services ?? []).map(
+                  (service) => html`
+                    <jk-service-card
+                      .name=${service.name}
+                      .subtitle=${service.url}
+                      .icon=${service.icon}
+                      .badgeText=${service.key}
+                      .renderIcon=${(icon, cls) => this.renderIcon(icon, cls)}
+                      @card-click=${() => this.trackClick(service)}
+                    ></jk-service-card>
+                  `,
+                )}
+              </div>
             </div>
-          </div>
-        `,
-      )}
+          `,
+        )}
       </div>
     `;
   }
@@ -771,15 +748,34 @@ class DashboardApp extends LitElement {
   templateServicesGrid(activeGroup) {
     if (!activeGroup) return html``;
     return html`
+      <div class="flex items-center gap-3 mb-3">
+        <kbd
+          class="px-2 py-0.5 font-bold font-mono text-xs text-indigo-400 bg-slate-900 border border-indigo-500/30 rounded hidden sm:block"
+        >
+          ${activeGroup.categoryKey?.toUpperCase() ?? ""}
+        </kbd>
+        <jk-icon
+          .icon="${activeGroup.icon}"
+          class="w-4 h-4 text-indigo-400/80"
+        ></jk-icon>
+        <h2
+          class="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider"
+        >
+          ${activeGroup.category}
+        </h2>
+      </div>
       <div class="animate-fadeIn space-y-6">
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div
+          class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]"
+        >
           ${activeGroup.services.map(
             (service) => html`
               <jk-service-card
                 .name=${service.name}
-                .url=${service.url}
+                .subtitle=${service.url}
                 .icon=${service.icon}
                 .badgeText=${service.key}
+                .renderIcon=${(icon, cls) => this.renderIcon(icon, cls)}
                 @card-click=${() => this.trackClick(service)}
               ></jk-service-card>
             `,

@@ -14,7 +14,6 @@ class JkIcon extends LitElement {
   }
 
   render() {
-    console.error("arthur %o", this.icon);
     if (/\.(png|jpe?g|svg|webp)$/i.test(this.icon)) {
       return html`
         <img
