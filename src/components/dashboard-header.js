@@ -6,38 +6,36 @@ export class JkDashboardHeader extends LitElement {
     return this;
   }
 
-  static properties = {
-    isGridView: { type: Boolean },
-    lang: { type: String },
-    t: { type: Function },
-  };
-
-  constructor() {
-    super();
-    this.isGridView = false;
-    this.lang = "en";
-
-    // Internal reactive state for time/date
-    this._timeString = "";
-    this._dateString = "";
-    this._timeInterval = null;
-  }
-
   static get properties() {
     return {
       isGridView: { type: Boolean },
       lang: { type: String },
       t: { type: Function },
-      _timeString: { type: String, state: true },
+      _hoursString: { type: String, state: true },
+      _minutesString: { type: String, state: true },
       _dateString: { type: String, state: true },
     };
   }
 
+  constructor() {
+    super();
+    this.isGridView = false;
+    this.lang = "en";
+    this._hoursString = "";
+    this._minutesString = "";
+    this._dateString = "";
+    this._timeInterval = null;
+  }
+
   connectedCallback() {
     super.connectedCallback();
-    this._updateTime();
-    this._timeInterval = setInterval(() => this._updateTime(), 1000);
     setTimeout(() => createIcons({ icons }), 0);
+  }
+
+  firstUpdated() {
+    this._updateTime();
+    // 1000ms ist super, damit der Doppelpunkt präzise jede Sekunde pulsiert
+    this._timeInterval = setInterval(() => this._updateTime(), 1000);
   }
 
   disconnectedCallback() {
@@ -46,22 +44,17 @@ export class JkDashboardHeader extends LitElement {
   }
 
   updated(changedProperties) {
-    if (
-      changedProperties.has("isGridView") ||
-      changedProperties.has("_timeString")
-    ) {
-      createIcons({ icons });
+    if (changedProperties.has("isGridView")) {
+      setTimeout(() => createIcons({ icons }), 0);
     }
   }
-
   _updateTime() {
     const locale = this.lang === "de" ? "de-DE" : "en-US";
     const now = new Date();
 
-    this._timeString = now.toLocaleTimeString(locale, {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    // Reine Zahlen extrahieren und mit führender Null formatieren (z.B. "09" statt "9")
+    this._hoursString = String(now.getHours()).padStart(2, "0");
+    this._minutesString = String(now.getMinutes()).padStart(2, "0");
 
     const isMobile = window.matchMedia("(max-width: 639px)").matches;
     if (isMobile) {
@@ -90,7 +83,6 @@ export class JkDashboardHeader extends LitElement {
       <div
         class="flex flex-row justify-between items-center mb-8 sm:mb-12 border-b border-slate-800 pb-6 gap-4"
       >
-        <!-- Brand / Logo Section -->
         <div class="flex items-center gap-4">
           <a
             href="https://github.com/desirevolution/jump-key"
@@ -113,37 +105,36 @@ export class JkDashboardHeader extends LitElement {
             <button
               @click="${() => this._dispatchEvent("open-help")}"
               class="text-slate-500 hover:text-indigo-400 transition-colors flex items-center alignment-baseline dynamic-icon hidden md:block"
-              title="${this.t("helpHint")}"
+              title="${this.t ? this.t("helpHint") : ""}"
             >
               <i data-lucide="help-circle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
             </button>
           </div>
         </div>
 
-        <!-- Action Buttons & Clock Section -->
         <div class="flex items-center gap-3 font-mono">
           <button
             @click="${() => this._dispatchEvent("toggle-view")}"
             class="p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-slate-300 transition-colors shadow-md group"
-            title="${this.t("hkToggleView")} [#]"
+            title="${this.t ? this.t("hkToggleView") : ""} [#]"
           >
             ${
-              this.isGridView
-                ? html`<i
-                    data-lucide="rows-2"
-                    class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
-                  ></i>`
-                : html`<i
-                    data-lucide="layout-grid"
-                    class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
-                  ></i>`
-            }
+      this.isGridView
+        ? html`<i
+            data-lucide="rows-2"
+            class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
+          ></i>`
+        : html`<i
+            data-lucide="layout-grid"
+            class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
+          ></i>`
+    }
           </button>
 
           <button
             @click="${() => this._dispatchEvent("open-search")}"
             class="p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-slate-300 transition-colors shadow-md group"
-            title="${this.t("hkSearch")} [Space]"
+            title="${this.t ? this.t("hkSearch") : ""} [Space]"
           >
             <i
               data-lucide="search"
@@ -154,7 +145,7 @@ export class JkDashboardHeader extends LitElement {
           <button
             @click="${() => this._dispatchEvent("open-config")}"
             class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md hidden md:block"
-            title="${this.t("editConfig")}"
+            title="${this.t ? this.t("editConfig") : ""}"
           >
             <i
               data-lucide="settings"
@@ -162,12 +153,13 @@ export class JkDashboardHeader extends LitElement {
             ></i>
           </button>
 
-          <!-- Clock Display -->
           <div class="text-center sm:text-right ml-2 select-none">
             <div
-              class="text-2xl sm:text-4xl font-bold text-indigo-400 tracking-wider"
+              class="text-2xl sm:text-4xl font-bold text-indigo-400 tracking-wider flex items-center justify-center sm:justify-end"
             >
-              ${this._timeString}
+              <span>${this._hoursString}</span>
+              <span class="mx-[1px] relative -top-[2px]">:</span>
+              <span>${this._minutesString}</span>
             </div>
             <div
               class="text-[10px] sm:text-xs text-slate-400 font-medium mt-0.5"
