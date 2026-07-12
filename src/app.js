@@ -646,20 +646,19 @@ class DashboardApp extends LitElement {
   templateFavorites(favs) {
     if (favs.length === 0) return html``;
     return html`
-      <div>
-        <h2
-          class="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 font-mono flex items-center gap-2"
-        >
-          <jk-icon
-            icon="star"
-            class="text-amber-400 w-4 h-4 fill-amber-400/20"
-          ></jk-icon>
-          ${this.t("favorites")}
-        </h2>
-        <div
-          class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]"
-        >
-          ${favs.map(
+      <h2
+        class="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2"
+      >
+        <jk-icon
+          icon="star"
+          class="text-amber-500 w-4 h-4 fill-amber-400/20"
+        ></jk-icon>
+        ${this.t("frequent")}
+      </h2>
+      <div
+        class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]"
+      >
+        ${favs.map(
             (service) => html`
               <jk-service-card
                 .name=${service.name}
@@ -671,13 +670,21 @@ class DashboardApp extends LitElement {
               ></jk-service-card>
             `,
           )}
-        </div>
       </div>
     `;
   }
 
   templateCategoriesList() {
     return html`
+      <h2
+        class="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2"
+      >
+        <jk-icon
+          icon="folder"
+          class="text-blue-500 w-4 h-4 fill-amber-400/20"
+        ></jk-icon>
+        ${this.t("categories")}
+      </h2>
       <div
         class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]"
       >
