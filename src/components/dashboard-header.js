@@ -143,7 +143,7 @@ export class JkDashboardHeader extends LitElement {
           <button
             @click="${() => this._dispatchEvent("open-search")}"
             class="p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-slate-300 transition-colors shadow-md group"
-            title="Suche [Space]"
+            title="${this.t("hkSearch")} [Space]"
           >
             <i
               data-lucide="search"
