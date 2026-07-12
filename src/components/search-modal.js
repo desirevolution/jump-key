@@ -74,25 +74,52 @@ export class JkSearchModal extends LitElement {
     const queryTrimmed = this.searchQuery.trim();
     let matchedEngine = null;
     let searchTermsPreview = "";
+    let candidateEngines = [];
+    let isFilteringEngines = false;
+    let showPreviewBlock = false;
 
-    if (queryTrimmed.startsWith(":")) {
-      const commandString = queryTrimmed.substring(1).trim();
+    // Detect if user is intentionally using a search engine command
+    if (this.searchQuery.startsWith(":")) {
+      const commandString = this.searchQuery.substring(1);
       const firstSpaceIndex = commandString.indexOf(" ");
-      const prefix =
-        firstSpaceIndex !== -1
-          ? commandString.substring(0, firstSpaceIndex)
-          : commandString;
-      searchTermsPreview =
-        firstSpaceIndex !== -1
-          ? commandString.substring(firstSpaceIndex + 1).trim()
-          : "";
-      matchedEngine = this.searchEngines.find(
-        (e) => e.prefix.toLowerCase() === prefix.toLowerCase(),
-      );
+
+      if (firstSpaceIndex !== -1) {
+        // User typed a space after the prefix token
+        const prefix = commandString
+          .substring(0, firstSpaceIndex)
+          .toLowerCase();
+        searchTermsPreview = commandString.substring(firstSpaceIndex + 1); // Keep the exact string after space
+
+        matchedEngine = this.searchEngines.find(
+          (e) => e.prefix.toLowerCase() === prefix,
+        );
+
+        // Directly show the preview block if a valid engine is found,
+        // even if searchTermsPreview is currently empty ("")
+        if (matchedEngine) {
+          showPreviewBlock = true;
+        }
+      } else {
+        // No space typed yet: User is still filtering the prefixes (e.g., ":y", ":yd")
+        isFilteringEngines = true;
+        const currentPrefixToken = commandString.toLowerCase();
+
+        candidateEngines = this.searchEngines.filter((e) =>
+          e.prefix.toLowerCase().startsWith(currentPrefixToken),
+        );
+      }
     }
 
     const showAllEngines = queryTrimmed === ":";
     const showQuickTrigger = queryTrimmed === "";
+
+    // Show engines list only when actively filtering prefixes or when user just typed a single ":"
+    const enginesToRender = showAllEngines
+      ? this.searchEngines
+      : isFilteringEngines
+        ? candidateEngines
+        : [];
+    const showEnginesList = enginesToRender.length > 0;
 
     return html`
       <div
@@ -154,14 +181,14 @@ export class JkSearchModal extends LitElement {
 
           <div class="overflow-y-auto p-2 space-y-1 grow">
             ${
-              showAllEngines
+              showEnginesList
                 ? html`
                     <div
                       class="px-2 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 font-mono"
                     >
                       ${this.t("searchEnginesTitle")}
                     </div>
-                    ${this.searchEngines.map(
+                    ${enginesToRender.map(
                       (engine, i) => html`
                         <button
                           @click="${() => this._selectEngine(engine.prefix)}"
@@ -193,13 +220,13 @@ export class JkSearchModal extends LitElement {
                 : ""
             }
             ${
-              matchedEngine && !showAllEngines && searchTermsPreview
+              showPreviewBlock
                 ? html`
                     <button
                       @click="${() => {
                         const finalUrl = matchedEngine.url.replace(
                           "%s",
-                          encodeURIComponent(searchTermsPreview),
+                          encodeURIComponent(searchTermsPreview.trim()),
                         );
                         window.open(finalUrl, "_blank");
                         this._handleClose();
@@ -220,8 +247,9 @@ export class JkSearchModal extends LitElement {
                           <br class="sm:hidden" />
                           <span
                             class="italic ${this.selectedIndex === 0 ? "text-indigo-100" : "text-indigo-300"}"
-                            >"${searchTermsPreview}"</span
                           >
+                            ${searchTermsPreview.trim() ? html`"${searchTermsPreview.trim()}"` : html`...`}
+                          </span>
                         </div>
                       </div>
                       <span
@@ -233,10 +261,9 @@ export class JkSearchModal extends LitElement {
                 : ""
             }
             ${
-              !showAllEngines
+              !showEnginesList
                 ? this.filteredServices.map((s, i) => {
-                    const targetIndex =
-                      matchedEngine && searchTermsPreview ? i + 1 : i;
+                    const targetIndex = showPreviewBlock ? i + 1 : i;
                     const isActive = targetIndex === this.selectedIndex;
 
                     return html`
@@ -264,8 +291,8 @@ export class JkSearchModal extends LitElement {
             ${
               this.searchQuery &&
               this.filteredServices.length === 0 &&
-              !matchedEngine &&
-              !showAllEngines
+              !showPreviewBlock &&
+              !showEnginesList
                 ? html`<p class="text-center text-slate-500 text-sm py-4">
                     ${this.t("noServices")}
                   </p>`

@@ -25,7 +25,6 @@ export class JkHelpModal extends LitElement {
   }
 
   render() {
-
     if (!this.show) return "";
 
     const shortcuts = [
@@ -58,7 +57,10 @@ export class JkHelpModal extends LitElement {
             class="flex items-center justify-between mb-6 border-b border-slate-700 pb-3"
           >
             <h3 class="text-lg font-bold text-white flex items-center gap-2">
-              <jk-icon icon="keyboard" class="text-indigo-400 w-5 h-5"></jk-icon>
+              <jk-icon
+                icon="keyboard"
+                class="text-indigo-400 w-5 h-5"
+              ></jk-icon>
               ${this.t("helpTitle")}
             </h3>
             <button
