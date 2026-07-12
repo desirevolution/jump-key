@@ -1,5 +1,5 @@
 import { LitElement, html } from "lit";
-import { createIcons, icons } from "lucide";
+import "./icon.js";
 
 export class JkDashboardHeader extends LitElement {
   createRenderRoot() {
@@ -107,7 +107,10 @@ export class JkDashboardHeader extends LitElement {
               class="text-slate-500 hover:text-indigo-400 transition-colors flex items-center alignment-baseline dynamic-icon hidden md:block"
               title="${this.t ? this.t("helpHint") : ""}"
             >
-              <i data-lucide="help-circle" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+              <jk-icon
+                icon="help-circle"
+                class="w-5 h-5 sm:w-6 sm:h-6"
+              ></jk-icon>
             </button>
           </div>
         </div>
@@ -115,31 +118,31 @@ export class JkDashboardHeader extends LitElement {
         <div class="flex items-center gap-3 font-mono">
           <button
             @click="${() => this._dispatchEvent("toggle-view")}"
-            class="p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-slate-300 transition-colors shadow-md group"
+            class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md hidden md:block"
             title="${this.t ? this.t("hkToggleView") : ""} [#]"
           >
             ${
-      this.isGridView
-        ? html`<i
-            data-lucide="rows-2"
-            class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
-          ></i>`
-        : html`<i
-            data-lucide="layout-grid"
-            class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
-          ></i>`
-    }
+              this.isGridView
+                ? html`<jk-icon
+                    icon="rows-2"
+                    class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
+                  ></jk-icon>`
+                : html`<jk-icon
+                    icon="layout-grid"
+                    class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
+                  ></jk-icon>`
+            }
           </button>
 
           <button
             @click="${() => this._dispatchEvent("open-search")}"
-            class="p-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-slate-300 transition-colors shadow-md group"
+            class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md hidden md:block"
             title="${this.t ? this.t("hkSearch") : ""} [Space]"
           >
-            <i
-              data-lucide="search"
+            <jk-icon
+              icon="search"
               class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
-            ></i>
+            ></jk-icon>
           </button>
 
           <button
@@ -147,10 +150,10 @@ export class JkDashboardHeader extends LitElement {
             class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md hidden md:block"
             title="${this.t ? this.t("editConfig") : ""}"
           >
-            <i
-              data-lucide="settings"
+            <jk-icon
+              icon="settings"
               class="w-5 h-5 text-slate-400 group-hover:text-indigo-400 transition-colors"
-            ></i>
+            ></jk-icon>
           </button>
 
           <div class="text-center sm:text-right ml-2 select-none">

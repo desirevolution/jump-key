@@ -50,9 +50,23 @@ export class JkServiceCard extends LitElement {
         class="group relative bg-slate-800 border border-slate-700 hover:border-indigo-500 rounded-2xl p-4 flex items-center gap-4 text-left cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/5 active:scale-[0.98] w-full"
       >
         <div
-          class="bg-slate-900 rounded-xl text-indigo-400 group-hover:text-white group-hover:bg-indigo-600 transition-all duration-300 shadow-inner shrink-0"
+          class="
+    flex items-center justify-center
+    size-18
+    rounded-2xl
+    bg-slate-800
+    text-indigo-500
+    shadow-sm
+    transition
+    duration-300
+    group-hover:bg-indigo-600
+    group-hover:text-white
+    group-hover:scale-105
+    shrink-0
+    overflow-hidden
+  "
         >
-          <jk-icon .icon=${this.icon} class="w-12 h-12"></jk-icon>
+          <jk-icon .icon=${this.icon} class="size-full"></jk-icon>
         </div>
 
         <div class="min-w-0 grow pr-8">
