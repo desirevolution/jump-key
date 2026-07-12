@@ -172,18 +172,30 @@ export class JkConfigModal extends LitElement {
               ${this.t("editConfig")}
             </h3>
 
-            <div
-              class="p-2 rounded-lg border transition-all duration-300 ${
-                this._isEditorConfigValid
-                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                  : "bg-rose-500/10 text-rose-400 border-rose-500/20"
-              }"
-              title="${this._isEditorConfigValid ? this.t("editConfigValid") : this.t("editConfigInvalid")}"
-            >
-              <jk-icon
-                .icon="${this._isEditorConfigValid ? "circle-check" : "triangle-alert"}"
-                class="w-5 h-5"
-              ></jk-icon>
+            <div class="flex items-center gap-3">
+              <div
+                class="p-2 transition-all duration-300 ${
+                  this._isEditorConfigValid
+                    ? "text-emerald-400"
+                    : "text-rose-400"
+                }"
+                title="${this._isEditorConfigValid ? this.t("editConfigValid") : this.t("editConfigInvalid")}"
+              >
+                <jk-icon
+                  .icon="${this._isEditorConfigValid ? "circle-check" : "triangle-alert"}"
+                  class="w-5 h-5"
+                ></jk-icon>
+              </div>
+
+              <button
+                @click="${this._handleClose}"
+                class="flex items-center justify-center p-2 bg-slate-850 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-md cursor-pointer transition-all duration-150 shrink-0 group shadow-md"
+              >
+                <jk-icon
+                  icon="x"
+                  class="block w-5 h-5 text-slate-400 group-hover:text-indigo-400 transition-colors"
+                ></jk-icon>
+              </button>
             </div>
           </div>
 

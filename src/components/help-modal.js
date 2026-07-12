@@ -25,103 +25,79 @@ export class JkHelpModal extends LitElement {
   }
 
   render() {
-    if (!this.show) return html``;
+
+    if (!this.show) return "";
+
+    const shortcuts = [
+      { keys: ["Space"], desc: this.t("hkSearch") },
+      { keys: ["#"], desc: this.t("hkToggleView") },
+    ];
+
+    if (!this.isGridView) {
+      shortcuts.push({ keys: ["1", "-", "0"], desc: this.t("hkFavs") });
+    }
+
+    shortcuts.push(
+      { keys: ["A-Z"], desc: this.t("hkCat") },
+      { keys: ["A-Z"], desc: this.t("hkService"), context: true },
+      { keys: [":"], desc: this.t("hkSearchEngines") },
+      { keys: ["↑", "↓"], desc: this.t("hkNavigate") },
+      { keys: ["ESC"], desc: this.t("hkReset") },
+    );
 
     return html`
       <div
-        @click="${this._handleClose}"
-        class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
+        @click="${() => (this.show = false)}"
+        class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn p-4"
       >
         <div
           @click="${(e) => e.stopPropagation()}"
-          class="bg-slate-800 border border-slate-700 w-full max-w-lg rounded-2xl shadow-2xl p-6 relative max-h-[90vh] overflow-y-auto"
+          class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-2xl shadow-2xl p-6 relative font-mono text-slate-300"
         >
-          <button
-            @click="${this._handleClose}"
-            class="absolute top-4 right-4 p-2 bg-slate-850 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-md cursor-pointer transition-all duration-150 group"
-          >
-            <jk-icon
-              icon="x"
-              class="block w-4 h-4 text-slate-400 group-hover:text-indigo-400 transition-colors"
-            ></jk-icon>
-          </button>
-
-          <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-            <jk-icon icon="keyboard" class="text-indigo-400 w-6 h-6"></jk-icon>
-            ${this.t("helpShortcutsTitle")}
-          </h3>
-
-          <div class="space-y-4">
-            <div
-              class="flex items-center justify-between py-2 border-b border-slate-700/50"
-            >
-              <span class="text-slate-300 font-medium"
-                >${this.t("helpToggleSearch")}</span
-              >
-              <kbd
-                class="px-2 py-1 bg-slate-900 border border-slate-700 text-indigo-400 font-mono text-sm rounded shadow"
-                >Space</kbd
-              >
-            </div>
-            <div
-              class="flex items-center justify-between py-2 border-b border-slate-700/50"
-            >
-              <span class="text-slate-300 font-medium"
-                >${this.t("helpToggleConfig")}</span
-              >
-              <div class="flex gap-1">
-                <kbd
-                  class="px-2 py-1 bg-slate-900 border border-slate-700 text-slate-400 font-mono text-xs rounded shadow"
-                  >Ctrl</kbd
-                >
-                <kbd
-                  class="px-2 py-1 bg-slate-900 border border-slate-700 text-indigo-400 font-mono text-sm rounded shadow"
-                  >,</kbd
-                >
-              </div>
-            </div>
-            <div
-              class="flex items-center justify-between py-2 border-b border-slate-700/50"
-            >
-              <span class="text-slate-300 font-medium"
-                >${this.t("helpToggleView")}</span
-              >
-              <kbd
-                class="px-2 py-1 bg-slate-900 border border-slate-700 text-indigo-400 font-mono text-sm rounded shadow"
-                >v</kbd
-              >
-            </div>
-            <div
-              class="flex items-center justify-between py-2 border-b border-slate-700/50"
-            >
-              <span class="text-slate-300 font-medium"
-                >${this.t("helpToggleHelp")}</span
-              >
-              <kbd
-                class="px-2 py-1 bg-slate-900 border border-slate-700 text-indigo-400 font-mono text-sm rounded shadow"
-                >?</kbd
-              >
-            </div>
-            <div
-              class="flex items-center justify-between py-2 border-b border-slate-700/50"
-            >
-              <span class="text-slate-300 font-medium"
-                >${this.t("helpBackDashboard")}</span
-              >
-              <kbd
-                class="px-2 py-1 bg-slate-900 border border-slate-700 text-indigo-400 font-mono text-sm rounded shadow"
-                >Esc</kbd
-              >
-            </div>
-          </div>
-
           <div
-            class="mt-6 p-4 bg-slate-900/50 rounded-xl border border-slate-700/40 text-xs text-slate-400 leading-relaxed"
+            class="flex items-center justify-between mb-6 border-b border-slate-700 pb-3"
           >
-            <span class="font-semibold text-slate-300 block mb-1"
-              >${this.t("helpNavigationTipTitle")}</span
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <jk-icon icon="keyboard" class="text-indigo-400 w-5 h-5"></jk-icon>
+              ${this.t("helpTitle")}
+            </h3>
+            <button
+              @click="${() => (this.show = false)}"
+              class="text-slate-400 hover:text-white bg-slate-700 hover:bg-slate-600 p-1.5 rounded-lg transition-colors"
             >
-            ${this.isGridView ? this.t("helpNavigationTipGrid") : this.t("helpNavigationTipSequence")}
+              <jk-icon icon="x" class="w-4 h-4"></jk-icon>
+            </button>
+          </div>
+          <div class="space-y-4">
+            ${shortcuts.map(
+              (item) => html`
+                <div
+                  class="flex items-center justify-between gap-4 py-1.5 border-b border-slate-700/30"
+                >
+                  <span class="text-sm text-slate-400">${item.desc}</span>
+                  <div class="flex items-center gap-1 shrink-0">
+                    ${
+                      item.context
+                        ? html`<span
+                            class="text-[10px] bg-slate-900 px-1 py-0.5 rounded text-indigo-400 mr-1 uppercase font-bold"
+                            >${this.t("contextInCat")}</span
+                          >`
+                        : ""
+                    }
+                    ${item.keys.map(
+                      (k) =>
+                        html`<kbd
+                          class="px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs font-bold text-indigo-400 shadow shadow-black/40"
+                          >${k}</kbd
+                        >`,
+                    )}
+                  </div>
+                </div>
+              `,
+            )}
+          </div>
+          <div class="text-[11px] text-slate-500 text-center mt-6">
+            ${this.t("helpExit")}
           </div>
         </div>
       </div>
