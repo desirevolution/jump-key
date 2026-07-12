@@ -118,7 +118,7 @@ export class JkDashboardHeader extends LitElement {
         <div class="flex items-center gap-3 font-mono">
           <button
             @click="${() => this._dispatchEvent("toggle-view")}"
-            class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md hidden md:block"
+            class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md"
             title="${this.t ? this.t("hkToggleView") : ""} [#]"
           >
             ${
@@ -136,7 +136,7 @@ export class JkDashboardHeader extends LitElement {
 
           <button
             @click="${() => this._dispatchEvent("open-search")}"
-            class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md hidden md:block"
+            class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md"
             title="${this.t ? this.t("hkSearch") : ""} [Space]"
           >
             <jk-icon
