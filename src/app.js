@@ -153,20 +153,16 @@ class DashboardApp extends LitElement {
   }
 
   validateConfig(jsonObj) {
-    // 1. Grundprüfung auf Objekt und Existenz der Haupt-Arrays
     if (!jsonObj || typeof jsonObj !== "object") return false;
 
-    // 2. Prüfen, ob Kategorien existieren und mindestens eine vorhanden ist
     const hasCategories =
       Array.isArray(jsonObj.categories) && jsonObj.categories.length > 0;
 
-    // 3. Prüfen, ob Suchmaschinen existieren und mindestens eine vorhanden ist
     const hasSearchEngines =
       Array.isArray(jsonObj.searchEngines) && jsonObj.searchEngines.length > 0;
 
     if (!hasCategories || !hasSearchEngines) return false;
 
-    // 4. Optional: Tiefe Prüfung der Kategorien (z.B. ob 'categoryKey' existiert)
     const isCategoriesValid = jsonObj.categories.every(
       (cat) =>
         typeof cat.category === "string" &&
@@ -174,7 +170,6 @@ class DashboardApp extends LitElement {
         Array.isArray(cat.services),
     );
 
-    // 5. Optional: Prüfung der Suchmaschinen (z.B. ob 'prefix' und 'url' existieren)
     const isSearchEnginesValid = jsonObj.searchEngines.every(
       (engine) =>
         typeof engine.name === "string" &&
@@ -231,7 +226,7 @@ class DashboardApp extends LitElement {
       return;
     }
 
-    if (this.showConfigModal) return; // Shortcuts sperren, wenn der Editor offen ist
+    if (this.showConfigModal) return;
 
     const filtered = getFilteredServices(this.categories, this.searchQuery);
 
@@ -246,28 +241,71 @@ class DashboardApp extends LitElement {
 
       let matchedEngine = null;
       let searchTermsPreview = "";
-      if (queryTrimmed.startsWith(":") && !showAllEngines) {
-        const commandString = queryTrimmed.substring(1).trim();
+      let candidateEngines = [];
+      let isFilteringEngines = false;
+      let showPreviewBlock = false;
+
+      if (this.searchQuery.startsWith(":")) {
+        const commandString = this.searchQuery.substring(1);
         const firstSpaceIndex = commandString.indexOf(" ");
-        const prefix =
-          firstSpaceIndex !== -1
-            ? commandString.substring(0, firstSpaceIndex)
-            : commandString;
-        searchTermsPreview =
-          firstSpaceIndex !== -1
-            ? commandString.substring(firstSpaceIndex + 1).trim()
-            : "";
-        matchedEngine = this.searchEngines.find(
-          (eng) => eng.prefix.toLowerCase() === prefix.toLowerCase(),
-        );
+
+        if (firstSpaceIndex !== -1) {
+          const prefix = commandString
+            .substring(0, firstSpaceIndex)
+            .toLowerCase();
+          searchTermsPreview = commandString.substring(firstSpaceIndex + 1);
+          matchedEngine = this.searchEngines.find(
+            (eng) => eng.prefix.toLowerCase() === prefix,
+          );
+          if (matchedEngine) {
+            showPreviewBlock = true;
+          }
+        } else {
+          isFilteringEngines = true;
+          const currentPrefixToken = commandString.toLowerCase();
+          candidateEngines = this.searchEngines.filter((eng) =>
+            eng.prefix.toLowerCase().startsWith(currentPrefixToken),
+          );
+        }
       }
 
-      let totalItems = 0;
-      let engineItemsCount = showAllEngines ? this.searchEngines.length : 0;
-      let previewItemsCount = matchedEngine && searchTermsPreview ? 1 : 0;
-      let serviceItemsCount = !showAllEngines ? filtered.length : 0;
+      const enginesToRender = showAllEngines
+        ? this.searchEngines
+        : isFilteringEngines
+          ? candidateEngines
+          : [];
 
-      totalItems = engineItemsCount + previewItemsCount + serviceItemsCount;
+      // Unified Polymorphic action handlers array construction
+      const items = [];
+      enginesToRender.forEach((engine) => {
+        items.push({
+          action: () => {
+            this.searchQuery = `:${engine.prefix} `;
+            this.querySelector("#searchInput")?.focus();
+          },
+        });
+      });
+      if (showPreviewBlock) {
+        items.push({
+          action: () => {
+            const finalUrl = matchedEngine.url.replace(
+              "%s",
+              encodeURIComponent(searchTermsPreview.trim()),
+            );
+            window.open(finalUrl, "_blank");
+            this.resetInput(true);
+          },
+        });
+      }
+      if (!showAllEngines) {
+        filtered.forEach((service) => {
+          items.push({
+            action: () => this.trackClick(service),
+          });
+        });
+      }
+
+      const totalItems = items.length;
 
       if (e.key === "ArrowDown") {
         e.preventDefault();
@@ -289,33 +327,8 @@ class DashboardApp extends LitElement {
 
       if (e.key === "Enter") {
         e.preventDefault();
-
-        if (showAllEngines) {
-          const selectedEngine = this.searchEngines[this.selectedIndex];
-          if (selectedEngine) {
-            this.searchQuery = `:${selectedEngine.prefix} `;
-            this.querySelector("#searchInput")?.focus();
-          }
-          return;
-        }
-
-        if (matchedEngine && searchTermsPreview && this.selectedIndex === 0) {
-          const finalUrl = matchedEngine.url.replace(
-            "%s",
-            encodeURIComponent(searchTermsPreview),
-          );
-          window.open(finalUrl, "_blank");
-          this.resetInput(true);
-          return;
-        }
-
-        const actualServiceIndex =
-          matchedEngine && searchTermsPreview
-            ? this.selectedIndex - 1
-            : this.selectedIndex;
-        if (filtered[actualServiceIndex]) {
-          this.trackClick(filtered[actualServiceIndex]);
-        }
+        const item = items[this.selectedIndex];
+        if (item) item.action();
         return;
       }
       return;
@@ -392,14 +405,13 @@ class DashboardApp extends LitElement {
     }
   }
 
-  scrollToSelected() {
-    setTimeout(
-      () =>
-        this.querySelector(".search-item-active")?.scrollIntoView({
-          block: "nearest",
-        }),
-      10,
-    );
+  async scrollToSelected() {
+    await this.updateComplete;
+
+    this.querySelector(".search-item-active")?.scrollIntoView({
+      block: "nearest",
+      behavior: "instant",
+    });
   }
 
   // --- Backend Communication (WebDAV) ---
@@ -408,7 +420,6 @@ class DashboardApp extends LitElement {
     try {
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
 
-      // 1. SAVE BACKUP
       const backupResponse = await fetch(
         `/config/services.backup-${timestamp}.json`,
         {
@@ -422,7 +433,6 @@ class DashboardApp extends LitElement {
         throw new Error("Failed to create configuration backup.");
       }
 
-      // 2. OVERWRITE LIVE CONFIGURATION
       const response = await fetch("/config/services.json", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -430,7 +440,6 @@ class DashboardApp extends LitElement {
       });
 
       if (response.ok) {
-        // 3. UPDATE APP STATE
         if (updatedConfig.categories) {
           this.categories = generateShortcuts(updatedConfig.categories);
         } else {
@@ -441,9 +450,7 @@ class DashboardApp extends LitElement {
           this.searchEngines = updatedConfig.searchEngines;
         }
 
-        // 4. CLOSE MODAL
         this.showConfigModal = false;
-
         alert(this.t("editConfigSaveDone"));
       } else {
         alert(this.t("editConfigSaveFailed"));
@@ -454,7 +461,6 @@ class DashboardApp extends LitElement {
     }
   }
 
-  // Speichern-Button Handler (nutzt den synchronisierten Instanz-Wert)
   async handleSaveConfig(e) {
     const updatedConfig = e.detail.config;
     await this.saveConfiguration(updatedConfig);
@@ -566,17 +572,17 @@ class DashboardApp extends LitElement {
         class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]"
       >
         ${favs.map(
-            (service) => html`
-              <jk-service-card
-                .name=${service.name}
-                .subtitle=${service.url}
-                .icon=${service.icon}
-                .badgeText=${service.key}
-                .renderIcon=${(icon, cls) => this.renderIcon(icon, cls)}
-                @card-click=${() => this.trackClick(service)}
-              ></jk-service-card>
-            `,
-          )}
+          (service) => html`
+            <jk-service-card
+              .name=${service.name}
+              .subtitle=${service.url}
+              .icon=${service.icon}
+              .badgeText=${service.key}
+              .renderIcon=${(icon, cls) => this.renderIcon(icon, cls)}
+              @card-click=${() => this.trackClick(service)}
+            ></jk-service-card>
+          `,
+        )}
       </div>
     `;
   }
@@ -617,7 +623,6 @@ class DashboardApp extends LitElement {
         ${this.categories.map(
           (cat) => html`
             <div class="border-b border-slate-800/40 pb-5 last:border-0">
-              <!-- Category Section Header -->
               <div class="flex items-center gap-3 mb-3">
                 <kbd
                   class="px-2 py-0.5 font-bold font-mono text-xs text-indigo-400 bg-slate-900 border border-indigo-500/30 rounded hidden sm:block"
@@ -635,7 +640,6 @@ class DashboardApp extends LitElement {
                 </h2>
               </div>
 
-              <!-- Services Grid for this specific Category -->
               <div
                 class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]"
               >

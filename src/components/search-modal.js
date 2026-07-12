@@ -68,9 +68,97 @@ export class JkSearchModal extends LitElement {
     );
   }
 
-  render() {
-    if (!this.show) return html``;
+  // --- Specialized Micro-Renderers ---
 
+  _renderEngine(engine, active) {
+    return html`
+      <button
+        @click="${() => this._selectEngine(engine.prefix)}"
+        class="w-full flex items-center justify-between p-3 rounded-xl font-mono text-sm text-left transition-colors ${active ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/40 text-slate-300"}"
+      >
+        <div class="flex items-center gap-3">
+          <jk-icon
+            .icon=${engine.icon}
+            class="${"w-5 h-5 " + (active ? "text-white" : "text-indigo-400")}"
+          ></jk-icon>
+          <div>
+            <span class="font-bold text-white">${engine.name}</span>
+            <span
+              class="text-xs ml-2 ${active ? "text-indigo-200" : "text-slate-500"}"
+              >(${engine.url})</span
+            >
+          </div>
+        </div>
+        <kbd
+          class="px-2 py-0.5 text-base font-bold rounded shadow ${active ? "bg-indigo-700 text-white border-indigo-500" : "bg-slate-900 border border-slate-700 text-indigo-400"}"
+          >:${engine.prefix}</kbd
+        >
+      </button>
+    `;
+  }
+
+  _renderPreview(matchedEngine, searchTermsPreview, active) {
+    return html`
+      <button
+        @click="${() => {
+          const finalUrl = matchedEngine.url.replace(
+            "%s",
+            encodeURIComponent(searchTermsPreview.trim()),
+          );
+          window.open(finalUrl, "_blank");
+          this._handleClose();
+        }}"
+        class="w-full flex items-center justify-between p-4 rounded-xl border font-mono text-sm text-left active:scale-[0.98] transition-all mb-3 ${active ? "search-item-active bg-indigo-600 border-indigo-500 text-white" : "bg-indigo-600/20 border-indigo-500 text-slate-200"}"
+      >
+        <div class="flex items-center gap-3 min-w-0 grow">
+          <jk-icon
+            .icon=${matchedEngine.icon}
+            class="${"w-6 h-6 shrink-0 " + (active ? "text-white" : "text-indigo-400")}"
+          ></jk-icon>
+          <div class="truncate text-xs sm:text-sm">
+            ${this.t("searchEnginePreviewPrefix")}
+            <span class="font-bold text-white">${matchedEngine.name}</span
+            >${this.t("searchEnginePreviewFor")}:
+            <br class="sm:hidden" />
+            <span
+              class="italic ${active ? "text-indigo-100" : "text-indigo-300"}"
+            >
+              ${searchTermsPreview.trim() ? html`"${searchTermsPreview.trim()}"` : html`...`}
+            </span>
+          </div>
+        </div>
+        <span
+          class="text-xs font-mono px-2 py-0.5 rounded shadow text-white hidden sm:inline ${active ? "bg-indigo-700" : "bg-indigo-600"}"
+          >Enter</span
+        >
+      </button>
+    `;
+  }
+
+  _renderService(s, active) {
+    return html`
+      <button
+        @click=${() => this._triggerServiceClick(s)}
+        class="w-full flex items-center justify-between p-3 rounded-xl transition-all text-left
+        ${active ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/30 text-slate-300"}
+        active:bg-indigo-600 active:text-white"
+      >
+        <div class="flex items-center gap-3">
+          <jk-icon .icon=${s.icon} class="w-6 h-6"></jk-icon>
+          <div>
+            <span class="font-medium block sm:inline">${s.name}</span>
+            <span class="text-xs opacity-60 sm:ml-1">(${s.category})</span>
+          </div>
+        </div>
+        ${active ? html`<span class="text-xs font-mono bg-indigo-700 px-2 py-0.5 rounded shadow hidden sm:inline">Enter</span>` : ""}
+      </button>
+    `;
+  }
+
+  /**
+   * Builds the clean polymorphic items array shared dynamically across templates
+   */
+  _buildPolymorphicItems() {
     const queryTrimmed = this.searchQuery.trim();
     let matchedEngine = null;
     let searchTermsPreview = "";
@@ -78,32 +166,22 @@ export class JkSearchModal extends LitElement {
     let isFilteringEngines = false;
     let showPreviewBlock = false;
 
-    // Detect if user is intentionally using a search engine command
     if (this.searchQuery.startsWith(":")) {
       const commandString = this.searchQuery.substring(1);
       const firstSpaceIndex = commandString.indexOf(" ");
 
       if (firstSpaceIndex !== -1) {
-        // User typed a space after the prefix token
         const prefix = commandString
           .substring(0, firstSpaceIndex)
           .toLowerCase();
-        searchTermsPreview = commandString.substring(firstSpaceIndex + 1); // Keep the exact string after space
-
+        searchTermsPreview = commandString.substring(firstSpaceIndex + 1);
         matchedEngine = this.searchEngines.find(
           (e) => e.prefix.toLowerCase() === prefix,
         );
-
-        // Directly show the preview block if a valid engine is found,
-        // even if searchTermsPreview is currently empty ("")
-        if (matchedEngine) {
-          showPreviewBlock = true;
-        }
+        if (matchedEngine) showPreviewBlock = true;
       } else {
-        // No space typed yet: User is still filtering the prefixes (e.g., ":y", ":yd")
         isFilteringEngines = true;
         const currentPrefixToken = commandString.toLowerCase();
-
         candidateEngines = this.searchEngines.filter((e) =>
           e.prefix.toLowerCase().startsWith(currentPrefixToken),
         );
@@ -111,15 +189,48 @@ export class JkSearchModal extends LitElement {
     }
 
     const showAllEngines = queryTrimmed === ":";
-    const showQuickTrigger = queryTrimmed === "";
-
-    // Show engines list only when actively filtering prefixes or when user just typed a single ":"
     const enginesToRender = showAllEngines
       ? this.searchEngines
       : isFilteringEngines
         ? candidateEngines
         : [];
-    const showEnginesList = enginesToRender.length > 0;
+
+    const items = [];
+
+    // Polymorphic composition mapping rendering rules and triggers
+    enginesToRender.forEach((engine) => {
+      items.push({
+        isEngineHeadingGroup: true,
+        render: (active) => this._renderEngine(engine, active),
+      });
+    });
+
+    if (showPreviewBlock) {
+      items.push({
+        render: (active) =>
+          this._renderPreview(matchedEngine, searchTermsPreview, active),
+      });
+    }
+
+    if (!showAllEngines) {
+      this.filteredServices.forEach((service) => {
+        items.push({
+          render: (active) => this._renderService(service, active),
+        });
+      });
+    }
+
+    return { items, showAllEngines, isFilteringEngines };
+  }
+
+  render() {
+    if (!this.show) return html``;
+
+    const queryTrimmed = this.searchQuery.trim();
+    const showQuickTrigger = queryTrimmed === "";
+
+    const { items, showAllEngines, isFilteringEngines } =
+      this._buildPolymorphicItems();
 
     return html`
       <div
@@ -181,118 +292,19 @@ export class JkSearchModal extends LitElement {
 
           <div class="overflow-y-auto p-2 space-y-1 grow">
             ${
-              showEnginesList
+              (showAllEngines || isFilteringEngines) && items.length > 0
                 ? html`
                     <div
                       class="px-2 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 font-mono"
                     >
                       ${this.t("searchEnginesTitle")}
                     </div>
-                    ${enginesToRender.map(
-                      (engine, i) => html`
-                        <button
-                          @click="${() => this._selectEngine(engine.prefix)}"
-                          class="w-full flex items-center justify-between p-3 rounded-xl font-mono text-sm text-left transition-colors ${i === this.selectedIndex ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/40 text-slate-300"}"
-                        >
-                          <div class="flex items-center gap-3">
-                            <jk-icon
-                              .icon=${engine.icon}
-                              class="${"w-5 h-5 " + (i === this.selectedIndex ? "text-white" : "text-indigo-400")}"
-                            ></jk-icon>
-                            <div>
-                              <span class="font-bold text-white"
-                                >${engine.name}</span
-                              >
-                              <span
-                                class="text-xs ml-2 ${i === this.selectedIndex ? "text-indigo-200" : "text-slate-500"}"
-                                >(${engine.url})</span
-                              >
-                            </div>
-                          </div>
-                          <kbd
-                            class="px-2 py-0.5 text-base font-bold rounded shadow ${i === this.selectedIndex ? "bg-indigo-700 text-white border-indigo-500" : "bg-slate-900 border border-slate-700 text-indigo-400"}"
-                            >:${engine.prefix}</kbd
-                          >
-                        </button>
-                      `,
-                    )}
                   `
                 : ""
             }
+            ${items.map((item, i) => item.render(i === this.selectedIndex))}
             ${
-              showPreviewBlock
-                ? html`
-                    <button
-                      @click="${() => {
-                        const finalUrl = matchedEngine.url.replace(
-                          "%s",
-                          encodeURIComponent(searchTermsPreview.trim()),
-                        );
-                        window.open(finalUrl, "_blank");
-                        this._handleClose();
-                      }}"
-                      class="w-full flex items-center justify-between p-4 rounded-xl border font-mono text-sm text-left active:scale-[0.98] transition-all mb-3 ${this.selectedIndex === 0 ? "search-item-active bg-indigo-600 border-indigo-500 text-white" : "bg-indigo-600/20 border-indigo-500 text-slate-200"}"
-                    >
-                      <div class="flex items-center gap-3 min-w-0 grow">
-                        <jk-icon
-                          .icon=${matchedEngine.icon}
-                          class="${"w-6 h-6 shrink-0 " + (this.selectedIndex === 0 ? "text-white" : "text-indigo-400")}"
-                        ></jk-icon>
-                        <div class="truncate text-xs sm:text-sm">
-                          ${this.t("searchEnginePreviewPrefix")}
-                          <span class="font-bold text-white"
-                            >${matchedEngine.name}</span
-                          >
-                          ${this.t("searchEnginePreviewFor")}:
-                          <br class="sm:hidden" />
-                          <span
-                            class="italic ${this.selectedIndex === 0 ? "text-indigo-100" : "text-indigo-300"}"
-                          >
-                            ${searchTermsPreview.trim() ? html`"${searchTermsPreview.trim()}"` : html`...`}
-                          </span>
-                        </div>
-                      </div>
-                      <span
-                        class="text-xs font-mono px-2 py-0.5 rounded shadow text-white hidden sm:inline ${this.selectedIndex === 0 ? "bg-indigo-700" : "bg-indigo-600"}"
-                        >Enter</span
-                      >
-                    </button>
-                  `
-                : ""
-            }
-            ${
-              !showEnginesList
-                ? this.filteredServices.map((s, i) => {
-                    const targetIndex = showPreviewBlock ? i + 1 : i;
-                    const isActive = targetIndex === this.selectedIndex;
-
-                    return html`
-                      <button
-                        @click="${() => this._triggerServiceClick(s)}"
-                        class="w-full flex items-center justify-between p-3 rounded-xl transition-all text-left ${isActive ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/30 text-slate-300"} active:bg-indigo-600 active:text-white"
-                      >
-                        <div class="flex items-center gap-3">
-                          <jk-icon .icon=${s.icon} class="w-6 h-6"></jk-icon>
-                          <div>
-                            <span class="font-medium block sm:inline"
-                              >${s.name}</span
-                            >
-                            <span class="text-xs opacity-60 sm:ml-1"
-                              >(${s.category})</span
-                            >
-                          </div>
-                        </div>
-                        ${isActive ? html`<span class="text-xs font-mono bg-indigo-700 px-2 py-0.5 rounded shadow hidden sm:inline">Enter</span>` : ""}
-                      </button>
-                    `;
-                  })
-                : ""
-            }
-            ${
-              this.searchQuery &&
-              this.filteredServices.length === 0 &&
-              !showPreviewBlock &&
-              !showEnginesList
+              this.searchQuery && items.length === 0
                 ? html`<p class="text-center text-slate-500 text-sm py-4">
                     ${this.t("noServices")}
                   </p>`
