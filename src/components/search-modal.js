@@ -139,7 +139,7 @@ export class JkSearchModal extends LitElement {
     return html`
       <button
         @click=${() => this._triggerServiceClick(s)}
-        class="w-full flex items-center justify-between p-3 rounded-xl transition-all text-left
+        class="w-full flex items-center justify-between p-3 rounded-xl text-left
         ${active ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/30 text-slate-300"}
         active:bg-indigo-600 active:text-white"
       >
