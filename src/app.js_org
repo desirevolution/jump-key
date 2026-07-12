@@ -656,9 +656,7 @@ class DashboardApp extends LitElement {
           ></jk-icon>
           ${this.t("favorites")}
         </h2>
-        <div
-          class="grid gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(285px,1fr))]"
-        >
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           ${favs.map(
             (service) => html`
               <jk-service-card
@@ -684,7 +682,8 @@ class DashboardApp extends LitElement {
           ${this.t("categories")}
         </h2>
         <div
-          class="grid gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(285px,1fr))]"
+          class="grid grid-cols-1 gap-3 sm:gap-4"
+          style="grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));"
         >
           ${this.categories.map(
             (cat) => html`
@@ -721,49 +720,27 @@ class DashboardApp extends LitElement {
   }
 
   templateFullGridView() {
-    return html`
-      <div class="animate-fadeIn space-y-5">
-        ${this.categories.map(
-        (cat) => html`
-          <div class="border-b border-slate-800/40 pb-5 last:border-0">
-            <!-- Category Section Header -->
-            <div class="flex items-center gap-3 mb-3">
-              <kbd
-                class="px-2 py-0.5 font-bold font-mono text-xs text-indigo-400 bg-slate-900 border border-indigo-500/30 rounded hidden sm:block"
-              >
-                ${cat.categoryKey?.toUpperCase() ?? ""}
-              </kbd>
-              <jk-icon
-                .icon="${cat.icon}"
-                class="w-4 h-4 text-indigo-400/80"
-              ></jk-icon>
-              <h2
-                class="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider"
-              >
-                ${cat.category}
-              </h2>
-            </div>
+    const allServices = this.categories.flatMap((c) =>
+      c.services.map((s) => ({ ...s, category: c.category })),
+    );
 
-            <!-- Services Grid for this specific Category -->
-            <div
-              class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(285px,1fr))]"
-            >
-              ${(cat.services ?? []).map(
-                (service) => html`
-                  <jk-service-card
-                    .name=${service.name}
-                    .url=${service.url}
-                    .icon=${service.icon}
-                    .badgeText=${service.key}
-                    .renderIcon=${(icon, cls) => this.renderIcon(icon, cls)}
-                    @card-click=${() => this.trackClick(service)}
-                  ></jk-service-card>
-                `,
-              )}
-            </div>
-          </div>
-        `,
-      )}
+    return html`
+      <div class="animate-fadeIn space-y-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          ${allServices.map(
+            (service) => html`
+              <jk-service-card
+                .name=${service.name}
+                .url=${service.url}
+                .icon=${service.icon}
+                .category=${service.category}
+                .badgeText=${service.key}
+                .showCategoryBadge=${true}
+                @card-click=${() => this.trackClick(service)}
+              ></jk-service-card>
+            `,
+          )}
+        </div>
       </div>
     `;
   }
@@ -776,7 +753,7 @@ class DashboardApp extends LitElement {
           ${activeGroup.services.map(
             (service) => html`
               <jk-service-card
-                .name=${service.name}
+                .icon=${service.name}
                 .url=${service.url}
                 .icon=${service.icon}
                 .badgeText=${service.key}
@@ -809,15 +786,15 @@ class DashboardApp extends LitElement {
         @open-help=${() => (this.showHelp = true)}
         @open-search=${this.openSearch}
         @open-config=${() => {
-          this.showConfigModal = true;
-          this.editorValue = JSON.stringify(
-            { categories: this.categories, searchEngines: this.searchEngines },
-            null,
-            2,
-          );
-          this.originalConfigString = this.editorValue;
-        }}
-        @toggle-view=${this.toggleViewMode}
+      this.showConfigModal = true;
+      this.editorValue = JSON.stringify(
+        { categories: this.categories, searchEngines: this.searchEngines },
+        null,
+        2,
+      );
+      this.originalConfigString = this.editorValue;
+      }}
+      @toggle-view=${this.toggleViewMode}
       ></jk-dashboard-header>
       ${this.templateKeyBadge()} ${this.templateHelpModal()}
       ${this.templateSearchModal(filteredServices)}
