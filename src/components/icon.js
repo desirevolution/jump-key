@@ -14,16 +14,16 @@ class JkIcon extends LitElement {
   }
 
   render() {
-    if (/\.(png|jpe?g|svg|webp)$/i.test(this.icon)) {
+    const isUrl = /^https?:\/\//i.test(this.icon);
+    const isImageFile = /\.(png|jpe?g|svg|webp)$/i.test(this.icon);
+
+    if (isUrl || isImageFile) {
+      const imgSrc = isUrl ? this.icon : `./icons/${this.icon}`;
+
       return html`
-        <img
-          src=./icons/${this.icon}
-          alt=""
-          class="${this.svgClass} object-contain"
-        />
+        <img src="${imgSrc}" alt="" class="${this.svgClass} object-contain" />
       `;
     }
-
     const node = this.icon && icons[this.toPascalCase(this.icon)];
 
     if (!node) {
