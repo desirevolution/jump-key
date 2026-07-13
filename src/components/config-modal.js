@@ -4,6 +4,7 @@ import "prism-code-editor/prism/languages/json";
 import "prism-code-editor/layout.css";
 import "prism-code-editor/themes/night-owl.css";
 import "./icon.js";
+import "./jk-icon-button.js";
 
 export class JkConfigModal extends LitElement {
   // We disable shadow DOM styling boundaries here only if we need Tailwind classes
@@ -192,15 +193,10 @@ export class JkConfigModal extends LitElement {
                 ></jk-icon>
               </div>
 
-              <button
+              <jk-icon-button
+                icon="x"
                 @click="${this._handleClose}"
-                class="flex items-center justify-center p-2 bg-slate-850 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-md cursor-pointer transition-all duration-150 shrink-0 group shadow-md"
-              >
-                <jk-icon
-                  icon="x"
-                  class="block w-5 h-5 text-slate-400 group-hover:text-indigo-400 transition-colors"
-                ></jk-icon>
-              </button>
+              ></jk-icon-button>
             </div>
           </div>
 

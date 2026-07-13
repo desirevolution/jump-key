@@ -180,6 +180,15 @@ class DashboardApp extends LitElement {
     return isCategoriesValid && isSearchEnginesValid;
   }
 
+  scrollToSelected() {
+    setTimeout(
+      () =>
+        this.querySelector(".search-item-active")?.scrollIntoView({
+          block: "nearest",
+        }),
+      10,
+    );
+  }
   // --- Event handlers ---
 
   handlePopState(e) {

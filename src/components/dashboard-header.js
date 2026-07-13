@@ -1,5 +1,6 @@
 import { LitElement, html } from "lit";
 import "./icon.js";
+import "./jk-icon-button.js"; // Import the new component
 
 export class JkDashboardHeader extends LitElement {
   createRenderRoot() {
@@ -27,13 +28,8 @@ export class JkDashboardHeader extends LitElement {
     this._timeInterval = null;
   }
 
-  connectedCallback() {
-    super.connectedCallback();
-  }
-
   firstUpdated() {
     this._updateTime();
-    // 1000ms ist super, damit der Doppelpunkt präzise jede Sekunde pulsiert
     this._timeInterval = setInterval(() => this._updateTime(), 1000);
   }
 
@@ -46,7 +42,6 @@ export class JkDashboardHeader extends LitElement {
     const locale = this.lang === "de" ? "de-DE" : "en-US";
     const now = new Date();
 
-    // Reine Zahlen extrahieren und mit führender Null formatieren (z.B. "09" statt "9")
     this._hoursString = String(now.getHours()).padStart(2, "0");
     this._minutesString = String(now.getMinutes()).padStart(2, "0");
 
@@ -110,45 +105,24 @@ export class JkDashboardHeader extends LitElement {
         </div>
 
         <div class="flex items-center gap-3 font-mono">
-          <button
-            @click="${() => this._dispatchEvent("toggle-view")}"
-            class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md"
+          <jk-icon-button
+            icon="${this.isGridView ? "rows-2" : "layout-grid"}"
             title="${this.t ? this.t("hkToggleView") : ""} [#]"
-          >
-            ${
-              this.isGridView
-                ? html`<jk-icon
-                    icon="rows-2"
-                    class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
-                  ></jk-icon>`
-                : html`<jk-icon
-                    icon="layout-grid"
-                    class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
-                  ></jk-icon>`
-            }
-          </button>
+            @click="${() => this._dispatchEvent("toggle-view")}"
+          ></jk-icon-button>
 
-          <button
-            @click="${() => this._dispatchEvent("open-search")}"
-            class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md"
+          <jk-icon-button
+            icon="search"
             title="${this.t ? this.t("hkSearch") : ""} [Space]"
-          >
-            <jk-icon
-              icon="search"
-              class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
-            ></jk-icon>
-          </button>
+            @click="${() => this._dispatchEvent("open-search")}"
+          ></jk-icon-button>
 
-          <button
-            @click="${() => this._dispatchEvent("open-config")}"
-            class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md hidden md:block"
+          <jk-icon-button
+            icon="settings"
             title="${this.t ? this.t("editConfig") : ""}"
-          >
-            <jk-icon
-              icon="settings"
-              class="w-5 h-5 text-slate-400 group-hover:text-indigo-400 transition-colors"
-            ></jk-icon>
-          </button>
+            extraClass="hidden md:block"
+            @click="${() => this._dispatchEvent("open-config")}"
+          ></jk-icon-button>
 
           <div class="text-center sm:text-right ml-2 select-none">
             <div

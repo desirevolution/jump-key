@@ -1,5 +1,7 @@
 import { LitElement, html } from "lit";
 import "./icon.js";
+import "./jk-icon-button.js";
+import "./jk-search-item.js";
 
 export class JkSearchModal extends LitElement {
   createRenderRoot() {
@@ -70,94 +72,49 @@ export class JkSearchModal extends LitElement {
 
   // --- Specialized Micro-Renderers ---
 
+// --- Extrem schlanke Datenweitergabe im Modal ---
+
   _renderEngine(engine, active) {
     return html`
-      <button
+      <jk-search-item
+        type="engine"
+        .active=${active}
+        .data=${engine}
         @click="${() => this._selectEngine(engine.prefix)}"
-        class="w-full flex items-center justify-between p-3 rounded-xl font-mono text-sm text-left transition-colors ${active ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/40 text-slate-300"}"
-      >
-        <div class="flex items-center gap-3">
-          <jk-icon
-            .icon=${engine.icon}
-            class="${"w-5 h-5 " + (active ? "text-white" : "text-indigo-400")}"
-          ></jk-icon>
-          <div>
-            <span class="font-bold text-white">${engine.name}</span>
-            <span
-              class="text-xs ml-2 ${active ? "text-indigo-200" : "text-slate-500"}"
-              >(${engine.url})</span
-            >
-          </div>
-        </div>
-        <kbd
-          class="px-2 py-0.5 text-base font-bold rounded shadow ${active ? "bg-indigo-700 text-white border-indigo-500" : "bg-slate-900 border border-slate-700 text-indigo-400"}"
-          >:${engine.prefix}</kbd
-        >
-      </button>
+      ></jk-search-item>
     `;
   }
 
   _renderPreview(matchedEngine, searchTermsPreview, active) {
+    // Wir erweitern das Engine-Objekt temporär um die aktuellen Suchbegriffe für die Komponente
+    const previewData = { ...matchedEngine, searchTerms: searchTermsPreview };
+
     return html`
-      <button
+      <jk-search-item
+        type="preview"
+        .active=${active}
+        .data=${previewData}
+        .t=${this.t}
         @click="${() => {
-          const finalUrl = matchedEngine.url.replace(
-            "%s",
-            encodeURIComponent(searchTermsPreview.trim()),
-          );
+          const finalUrl = matchedEngine.url.replace("%s", encodeURIComponent(searchTermsPreview.trim()));
           window.open(finalUrl, "_blank");
           this._handleClose();
         }}"
-        class="w-full flex items-center justify-between p-4 rounded-xl border font-mono text-sm text-left active:scale-[0.98] transition-all mb-3 ${active ? "search-item-active bg-indigo-600 border-indigo-500 text-white" : "bg-indigo-600/20 border-indigo-500 text-slate-200"}"
-      >
-        <div class="flex items-center gap-3 min-w-0 grow">
-          <jk-icon
-            .icon=${matchedEngine.icon}
-            class="${"w-6 h-6 shrink-0 " + (active ? "text-white" : "text-indigo-400")}"
-          ></jk-icon>
-          <div class="truncate text-xs sm:text-sm">
-            ${this.t("searchEnginePreviewPrefix")}
-            <span class="font-bold text-white">${matchedEngine.name}</span
-            >${this.t("searchEnginePreviewFor")}:
-            <br class="sm:hidden" />
-            <span
-              class="italic ${active ? "text-indigo-100" : "text-indigo-300"}"
-            >
-              ${searchTermsPreview.trim() ? html`"${searchTermsPreview.trim()}"` : html`...`}
-            </span>
-          </div>
-        </div>
-        <span
-          class="text-xs font-mono px-2 py-0.5 rounded shadow text-white hidden sm:inline ${active ? "bg-indigo-700" : "bg-indigo-600"}"
-          >Enter</span
-        >
-      </button>
+      ></jk-search-item>
     `;
   }
 
   _renderService(s, active) {
     return html`
-      <button
+      <jk-search-item
+        type="service"
+        .active=${active}
+        .data=${s}
         @click=${() => this._triggerServiceClick(s)}
-        class="w-full flex items-center justify-between p-3 rounded-xl text-left
-        ${active ? "search-item-active sm:bg-indigo-600 text-white" : "hover:bg-slate-700/30 text-slate-300"}
-        active:bg-indigo-600 active:text-white"
-      >
-        <div class="flex items-center gap-3">
-          <jk-icon .icon=${s.icon} class="w-6 h-6"></jk-icon>
-          <div>
-            <span class="font-medium block sm:inline">${s.name}</span>
-            <span class="text-xs opacity-60 sm:ml-1">(${s.category})</span>
-          </div>
-        </div>
-        ${active ? html`<span class="text-xs font-mono bg-indigo-700 px-2 py-0.5 rounded shadow hidden sm:inline">Enter</span>` : ""}
-      </button>
+      ></jk-search-item>
     `;
   }
-
-  /**
-   * Builds the clean items array shared dynamically across templates
-   */
+  
   _buildItems() {
     const queryTrimmed = this.searchQuery.trim();
     let matchedEngine = null;
@@ -259,29 +216,18 @@ export class JkSearchModal extends LitElement {
             ${
               showQuickTrigger
                 ? html`
-                    <button
+                    <jk-icon-button
+                      icon="globe"
                       @click="${() => this._selectEngine("")}"
-                      class="flex items-center justify-center p-2 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-md cursor-pointer transition-all duration-150 shrink-0 group shadow-md"
-                      title="${this.t("searchEnginesShow")}"
-                    >
-                      <jk-icon
-                        icon="globe"
-                        class="block w-5 h-5 text-slate-400 group-hover:text-indigo-400 transition-colors"
-                      ></jk-icon>
-                    </button>
+                    ></jk-icon-button>
                   `
                 : ""
             }
 
-            <button
+            <jk-icon-button
+              icon="x"
               @click="${this._handleClose}"
-              class="flex items-center justify-center p-2 bg-slate-850 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-md cursor-pointer transition-all duration-150 shrink-0 group shadow-md"
-            >
-              <jk-icon
-                icon="x"
-                class="block w-5 h-5 text-slate-400 group-hover:text-indigo-400 transition-colors"
-              ></jk-icon>
-            </button>
+            ></jk-icon-button>
           </div>
 
           <div class="overflow-y-auto p-2 space-y-1 grow">
