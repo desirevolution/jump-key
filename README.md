@@ -10,6 +10,9 @@
   <img src="screenshots/screenshot_2.png" alt="Grid dashboard">
 </p>
 
+
+## [Live Demo](https://desirevolution.github.io/jump-key/)
+
 ## Features
 
 - **Keyboard-Centric Navigation**: Navigate categories and launch services using sequential keyboard shortcuts.
