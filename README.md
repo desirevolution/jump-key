@@ -44,9 +44,6 @@
   <a href="screenshots/screenshot_5.png">
     <img src="screenshots/screenshot_5.png" width="300">
   </a>
-  <a href="screenshots/screenshot_6.png">
-    <img src="screenshots/screenshot_6.png" width="300">
-  </a>
 </p>
 
 ## Quick Start
