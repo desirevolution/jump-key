@@ -67,22 +67,22 @@ The application is configured through the `config/services.json` file.
 
 ### Available Options
 
-| Key                            | Type     | Description                                                                                     |
-| :----------------------------- | :------- | :---------------------------------------------------------------------------------------------- |
-| `categories`                   | `Array`  | List of category objects grouping your web services.                                            |
-| `categories[].category`        | `String` | The visible display name of the category block.                                                 |
-| `categories[].categoryKey`     | `String` | _(Optional)_ The keyboard hotkey character to activate this category. Auto-assigned if omitted. |
-| `categories[].icon`            | `String` | Lucide icon identifier (e.g., `layout-grid`) or filename matching an image in `./icons/`.       |
-| `categories[].services`        | `Array`  | Array of links belonging inside this group.                                                     |
-| `categories[].services[].name` | `String` | Title of the specific web application or website.                                               |
-| `categories[].services[].url`  | `String` | Full destination URL (e.g., `https://github.com`).                                              |
-| `categories[].services[].key`  | `String` | _(Optional)_ Specific hotkey to launch this item once its category is open.                     |
-| `categories[].services[].icon` | `String` | Lucide icon identifier or image filename for the link.                                          |
-| `searchEngines`                | `Array`  | Custom query shortcuts available inside the unified search bar using the `:` indicator.         |
-| `searchEngines[].name`         | `String` | Display name of the external search provider.                                                   |
-| `searchEngines[].prefix`       | `String` | The keyword trigger text (e.g., `g` maps to searching via `:g <query>`).                        |
-| `searchEngines[].url`          | `String` | Search engine query URL string containing `%s` as the search term placeholder.                  |
-| `searchEngines[].icon`         | `String` | Icon reference for the search engine overlay listing.                                           |
+| Key                            | Type     | Description                                                                                        |
+| :----------------------------- | :------- | :------------------------------------------------------------------------------------------------- |
+| `categories`                   | `Array`  | List of category objects grouping your web services.                                               |
+| `categories[].category`        | `String` | The visible display name of the category block.                                                    |
+| `categories[].categoryKey`     | `String` | _(Optional)_ The keyboard hotkey character to activate this category. Auto-assigned if omitted.    |
+| `categories[].icon`            | `String` | Lucide icon identifier (e.g., `layout-grid`) imageURL or filename matching an image in `./icons/`. |
+| `categories[].services`        | `Array`  | Array of links belonging inside this group.                                                        |
+| `categories[].services[].name` | `String` | Title of the specific web application or website.                                                  |
+| `categories[].services[].url`  | `String` | Full destination URL (e.g., `https://github.com`).                                                 |
+| `categories[].services[].key`  | `String` | _(Optional)_ Specific hotkey to launch this item once its category is open.                        |
+| `categories[].services[].icon` | `String` | Lucide icon identifier (e.g., `layout-grid`) imageURL or filename matching an image in `./icons/`. |
+| `searchEngines`                | `Array`  | Custom query shortcuts available inside the unified search bar using the `:` indicator.            |
+| `searchEngines[].name`         | `String` | Display name of the external search provider.                                                      |
+| `searchEngines[].prefix`       | `String` | The keyword trigger text (e.g., `g` maps to searching via `:g <query>`).                           |
+| `searchEngines[].url`          | `String` | Search engine query URL string containing `%s` as the search term placeholder.                     |
+| `searchEngines[].icon`         | `String` | Lucide icon identifier (e.g., `layout-grid`) imageURL or filename matching an image in `./icons/`. |
 
 ### Sample `services.json`
 
@@ -141,4 +141,4 @@ The application is configured through the `config/services.json` file.
 
 ## Disclaimer
 
-Project was build with AI support. I am a lazy dev...
+#### Project was build with AI support. I am a lazy dev...
