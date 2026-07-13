@@ -72,7 +72,7 @@ export class JkSearchModal extends LitElement {
 
   // --- Specialized Micro-Renderers ---
 
-// --- Extrem schlanke Datenweitergabe im Modal ---
+  // --- Extrem schlanke Datenweitergabe im Modal ---
 
   _renderEngine(engine, active) {
     return html`
@@ -96,7 +96,10 @@ export class JkSearchModal extends LitElement {
         .data=${previewData}
         .t=${this.t}
         @click="${() => {
-          const finalUrl = matchedEngine.url.replace("%s", encodeURIComponent(searchTermsPreview.trim()));
+          const finalUrl = matchedEngine.url.replace(
+            "%s",
+            encodeURIComponent(searchTermsPreview.trim()),
+          );
           window.open(finalUrl, "_blank");
           this._handleClose();
         }}"
@@ -114,7 +117,7 @@ export class JkSearchModal extends LitElement {
       ></jk-search-item>
     `;
   }
-  
+
   _buildItems() {
     const queryTrimmed = this.searchQuery.trim();
     let matchedEngine = null;
