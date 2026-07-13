@@ -27,6 +27,7 @@
 - **Lucide Icons**: Use the Lucide icon set for services and actions.([https://lucide.dev/icons/](https://lucide.dev/icons/))
 - **Docker Ready**: Deploy using the included Docker Compose configuration.
 - **Lightweight Architecture**: Built with Lit for fast rendering and minimal resource usage.
+- **Static Deployment**: No backend or database required. (Caddy + WebDav plugin)
 
 ## Screenshots
 
