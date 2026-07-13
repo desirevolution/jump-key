@@ -214,7 +214,9 @@ class DashboardApp extends LitElement {
     window.history.pushState({ view: "category", key: cat.categoryKey }, "");
   }
 
+
   handleKeyDown(e) {
+    // 1. Global short-circuits and modifier guards
     if (e.ctrlKey || e.altKey || e.metaKey) return;
 
     if (e.key === "Escape") {
@@ -226,125 +228,26 @@ class DashboardApp extends LitElement {
       return;
     }
 
+    // If configuration modal is up, ignore all remaining app-level shortcuts
     if (this.showConfigModal) return;
 
-    const filtered = getFilteredServices(this.categories, this.searchQuery);
-
+    // 2. Delegate to Search-specific key handling if search is active
     if (this.showSearch) {
-      if (e.key === "Escape") {
-        this.resetInput(true);
-        return;
-      }
-
-      const queryTrimmed = this.searchQuery.trim();
-      const showAllEngines = queryTrimmed === ":";
-
-      let matchedEngine = null;
-      let searchTermsPreview = "";
-      let candidateEngines = [];
-      let isFilteringEngines = false;
-      let showPreviewBlock = false;
-
-      if (this.searchQuery.startsWith(":")) {
-        const commandString = this.searchQuery.substring(1);
-        const firstSpaceIndex = commandString.indexOf(" ");
-
-        if (firstSpaceIndex !== -1) {
-          const prefix = commandString
-            .substring(0, firstSpaceIndex)
-            .toLowerCase();
-          searchTermsPreview = commandString.substring(firstSpaceIndex + 1);
-          matchedEngine = this.searchEngines.find(
-            (eng) => eng.prefix.toLowerCase() === prefix,
-          );
-          if (matchedEngine) {
-            showPreviewBlock = true;
-          }
-        } else {
-          isFilteringEngines = true;
-          const currentPrefixToken = commandString.toLowerCase();
-          candidateEngines = this.searchEngines.filter((eng) =>
-            eng.prefix.toLowerCase().startsWith(currentPrefixToken),
-          );
-        }
-      }
-
-      const enginesToRender = showAllEngines
-        ? this.searchEngines
-        : isFilteringEngines
-          ? candidateEngines
-          : [];
-
-      // Unified Polymorphic action handlers array construction
-      const items = [];
-      enginesToRender.forEach((engine) => {
-        items.push({
-          action: () => {
-            this.searchQuery = `:${engine.prefix} `;
-            this.querySelector("#searchInput")?.focus();
-          },
-        });
-      });
-      if (showPreviewBlock) {
-        items.push({
-          action: () => {
-            const finalUrl = matchedEngine.url.replace(
-              "%s",
-              encodeURIComponent(searchTermsPreview.trim()),
-            );
-            window.open(finalUrl, "_blank");
-            this.resetInput(true);
-          },
-        });
-      }
-      if (!showAllEngines) {
-        filtered.forEach((service) => {
-          items.push({
-            action: () => this.trackClick(service),
-          });
-        });
-      }
-
-      const totalItems = items.length;
-
-      if (e.key === "ArrowDown") {
-        e.preventDefault();
-        if (totalItems > 0) {
-          this.selectedIndex = (this.selectedIndex + 1) % totalItems;
-          this.scrollToSelected();
-        }
-        return;
-      }
-      if (e.key === "ArrowUp") {
-        e.preventDefault();
-        if (totalItems > 0) {
-          this.selectedIndex =
-            (this.selectedIndex - 1 + totalItems) % totalItems;
-          this.scrollToSelected();
-        }
-        return;
-      }
-
-      if (e.key === "Enter") {
-        e.preventDefault();
-        const item = items[this.selectedIndex];
-        if (item) item.action();
-        return;
-      }
+      this.handleSearchKeyDown(e);
       return;
     }
 
+    // 3. Delegate to Help-specific state closing if help is active
     if (this.showHelp) {
       e.preventDefault();
       this.showHelp = false;
       return;
     }
+
+    // 4. Form inputs guard (for any unexpected input focused outside modals)
     if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
 
-    if (e.key === "Escape") {
-      this.resetInput(true);
-      return;
-    }
+    // 5. Global Command triggers
     if (e.key === "?") {
       e.preventDefault();
       this.showHelp = true;
@@ -355,29 +258,128 @@ class DashboardApp extends LitElement {
       this.openSearch();
       return;
     }
-
     if (e.key.toLowerCase() === "#" && !this.activeCategoryKey) {
       e.preventDefault();
       this.toggleViewMode();
       return;
     }
 
-    if (e.key.length !== 1) return;
+    // 6. Delegate alpha-numeric shortcut sequences
+    if (e.key.length === 1) {
+      this.handleNavigationKeyDown(e.key.toLowerCase());
+    }
+  }
 
-    const key = e.key.toLowerCase();
+  /**
+   * Encapsulates key navigation and item selection while the Search modal is active
+   */
+  handleSearchKeyDown(e) {
+    const filtered = getFilteredServices(this.categories, this.searchQuery);
+    const queryTrimmed = this.searchQuery.trim();
+    const showAllEngines = queryTrimmed === ":";
 
+    let matchedEngine = null;
+    let searchTermsPreview = "";
+    let candidateEngines = [];
+    let isFilteringEngines = false;
+    let showPreviewBlock = false;
+
+    if (this.searchQuery.startsWith(":")) {
+      const commandString = this.searchQuery.substring(1);
+      const firstSpaceIndex = commandString.indexOf(" ");
+
+      if (firstSpaceIndex !== -1) {
+        const prefix = commandString.substring(0, firstSpaceIndex).toLowerCase();
+        searchTermsPreview = commandString.substring(firstSpaceIndex + 1);
+        matchedEngine = this.searchEngines.find((eng) => eng.prefix.toLowerCase() === prefix);
+        if (matchedEngine) showPreviewBlock = true;
+      } else {
+        isFilteringEngines = true;
+        const currentPrefixToken = commandString.toLowerCase();
+        candidateEngines = this.searchEngines.filter((eng) =>
+        eng.prefix.toLowerCase().startsWith(currentPrefixToken)
+        );
+      }
+    }
+
+    const enginesToRender = showAllEngines
+    ? this.searchEngines
+    : isFilteringEngines
+    ? candidateEngines
+    : [];
+
+    // Build Polymorphic action map
+    const items = [];
+    enginesToRender.forEach((engine) => {
+      items.push({
+        action: () => {
+          this.searchQuery = `:${engine.prefix} `;
+          this.querySelector("#searchInput")?.focus();
+        },
+      });
+    });
+
+    if (showPreviewBlock) {
+      items.push({
+        action: () => {
+          const finalUrl = matchedEngine.url.replace("%s", encodeURIComponent(searchTermsPreview.trim()));
+          window.open(finalUrl, "_blank");
+          this.resetInput(true);
+        },
+      });
+    }
+
+    if (!showAllEngines) {
+      filtered.forEach((service) => {
+        items.push({
+          action: () => this.trackClick(service),
+        });
+      });
+    }
+
+    const totalItems = items.length;
+
+    // Handle directional/execution inputs
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (totalItems > 0) {
+        this.selectedIndex = (this.selectedIndex + 1) % totalItems;
+        this.scrollToSelected();
+      }
+      return;
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (totalItems > 0) {
+        this.selectedIndex = (this.selectedIndex - 1 + totalItems) % totalItems;
+        this.scrollToSelected();
+      }
+      return;
+    }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      const item = items[this.selectedIndex];
+      if (item) item.action();
+    }
+  }
+
+  /**
+   * Handles sequence hotkeys for dashboard navigation (Categories -> Services)
+   */
+  handleNavigationKeyDown(key) {
+    // STATE A: No category selected yet
     if (!this.activeCategoryKey) {
+      // Direct numeric hotkeys for top favorites (List View only)
       if (/^[0-9]$/.test(key) && !this.isGridView) {
-        const favService = getTopFavorites(
-          this.categories,
-          this.favorites,
-        ).find((s) => s.key === key);
+        const favService = getTopFavorites(this.categories, this.favorites).find((s) => s.key === key);
         if (favService) {
           this.currentInput = key.toUpperCase();
           this.trackClick(favService, true);
           return;
         }
       }
+
+      // Check if key matches a top-level category
       if (this.categories.some((c) => c.categoryKey === key)) {
         this.activeCategoryKey = key;
         this.currentInput = key.toUpperCase();
@@ -389,29 +391,21 @@ class DashboardApp extends LitElement {
         this.isInvalidInput = true;
         this.startResetTimer(1500);
       }
-    } else {
-      this.currentInput += ` → ${key.toUpperCase()}`;
-      const cat = this.categories.find(
-        (c) => c.categoryKey === this.activeCategoryKey,
-      );
-      const service = cat?.services?.find((s) => s.key === key);
-      if (service) {
-        this.isInvalidInput = false;
-        this.trackClick(service);
-      } else {
-        this.isInvalidInput = true;
-        this.startResetTimer(1500);
-      }
+      return;
     }
-  }
 
-  async scrollToSelected() {
-    await this.updateComplete;
+    // STATE B: Inside a category, matching a child service
+    this.currentInput += ` → ${key.toUpperCase()}`;
+    const cat = this.categories.find((c) => c.categoryKey === this.activeCategoryKey);
+    const service = cat?.services?.find((s) => s.key === key);
 
-    this.querySelector(".search-item-active")?.scrollIntoView({
-      block: "nearest",
-      behavior: "instant",
-    });
+    if (service) {
+      this.isInvalidInput = false;
+      this.trackClick(service);
+    } else {
+      this.isInvalidInput = true;
+      this.startResetTimer(1500);
+    }
   }
 
   // --- Backend Communication (WebDAV) ---
