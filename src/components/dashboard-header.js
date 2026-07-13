@@ -29,7 +29,6 @@ export class JkDashboardHeader extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    setTimeout(() => createIcons({ icons }), 0);
   }
 
   firstUpdated() {
@@ -43,11 +42,6 @@ export class JkDashboardHeader extends LitElement {
     clearInterval(this._timeInterval);
   }
 
-  updated(changedProperties) {
-    if (changedProperties.has("isGridView")) {
-      setTimeout(() => createIcons({ icons }), 0);
-    }
-  }
   _updateTime() {
     const locale = this.lang === "de" ? "de-DE" : "en-US";
     const now = new Date();
