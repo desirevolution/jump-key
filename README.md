@@ -7,7 +7,7 @@
 #### JumpKey — A minimalist, keyboard-driven local first PWA homepage for your services.
 
 <p align="center">
-  <img src="screenshots/screenshot_1.png?v=3" alt="Grid dashboard">
+  <img src="screenshots/screenshot_2.png" alt="Grid dashboard">
 </p>
 
 ## [Live Demo](https://desirevolution.github.io/jump-key/)
@@ -26,25 +26,24 @@
 - **Lucide Icons**: Use the Lucide icon set for services and actions.([https://lucide.dev/icons/](https://lucide.dev/icons/))
 - **Docker Ready**: Deploy using the included Docker Compose configuration.
 - **Lightweight Architecture**: Built with Lit for fast rendering and minimal resource usage.
-- **Static Deployment**: No backend or database required. (Caddy + WebDav plugin)
 
 ## Screenshots
 
 <p align="center">
-  <a href="screenshots/screenshot_2.png">
-    <img src="screenshots/screenshot_1.png?v=2" width="300">
+  <a href="screenshots/screenshot_1.png">
+    <img src="screenshots/screenshot_1.png" width="300">
   </a>
   <a href="screenshots/screenshot_3.png">
-    <img src="screenshots/screenshot_3.png?v=2" width="300">
+    <img src="screenshots/screenshot_3.png" width="300">
   </a>
   <a href="screenshots/screenshot_4.png">
-    <img src="screenshots/screenshot_4.png?v=2" width="300">
+    <img src="screenshots/screenshot_4.png" width="300">
   </a>
   <a href="screenshots/screenshot_5.png">
-    <img src="screenshots/screenshot_5.png?v=2" width="300">
+    <img src="screenshots/screenshot_5.png" width="300">
   </a>
   <a href="screenshots/screenshot_6.png">
-    <img src="screenshots/screenshot_6.png?v=2" width="300">
+    <img src="screenshots/screenshot_6.png" width="300">
   </a>
 </p>
 
@@ -67,22 +66,22 @@ The application is configured through the `config/services.json` file.
 
 ### Available Options
 
-| Key                            | Type     | Description                                                                                          |
-| :----------------------------- | :------- | :--------------------------------------------------------------------------------------------------- |
-| `categories`                   | `Array`  | List of category objects grouping your web services.                                                 |
-| `categories[].category`        | `String` | The visible display name of the category block.                                                      |
-| `categories[].categoryKey`     | `String` | _(Optional)_ The keyboard hotkey character to activate this category. Auto-assigned if omitted.      |
-| `categories[].icon`            | `String` | Lucide icon identifier (e.g., `layout-grid`), image URL or filename matching an image in `./icons/`. |
-| `categories[].services`        | `Array`  | Array of links belonging inside this group.                                                          |
-| `categories[].services[].name` | `String` | Title of the specific web application or website.                                                    |
-| `categories[].services[].url`  | `String` | Full destination URL (e.g., `https://github.com`).                                                   |
-| `categories[].services[].key`  | `String` | _(Optional)_ Specific hotkey to launch this item once its category is open.                          |
-| `categories[].services[].icon` | `String` | Lucide icon identifier (e.g., `layout-grid`), image URL or filename matching an image in `./icons/`. |
-| `searchEngines`                | `Array`  | Custom query shortcuts available inside the unified search bar using the `:` indicator.              |
-| `searchEngines[].name`         | `String` | Display name of the external search provider.                                                        |
-| `searchEngines[].prefix`       | `String` | The keyword trigger text (e.g., `g` maps to searching via `:g <query>`).                             |
-| `searchEngines[].url`          | `String` | Search engine query URL string containing `%s` as the search term placeholder.                       |
-| `searchEngines[].icon`         | `String` | Lucide icon identifier (e.g., `layout-grid`), image URL or filename matching an image in `./icons/`. |
+| Key                            | Type     | Description                                                                                        |
+| :----------------------------- | :------- | :------------------------------------------------------------------------------------------------- |
+| `categories`                   | `Array`  | List of category objects grouping your web services.                                               |
+| `categories[].category`        | `String` | The visible display name of the category block.                                                    |
+| `categories[].categoryKey`     | `String` | _(Optional)_ The keyboard hotkey character to activate this category. Auto-assigned if omitted.    |
+| `categories[].icon`            | `String` | Lucide icon identifier (e.g., `layout-grid`) imageURL or filename matching an image in `./icons/`. |
+| `categories[].services`        | `Array`  | Array of links belonging inside this group.                                                        |
+| `categories[].services[].name` | `String` | Title of the specific web application or website.                                                  |
+| `categories[].services[].url`  | `String` | Full destination URL (e.g., `https://github.com`).                                                 |
+| `categories[].services[].key`  | `String` | _(Optional)_ Specific hotkey to launch this item once its category is open.                        |
+| `categories[].services[].icon` | `String` | Lucide icon identifier (e.g., `layout-grid`) imageURL or filename matching an image in `./icons/`. |
+| `searchEngines`                | `Array`  | Custom query shortcuts available inside the unified search bar using the `:` indicator.            |
+| `searchEngines[].name`         | `String` | Display name of the external search provider.                                                      |
+| `searchEngines[].prefix`       | `String` | The keyword trigger text (e.g., `g` maps to searching via `:g <query>`).                           |
+| `searchEngines[].url`          | `String` | Search engine query URL string containing `%s` as the search term placeholder.                     |
+| `searchEngines[].icon`         | `String` | Lucide icon identifier (e.g., `layout-grid`) imageURL or filename matching an image in `./icons/`. |
 
 ### Sample `services.json`
 
@@ -141,4 +140,4 @@ The application is configured through the `config/services.json` file.
 
 ## Disclaimer
 
-#### Project was build with AI support. I am a lazy dev...
+Project was build with AI support. I am a lazy dev...
