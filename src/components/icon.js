@@ -1,4 +1,4 @@
-import { LitElement, html } from "lit";
+import { LitElement, html, css } from "lit";
 import { unsafeSVG } from "lit/directives/unsafe-svg.js";
 import { createIcons, icons } from "lucide";
 
@@ -9,9 +9,26 @@ class JkIcon extends LitElement {
     icon: { type: String },
   };
 
-  createRenderRoot() {
-    return this;
-  }
+  // Shadow DOM Styles mapping the necessary layout & default fallbacks
+  static styles = css`
+    :host {
+      /* Replicates default 'w-6 h-6' if width/height are not set externally */
+      display: inline-block;
+      width: var(--jk-icon-size, 1.5rem);
+      height: var(--jk-icon-size, 1.5rem);
+    }
+
+    /* Style rule for both SVG and Image rendering pathways */
+    .icon-core {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    .object-contain {
+      object-fit: contain;
+    }
+  `;
 
   render() {
     const isUrl = /^https?:\/\//i.test(this.icon);
@@ -21,7 +38,7 @@ class JkIcon extends LitElement {
       const imgSrc = isUrl ? this.icon : `./icons/${this.icon}`;
 
       return html`
-        <img src="${imgSrc}" alt="" class="${this.svgClass} object-contain" />
+        <img src="${imgSrc}" alt="" class="icon-core object-contain" />
       `;
     }
     const node = this.icon && icons[this.toPascalCase(this.icon)];
@@ -53,18 +70,11 @@ class JkIcon extends LitElement {
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="${this.svgClass}"
+        class="icon-core"
       >
         ${children}
       </svg>
     `;
-  }
-
-  get svgClass() {
-    if (!this.className.trim()) {
-      return "w-6 h-6";
-    }
-    return `${this.className}`;
   }
 
   toPascalCase(name) {
