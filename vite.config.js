@@ -13,6 +13,7 @@ const displayVersion = resolveDisplayVersion({
 
 export default defineConfig({
   define: { __APP_VERSION__: JSON.stringify(displayVersion) },
+  base: "/jump-key",
   plugins: [
     tailwindcss(),
     VitePWA({
