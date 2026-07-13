@@ -211,7 +211,7 @@ export class JkConfigModal extends LitElement {
           <div class="flex justify-end gap-3 mt-4">
             <button
               @click="${this._handleClose}"
-              class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded-xl text-sm font-medium transition-colors"
+              class="px-4 py-2 bg-slate-700 border border-transparent hover:border-indigo-500 rounded-xl text-sm font-medium transition-colors"
             >
               ${this.t("editConfigCancel")}
             </button>

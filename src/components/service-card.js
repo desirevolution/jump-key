@@ -59,12 +59,12 @@ export class JkServiceCard extends LitElement {
     shadow-sm
     transition
     duration-300
-    group-hover:bg-indigo-600
-    group-hover:text-white
+    group-hover:bg-slate-700
+    group-hover:text-slate-200
     group-hover:scale-105
     shrink-0
     overflow-hidden
-  "
+"
         >
           <jk-icon .icon=${this.icon} class="size-full"></jk-icon>
         </div>

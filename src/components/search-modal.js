@@ -156,9 +156,9 @@ export class JkSearchModal extends LitElement {
   }
 
   /**
-   * Builds the clean polymorphic items array shared dynamically across templates
+   * Builds the clean items array shared dynamically across templates
    */
-  _buildPolymorphicItems() {
+  _buildItems() {
     const queryTrimmed = this.searchQuery.trim();
     let matchedEngine = null;
     let searchTermsPreview = "";
@@ -197,7 +197,6 @@ export class JkSearchModal extends LitElement {
 
     const items = [];
 
-    // Polymorphic composition mapping rendering rules and triggers
     enginesToRender.forEach((engine) => {
       items.push({
         isEngineHeadingGroup: true,
@@ -229,8 +228,7 @@ export class JkSearchModal extends LitElement {
     const queryTrimmed = this.searchQuery.trim();
     const showQuickTrigger = queryTrimmed === "";
 
-    const { items, showAllEngines, isFilteringEngines } =
-      this._buildPolymorphicItems();
+    const { items, showAllEngines, isFilteringEngines } = this._buildItems();
 
     return html`
       <div
@@ -270,10 +268,6 @@ export class JkSearchModal extends LitElement {
                         icon="globe"
                         class="block w-5 h-5 text-slate-400 group-hover:text-indigo-400 transition-colors"
                       ></jk-icon>
-                      <kbd
-                        class="px-2 py-0.5 text-xs font-mono font-bold bg-slate-900 border border-slate-700 text-indigo-400 rounded shadow shadow-black/40 group-hover:text-indigo-300 hidden md:block ml-2"
-                        >:</kbd
-                      >
                     </button>
                   `
                 : ""
