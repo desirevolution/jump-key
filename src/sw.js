@@ -26,9 +26,7 @@ precacheAndRoute(self.__WB_MANIFEST);
 //
 // SPA-Navigation immer aus dem Precache
 //
-createHandlerBoundToURL(
-  import.meta.env.BASE_URL + "index.html"
-);
+createHandlerBoundToURL(import.meta.env.BASE_URL + "index.html");
 
 registerRoute(new NavigationRoute(navigationHandler));
 

@@ -54,8 +54,9 @@ export class JkConfigModal extends LitElement {
     }
   }
 
-  updated(changedProperties) {
+  async updated(changedProperties) {
     if (changedProperties.has("show") && this.show) {
+      await this.updateComplete;
       this.initEditor();
     }
   }
@@ -90,7 +91,11 @@ export class JkConfigModal extends LitElement {
           }
         },
       },
-      () => console.log("Prism Code Editor mounted inside jk-config-modal"),
+      (editor) => {
+        requestAnimationFrame(() => {
+          this._editorInstance.textarea.focus();
+        });
+      },
     );
   }
 

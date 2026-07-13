@@ -10,7 +10,6 @@
   <img src="screenshots/screenshot_1.png?v=1" alt="Grid dashboard">
 </p>
 
-
 ## [Live Demo](https://desirevolution.github.io/jump-key/)
 
 ## Features

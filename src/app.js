@@ -214,7 +214,6 @@ class DashboardApp extends LitElement {
     window.history.pushState({ view: "category", key: cat.categoryKey }, "");
   }
 
-
   handleKeyDown(e) {
     // 1. Global short-circuits and modifier guards
     if (e.ctrlKey || e.altKey || e.metaKey) return;
@@ -289,24 +288,28 @@ class DashboardApp extends LitElement {
       const firstSpaceIndex = commandString.indexOf(" ");
 
       if (firstSpaceIndex !== -1) {
-        const prefix = commandString.substring(0, firstSpaceIndex).toLowerCase();
+        const prefix = commandString
+          .substring(0, firstSpaceIndex)
+          .toLowerCase();
         searchTermsPreview = commandString.substring(firstSpaceIndex + 1);
-        matchedEngine = this.searchEngines.find((eng) => eng.prefix.toLowerCase() === prefix);
+        matchedEngine = this.searchEngines.find(
+          (eng) => eng.prefix.toLowerCase() === prefix,
+        );
         if (matchedEngine) showPreviewBlock = true;
       } else {
         isFilteringEngines = true;
         const currentPrefixToken = commandString.toLowerCase();
         candidateEngines = this.searchEngines.filter((eng) =>
-        eng.prefix.toLowerCase().startsWith(currentPrefixToken)
+          eng.prefix.toLowerCase().startsWith(currentPrefixToken),
         );
       }
     }
 
     const enginesToRender = showAllEngines
-    ? this.searchEngines
-    : isFilteringEngines
-    ? candidateEngines
-    : [];
+      ? this.searchEngines
+      : isFilteringEngines
+        ? candidateEngines
+        : [];
 
     // Build Polymorphic action map
     const items = [];
@@ -322,7 +325,10 @@ class DashboardApp extends LitElement {
     if (showPreviewBlock) {
       items.push({
         action: () => {
-          const finalUrl = matchedEngine.url.replace("%s", encodeURIComponent(searchTermsPreview.trim()));
+          const finalUrl = matchedEngine.url.replace(
+            "%s",
+            encodeURIComponent(searchTermsPreview.trim()),
+          );
           window.open(finalUrl, "_blank");
           this.resetInput(true);
         },
@@ -371,7 +377,10 @@ class DashboardApp extends LitElement {
     if (!this.activeCategoryKey) {
       // Direct numeric hotkeys for top favorites (List View only)
       if (/^[0-9]$/.test(key) && !this.isGridView) {
-        const favService = getTopFavorites(this.categories, this.favorites).find((s) => s.key === key);
+        const favService = getTopFavorites(
+          this.categories,
+          this.favorites,
+        ).find((s) => s.key === key);
         if (favService) {
           this.currentInput = key.toUpperCase();
           this.trackClick(favService, true);
@@ -396,7 +405,9 @@ class DashboardApp extends LitElement {
 
     // STATE B: Inside a category, matching a child service
     this.currentInput += ` → ${key.toUpperCase()}`;
-    const cat = this.categories.find((c) => c.categoryKey === this.activeCategoryKey);
+    const cat = this.categories.find(
+      (c) => c.categoryKey === this.activeCategoryKey,
+    );
     const service = cat?.services?.find((s) => s.key === key);
 
     if (service) {
