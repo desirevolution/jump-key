@@ -46,11 +46,10 @@ export class JkHelpModal extends LitElement {
 
     return html`
       <div
-        @click="${() => (this.show = false)}"
+        @click="${() => this._handleClose()}"
         class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center z-50 animate-fadeIn p-4"
       >
         <div
-          @click="${(e) => e.stopPropagation()}"
           class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-2xl shadow-2xl p-6 relative font-mono text-slate-300"
         >
           <div
@@ -63,12 +62,6 @@ export class JkHelpModal extends LitElement {
               ></jk-icon>
               ${this.t("helpTitle")}
             </h3>
-            <button
-              @click="${() => (this.show = false)}"
-              class="text-slate-400 hover:text-white bg-slate-700 hover:bg-slate-600 p-1.5 rounded-lg transition-colors"
-            >
-              <jk-icon icon="x" class="w-4 h-4"></jk-icon>
-            </button>
           </div>
           <div class="space-y-4">
             ${shortcuts.map(
