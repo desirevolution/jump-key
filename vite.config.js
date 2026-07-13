@@ -3,7 +3,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
-  base: "/jump-key",
+  base: "/jump-key/",
   plugins: [
     tailwindcss(),
     VitePWA({
