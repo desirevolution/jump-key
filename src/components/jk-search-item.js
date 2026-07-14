@@ -23,7 +23,7 @@ export class JkDashboardSearchItem extends LitElement {
 
   render() {
     // We apply consistent interactive utility styles for active states
-    const itemClasses = `w-full flex items-center justify-between p-3 rounded-xl text-left font-mono text-sm transition-all ${
+    const itemClasses = `w-full flex items-center justify-between p-4 rounded-xl text-left font-mono text-base ${
       this.active
         ? "search-item-active sm:bg-indigo-600 text-white"
         : "hover:bg-slate-700/30 text-slate-300"
@@ -35,15 +35,17 @@ export class JkDashboardSearchItem extends LitElement {
           ${
             this.data.icon
               ? html`
-                  <wa-dashboard-icon
+                  <jk-icon
                     .icon=${this.data.icon}
                     class="w-5 h-5 shrink-0 ${this.active ? "text-white" : "text-indigo-400"}"
-                  ></wa-dashboard-icon>
+                  ></jk-icon>
                 `
               : ""
           }
 
-          <div class="min-w-0 text-xs sm:text-sm">${this._renderContent()}</div>
+          <div class="min-w-0 text-sm sm:text-base">
+            ${this._renderContent()}
+          </div>
         </div>
         <div class="flex items-center shrink-0 ml-3">${this._renderMeta()}</div>
       </button>
@@ -57,7 +59,7 @@ export class JkDashboardSearchItem extends LitElement {
           <div class="flex items-center gap-2 min-w-0">
             <span class="font-bold text-white shrink-0">${this.data.name}</span>
             <span
-              class="truncate text-xs ${this.active ? "text-indigo-200" : "text-slate-500"}"
+              class="truncate text-sm ${this.active ? "text-indigo-200" : "text-slate-500"}"
             >
               (${this.data.url})
             </span>
@@ -85,7 +87,7 @@ export class JkDashboardSearchItem extends LitElement {
             <span class="font-medium block sm:inline text-white"
               >${this.data.name}</span
             >
-            <span class="text-xs opacity-60 sm:ml-1"
+            <span class="text-sm opacity-60 sm:ml-1"
               >(${this.data.category})</span
             >
           </div>

@@ -166,7 +166,8 @@ class DashboardApp extends LitElement {
   // --- Keyboard Event Dispatcher ---
 
   handleKeyDown(e) {
-    if (e.ctrlKey || e.altKey || e.metaKey) return;
+    console.error("key %o", e);
+    if ((e.ctrlKey && !e.key === ",") || e.altKey || e.metaKey) return;
 
     if (e.key === "Escape") {
       if (this.showConfigModal) {
@@ -195,6 +196,11 @@ class DashboardApp extends LitElement {
     if (e.key === "?") {
       e.preventDefault();
       this.showHelp = true;
+      return;
+    }
+    if (e.ctrlKey && e.key === ",") {
+      e.preventDefault();
+      this.showConfigModal = true;
       return;
     }
     if (e.key === " " || e.key === "Spacebar") {
@@ -535,7 +541,6 @@ class DashboardApp extends LitElement {
                 <jk-favorites-view
                   .favorites=${favs}
                   .t=${(key) => this.t(key)}
-                  .renderIcon=${(icon, cls) => this.renderIcon(icon, cls)}
                   @service-click=${(e) => this.trackClick(e.detail.service)}
                 ></jk-favorites-view>
 
@@ -544,20 +549,19 @@ class DashboardApp extends LitElement {
                   title="${this.t("categories")}"
                   icon="folder"
                   .services=${this.categories.map((cat) => ({
-                  name: cat.category,
-                  url: `${cat.services?.length ?? 0} Services`,
-                  icon: cat.icon,
-                  key: cat.categoryKey,
-                }))}
-                  .renderIcon=${(icon, cls) => this.renderIcon(icon, cls)}
+                    name: cat.category,
+                    url: `${cat.services?.length ?? 0} Services`,
+                    icon: cat.icon,
+                    key: cat.categoryKey,
+                  }))}
                   @service-click=${(e) => {
-                  this.activeCategoryKey = e.detail.service.key;
-                  this.currentInput = e.detail.service.key.toUpperCase();
-                  window.history.pushState(
-                    { view: "category", key: e.detail.service.key },
-                    "",
-                  );
-                }}
+                    this.activeCategoryKey = e.detail.service.key;
+                    this.currentInput = e.detail.service.key.toUpperCase();
+                    window.history.pushState(
+                      { view: "category", key: e.detail.service.key },
+                      "",
+                    );
+                  }}
                 ></jk-service-group>
               `
             : html`
@@ -565,7 +569,6 @@ class DashboardApp extends LitElement {
                 <jk-grid-view
                   .categories=${this.categories}
                   .activeCategoryKey=${this.activeCategoryKey}
-                  .renderIcon=${(icon, cls) => this.renderIcon(icon, cls)}
                   .t=${(key) => this.t(key)}
                   @service-click=${(e) => this.trackClick(e.detail.service)}
                 ></jk-grid-view>

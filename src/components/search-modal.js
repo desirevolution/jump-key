@@ -193,7 +193,7 @@ export class JkSearchModal extends LitElement {
       >
         <div
           @click="${(e) => e.stopPropagation()}"
-          class="bg-slate-800 border border-slate-700 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] font-mono"
+          class="bg-slate-800 border border-slate-700 w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] font-mono"
         >
           <div
             class="p-4 border-b border-slate-700 flex items-center gap-3 shrink-0"
@@ -209,7 +209,7 @@ export class JkSearchModal extends LitElement {
                 placeholder="${this.t("searchPlaceholder")}"
                 .value="${this.searchQuery}"
                 @input="${this._handleInput}"
-                class="bg-transparent w-full focus:outline-none text-base sm:text-lg text-white placeholder-slate-500"
+                class="bg-transparent w-full focus:outline-none text-lg sm:text-xl text-white placeholder-slate-500"
               />
             </form>
 

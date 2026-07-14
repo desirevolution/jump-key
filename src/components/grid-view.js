@@ -28,7 +28,6 @@ export class JkGridView extends LitElement {
             .icon=${activeGroup.icon}
             .badgeText=${activeGroup.categoryKey}
             .services=${activeGroup.services}
-            .renderIcon=${this.renderIcon}
           ></jk-service-group>
         </div>
       `;
@@ -44,7 +43,6 @@ export class JkGridView extends LitElement {
               .icon=${cat.icon}
               .badgeText=${cat.categoryKey}
               .services=${cat.services}
-              .renderIcon=${this.renderIcon}
             ></jk-service-group>
           `,
         )}

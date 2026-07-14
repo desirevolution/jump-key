@@ -3,24 +3,26 @@ import { basicEditor } from "prism-code-editor/setups";
 import "prism-code-editor/prism/languages/json";
 import "prism-code-editor/layout.css";
 import "prism-code-editor/themes/night-owl.css";
-import "./icon.js"; // Standardized wa-dashboard-icon wrapper
-import "./jk-icon-button.js"; // Standardized wa-dashboard-icon-button wrapper
+import "./icon.js";
+import "./jk-icon-button.js";
+import "./dialog.js";
 
 export class JkConfigModal extends LitElement {
   createRenderRoot() {
-    return this; // Preserves global Tailwind configuration styles
+    return this;
   }
 
   static properties = {
     show: { type: Boolean },
     categories: { type: Array },
     searchEngines: { type: Array },
-    t: { type: Function }, // Pass down translation helper
+    t: { type: Function },
     _isEditorConfigValid: { type: Boolean },
     _hasEditorConfigChanged: { type: Boolean },
     _editorValue: { type: String },
     _originalConfigString: { type: String },
     _editorInstance: { type: Function },
+    _showDiscardDialog: { type: Boolean },
   };
 
   constructor() {
@@ -29,28 +31,40 @@ export class JkConfigModal extends LitElement {
     this.categories = [];
     this.searchEngines = [];
 
-    // Internal reactive states
     this._isEditorConfigValid = true;
     this._hasEditorConfigChanged = false;
     this._editorValue = "";
     this._originalConfigString = "";
     this._editorInstance = null;
+    this._showDiscardDialog = false;
     this.t = (key) => key;
+
+    // Bind keyboard interceptor
+    this._handleKeyDown = this._handleKeyDown.bind(this);
   }
 
   willUpdate(changed) {
-    if (changed.has("show") && this.show) {
-      this._editorValue = JSON.stringify(
-        {
-          categories: this.categories,
-          searchEngines: this.searchEngines,
-        },
-        null,
-        2,
-      );
-      this._originalConfigString = this._editorValue;
-      this._isEditorConfigValid = true;
-      this._hasEditorConfigChanged = false;
+    if (changed.has("show")) {
+      if (this.show) {
+        this._editorValue = JSON.stringify(
+          {
+            categories: this.categories,
+            searchEngines: this.searchEngines,
+          },
+          null,
+          2,
+        );
+        this._originalConfigString = this._editorValue;
+        this._isEditorConfigValid = true;
+        this._hasEditorConfigChanged = false;
+        this._showDiscardDialog = false;
+
+        // Register capture-phase listener to intercept global Escape keys and Ctrl+S
+        window.addEventListener("keydown", this._handleKeyDown, true);
+      } else {
+        // Cleanup when hiding
+        window.removeEventListener("keydown", this._handleKeyDown, true);
+      }
     }
   }
 
@@ -58,6 +72,75 @@ export class JkConfigModal extends LitElement {
     if (changedProperties.has("show") && this.show) {
       await this.updateComplete;
       this.initEditor();
+    }
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener("keydown", this._handleKeyDown, true);
+  }
+
+  // Helper utility to safely query and focus our modal buttons
+  async _focusButton(id) {
+    await this.updateComplete;
+    const btn = this.querySelector(`#${id}`);
+    if (btn) {
+      btn.focus();
+    }
+  }
+
+  // Intercept keyboard events globally while modal is active
+  _handleKeyDown(e) {
+    // If the discard warning dialog is currently showing, let it handle its own keys!
+    if (this._showDiscardDialog) {
+      return;
+    }
+
+    // 1. Ctrl + S (or Cmd + S) Shortcut to Save
+    const isSaveShortcut =
+      (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s";
+    if (isSaveShortcut) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (this._isEditorConfigValid && this._hasEditorConfigChanged) {
+        this._handleSave();
+      }
+      return;
+    }
+
+    // 2. Arrow Key Navigation between footer buttons
+    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      const activeElementId = document.activeElement?.id;
+      const isSaveEnabled =
+        this._isEditorConfigValid && this._hasEditorConfigChanged;
+
+      // Only navigate if focus is already on one of our action buttons
+      if (
+        activeElementId === "cancelModalBtn" ||
+        activeElementId === "saveModalBtn"
+      ) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        if (e.key === "ArrowLeft" && activeElementId === "saveModalBtn") {
+          this._focusButton("cancelModalBtn");
+        } else if (
+          e.key === "ArrowRight" &&
+          activeElementId === "cancelModalBtn" &&
+          isSaveEnabled
+        ) {
+          this._focusButton("saveModalBtn");
+        }
+        return;
+      }
+    }
+
+    // 3. Escape Shortcut to Close
+    if (e.key === "Escape") {
+      e.preventDefault();
+      e.stopPropagation();
+      this._handleClose();
     }
   }
 
@@ -127,6 +210,16 @@ export class JkConfigModal extends LitElement {
   }
 
   _handleClose() {
+    if (this._hasEditorConfigChanged) {
+      this._showDiscardDialog = true;
+    } else {
+      this._forceClose();
+    }
+  }
+
+  _forceClose() {
+    this._showDiscardDialog = false;
+    window.removeEventListener("keydown", this._handleKeyDown, true);
     this.dispatchEvent(
       new CustomEvent("close", { bubbles: true, composed: true }),
     );
@@ -148,7 +241,6 @@ export class JkConfigModal extends LitElement {
   }
 
   render() {
-    // 1. Restore visibility guard-clause
     if (!this.show) return html``;
 
     return html`
@@ -212,20 +304,27 @@ export class JkConfigModal extends LitElement {
           <div class="flex justify-end gap-3 mt-4">
             <button
               type="button"
+              id="cancelModalBtn"
               @click="${this._handleClose}"
-              class="px-4 py-2 bg-slate-700 border border-transparent hover:border-indigo-500 rounded-xl text-sm font-medium transition-colors"
+              class="px-4 py-2 bg-slate-700 border border-transparent focus:border-indigo-500 hover:border-indigo-500 rounded-xl text-sm font-medium transition-colors outline-none focus:ring-2 focus:ring-indigo-500/20"
             >
               ${this.t("editConfigCancel")}
             </button>
 
             <button
               type="button"
+              id="saveModalBtn"
               @click="${this._handleSave}"
               ?disabled="${!this._isEditorConfigValid || !this._hasEditorConfigChanged}"
-              class="px-4 py-2 rounded-xl text-sm font-medium text-white transition-all ${
+              class="px-4 py-2 rounded-xl text-sm font-medium text-white transition-all outline-none focus:ring-2 focus:ring-indigo-500/50 ${
                 this._isEditorConfigValid && this._hasEditorConfigChanged
-                  ? "bg-indigo-600 hover:bg-indigo-500 cursor-pointer"
-                  : "bg-slate-700 text-slate-500 cursor-not-allowed opacity-50"
+                  ? "bg-indigo-600 hover:bg-indigo-500 cursor-pointer border border-transparent focus:border-indigo-300"
+                  : "bg-slate-700 text-slate-500 cursor-not-allowed opacity-50 border border-transparent"
+              }"
+              title="${
+                this._isEditorConfigValid && this._hasEditorConfigChanged
+                  ? "Ctrl + S"
+                  : ""
               }"
             >
               ${this.t("editConfigSave")}
@@ -233,6 +332,18 @@ export class JkConfigModal extends LitElement {
           </div>
         </div>
       </div>
+
+      <jk-dialog
+        .show="${this._showDiscardDialog}"
+        title="${this.t("discardChangesTitle") || "Unsaved Changes"}"
+        message="${this.t("discardChangesMsg") || "You have unsaved changes in your editor. Are you sure you want to discard them?"}"
+        icon="triangle-alert"
+        iconColor="text-rose-400"
+        confirmLabel="${this.t("discardChangesConfirm") || "Discard Changes"}"
+        cancelLabel="${this.t("discardChangesCancel") || "Keep Editing"}"
+        @confirm="${this._forceClose}"
+        @cancel="${() => (this._showDiscardDialog = false)}"
+      ></jk-dialog>
     `;
   }
 }

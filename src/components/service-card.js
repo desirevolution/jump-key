@@ -8,11 +8,10 @@ export class JkServiceCard extends LitElement {
 
   static properties = {
     name: { type: String },
-    subtitle: { type: String }, // Replaces "url" to support text definitions or URLs universally
+    subtitle: { type: String },
     icon: { type: String },
-    category: { type: String },
     badgeText: { type: String },
-    showCategoryBadge: { type: Boolean },
+    isFavorite: { type: Boolean },
   };
 
   constructor() {
@@ -20,9 +19,8 @@ export class JkServiceCard extends LitElement {
     this.name = "";
     this.subtitle = "";
     this.icon = "";
-    this.category = "";
     this.badgeText = "";
-    this.showCategoryBadge = false;
+    this.isFavorite = false;
   }
 
   _handleClick() {
@@ -35,7 +33,6 @@ export class JkServiceCard extends LitElement {
   }
 
   render() {
-    // Clean up subtitle formatting
     const isUrl =
       this.subtitle &&
       (this.subtitle.includes(".") || this.subtitle.includes("/")); //
@@ -67,18 +64,6 @@ export class JkServiceCard extends LitElement {
           >
             ${displaySubtitle}
           </span>
-
-          ${
-            this.showCategoryBadge && this.category
-              ? html`
-                  <span
-                    class="inline-block mt-2 px-2 py-0.5 text-[10px] uppercase tracking-wider font-semibold bg-slate-900 border border-slate-700 text-slate-400 rounded"
-                  >
-                    ${this.category}
-                  </span>
-                `
-              : ""
-          }
         </div>
 
         <!-- Shortcut Keyboard Badge -->
@@ -86,7 +71,11 @@ export class JkServiceCard extends LitElement {
           this.badgeText
             ? html`
                 <kbd
-                  class="absolute top-4 right-4 px-2 py-0.5 font-bold font-mono text-xs sm:text-sm bg-indigo-600 text-white rounded shadow shadow-indigo-500/50 hidden sm:inline"
+                  class=${`absolute top-4 right-4 px-2 py-0.5 font-bold font-mono text-lg border rounded shadow-md hidden sm:inline ${
+                    this.isFavorite
+                      ? "bg-indigo-600 text-white border-indigo-600 shadow-indigo-500/50"
+                      : "bg-slate-900 text-indigo-400 border-slate-700 shadow-black/40"
+                  }`}
                 >
                   ${this.badgeText.toUpperCase()}
                 </kbd>
