@@ -1,10 +1,10 @@
 import { LitElement, html } from "lit";
 import "./icon.js";
-import "./jk-icon-button.js"; // Import the new component
+import "./jk-icon-button.js";
 
 export class JkDashboardHeader extends LitElement {
   createRenderRoot() {
-    return this;
+    return this; // Preserves global Tailwind styling classes
   }
 
   static get properties() {
@@ -12,9 +12,8 @@ export class JkDashboardHeader extends LitElement {
       isGridView: { type: Boolean },
       lang: { type: String },
       t: { type: Function },
-      _hoursString: { type: String, state: true },
-      _minutesString: { type: String, state: true },
-      _dateString: { type: String, state: true },
+      // Track only the raw Date object as internal state
+      _now: { type: Object, state: true },
     };
   }
 
@@ -22,43 +21,52 @@ export class JkDashboardHeader extends LitElement {
     super();
     this.isGridView = false;
     this.lang = "en";
-    this._hoursString = "";
-    this._minutesString = "";
-    this._dateString = "";
+    this._now = new Date();
     this._timeInterval = null;
   }
 
-  firstUpdated() {
-    this._updateTime();
-    this._timeInterval = setInterval(() => this._updateTime(), 1000);
+  // Set up the interval here so it restarts if the component is re-appended to the DOM
+  connectedCallback() {
+    super.connectedCallback();
+    this._now = new Date();
+    this._timeInterval = setInterval(() => {
+      this._now = new Date();
+    }, 1000);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    clearInterval(this._timeInterval);
+    if (this._timeInterval) {
+      clearInterval(this._timeInterval);
+    }
   }
 
-  _updateTime() {
+  // Clean, reactive getters to derive formatted strings on the fly
+  get _hours() {
+    return String(this._now.getHours()).padStart(2, "0");
+  }
+
+  get _minutes() {
+    return String(this._now.getMinutes()).padStart(2, "0");
+  }
+
+  get _dateString() {
     const locale = this.lang === "de" ? "de-DE" : "en-US";
-    const now = new Date();
-
-    this._hoursString = String(now.getHours()).padStart(2, "0");
-    this._minutesString = String(now.getMinutes()).padStart(2, "0");
-
     const isMobile = window.matchMedia("(max-width: 639px)").matches;
+
     if (isMobile) {
-      this._dateString = now.toLocaleDateString(locale, {
+      return this._now.toLocaleDateString(locale, {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
       });
-    } else {
-      this._dateString = now.toLocaleDateString(locale, {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-      });
     }
+
+    return this._now.toLocaleDateString(locale, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    });
   }
 
   _dispatchEvent(eventName) {
@@ -128,9 +136,9 @@ export class JkDashboardHeader extends LitElement {
             <div
               class="text-2xl sm:text-4xl font-bold text-indigo-400 tracking-wider flex items-center justify-center sm:justify-end"
             >
-              <span>${this._hoursString}</span>
+              <span>${this._hours}</span>
               <span class="mx-[1px] relative -top-[2px]">:</span>
-              <span>${this._minutesString}</span>
+              <span>${this._minutes}</span>
             </div>
             <div
               class="text-[10px] sm:text-xs text-slate-400 font-medium mt-0.5"

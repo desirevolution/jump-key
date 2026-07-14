@@ -1,23 +1,21 @@
-import { LitElement, html, css } from "lit";
+import { LitElement, html } from "lit";
 import { basicEditor } from "prism-code-editor/setups";
 import "prism-code-editor/prism/languages/json";
 import "prism-code-editor/layout.css";
 import "prism-code-editor/themes/night-owl.css";
-import "./icon.js";
-import "./jk-icon-button.js";
+import "./icon.js"; // Standardized wa-dashboard-icon wrapper
+import "./jk-icon-button.js"; // Standardized wa-dashboard-icon-button wrapper
 
 export class JkConfigModal extends LitElement {
-  // We disable shadow DOM styling boundaries here only if we need Tailwind classes
-  // from the global stylesheet to apply inside the modal templates seamlessly.
   createRenderRoot() {
-    return this;
+    return this; // Preserves global Tailwind configuration styles
   }
 
   static properties = {
     show: { type: Boolean },
     categories: { type: Array },
     searchEngines: { type: Array },
-    t: { type: Function }, // Pass down the translation helper from parent
+    t: { type: Function }, // Pass down translation helper
     _isEditorConfigValid: { type: Boolean },
     _hasEditorConfigChanged: { type: Boolean },
     _editorValue: { type: String },
@@ -37,6 +35,7 @@ export class JkConfigModal extends LitElement {
     this._editorValue = "";
     this._originalConfigString = "";
     this._editorInstance = null;
+    this.t = (key) => key;
   }
 
   willUpdate(changed) {
@@ -94,7 +93,7 @@ export class JkConfigModal extends LitElement {
       },
       (editor) => {
         requestAnimationFrame(() => {
-          this._editorInstance.textarea.focus();
+          this._editorInstance?.textarea?.focus();
         });
       },
     );
@@ -149,6 +148,7 @@ export class JkConfigModal extends LitElement {
   }
 
   render() {
+    // 1. Restore visibility guard-clause
     if (!this.show) return html``;
 
     return html`
@@ -170,13 +170,13 @@ export class JkConfigModal extends LitElement {
       >
         <div
           @click="${(e) => e.stopPropagation()}"
-          class="bg-slate-800 border border-slate-700 w-full max-w-5xl rounded-2xl shadow-2xl p-6 flex flex-col h-[80vh]"
+          class="bg-slate-800 border border-slate-700 w-full max-w-5xl rounded-2xl shadow-2xl p-6 flex flex-col h-[80vh] font-mono"
         >
           <div class="flex items-center justify-between mb-4">
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <span class="text-lg font-bold text-white flex items-center gap-2">
               <jk-icon icon="edit" class="text-indigo-400 w-5 h-5"></jk-icon>
               ${this.t("editConfig")}
-            </h3>
+            </span>
 
             <div class="flex items-center gap-3">
               <div
@@ -211,6 +211,7 @@ export class JkConfigModal extends LitElement {
 
           <div class="flex justify-end gap-3 mt-4">
             <button
+              type="button"
               @click="${this._handleClose}"
               class="px-4 py-2 bg-slate-700 border border-transparent hover:border-indigo-500 rounded-xl text-sm font-medium transition-colors"
             >
@@ -218,6 +219,7 @@ export class JkConfigModal extends LitElement {
             </button>
 
             <button
+              type="button"
               @click="${this._handleSave}"
               ?disabled="${!this._isEditorConfigValid || !this._hasEditorConfigChanged}"
               class="px-4 py-2 rounded-xl text-sm font-medium text-white transition-all ${

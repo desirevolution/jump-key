@@ -1,9 +1,9 @@
 import { LitElement, html } from "lit";
-import "./icon.js";
+import "./icon.js"; // Standardized imported dashboard icon wrapper
 
-export class JkSearchItem extends LitElement {
+export class JkDashboardSearchItem extends LitElement {
   createRenderRoot() {
-    return this; // Für globales Tailwind-Styling
+    return this; // Preserves global Tailwind styling classes
   }
 
   static properties = {
@@ -22,6 +22,7 @@ export class JkSearchItem extends LitElement {
   }
 
   render() {
+    // We apply consistent interactive utility styles for active states
     const itemClasses = `w-full flex items-center justify-between p-3 rounded-xl text-left font-mono text-sm transition-all ${
       this.active
         ? "search-item-active sm:bg-indigo-600 text-white"
@@ -31,7 +32,16 @@ export class JkSearchItem extends LitElement {
     return html`
       <button class="${itemClasses}">
         <div class="flex items-center gap-3 min-w-0 grow">
-          ${this.data.icon ? html`<jk-icon .icon=${this.data.icon} class="w-5 h-5 shrink-0 ${this.active ? "text-white" : "text-indigo-400"}"></jk-icon>` : ""}
+          ${
+            this.data.icon
+              ? html`
+                  <wa-dashboard-icon
+                    .icon=${this.data.icon}
+                    class="w-5 h-5 shrink-0 ${this.active ? "text-white" : "text-indigo-400"}"
+                  ></wa-dashboard-icon>
+                `
+              : ""
+          }
 
           <div class="min-w-0 text-xs sm:text-sm">${this._renderContent()}</div>
         </div>
@@ -62,8 +72,9 @@ export class JkSearchItem extends LitElement {
             <span class="font-bold text-white">${this.data.name}</span>:
             <span
               class="italic ${this.active ? "text-indigo-100" : "text-indigo-300"}"
-              >"${terms}"</span
             >
+              "${terms}"
+            </span>
           </div>
         `;
 
@@ -81,12 +92,17 @@ export class JkSearchItem extends LitElement {
         `;
     }
   }
+
   _renderMeta() {
     switch (this.type) {
       case "engine":
         return html`
           <kbd
-            class="px-2 py-0.5 text-xs font-bold rounded shadow ${this.active ? "bg-indigo-700 text-white border-indigo-500" : "bg-slate-900 border border-slate-700 text-indigo-400"}"
+            class="px-2 py-0.5 text-xs font-bold rounded shadow ${
+              this.active
+                ? "bg-indigo-700 text-white border-indigo-500"
+                : "bg-slate-900 border border-slate-700 text-indigo-400"
+            }"
           >
             :${this.data.prefix}
           </kbd>
@@ -96,13 +112,16 @@ export class JkSearchItem extends LitElement {
       case "service":
       default:
         return this.active
-          ? html`<span
-              class="text-xs font-mono bg-indigo-700 px-2 py-0.5 rounded shadow hidden sm:inline"
-              >Enter</span
-            >`
+          ? html`
+              <span
+                class="text-xs font-mono bg-indigo-700 px-2 py-0.5 rounded shadow hidden sm:inline"
+              >
+                Enter
+              </span>
+            `
           : "";
     }
   }
 }
 
-customElements.define("jk-search-item", JkSearchItem);
+customElements.define("jk-dashboard-search-item", JkDashboardSearchItem);

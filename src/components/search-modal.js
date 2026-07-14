@@ -1,11 +1,11 @@
 import { LitElement, html } from "lit";
-import "./icon.js";
-import "./jk-icon-button.js";
-import "./jk-search-item.js";
+import "./icon.js"; // Standardized wa-dashboard-icon wrapper
+import "./jk-icon-button.js"; // Standardized wa-dashboard-icon-button wrapper
+import "./jk-search-item.js"; // Standardized wa-dashboard-search-item wrapper
 
 export class JkSearchModal extends LitElement {
   createRenderRoot() {
-    return this;
+    return this; // Preserves global Tailwind configuration styles
   }
 
   static properties = {
@@ -24,6 +24,7 @@ export class JkSearchModal extends LitElement {
     this.searchEngines = [];
     this.filteredServices = [];
     this.selectedIndex = 0;
+    this.t = (key) => key;
   }
 
   _handleClose() {
@@ -70,27 +71,22 @@ export class JkSearchModal extends LitElement {
     );
   }
 
-  // --- Specialized Micro-Renderers ---
-
-  // --- Extrem schlanke Datenweitergabe im Modal ---
-
   _renderEngine(engine, active) {
     return html`
-      <jk-search-item
+      <jk-dashboard-search-item
         type="engine"
         .active=${active}
         .data=${engine}
         @click="${() => this._selectEngine(engine.prefix)}"
-      ></jk-search-item>
+      ></jk-dashboard-search-item>
     `;
   }
 
   _renderPreview(matchedEngine, searchTermsPreview, active) {
-    // Wir erweitern das Engine-Objekt temporär um die aktuellen Suchbegriffe für die Komponente
     const previewData = { ...matchedEngine, searchTerms: searchTermsPreview };
 
     return html`
-      <jk-search-item
+      <jk-dashboard-search-item
         type="preview"
         .active=${active}
         .data=${previewData}
@@ -103,18 +99,18 @@ export class JkSearchModal extends LitElement {
           window.open(finalUrl, "_blank");
           this._handleClose();
         }}"
-      ></jk-search-item>
+      ></jk-dashboard-search-item>
     `;
   }
 
   _renderService(s, active) {
     return html`
-      <jk-search-item
+      <jk-dashboard-search-item
         type="service"
         .active=${active}
         .data=${s}
         @click=${() => this._triggerServiceClick(s)}
-      ></jk-search-item>
+      ></jk-dashboard-search-item>
     `;
   }
 
@@ -183,27 +179,28 @@ export class JkSearchModal extends LitElement {
   }
 
   render() {
+    // 1. Restore the visibility guard clause
     if (!this.show) return html``;
 
     const queryTrimmed = this.searchQuery.trim();
     const showQuickTrigger = queryTrimmed === "";
-
     const { items, showAllEngines, isFilteringEngines } = this._buildItems();
 
     return html`
       <div
         @click="${this._handleClose}"
-        class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-start justify-center pt-8 sm:pt-24 z-50 animate-fadeIn"
+        class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-start justify-center pt-8 sm:pt-24 z-50 p-4"
       >
         <div
           @click="${(e) => e.stopPropagation()}"
-          class="bg-slate-800 border border-slate-700 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden mx-4 flex flex-col max-h-[80vh]"
+          class="bg-slate-800 border border-slate-700 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] font-mono"
         >
           <div
             class="p-4 border-b border-slate-700 flex items-center gap-3 shrink-0"
           >
             <jk-icon icon="search" class="text-slate-400 w-5 h-5"></jk-icon>
-            <form @submit="${this._handleSubmit}" class="w-full m-0 p-0">
+
+            <form @submit="${this._handleSubmit}" class="grow m-0 p-0">
               <input
                 id="searchInput"
                 type="text"
@@ -248,9 +245,11 @@ export class JkSearchModal extends LitElement {
             ${items.map((item, i) => item.render(i === this.selectedIndex))}
             ${
               this.searchQuery && items.length === 0
-                ? html`<p class="text-center text-slate-500 text-sm py-4">
-                    ${this.t("noServices")}
-                  </p>`
+                ? html`
+                    <p class="text-center text-slate-500 text-sm py-4">
+                      ${this.t("noServices")}
+                    </p>
+                  `
                 : ""
             }
           </div>
