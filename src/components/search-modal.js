@@ -1,7 +1,7 @@
 import { LitElement, html } from "lit";
-import "./icon.js"; // Standardized wa-dashboard-icon wrapper
-import "./icon-button.js"; // Standardized wa-dashboard-icon-button wrapper
-import "./search-item.js"; // Standardized wa-dashboard-search-item wrapper
+import "./icon.js";
+import "./icon-button.js";
+import "./search-item.js";
 
 export class JkSearchModal extends LitElement {
   createRenderRoot() {

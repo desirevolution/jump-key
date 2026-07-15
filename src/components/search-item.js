@@ -1,5 +1,5 @@
 import { LitElement, html } from "lit";
-import "./icon.js"; // Standardized imported dashboard icon wrapper
+import "./icon.js";
 
 export class JkDashboardSearchItem extends LitElement {
   createRenderRoot() {

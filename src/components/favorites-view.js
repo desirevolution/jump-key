@@ -1,4 +1,7 @@
 import { LitElement, html } from "lit";
+import "./service-card.js";
+import "./icon.js";
+import "./icon-button.js";
 
 export class JkFavoritesView extends LitElement {
   createRenderRoot() {
@@ -24,8 +27,22 @@ export class JkFavoritesView extends LitElement {
             class="w-4 h-4 text-amber-500 fill-amber-400/20"
           ></jk-icon>
           ${this.t("frequent")}
-        </h2>
 
+          <jk-icon-button
+            icon="trash-2"
+            variant="text"
+            .text=${this.t("resetFavs")}
+            class="ml-auto"
+            @click=${() => {
+    this.dispatchEvent(
+      new CustomEvent("clear-favorites", {
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }}
+          ></jk-icon-button>
+        </h2>
         <div
           class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]"
         >

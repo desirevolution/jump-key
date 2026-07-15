@@ -13,6 +13,7 @@ import "./components/search-modal.js";
 import "./components/service-card.js";
 import "./components/help-modal.js";
 import "./components/icon.js";
+import "./components/dialog.js";
 import "./components/service-group.js";
 import "./components/favorites-view.js";
 import "./components/grid-view.js";
@@ -37,6 +38,10 @@ class DashboardApp extends LitElement {
     selectedIndex: { type: Number },
     favorites: { type: Object },
     lang: { type: String },
+
+    // Dialog UI States
+    showSaveSuccessDialog: { type: Boolean },
+    showSaveErrorDialog: { type: Boolean },
   };
 
   constructor() {
@@ -57,6 +62,10 @@ class DashboardApp extends LitElement {
     this.favorites = JSON.parse(localStorage.getItem("dashboard_favs")) || {};
     this.resetTimeout = null;
     this.lang = detectLang();
+
+    // Dialog initial state
+    this.showSaveSuccessDialog = false;
+    this.showSaveErrorDialog = false;
 
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
@@ -161,6 +170,14 @@ class DashboardApp extends LitElement {
     this.selectedIndex = 0;
     window.history.pushState({ view: "search" }, "");
     setTimeout(() => this.querySelector("#searchInput")?.focus(), 100);
+  }
+
+  clearFavorites() {
+    if (confirm(this.t("confirmReset"))) {
+      this.favorites = {};
+      localStorage.removeItem("dashboard_favs");
+      this.requestUpdate();
+    }
   }
 
   // --- Keyboard Event Dispatcher ---
@@ -393,29 +410,29 @@ class DashboardApp extends LitElement {
       });
 
       if (response.ok) {
-        if (updatedConfig.categories) {
-          this.categories = generateShortcuts(updatedConfig.categories);
+        if (newConfig.categories) {
+          this.categories = generateShortcuts(newConfig.categories);
         } else {
-          this.categories = generateShortcuts(updatedConfig);
+          this.categories = generateShortcuts(newConfig);
         }
 
-        if (updatedConfig.searchEngines) {
-          this.searchEngines = updatedConfig.searchEngines;
+        if (newConfig.searchEngines) {
+          this.searchEngines = newConfig.searchEngines;
         }
 
         this.showConfigModal = false;
-        alert(this.t("editConfigSaveDone"));
+        this.showSaveSuccessDialog = true;
       } else {
-        alert(this.t("editConfigSaveFailed"));
+        this.showSaveErrorDialog = true;
       }
     } catch (error) {
       console.error("WebDAV Error:", error);
-      alert(this.t("editConfigSaveFailed"));
+      this.showSaveErrorDialog = true;
     }
   }
 
   async handleSaveConfig(e) {
-    const { newConfig, oldConfig } = e.detail.config;
+    const { newConfig, oldConfig } = e.detail;
     await this.saveConfiguration(newConfig, oldConfig);
   }
 
@@ -470,6 +487,36 @@ class DashboardApp extends LitElement {
           });
         }}
       ></jk-search-modal>
+    `;
+  }
+
+  templateSaveSuccessDialog() {
+    return html`
+      <jk-dialog
+        .show="${this.showSaveSuccessDialog}"
+        title="${this.t("editConfigSaveDoneTitle") || "Success"}"
+        message="${this.t("editConfigSaveDone") || "Configuration saved successfully!"}"
+        icon="circle-check"
+        iconColor="text-emerald-400"
+        confirmLabel="${this.t("ok") || "OK"}"
+        @confirm="${() => (this.showSaveSuccessDialog = false)}"
+        @cancel="${() => (this.showSaveSuccessDialog = false)}"
+      ></jk-dialog>
+    `;
+  }
+
+  templateSaveErrorDialog() {
+    return html`
+      <jk-dialog
+        .show="${this.showSaveErrorDialog}"
+        title="${this.t("editConfigSaveFailedTitle") || "Save Failed"}"
+        message="${this.t("editConfigSaveFailed") || "Could not write the changes to services.json."}"
+        icon="triangle-alert"
+        iconColor="text-rose-400"
+        confirmLabel="${this.t("ok") || "OK"}"
+        @confirm="${() => (this.showSaveErrorDialog = false)}"
+        @cancel="${() => (this.showSaveErrorDialog = false)}"
+      ></jk-dialog>
     `;
   }
 
@@ -531,20 +578,20 @@ class DashboardApp extends LitElement {
 
       ${this.templateKeyBadge()} ${this.templateHelpModal()}
       ${this.templateSearchModal(filteredServices)}
-      ${this.templateConfigModal()}
+      ${this.templateConfigModal()} ${this.templateSaveSuccessDialog()}
+      ${this.templateSaveErrorDialog()}
 
       <main class="container px-4 py-6 mx-auto">
         ${
           showMain && !this.isGridView
             ? html`
-                <!-- Standard List View (Favorites + Folders) -->
                 <jk-favorites-view
                   .favorites=${favs}
                   .t=${(key) => this.t(key)}
                   @service-click=${(e) => this.trackClick(e.detail.service)}
+                  @clear-favorites=${() => this.clearFavorites()}
                 ></jk-favorites-view>
 
-                <!-- Standard Category Directories -->
                 <jk-service-group
                   title="${this.t("categories")}"
                   icon="folder"
@@ -565,7 +612,6 @@ class DashboardApp extends LitElement {
                 ></jk-service-group>
               `
             : html`
-                <!-- Grid/Category Multi-Column View -->
                 <jk-grid-view
                   .categories=${this.categories}
                   .activeCategoryKey=${this.activeCategoryKey}

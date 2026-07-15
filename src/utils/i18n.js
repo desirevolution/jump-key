@@ -34,6 +34,9 @@ export const translations = {
     editConfigCancel: "Abbrechen",
     editConfigSaveDone: "Änderungen wurden erfolgreich gespeichert",
     editConfigSaveFailed: "Änderungen konnten nicht gespeichert werden",
+
+    tabImportExport: "Import & Export",
+    tabEditor: "JSON-Editor",
   },
   en: {
     helpHint: "Press [?] for hotkey help",
@@ -70,6 +73,9 @@ export const translations = {
     editConfigCancel: "Cancel",
     editConfigSaveDone: "Changes were saved successfully",
     editConfigSaveFailed: "Changes could not be saved",
+
+    tabImportExport: "Import & Export",
+    tabEditor: "JSON-Editor",
   },
 };
 

@@ -41,7 +41,7 @@ export class JkServiceCard extends LitElement {
       : this.subtitle || ""; //
 
     return html`
-      <dialog
+      <div
         @click="${this._handleClick}"
         class="group relative bg-slate-800 border border-slate-700 hover:border-indigo-500 rounded-2xl p-4 flex flex-row items-center gap-4 text-left cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/5 active:scale-[0.98] w-full"
       >
@@ -82,7 +82,7 @@ export class JkServiceCard extends LitElement {
               `
             : ""
         }
-      </dialog>
+      </div>
     `;
   }
 }

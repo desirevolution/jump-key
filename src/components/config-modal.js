@@ -1,11 +1,9 @@
 import { LitElement, html } from "lit";
-import { basicEditor } from "prism-code-editor/setups";
-import "prism-code-editor/prism/languages/json";
-import "prism-code-editor/layout.css";
-import "prism-code-editor/themes/night-owl.css";
 import "./icon.js";
 import "./icon-button.js";
 import "./dialog.js";
+import "./config-data.js";
+import "./config-editor.js";
 
 export class JkConfigModal extends LitElement {
   createRenderRoot() {
@@ -17,11 +15,11 @@ export class JkConfigModal extends LitElement {
     categories: { type: Array },
     searchEngines: { type: Array },
     t: { type: Function },
+    _activeTab: { type: String }, // "data" | "editor"
     _isEditorConfigValid: { type: Boolean },
     _hasEditorConfigChanged: { type: Boolean },
     _editorValue: { type: String },
     _originalConfigString: { type: String },
-    _editorInstance: { type: Function },
     _showDiscardDialog: { type: Boolean },
   };
 
@@ -31,15 +29,14 @@ export class JkConfigModal extends LitElement {
     this.categories = [];
     this.searchEngines = [];
 
+    this._activeTab = "data"; // Start-Tab ist jetzt "Daten & Backup"
     this._isEditorConfigValid = true;
     this._hasEditorConfigChanged = false;
     this._editorValue = "";
     this._originalConfigString = "";
-    this._editorInstance = null;
     this._showDiscardDialog = false;
     this.t = (key) => key;
 
-    // Bind keyboard interceptor
     this._handleKeyDown = this._handleKeyDown.bind(this);
   }
 
@@ -58,20 +55,12 @@ export class JkConfigModal extends LitElement {
         this._isEditorConfigValid = true;
         this._hasEditorConfigChanged = false;
         this._showDiscardDialog = false;
+        this._activeTab = "data";
 
-        // Register capture-phase listener to intercept global Escape keys and Ctrl+S
         window.addEventListener("keydown", this._handleKeyDown, true);
       } else {
-        // Cleanup when hiding
         window.removeEventListener("keydown", this._handleKeyDown, true);
       }
-    }
-  }
-
-  async updated(changedProperties) {
-    if (changedProperties.has("show") && this.show) {
-      await this.updateComplete;
-      this.initEditor();
     }
   }
 
@@ -80,63 +69,69 @@ export class JkConfigModal extends LitElement {
     window.removeEventListener("keydown", this._handleKeyDown, true);
   }
 
-  // Helper utility to safely query and focus our modal buttons
   async _focusButton(id) {
     await this.updateComplete;
     const btn = this.querySelector(`#${id}`);
-    if (btn) {
-      btn.focus();
-    }
+    if (btn) btn.focus();
   }
 
-  // Intercept keyboard events globally while modal is active
   _handleKeyDown(e) {
-    // If the discard warning dialog is currently showing, let it handle its own keys!
-    if (this._showDiscardDialog) {
-      return;
-    }
+    if (this._showDiscardDialog) return;
 
-    // 1. Ctrl + S (or Cmd + S) Shortcut to Save
-    const isSaveShortcut =
-      (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s";
-    if (isSaveShortcut) {
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (this._isEditorConfigValid && this._hasEditorConfigChanged) {
-        this._handleSave();
-      }
-      return;
-    }
-
-    // 2. Arrow Key Navigation between footer buttons
-    if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-      const activeElementId = document.activeElement?.id;
-      const isSaveEnabled =
-        this._isEditorConfigValid && this._hasEditorConfigChanged;
-
-      // Only navigate if focus is already on one of our action buttons
-      if (
-        activeElementId === "cancelModalBtn" ||
-        activeElementId === "saveModalBtn"
-      ) {
+    // Tab-Wechsel Shortcuts: Ctrl + 1 (Daten & Backup) oder Ctrl + 2 (JSON-Editor)
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === "1") {
         e.preventDefault();
         e.stopPropagation();
-
-        if (e.key === "ArrowLeft" && activeElementId === "saveModalBtn") {
-          this._focusButton("cancelModalBtn");
-        } else if (
-          e.key === "ArrowRight" &&
-          activeElementId === "cancelModalBtn" &&
-          isSaveEnabled
-        ) {
-          this._focusButton("saveModalBtn");
-        }
+        this._setActiveTab("data");
+        return;
+      } else if (e.key === "2") {
+        e.preventDefault();
+        e.stopPropagation();
+        this._setActiveTab("editor");
         return;
       }
     }
 
-    // 3. Escape Shortcut to Close
+    // Shortcuts nur verarbeiten, wenn wir uns im Editor-Tab befinden
+    if (this._activeTab === "editor") {
+      const isSaveShortcut =
+        (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s";
+      if (isSaveShortcut) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (this._isEditorConfigValid && this._hasEditorConfigChanged) {
+          this._handleSave();
+        }
+        return;
+      }
+
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        const activeElementId = document.activeElement?.id;
+        const isSaveEnabled =
+          this._isEditorConfigValid && this._hasEditorConfigChanged;
+
+        if (
+          activeElementId === "cancelModalBtn" ||
+          activeElementId === "saveModalBtn"
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+
+          if (e.key === "ArrowLeft" && activeElementId === "saveModalBtn") {
+            this._focusButton("cancelModalBtn");
+          } else if (
+            e.key === "ArrowRight" &&
+            activeElementId === "cancelModalBtn" &&
+            isSaveEnabled
+          ) {
+            this._focusButton("saveModalBtn");
+          }
+          return;
+        }
+      }
+    }
+
     if (e.key === "Escape") {
       e.preventDefault();
       e.stopPropagation();
@@ -144,69 +139,25 @@ export class JkConfigModal extends LitElement {
     }
   }
 
-  initEditor() {
-    const container = this.querySelector("#editorContainer");
-    if (!container) return;
-    container.innerHTML = "";
-
-    this._editorInstance = basicEditor(
-      container,
-      {
-        value: this._editorValue,
-        language: "json",
-        theme: "night-owl",
-        onUpdate: (value) => {
-          this._editorValue = value;
-          try {
-            const changed = value !== this._originalConfigString;
-            if (this._hasEditorConfigChanged !== changed) {
-              this._hasEditorConfigChanged = changed;
-            }
-            const parsed = JSON.parse(value);
-            const isStructureValid = this.validateConfig(parsed);
-            if (this._isEditorConfigValid !== isStructureValid) {
-              this._isEditorConfigValid = isStructureValid;
-            }
-          } catch (err) {
-            if (this._isEditorConfigValid) {
-              this._isEditorConfigValid = false;
-            }
-          }
-        },
-      },
-      (editor) => {
-        requestAnimationFrame(() => {
-          this._editorInstance?.textarea?.focus();
-        });
-      },
-    );
+  _setActiveTab(tab) {
+    this._activeTab = tab;
   }
 
-  validateConfig(jsonObj) {
-    if (!jsonObj || typeof jsonObj !== "object") return false;
+  _handleEditorChange(e) {
+    const { value, isValid, hasChanged } = e.detail;
+    this._editorValue = value;
+    this._isEditorConfigValid = isValid;
+    this._hasEditorConfigChanged = hasChanged;
+  }
 
-    const hasCategories =
-      Array.isArray(jsonObj.categories) && jsonObj.categories.length > 0;
-    const hasSearchEngines =
-      Array.isArray(jsonObj.searchEngines) && jsonObj.searchEngines.length > 0;
+  _handleConfigImported(e) {
+    const importedConfig = e.detail;
+    this._editorValue = JSON.stringify(importedConfig, null, 2);
+    this._isEditorConfigValid = true;
+    this._hasEditorConfigChanged = true;
 
-    if (!hasCategories || !hasSearchEngines) return false;
-
-    const isCategoriesValid = jsonObj.categories.every(
-      (cat) =>
-        typeof cat.category === "string" &&
-        typeof cat.categoryKey === "string" &&
-        Array.isArray(cat.services),
-    );
-
-    const isSearchEnginesValid = jsonObj.searchEngines.every(
-      (engine) =>
-        typeof engine.name === "string" &&
-        typeof engine.prefix === "string" &&
-        typeof engine.url === "string",
-    );
-
-    return isCategoriesValid && isSearchEnginesValid;
+    // Nach erfolgreichem Import direkt in den Editor wechseln
+    this._setActiveTab("editor");
   }
 
   _handleClose() {
@@ -230,7 +181,10 @@ export class JkConfigModal extends LitElement {
       const parsedJson = JSON.parse(this._editorValue);
       this.dispatchEvent(
         new CustomEvent("save", {
-          detail: { newConfig: parsedJson, oldConfig: this._originalConfigString },
+          detail: {
+            newConfig: parsedJson,
+            oldConfig: this._originalConfigString,
+          },
           bubbles: true,
           composed: true,
         }),
@@ -240,107 +194,180 @@ export class JkConfigModal extends LitElement {
     }
   }
 
+  _renderActiveTabContent() {
+    switch (this._activeTab) {
+      case "data":
+        return html`
+          <jk-config-data
+            .categories="${this.categories}"
+            .searchEngines="${this.searchEngines}"
+            .t="${this.t}"
+            @config-imported="${this._handleConfigImported}"
+          ></jk-config-data>
+        `;
+      case "editor":
+      default:
+        return html`
+          <jk-config-editor
+            .value="${this._editorValue}"
+            .originalValue="${this._originalConfigString}"
+            .isValid="${this._isEditorConfigValid}"
+            @editor-change="${this._handleEditorChange}"
+          ></jk-config-editor>
+        `;
+    }
+  }
+
   render() {
     if (!this.show) return html``;
 
     return html`
-      <style>
-        #editorContainer {
-          display: grid;
-          grid-template-rows: 1fr auto;
-          gap: 1em;
-          overflow: hidden;
-        }
-        .prism-code-editor {
-          border-radius: 0.4em;
-        }
-      </style>
-
       <div
         @click="${this._handleClose}"
         class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
       >
         <div
           @click="${(e) => e.stopPropagation()}"
-          class="bg-slate-800 border border-slate-700 w-full max-w-5xl rounded-2xl shadow-2xl p-6 flex flex-col h-[80vh] font-mono"
+          class="bg-slate-800 border border-slate-700 w-full max-w-7xl rounded-2xl shadow-2xl p-6 flex flex-col h-[85vh] font-sans"
         >
-          <div class="flex items-center justify-between mb-4">
+          <div
+            class="flex items-center justify-between mb-6 pb-4 border-b border-slate-700/60"
+          >
             <span class="text-lg font-bold text-white flex items-center gap-2">
-              <jk-icon icon="edit" class="text-indigo-400 w-5 h-5"></jk-icon>
-              ${this.t("editConfig")}
+              <jk-icon
+                icon="settings"
+                class="text-indigo-400 w-5 h-5"
+              ></jk-icon>
+              ${this.t("dashboardSettings") || "Dashboard-Einstellungen"}
             </span>
 
             <div class="flex items-center gap-3">
-              <div
-                class="p-2 transition-all duration-300 ${
-                  this._isEditorConfigValid
-                    ? "text-emerald-400"
-                    : "text-rose-400"
-                }"
-                title="${this._isEditorConfigValid ? this.t("editConfigValid") : this.t("editConfigInvalid")}"
-              >
-                <jk-icon
-                  .icon="${this._isEditorConfigValid ? "circle-check" : "triangle-alert"}"
-                  class="w-5 h-5"
-                ></jk-icon>
-              </div>
+              ${
+                this._activeTab === "editor"
+                  ? html`
+                      <div
+                        class="p-2 transition-all duration-300 ${
+                        this._isEditorConfigValid
+                          ? "text-emerald-400"
+                          : "text-rose-400"
+                      }"
+                        title="${
+                        this._isEditorConfigValid
+                          ? this.t("editConfigValid")
+                          : this.t("editConfigInvalid")
+                      }"
+                      >
+                        <jk-icon
+                          .icon="${this._isEditorConfigValid ? "circle-check" : "triangle-alert"}"
+                          class="w-5 h-5"
+                        ></jk-icon>
+                      </div>
+                    `
+                  : html``
+              }
 
               <jk-icon-button
                 icon="x"
+                class="hover:bg-slate-700 rounded-lg transition-colors duration-200"
                 @click="${this._handleClose}"
               ></jk-icon-button>
             </div>
           </div>
 
-          <div
-            id="editorContainer"
-            class="w-full grow rounded-xl overflow-hidden bg-slate-900 border ${
-              this._isEditorConfigValid
-                ? "border-slate-700 focus-within:border-indigo-500"
-                : "border-rose-500 focus-within:border-rose-500"
-            } transition-colors"
-          ></div>
-
-          <div class="flex justify-end gap-3 mt-4">
-            <button
-              type="button"
-              id="cancelModalBtn"
-              @click="${this._handleClose}"
-              class="px-4 py-2 bg-slate-700 border border-transparent focus:border-indigo-500 hover:border-indigo-500 rounded-xl text-sm font-medium transition-colors outline-none focus:ring-2 focus:ring-indigo-500/20"
+          <div class="flex flex-1 gap-6 overflow-hidden min-h-0">
+            <div
+              class="w-56 flex flex-col gap-1 shrink-0 border-r border-slate-700/60 pr-4"
             >
-              ${this.t("editConfigCancel")}
-            </button>
+              <button
+                @click="${() => this._setActiveTab("data")}"
+                title="Ctrl + 1"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-left outline-none ${
+                  this._activeTab === "data"
+                    ? "bg-indigo-600/15 text-indigo-400"
+                    : "text-slate-400 hover:bg-slate-700/50 hover:text-white"
+                }"
+              >
+                💾 ${this.t("tabData") || "Daten & Backup"}
+              </button>
 
-            <button
-              type="button"
-              id="saveModalBtn"
-              @click="${this._handleSave}"
-              ?disabled="${!this._isEditorConfigValid || !this._hasEditorConfigChanged}"
-              class="px-4 py-2 rounded-xl text-sm font-medium text-white transition-all outline-none focus:ring-2 focus:ring-indigo-500/50 ${
-                this._isEditorConfigValid && this._hasEditorConfigChanged
-                  ? "bg-indigo-600 hover:bg-indigo-500 cursor-pointer border border-transparent focus:border-indigo-300"
-                  : "bg-slate-700 text-slate-500 cursor-not-allowed opacity-50 border border-transparent"
-              }"
-              title="${
-                this._isEditorConfigValid && this._hasEditorConfigChanged
-                  ? "Ctrl + S"
-                  : ""
-              }"
-            >
-              ${this.t("editConfigSave")}
-            </button>
+              <button
+                @click="${() => this._setActiveTab("editor")}"
+                title="Ctrl + 2"
+                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-left outline-none ${
+                  this._activeTab === "editor"
+                    ? "bg-indigo-600/15 text-indigo-400"
+                    : "text-slate-400 hover:bg-slate-700/50 hover:text-white"
+                }"
+              >
+                💻 ${this.t("tabEditor") || "JSON-Editor"}
+              </button>
+            </div>
+
+            <div class="flex-1 flex flex-col overflow-y-auto pr-1">
+              ${this._renderActiveTabContent()}
+            </div>
           </div>
+
+          ${
+            this._activeTab === "editor"
+              ? html`
+                  <div
+                    class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-700/60"
+                  >
+                    <button
+                      type="button"
+                      id="cancelModalBtn"
+                      @click="${this._handleClose}"
+                      class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 border border-transparent focus:border-indigo-500 rounded-xl text-sm font-medium transition-colors outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer text-white"
+                    >
+                      ${this.t("editConfigCancel") || "Abbrechen"}
+                    </button>
+
+                    <button
+                      type="button"
+                      id="saveModalBtn"
+                      @click="${this._handleSave}"
+                      ?disabled="${!this._isEditorConfigValid || !this._hasEditorConfigChanged}"
+                      class="px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-all outline-none focus:ring-2 focus:ring-indigo-500/50 ${
+                      this._isEditorConfigValid && this._hasEditorConfigChanged
+                        ? "bg-indigo-600 hover:bg-indigo-500 cursor-pointer border border-transparent focus:border-indigo-300"
+                        : "bg-slate-700 text-slate-500 cursor-not-allowed opacity-50 border border-transparent"
+                    }"
+                      title="${
+                      this._isEditorConfigValid && this._hasEditorConfigChanged
+                        ? "Ctrl + S"
+                        : ""
+                    }"
+                    >
+                      ${this.t("editConfigSave") || "Speichern"}
+                    </button>
+                  </div>
+                `
+              : html`
+                  <div
+                    class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-700/60"
+                  >
+                    <button
+                      type="button"
+                      @click="${this._handleClose}"
+                      class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 rounded-xl text-sm font-medium transition-colors cursor-pointer text-white"
+                    >
+                      ${this.t("close") || "Schließen"}
+                    </button>
+                  </div>
+                `
+          }
         </div>
       </div>
 
       <jk-dialog
         .show="${this._showDiscardDialog}"
-        title="${this.t("discardChangesTitle") || "Unsaved Changes"}"
-        message="${this.t("discardChangesMsg") || "You have unsaved changes in your editor. Are you sure you want to discard them?"}"
+        title="${this.t("discardChangesTitle") || "Ungespeicherte Änderungen"}"
+        message="${this.t("discardChangesMsg") || "Du hast ungespeicherte Änderungen vorgenommen. Möchtest du diese wirklich verwerfen?"}"
         icon="triangle-alert"
         iconColor="text-rose-400"
-        confirmLabel="${this.t("discardChangesConfirm") || "Discard Changes"}"
-        cancelLabel="${this.t("discardChangesCancel") || "Keep Editing"}"
+        confirmLabel="${this.t("discardChangesConfirm") || "Änderungen verwerfen"}"
+        cancelLabel="${this.t("discardChangesCancel") || "Weiter editieren"}"
         @confirm="${this._forceClose}"
         @cancel="${() => (this._showDiscardDialog = false)}"
       ></jk-dialog>

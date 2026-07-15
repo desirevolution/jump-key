@@ -1,5 +1,5 @@
 import { LitElement, html } from "lit";
-
+import "./service-card.js";
 export class JkServiceGroup extends LitElement {
   createRenderRoot() {
     return this; // Preserves Tailwind classes
