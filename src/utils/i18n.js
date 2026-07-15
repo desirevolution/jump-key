@@ -115,16 +115,14 @@ export const translations = {
 
     tabEditor: "JSON-Editor",
     tabEditorOk: "OK",
-    tabEditorSaveDoneTitle: "Erfolgreich",
-    tabEditorSaveDone: "Konfiguration erfolgreich gespeichert!",
-    tabEditorSaveFailedTitle: "Fehler beim Speichern",
-    tabEditorSaveFailed:
-      "Die Änderungen konnten nicht in die services.json geschrieben werden.",
-    tabEditorDiscardChangesTitle: "Ungespeicherte Änderungen",
-    tabEditorDiscardChangesMsg:
-      "Du hast ungespeicherte Änderungen vorgenommen. Möchtest du diese wirklich verwerfen?",
-    tabEditorDiscardChangesConfirm: "Änderungen verwerfen",
-    tabEditorDiscardChangesCancel: "Weiter editieren",
+    tabEditorgSaveDoneTitle: "Success",
+    tabEditorgSaveDone: "Configuration saved successfully!",
+    tabEditorgSaveFailedTitle: "Save Failed",
+    tabEditorSaveFailed: "Could not write the changes to services.json.",
+    tabEditorDiscardChangesTitle: "Unsaved Changes",
+    tabEditorDiscardChangesMsg: "You have unsaved changes. Do you really want to discard them?",
+    tabEditorDiscardChangesConfirm: "Discard changes",
+    tabEditorDiscardChangesCancel: "Continue editing",
   },
 };
 
