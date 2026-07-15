@@ -247,15 +247,15 @@ export class JkConfigModal extends LitElement {
                   ? html`
                       <div
                         class="p-2 transition-all duration-300 ${
-                        this._isEditorConfigValid
-                          ? "text-emerald-400"
-                          : "text-rose-400"
-                      }"
+                          this._isEditorConfigValid
+                            ? "text-emerald-400"
+                            : "text-rose-400"
+                        }"
                         title="${
-                        this._isEditorConfigValid
-                          ? this.t("editConfigValid")
-                          : this.t("editConfigInvalid")
-                      }"
+                          this._isEditorConfigValid
+                            ? this.t("editConfigValid")
+                            : this.t("editConfigInvalid")
+                        }"
                       >
                         <jk-icon
                           .icon="${this._isEditorConfigValid ? "circle-check" : "triangle-alert"}"
@@ -287,7 +287,7 @@ export class JkConfigModal extends LitElement {
                     : "text-slate-400 hover:bg-slate-700/50 hover:text-white"
                 }"
               >
-                💾 ${this.t("tabData") || "Daten & Backup"}
+                💾 ${this.t("tabData")}
               </button>
 
               <button
@@ -329,15 +329,17 @@ export class JkConfigModal extends LitElement {
                       @click="${this._handleSave}"
                       ?disabled="${!this._isEditorConfigValid || !this._hasEditorConfigChanged}"
                       class="px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-all outline-none focus:ring-2 focus:ring-indigo-500/50 ${
-                      this._isEditorConfigValid && this._hasEditorConfigChanged
-                        ? "bg-indigo-600 hover:bg-indigo-500 cursor-pointer border border-transparent focus:border-indigo-300"
-                        : "bg-slate-700 text-slate-500 cursor-not-allowed opacity-50 border border-transparent"
-                    }"
+                        this._isEditorConfigValid &&
+                        this._hasEditorConfigChanged
+                          ? "bg-indigo-600 hover:bg-indigo-500 cursor-pointer border border-transparent focus:border-indigo-300"
+                          : "bg-slate-700 text-slate-500 cursor-not-allowed opacity-50 border border-transparent"
+                      }"
                       title="${
-                      this._isEditorConfigValid && this._hasEditorConfigChanged
-                        ? "Ctrl + S"
-                        : ""
-                    }"
+                        this._isEditorConfigValid &&
+                        this._hasEditorConfigChanged
+                          ? "Ctrl + S"
+                          : ""
+                      }"
                     >
                       ${this.t("editConfigSave") || "Speichern"}
                     </button>
@@ -362,12 +364,12 @@ export class JkConfigModal extends LitElement {
 
       <jk-dialog
         .show="${this._showDiscardDialog}"
-        title="${this.t("discardChangesTitle") || "Ungespeicherte Änderungen"}"
-        message="${this.t("discardChangesMsg") || "Du hast ungespeicherte Änderungen vorgenommen. Möchtest du diese wirklich verwerfen?"}"
+        title="${this.t("tabEditorDiscardChangesTitle")}"
+        message="${this.t("tabEditorDiscardChangesMsg")}"
         icon="triangle-alert"
         iconColor="text-rose-400"
-        confirmLabel="${this.t("discardChangesConfirm") || "Änderungen verwerfen"}"
-        cancelLabel="${this.t("discardChangesCancel") || "Weiter editieren"}"
+        confirmLabel="${this.t("tabEditorDiscardChangesConfirm")}"
+        cancelLabel="${this.t("tabEditorDiscardChangesCancel")}"
         @confirm="${this._forceClose}"
         @cancel="${() => (this._showDiscardDialog = false)}"
       ></jk-dialog>

@@ -494,11 +494,11 @@ class DashboardApp extends LitElement {
     return html`
       <jk-dialog
         .show="${this.showSaveSuccessDialog}"
-        title="${this.t("editConfigSaveDoneTitle") || "Success"}"
-        message="${this.t("editConfigSaveDone") || "Configuration saved successfully!"}"
+        title="${this.t("tabEditorSaveDoneTitle")}"
+        message="${this.t("tabEditorSaveDone")}"
         icon="circle-check"
         iconColor="text-emerald-400"
-        confirmLabel="${this.t("ok") || "OK"}"
+        confirmLabel="${this.t("tabEditorOk")}"
         @confirm="${() => (this.showSaveSuccessDialog = false)}"
         @cancel="${() => (this.showSaveSuccessDialog = false)}"
       ></jk-dialog>
@@ -509,11 +509,11 @@ class DashboardApp extends LitElement {
     return html`
       <jk-dialog
         .show="${this.showSaveErrorDialog}"
-        title="${this.t("editConfigSaveFailedTitle") || "Save Failed"}"
-        message="${this.t("editConfigSaveFailed") || "Could not write the changes to services.json."}"
+        title="${this.t("tabEditorSaveFailedTitle")}"
+        message="${this.t("tabEditorSaveFailed")}"
         icon="triangle-alert"
         iconColor="text-rose-400"
-        confirmLabel="${this.t("ok") || "OK"}"
+        confirmLabel="${this.t("tabEditorOk")}"
         @confirm="${() => (this.showSaveErrorDialog = false)}"
         @cancel="${() => (this.showSaveErrorDialog = false)}"
       ></jk-dialog>

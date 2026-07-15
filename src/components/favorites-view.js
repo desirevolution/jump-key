@@ -34,13 +34,13 @@ export class JkFavoritesView extends LitElement {
             .text=${this.t("resetFavs")}
             class="ml-auto"
             @click=${() => {
-    this.dispatchEvent(
-      new CustomEvent("clear-favorites", {
-        bubbles: true,
-        composed: true,
-      }),
-    );
-  }}
+              this.dispatchEvent(
+                new CustomEvent("clear-favorites", {
+                  bubbles: true,
+                  composed: true,
+                }),
+              );
+            }}
           ></jk-icon-button>
         </h2>
         <div

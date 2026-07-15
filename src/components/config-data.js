@@ -55,12 +55,12 @@ export class JkConfigData extends LitElement {
               composed: true,
             }),
           );
-          alert("Konfiguration erfolgreich geladen!");
+          alert(this.t("tabDataImportSuccess"));
         } else {
-          alert("Die hochgeladene Datei hat keine valide Dashboard-Struktur.");
+          alert(this.t("tabDataImportInvalidStructure"));
         }
       } catch (err) {
-        alert("Fehler beim Lesen der JSON-Datei. Ungültige Syntax.");
+        alert(this.t("tabDataImportJsonError"));
       }
     };
     reader.readAsText(file);
@@ -74,10 +74,11 @@ export class JkConfigData extends LitElement {
           class="bg-slate-900/30 border border-slate-700 p-5 rounded-2xl flex items-center justify-between gap-4"
         >
           <div>
-            <h3 class="font-semibold text-white">Konfiguration sichern</h3>
+            <h3 class="font-semibold text-white">
+              ${this.t("tabDataBackupTitle")}
+            </h3>
             <p class="text-xs text-slate-400 mt-1">
-              Lade deine aktuellen Widgets und Suchmaschinen als .json-Datei
-              herunter.
+              ${this.t("tabDataBackupDesc")}
             </p>
           </div>
           <button
@@ -85,16 +86,16 @@ export class JkConfigData extends LitElement {
             class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 rounded-xl text-sm font-semibold text-white flex items-center gap-2 shrink-0 transition-colors cursor-pointer"
           >
             <jk-icon icon="download" class="w-4 h-4"></jk-icon>
-            ${this.t("export") || "Exportieren"}
+            ${this.t("tabDataExport")}
           </button>
         </div>
 
         <div class="bg-slate-900/30 border border-slate-700 p-5 rounded-2xl">
           <h3 class="font-semibold text-white mb-1">
-            Konfiguration wiederherstellen
+            ${this.t("tabDataRestoreTitle")}
           </h3>
           <p class="text-xs text-slate-400 mb-4">
-            Lade eine vorhandene JSON-Konfigurationsdatei hoch.
+            ${this.t("tabDataRestoreDesc")}
           </p>
 
           <div
@@ -110,12 +111,12 @@ export class JkConfigData extends LitElement {
               icon="upload"
               class="text-indigo-400 w-8 h-8 mb-2"
             ></jk-icon>
-            <span class="text-sm font-medium text-slate-200"
-              >Datei auswählen</span
-            >
-            <span class="text-xs text-slate-500 mt-1"
-              >Nur valide .json-Dateien</span
-            >
+            <span class="text-sm font-medium text-slate-200">
+              ${this.t("tabDataSelectFile")}
+            </span>
+            <span class="text-xs text-slate-500 mt-1">
+              ${this.t("tabDataOnlyJsonFiles")}
+            </span>
           </div>
         </div>
       </div>
