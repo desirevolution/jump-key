@@ -1,7 +1,7 @@
 {
   "categories": [
     {
-      "category": "AI3",
+      "category": "AI",
       "icon": "sparkles",
       "services": [
         {
@@ -10,7 +10,7 @@
           "icon": "sparkles"
         },
         {
-          "name": "Clautgggggggggggggggggggggggggggggggggggggggggggggggde",
+          "name": "Claude",
           "url": "https://claude.ai",
           "icon": "https://cdn.simpleicons.org/anthropic"
         },
