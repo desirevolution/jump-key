@@ -4,7 +4,7 @@ import "prism-code-editor/prism/languages/json";
 import "prism-code-editor/layout.css";
 import "prism-code-editor/themes/night-owl.css";
 import "./icon.js";
-import "./jk-icon-button.js";
+import "./icon-button.js";
 import "./dialog.js";
 
 export class JkConfigModal extends LitElement {

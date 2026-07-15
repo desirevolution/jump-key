@@ -1,6 +1,6 @@
 import { LitElement, html } from "lit";
 import "./icon.js";
-import "./jk-icon-button.js";
+import "./icon-button.js";
 
 export class JkDashboardHeader extends LitElement {
   createRenderRoot() {
