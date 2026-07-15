@@ -369,7 +369,7 @@ class DashboardApp extends LitElement {
 
   // --- Backend Sync (WebDAV) ---
 
-  async saveConfiguration(updatedConfig) {
+  async saveConfiguration(newConfig, oldConfig) {
     try {
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
 
@@ -378,7 +378,7 @@ class DashboardApp extends LitElement {
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedConfig),
+          body: JSON.stringify(oldConfig, null, 2),
         },
       );
 
@@ -389,7 +389,7 @@ class DashboardApp extends LitElement {
       const response = await fetch("/config/services.json", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedConfig),
+        body: JSON.stringify(newConfig, null, 2),
       });
 
       if (response.ok) {
@@ -415,8 +415,8 @@ class DashboardApp extends LitElement {
   }
 
   async handleSaveConfig(e) {
-    const updatedConfig = e.detail.config;
-    await this.saveConfiguration(updatedConfig);
+    const { newConfig, oldConfig } = e.detail.config;
+    await this.saveConfiguration(newConfig, oldConfig);
   }
 
   // --- Layout Helper Snippets ---

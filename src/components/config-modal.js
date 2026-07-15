@@ -230,7 +230,7 @@ export class JkConfigModal extends LitElement {
       const parsedJson = JSON.parse(this._editorValue);
       this.dispatchEvent(
         new CustomEvent("save", {
-          detail: { config: parsedJson },
+          detail: { newConfig: parsedJson, oldConfig: this._originalConfigString },
           bubbles: true,
           composed: true,
         }),
