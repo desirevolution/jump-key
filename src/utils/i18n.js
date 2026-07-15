@@ -34,6 +34,34 @@ export const translations = {
     editConfigCancel: "Abbrechen",
     editConfigSaveDone: "Änderungen wurden erfolgreich gespeichert",
     editConfigSaveFailed: "Änderungen konnten nicht gespeichert werden",
+
+    tabData: "Import & Export",
+    tabDataExport: "Exportieren",
+    tabDataBackupTitle: "Konfiguration sichern",
+    tabDataBackupDesc:
+      "Lade deine aktuellen Widgets und Suchmaschinen als .json-Datei herunter.",
+    tabDataRestoreTitle: "Konfiguration wiederherstellen",
+    tabDataRestoreDesc: "Lade eine vorhandene JSON-Konfigurationsdatei hoch.",
+    tabDataSelectFile: "Datei auswählen",
+    tabDataOnlyJsonFiles: "Nur valide .json-Dateien",
+    tabDataImportSuccess: "Konfiguration erfolgreich geladen!",
+    tabDataImportInvalidStructure:
+      "Die hochgeladene Datei hat keine valide Dashboard-Struktur.",
+    tabDataImportJsonError:
+      "Fehler beim Lesen der JSON-Datei. Ungültige Syntax.",
+
+    tabEditor: "JSON-Editor",
+    tabEditorOk: "OK",
+    tabEditorSaveDoneTitle: "Erfolgreich",
+    tabEditorSaveDone: "Konfiguration erfolgreich gespeichert!",
+    tabEditorSaveFailedTitle: "Fehler beim Speichern",
+    tabEditorSaveFailed:
+      "Die Änderungen konnten nicht in die services.json geschrieben werden.",
+    tabEditorDiscardChangesTitle: "Ungespeicherte Änderungen",
+    tabEditorDiscardChangesMsg:
+      "Du hast ungespeicherte Änderungen vorgenommen. Möchtest du diese wirklich verwerfen?",
+    tabEditorDiscardChangesConfirm: "Änderungen verwerfen",
+    tabEditorDiscardChangesCancel: "Weiter editieren",
   },
   en: {
     helpHint: "Press [?] for hotkey help",
@@ -70,6 +98,33 @@ export const translations = {
     editConfigCancel: "Cancel",
     editConfigSaveDone: "Changes were saved successfully",
     editConfigSaveFailed: "Changes could not be saved",
+
+    tabData: "Import & Export",
+    tabDataExport: "Export",
+    tabDataBackupTitle: "Back up configuration",
+    tabDataBackupDesc:
+      "Download your current widgets and search engines as a .json file.",
+    tabDataRestoreTitle: "Restore configuration",
+    tabDataRestoreDesc: "Upload an existing JSON configuration file.",
+    tabDataSelectFile: "Select file",
+    tabDataOnlyJsonFiles: "Only valid .json files",
+    tabDataImportSuccess: "Configuration successfully loaded!",
+    tabDataImportInvalidStructure:
+      "The uploaded file does not have a valid dashboard structure.",
+    tabDataImportJsonError: "Error reading the JSON file. Invalid syntax.",
+
+    tabEditor: "JSON-Editor",
+    tabEditorOk: "OK",
+    tabEditorSaveDoneTitle: "Erfolgreich",
+    tabEditorSaveDone: "Konfiguration erfolgreich gespeichert!",
+    tabEditorSaveFailedTitle: "Fehler beim Speichern",
+    tabEditorSaveFailed:
+      "Die Änderungen konnten nicht in die services.json geschrieben werden.",
+    tabEditorDiscardChangesTitle: "Ungespeicherte Änderungen",
+    tabEditorDiscardChangesMsg:
+      "Du hast ungespeicherte Änderungen vorgenommen. Möchtest du diese wirklich verwerfen?",
+    tabEditorDiscardChangesConfirm: "Änderungen verwerfen",
+    tabEditorDiscardChangesCancel: "Weiter editieren",
   },
 };
 

@@ -1,9 +1,10 @@
 import { LitElement, html } from "lit";
 import "./icon.js";
+import "./icon-button.js";
 
 export class JkDashboardHeader extends LitElement {
   createRenderRoot() {
-    return this;
+    return this; // Preserves global Tailwind styling classes
   }
 
   static get properties() {
@@ -11,9 +12,8 @@ export class JkDashboardHeader extends LitElement {
       isGridView: { type: Boolean },
       lang: { type: String },
       t: { type: Function },
-      _hoursString: { type: String, state: true },
-      _minutesString: { type: String, state: true },
-      _dateString: { type: String, state: true },
+      // Track only the raw Date object as internal state
+      _now: { type: Object, state: true },
     };
   }
 
@@ -21,49 +21,52 @@ export class JkDashboardHeader extends LitElement {
     super();
     this.isGridView = false;
     this.lang = "en";
-    this._hoursString = "";
-    this._minutesString = "";
-    this._dateString = "";
+    this._now = new Date();
     this._timeInterval = null;
   }
 
+  // Set up the interval here so it restarts if the component is re-appended to the DOM
   connectedCallback() {
     super.connectedCallback();
-  }
-
-  firstUpdated() {
-    this._updateTime();
-    // 1000ms ist super, damit der Doppelpunkt präzise jede Sekunde pulsiert
-    this._timeInterval = setInterval(() => this._updateTime(), 1000);
+    this._now = new Date();
+    this._timeInterval = setInterval(() => {
+      this._now = new Date();
+    }, 1000);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    clearInterval(this._timeInterval);
+    if (this._timeInterval) {
+      clearInterval(this._timeInterval);
+    }
   }
 
-  _updateTime() {
+  // Clean, reactive getters to derive formatted strings on the fly
+  get _hours() {
+    return String(this._now.getHours()).padStart(2, "0");
+  }
+
+  get _minutes() {
+    return String(this._now.getMinutes()).padStart(2, "0");
+  }
+
+  get _dateString() {
     const locale = this.lang === "de" ? "de-DE" : "en-US";
-    const now = new Date();
-
-    // Reine Zahlen extrahieren und mit führender Null formatieren (z.B. "09" statt "9")
-    this._hoursString = String(now.getHours()).padStart(2, "0");
-    this._minutesString = String(now.getMinutes()).padStart(2, "0");
-
     const isMobile = window.matchMedia("(max-width: 639px)").matches;
+
     if (isMobile) {
-      this._dateString = now.toLocaleDateString(locale, {
+      return this._now.toLocaleDateString(locale, {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
       });
-    } else {
-      this._dateString = now.toLocaleDateString(locale, {
-        weekday: "long",
-        day: "numeric",
-        month: "long",
-      });
     }
+
+    return this._now.toLocaleDateString(locale, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+    });
   }
 
   _dispatchEvent(eventName) {
@@ -110,53 +113,32 @@ export class JkDashboardHeader extends LitElement {
         </div>
 
         <div class="flex items-center gap-3 font-mono">
-          <button
-            @click="${() => this._dispatchEvent("toggle-view")}"
-            class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md"
+          <jk-icon-button
+            icon="${this.isGridView ? "rows-2" : "layout-grid"}"
             title="${this.t ? this.t("hkToggleView") : ""} [#]"
-          >
-            ${
-              this.isGridView
-                ? html`<jk-icon
-                    icon="rows-2"
-                    class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
-                  ></jk-icon>`
-                : html`<jk-icon
-                    icon="layout-grid"
-                    class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
-                  ></jk-icon>`
-            }
-          </button>
+            @click="${() => this._dispatchEvent("toggle-view")}"
+          ></jk-icon-button>
 
-          <button
-            @click="${() => this._dispatchEvent("open-search")}"
-            class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md"
+          <jk-icon-button
+            icon="search"
             title="${this.t ? this.t("hkSearch") : ""} [Space]"
-          >
-            <jk-icon
-              icon="search"
-              class="w-5 h-5 group-hover:text-indigo-400 transition-colors"
-            ></jk-icon>
-          </button>
+            @click="${() => this._dispatchEvent("open-search")}"
+          ></jk-icon-button>
 
-          <button
-            @click="${() => this._dispatchEvent("open-config")}"
-            class="flex items-center justify-center p-2.5 bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer transition-all duration-150 group shadow-md hidden md:block"
+          <jk-icon-button
+            icon="settings"
             title="${this.t ? this.t("editConfig") : ""}"
-          >
-            <jk-icon
-              icon="settings"
-              class="w-5 h-5 text-slate-400 group-hover:text-indigo-400 transition-colors"
-            ></jk-icon>
-          </button>
+            extraClass="hidden md:block"
+            @click="${() => this._dispatchEvent("open-config")}"
+          ></jk-icon-button>
 
           <div class="text-center sm:text-right ml-2 select-none">
             <div
               class="text-2xl sm:text-4xl font-bold text-indigo-400 tracking-wider flex items-center justify-center sm:justify-end"
             >
-              <span>${this._hoursString}</span>
+              <span>${this._hours}</span>
               <span class="mx-[1px] relative -top-[2px]">:</span>
-              <span>${this._minutesString}</span>
+              <span>${this._minutes}</span>
             </div>
             <div
               class="text-[10px] sm:text-xs text-slate-400 font-medium mt-0.5"

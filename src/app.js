@@ -1,5 +1,4 @@
 import { LitElement, html } from "lit";
-import { createIcons, icons } from "lucide";
 import { t, detectLang } from "./utils/i18n.js";
 import {
   generateShortcuts,
@@ -7,16 +6,21 @@ import {
   getTopFavorites,
 } from "./utils/shortcuts.js";
 
+// Import Sub-Components
 import "./components/dashboard-header.js";
 import "./components/config-modal.js";
 import "./components/search-modal.js";
 import "./components/service-card.js";
 import "./components/help-modal.js";
 import "./components/icon.js";
+import "./components/dialog.js";
+import "./components/service-group.js";
+import "./components/favorites-view.js";
+import "./components/grid-view.js";
 
 class DashboardApp extends LitElement {
   createRenderRoot() {
-    return this;
+    return this; // Preserves Tailwind utility structures
   }
 
   static properties = {
@@ -34,6 +38,10 @@ class DashboardApp extends LitElement {
     selectedIndex: { type: Number },
     favorites: { type: Object },
     lang: { type: String },
+
+    // Dialog UI States
+    showSaveSuccessDialog: { type: Boolean },
+    showSaveErrorDialog: { type: Boolean },
   };
 
   constructor() {
@@ -41,7 +49,6 @@ class DashboardApp extends LitElement {
     this.categories = [];
     this.searchEngines = [];
     this.showConfigModal = false;
-    this.isEditorConfigValid = true;
     this.activeCategoryKey = "";
     this.currentInput = "";
     this.isInvalidInput = false;
@@ -55,6 +62,10 @@ class DashboardApp extends LitElement {
     this.favorites = JSON.parse(localStorage.getItem("dashboard_favs")) || {};
     this.resetTimeout = null;
     this.lang = detectLang();
+
+    // Dialog initial state
+    this.showSaveSuccessDialog = false;
+    this.showSaveErrorDialog = false;
 
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
@@ -95,7 +106,7 @@ class DashboardApp extends LitElement {
     window.removeEventListener("popstate", this.handlePopState);
   }
 
-  // --- State helpers ---
+  // --- Core Actions & Resets ---
 
   resetInput(updateHistory = true) {
     this.activeCategoryKey = "";
@@ -144,44 +155,6 @@ class DashboardApp extends LitElement {
     }, 150);
   }
 
-  clearFavorites() {
-    if (confirm(this.t("confirmReset"))) {
-      this.favorites = {};
-      localStorage.removeItem("dashboard_favs");
-      this.requestUpdate();
-    }
-  }
-
-  validateConfig(jsonObj) {
-    if (!jsonObj || typeof jsonObj !== "object") return false;
-
-    const hasCategories =
-      Array.isArray(jsonObj.categories) && jsonObj.categories.length > 0;
-
-    const hasSearchEngines =
-      Array.isArray(jsonObj.searchEngines) && jsonObj.searchEngines.length > 0;
-
-    if (!hasCategories || !hasSearchEngines) return false;
-
-    const isCategoriesValid = jsonObj.categories.every(
-      (cat) =>
-        typeof cat.category === "string" &&
-        typeof cat.categoryKey === "string" &&
-        Array.isArray(cat.services),
-    );
-
-    const isSearchEnginesValid = jsonObj.searchEngines.every(
-      (engine) =>
-        typeof engine.name === "string" &&
-        typeof engine.prefix === "string" &&
-        typeof engine.url === "string",
-    );
-
-    return isCategoriesValid && isSearchEnginesValid;
-  }
-
-  // --- Event handlers ---
-
   handlePopState(e) {
     if (!e.state?.view) {
       this.resetInput(false);
@@ -199,24 +172,19 @@ class DashboardApp extends LitElement {
     setTimeout(() => this.querySelector("#searchInput")?.focus(), 100);
   }
 
-  handleSearchInput(e) {
-    this.searchQuery = e.target.value;
-    this.selectedIndex = 0;
+  clearFavorites() {
+    if (confirm(this.t("confirmReset"))) {
+      this.favorites = {};
+      localStorage.removeItem("dashboard_favs");
+      this.requestUpdate();
+    }
   }
 
-  handleCategoryUISelection(cat, event) {
-    if (event?.screenX === 0 && event?.screenY === 0) return;
-    this.activeCategoryKey = cat.categoryKey;
-    this.currentInput = cat.categoryKey.toUpperCase();
-    this.isInvalidInput = false;
-    this.isValidInput = false;
-    clearTimeout(this.resetTimeout);
-    window.history.pushState({ view: "category", key: cat.categoryKey }, "");
-  }
+  // --- Keyboard Event Dispatcher ---
 
   handleKeyDown(e) {
-    // 1. Global short-circuits and modifier guards
-    if (e.ctrlKey || e.altKey || e.metaKey) return;
+    console.error("key %o", e);
+    if ((e.ctrlKey && !e.key === ",") || e.altKey || e.metaKey) return;
 
     if (e.key === "Escape") {
       if (this.showConfigModal) {
@@ -227,29 +195,29 @@ class DashboardApp extends LitElement {
       return;
     }
 
-    // If configuration modal is up, ignore all remaining app-level shortcuts
     if (this.showConfigModal) return;
 
-    // 2. Delegate to Search-specific key handling if search is active
     if (this.showSearch) {
       this.handleSearchKeyDown(e);
       return;
     }
 
-    // 3. Delegate to Help-specific state closing if help is active
     if (this.showHelp) {
       e.preventDefault();
       this.showHelp = false;
       return;
     }
 
-    // 4. Form inputs guard (for any unexpected input focused outside modals)
     if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
 
-    // 5. Global Command triggers
     if (e.key === "?") {
       e.preventDefault();
       this.showHelp = true;
+      return;
+    }
+    if (e.ctrlKey && e.key === ",") {
+      e.preventDefault();
+      this.showConfigModal = true;
       return;
     }
     if (e.key === " " || e.key === "Spacebar") {
@@ -257,21 +225,17 @@ class DashboardApp extends LitElement {
       this.openSearch();
       return;
     }
-    if (e.key.toLowerCase() === "#" && !this.activeCategoryKey) {
+    if (e.key === "#" && !this.activeCategoryKey) {
       e.preventDefault();
       this.toggleViewMode();
       return;
     }
 
-    // 6. Delegate alpha-numeric shortcut sequences
     if (e.key.length === 1) {
       this.handleNavigationKeyDown(e.key.toLowerCase());
     }
   }
 
-  /**
-   * Encapsulates key navigation and item selection while the Search modal is active
-   */
   handleSearchKeyDown(e) {
     const filtered = getFilteredServices(this.categories, this.searchQuery);
     const queryTrimmed = this.searchQuery.trim();
@@ -311,7 +275,6 @@ class DashboardApp extends LitElement {
         ? candidateEngines
         : [];
 
-    // Build Polymorphic action map
     const items = [];
     enginesToRender.forEach((engine) => {
       items.push({
@@ -345,7 +308,6 @@ class DashboardApp extends LitElement {
 
     const totalItems = items.length;
 
-    // Handle directional/execution inputs
     if (e.key === "ArrowDown") {
       e.preventDefault();
       if (totalItems > 0) {
@@ -369,13 +331,8 @@ class DashboardApp extends LitElement {
     }
   }
 
-  /**
-   * Handles sequence hotkeys for dashboard navigation (Categories -> Services)
-   */
   handleNavigationKeyDown(key) {
-    // STATE A: No category selected yet
     if (!this.activeCategoryKey) {
-      // Direct numeric hotkeys for top favorites (List View only)
       if (/^[0-9]$/.test(key) && !this.isGridView) {
         const favService = getTopFavorites(
           this.categories,
@@ -388,7 +345,6 @@ class DashboardApp extends LitElement {
         }
       }
 
-      // Check if key matches a top-level category
       if (this.categories.some((c) => c.categoryKey === key)) {
         this.activeCategoryKey = key;
         this.currentInput = key.toUpperCase();
@@ -403,7 +359,6 @@ class DashboardApp extends LitElement {
       return;
     }
 
-    // STATE B: Inside a category, matching a child service
     this.currentInput += ` → ${key.toUpperCase()}`;
     const cat = this.categories.find(
       (c) => c.categoryKey === this.activeCategoryKey,
@@ -419,9 +374,19 @@ class DashboardApp extends LitElement {
     }
   }
 
-  // --- Backend Communication (WebDAV) ---
+  scrollToSelected() {
+    setTimeout(
+      () =>
+        this.querySelector(".search-item-active")?.scrollIntoView({
+          block: "nearest",
+        }),
+      10,
+    );
+  }
 
-  async saveConfiguration(updatedConfig) {
+  // --- Backend Sync (WebDAV) ---
+
+  async saveConfiguration(newConfig, oldConfig) {
     try {
       const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
 
@@ -430,7 +395,7 @@ class DashboardApp extends LitElement {
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatedConfig),
+          body: JSON.stringify(oldConfig, null, 2),
         },
       );
 
@@ -441,57 +406,37 @@ class DashboardApp extends LitElement {
       const response = await fetch("/config/services.json", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedConfig),
+        body: JSON.stringify(newConfig, null, 2),
       });
 
       if (response.ok) {
-        if (updatedConfig.categories) {
-          this.categories = generateShortcuts(updatedConfig.categories);
+        if (newConfig.categories) {
+          this.categories = generateShortcuts(newConfig.categories);
         } else {
-          this.categories = generateShortcuts(updatedConfig);
+          this.categories = generateShortcuts(newConfig);
         }
 
-        if (updatedConfig.searchEngines) {
-          this.searchEngines = updatedConfig.searchEngines;
+        if (newConfig.searchEngines) {
+          this.searchEngines = newConfig.searchEngines;
         }
 
         this.showConfigModal = false;
-        alert(this.t("editConfigSaveDone"));
+        this.showSaveSuccessDialog = true;
       } else {
-        alert(this.t("editConfigSaveFailed"));
+        this.showSaveErrorDialog = true;
       }
     } catch (error) {
       console.error("WebDAV Error:", error);
-      alert(this.t("editConfigSaveFailed"));
+      this.showSaveErrorDialog = true;
     }
   }
 
   async handleSaveConfig(e) {
-    const updatedConfig = e.detail.config;
-    await this.saveConfiguration(updatedConfig);
+    const { newConfig, oldConfig } = e.detail;
+    await this.saveConfiguration(newConfig, oldConfig);
   }
 
-  // --- Templates ---
-
-  renderIcon(icon, extraClass = "w-6 h-6") {
-    if (!icon)
-      return html`<jk-icon icon="help-circle" class="${extraClass}"></i>`;
-    if (/\.(png|jpe?g|svg|webp)$/i.test(icon)) {
-      return html`
-        <img
-          src="./icons/${icon}"
-          alt=""
-          class="${extraClass} object-contain"
-          @error="${(e) => {
-            e.target.style.display = "none";
-            e.target.nextElementSibling.style.display = "block";
-          }}"
-        />
-        <i data-lucide="globe" class="${extraClass} hidden"></i>
-      `;
-    }
-    return html`<i data-lucide="${icon}" class="${extraClass}"></i>`;
-  }
+  // --- Layout Helper Snippets ---
 
   templateConfigModal() {
     return html`
@@ -514,22 +459,6 @@ class DashboardApp extends LitElement {
         .t=${(key) => this.t(key)}
         @close=${() => (this.showHelp = false)}
       ></jk-help-modal>
-    `;
-  }
-
-  templateKeyBadge() {
-    if (!this.currentInput || this.showSearch || this.showHelp) return "";
-    const stateClass = this.isInvalidInput
-      ? "bg-rose-600 text-white border-rose-400 animate-bounce"
-      : this.isValidInput
-        ? "bg-emerald-600 text-white border-emerald-400 scale-105 shadow-emerald-900/50"
-        : "bg-indigo-600 text-white border-indigo-400 animate-pulse";
-    return html`
-      <div
-        class="fixed bottom-6 right-6 font-mono text-xl font-bold px-4 py-2 rounded-lg shadow-2xl border z-50 animate-fadeIn hidden sm:block transition-all duration-150 ${stateClass}"
-      >
-        ${this.currentInput}
-      </div>
     `;
   }
 
@@ -561,151 +490,62 @@ class DashboardApp extends LitElement {
     `;
   }
 
-  templateFavorites(favs) {
-    if (favs.length === 0) return html``;
+  templateSaveSuccessDialog() {
     return html`
-      <h2
-        class="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2"
-      >
-        <jk-icon
-          icon="star"
-          class="text-amber-500 w-4 h-4 fill-amber-400/20"
-        ></jk-icon>
-        ${this.t("frequent")}
-      </h2>
+      <jk-dialog
+        .show="${this.showSaveSuccessDialog}"
+        title="${this.t("tabEditorSaveDoneTitle")}"
+        message="${this.t("tabEditorSaveDone")}"
+        icon="circle-check"
+        iconColor="text-emerald-400"
+        confirmLabel="${this.t("tabEditorOk")}"
+        @confirm="${() => (this.showSaveSuccessDialog = false)}"
+        @cancel="${() => (this.showSaveSuccessDialog = false)}"
+      ></jk-dialog>
+    `;
+  }
+
+  templateSaveErrorDialog() {
+    return html`
+      <jk-dialog
+        .show="${this.showSaveErrorDialog}"
+        title="${this.t("tabEditorSaveFailedTitle")}"
+        message="${this.t("tabEditorSaveFailed")}"
+        icon="triangle-alert"
+        iconColor="text-rose-400"
+        confirmLabel="${this.t("tabEditorOk")}"
+        @confirm="${() => (this.showSaveErrorDialog = false)}"
+        @cancel="${() => (this.showSaveErrorDialog = false)}"
+      ></jk-dialog>
+    `;
+  }
+
+  templateKeyBadge() {
+    if (!this.currentInput || this.showSearch || this.showHelp) return "";
+    const stateClass = this.isInvalidInput
+      ? "bg-rose-600 text-white border-rose-400 animate-bounce"
+      : this.isValidInput
+        ? "bg-emerald-600 text-white border-emerald-400 scale-105 shadow-emerald-900/50"
+        : "bg-indigo-600 text-white border-indigo-400 animate-pulse";
+    return html`
       <div
-        class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]"
+        class="fixed bottom-6 right-6 font-mono text-xl font-bold px-4 py-2 rounded-lg shadow-2xl border z-50 animate-fadeIn hidden sm:block transition-all duration-150 ${stateClass}"
       >
-        ${favs.map(
-          (service) => html`
-            <jk-service-card
-              .name=${service.name}
-              .subtitle=${service.url}
-              .icon=${service.icon}
-              .badgeText=${service.key}
-              .renderIcon=${(icon, cls) => this.renderIcon(icon, cls)}
-              @card-click=${() => this.trackClick(service)}
-            ></jk-service-card>
-          `,
-        )}
+        ${this.currentInput}
       </div>
     `;
   }
 
-  templateCategoriesList() {
-    return html`
-      <h2
-        class="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-2"
-      >
-        <jk-icon
-          icon="folder"
-          class="text-blue-500 w-4 h-4 fill-amber-400/20"
-        ></jk-icon>
-        ${this.t("categories")}
-      </h2>
-      <div
-        class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]"
-      >
-        ${this.categories.map(
-          (cat) => html`
-            <jk-service-card
-              .name=${cat.category}
-              .subtitle=${`${cat.services?.length ?? 0} Services`}
-              .icon=${cat.icon}
-              .badgeText=${cat.categoryKey}
-              .renderIcon=${(icon, cls) => this.renderIcon(icon, cls)}
-              @card-click=${() => (this.activeCategoryKey = cat.categoryKey)}
-            ></jk-service-card>
-          `,
-        )}
-      </div>
-    `;
-  }
+  render_() {
+    const favs = getTopFavorites(this.categories, this.favorites);
+    const filteredServices = getFilteredServices(
+      this.categories,
+      this.searchQuery,
+    );
+    const showMain =
+      !this.activeCategoryKey && !this.showSearch && !this.showHelp;
 
-  templateFullGridView() {
-    return html`
-      <div class="animate-fadeIn space-y-5">
-        ${this.categories.map(
-          (cat) => html`
-            <div class="border-b border-slate-800/40 pb-5 last:border-0">
-              <div class="flex items-center gap-3 mb-3">
-                <kbd
-                  class="px-2 py-0.5 font-bold font-mono text-xs text-indigo-400 bg-slate-900 border border-indigo-500/30 rounded hidden sm:block"
-                >
-                  ${cat.categoryKey?.toUpperCase() ?? ""}
-                </kbd>
-                <jk-icon
-                  .icon="${cat.icon}"
-                  class="w-4 h-4 text-indigo-400/80"
-                ></jk-icon>
-                <h2
-                  class="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider"
-                >
-                  ${cat.category}
-                </h2>
-              </div>
-
-              <div
-                class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]"
-              >
-                ${(cat.services ?? []).map(
-                  (service) => html`
-                    <jk-service-card
-                      .name=${service.name}
-                      .subtitle=${service.url}
-                      .icon=${service.icon}
-                      .badgeText=${service.key}
-                      .renderIcon=${(icon, cls) => this.renderIcon(icon, cls)}
-                      @card-click=${() => this.trackClick(service)}
-                    ></jk-service-card>
-                  `,
-                )}
-              </div>
-            </div>
-          `,
-        )}
-      </div>
-    `;
-  }
-
-  templateServicesGrid(activeGroup) {
-    if (!activeGroup) return html``;
-    return html`
-      <div class="flex items-center gap-3 mb-3">
-        <kbd
-          class="px-2 py-0.5 font-bold font-mono text-xs text-indigo-400 bg-slate-900 border border-indigo-500/30 rounded hidden sm:block"
-        >
-          ${activeGroup.categoryKey?.toUpperCase() ?? ""}
-        </kbd>
-        <jk-icon
-          .icon="${activeGroup.icon}"
-          class="w-4 h-4 text-indigo-400/80"
-        ></jk-icon>
-        <h2
-          class="text-xs sm:text-sm font-semibold text-slate-400 uppercase tracking-wider"
-        >
-          ${activeGroup.category}
-        </h2>
-      </div>
-      <div class="animate-fadeIn space-y-6">
-        <div
-          class="grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(320px,1fr))]"
-        >
-          ${activeGroup.services.map(
-            (service) => html`
-              <jk-service-card
-                .name=${service.name}
-                .subtitle=${service.url}
-                .icon=${service.icon}
-                .badgeText=${service.key}
-                .renderIcon=${(icon, cls) => this.renderIcon(icon, cls)}
-                @card-click=${() => this.trackClick(service)}
-              ></jk-service-card>
-            `,
-          )}
-        </div>
-      </div>
-    `;
+    return html` ${this.templateHelpModal()} `;
   }
 
   render() {
@@ -713,9 +553,6 @@ class DashboardApp extends LitElement {
     const filteredServices = getFilteredServices(
       this.categories,
       this.searchQuery,
-    );
-    const activeGroup = this.categories.find(
-      (c) => c.categoryKey === this.activeCategoryKey,
     );
     const showMain =
       !this.activeCategoryKey && !this.showSearch && !this.showHelp;
@@ -738,26 +575,52 @@ class DashboardApp extends LitElement {
         }}
         @toggle-view=${this.toggleViewMode}
       ></jk-dashboard-header>
+
       ${this.templateKeyBadge()} ${this.templateHelpModal()}
       ${this.templateSearchModal(filteredServices)}
-      ${this.templateConfigModal()}
-      ${
-        showMain
-          ? html`
-              ${
-                this.isGridView
-                  ? this.templateFullGridView()
-                  : html`
-                      <div class="animate-fadeIn space-y-8 sm:space-y-10">
-                        ${this.templateFavorites(favs)}
-                        ${this.templateCategoriesList()}
-                      </div>
-                    `
-              }
-            `
-          : ""
-      }
-      ${this.templateServicesGrid(activeGroup)}
+      ${this.templateConfigModal()} ${this.templateSaveSuccessDialog()}
+      ${this.templateSaveErrorDialog()}
+
+      <main class="container px-4 py-6 mx-auto">
+        ${
+          showMain && !this.isGridView
+            ? html`
+                <jk-favorites-view
+                  .favorites=${favs}
+                  .t=${(key) => this.t(key)}
+                  @service-click=${(e) => this.trackClick(e.detail.service)}
+                  @clear-favorites=${() => this.clearFavorites()}
+                ></jk-favorites-view>
+
+                <jk-service-group
+                  title="${this.t("categories")}"
+                  icon="folder"
+                  .services=${this.categories.map((cat) => ({
+                    name: cat.category,
+                    url: `${cat.services?.length ?? 0} Services`,
+                    icon: cat.icon,
+                    key: cat.categoryKey,
+                  }))}
+                  @service-click=${(e) => {
+                    this.activeCategoryKey = e.detail.service.key;
+                    this.currentInput = e.detail.service.key.toUpperCase();
+                    window.history.pushState(
+                      { view: "category", key: e.detail.service.key },
+                      "",
+                    );
+                  }}
+                ></jk-service-group>
+              `
+            : html`
+                <jk-grid-view
+                  .categories=${this.categories}
+                  .activeCategoryKey=${this.activeCategoryKey}
+                  .t=${(key) => this.t(key)}
+                  @service-click=${(e) => this.trackClick(e.detail.service)}
+                ></jk-grid-view>
+              `
+        }
+      </main>
     `;
   }
 }
