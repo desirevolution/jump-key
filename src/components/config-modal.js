@@ -303,7 +303,7 @@ export class JkConfigModal extends LitElement {
               </button>
             </div>
 
-            <div class="flex-1 flex flex-col overflow-y-auto pr-1">
+            <div class="flex-1 flex flex-col overflow-y-hidden pr-1">
               ${this._renderActiveTabContent()}
             </div>
           </div>

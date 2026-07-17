@@ -128,7 +128,7 @@ export class JkDashboardHeader extends LitElement {
           <jk-icon-button
             icon="settings"
             title="${this.t ? this.t("editConfig") : ""}"
-            extraClass="hidden md:block"
+            .hideOnMobile="${true}"
             @click="${() => this._dispatchEvent("open-config")}"
           ></jk-icon-button>
 

@@ -183,7 +183,6 @@ class DashboardApp extends LitElement {
   // --- Keyboard Event Dispatcher ---
 
   handleKeyDown(e) {
-    console.error("key %o", e);
     if ((e.ctrlKey && !e.key === ",") || e.altKey || e.metaKey) return;
 
     if (e.key === "Escape") {
