@@ -27,6 +27,31 @@ export class JkSearchModal extends LitElement {
     this.t = (key) => key;
   }
 
+updated(changedProperties) {
+  if (changedProperties.has("selectedIndex")) {
+    requestAnimationFrame(() => {
+      const active = this.querySelector(".search-item-active");
+      const container = this.querySelector(".search-results");
+
+      if (active && container) {
+        const activeTop = active.offsetTop;
+        const activeBottom = activeTop + active.offsetHeight;
+
+        const visibleTop = container.scrollTop;
+        const visibleBottom =
+          visibleTop + container.clientHeight;
+
+        if (activeTop < visibleTop) {
+          container.scrollTop = activeTop;
+        } else if (activeBottom > visibleBottom) {
+          container.scrollTop =
+            activeBottom - container.clientHeight;
+        }
+      }
+    });
+  }
+}
+
   _handleClose() {
     this.dispatchEvent(
       new CustomEvent("close", { bubbles: true, composed: true }),
@@ -178,85 +203,253 @@ export class JkSearchModal extends LitElement {
     return { items, showAllEngines, isFilteringEngines };
   }
 
-  render() {
-    // 1. Restore the visibility guard clause
-    if (!this.show) return html``;
+render() {
+  if (!this.show) return html``;
 
-    const queryTrimmed = this.searchQuery.trim();
-    const showQuickTrigger = queryTrimmed === "";
-    const { items, showAllEngines, isFilteringEngines } = this._buildItems();
+  const queryTrimmed = this.searchQuery.trim();
+  const showQuickTrigger = queryTrimmed === "";
 
-    return html`
+  const {
+    items,
+    showAllEngines,
+    isFilteringEngines,
+  } = this._buildItems();
+
+
+  return html`
+    <div
+      @click=${this._handleClose}
+      class="
+        fixed
+        inset-0
+        z-50
+
+        flex
+        items-start
+        justify-center
+
+        pt-10
+        sm:pt-24
+
+        p-4
+
+        bg-slate-950/70
+        backdrop-blur-md
+      "
+    >
+
       <div
-        @click="${this._handleClose}"
-        class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-start justify-center pt-8 sm:pt-24 z-50 p-4"
+        @click=${(e) => e.stopPropagation()}
+        class="
+          w-full
+          max-w-3xl
+
+          overflow-hidden
+
+          rounded-2xl
+
+          border
+          border-slate-700/70
+
+          bg-gradient-to-br
+          from-slate-800
+          to-slate-900
+
+          shadow-2xl
+          shadow-black/40
+
+          flex
+          flex-col
+
+          max-h-[80vh]
+        "
       >
+
+        <!-- Search Header -->
+
         <div
-          @click="${(e) => e.stopPropagation()}"
-          class="bg-slate-800 border border-slate-700 w-full max-w-3xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[80vh] font-mono"
+          class="
+            flex
+            items-center
+            gap-3
+
+            px-5
+            py-4
+
+            border-b
+            border-slate-700/70
+
+            bg-slate-900/30
+
+            shrink-0
+          "
         >
+
           <div
-            class="p-4 border-b border-slate-700 flex items-center gap-3 shrink-0"
+            class="
+              flex
+              items-center
+              justify-center
+
+              size-9
+
+              rounded-xl
+
+              bg-slate-700/60
+
+              ring-1
+              ring-slate-600/70
+
+              text-indigo-300
+            "
           >
-            <jk-icon icon="search" class="text-slate-400 w-5 h-5"></jk-icon>
-
-            <form @submit="${this._handleSubmit}" class="grow m-0 p-0">
-              <input
-                id="searchInput"
-                type="text"
-                inputmode="search"
-                enterkeyhint="search"
-                placeholder="${this.t("searchPlaceholder")}"
-                .value="${this.searchQuery}"
-                @input="${this._handleInput}"
-                class="bg-transparent w-full focus:outline-none text-lg sm:text-xl text-white placeholder-slate-500"
-              />
-            </form>
-
-            ${
-              showQuickTrigger
-                ? html`
-                    <jk-icon-button
-                      icon="globe"
-                      @click="${() => this._selectEngine("")}"
-                    ></jk-icon-button>
-                  `
-                : ""
-            }
-
-            <jk-icon-button
-              icon="x"
-              @click="${this._handleClose}"
-            ></jk-icon-button>
+            <jk-icon
+              icon="search"
+              class="size-5"
+            ></jk-icon>
           </div>
 
-          <div class="overflow-y-auto p-2 space-y-1 grow">
-            ${
-              (showAllEngines || isFilteringEngines) && items.length > 0
-                ? html`
-                    <div
-                      class="px-2 py-1.5 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1 font-mono"
-                    >
-                      ${this.t("searchEnginesTitle")}
-                    </div>
-                  `
-                : ""
-            }
-            ${items.map((item, i) => item.render(i === this.selectedIndex))}
-            ${
-              this.searchQuery && items.length === 0
-                ? html`
-                    <p class="text-center text-slate-500 text-sm py-4">
-                      ${this.t("noServices")}
-                    </p>
-                  `
-                : ""
-            }
-          </div>
+
+          <form
+            @submit=${this._handleSubmit}
+            class="grow"
+          >
+            <input
+              id="searchInput"
+              type="text"
+              inputmode="search"
+              enterkeyhint="search"
+
+              placeholder="${this.t("searchPlaceholder")}"
+
+              .value=${this.searchQuery}
+
+              @input=${this._handleInput}
+
+              class="
+                w-full
+                bg-transparent
+
+                text-lg
+                sm:text-xl
+
+                font-medium
+                tracking-tight
+
+                text-white
+
+                placeholder-slate-500
+
+                focus:outline-none
+              "
+            />
+          </form>
+
+
+          ${
+            showQuickTrigger
+              ? html`
+                  <jk-icon-button
+                    icon="globe"
+                    title="Search engines"
+                    @click=${() => this._selectEngine("")}
+                  ></jk-icon-button>
+                `
+              : ""
+          }
+
+
+          <jk-icon-button
+            icon="x"
+            title="Close"
+            @click=${this._handleClose}
+          ></jk-icon-button>
+
         </div>
+
+
+        <!-- Results -->
+
+        <div
+          class="
+    search-results
+    overflow-y-auto
+    p-2
+    space-y-1
+    grow
+          "
+        >
+
+          ${
+            (showAllEngines || isFilteringEngines) &&
+            items.length > 0
+              ? html`
+                  <div
+                    class="
+                      px-3
+                      pt-2
+                      pb-1
+
+                      text-[10px]
+
+                      font-semibold
+
+                      uppercase
+
+                      tracking-[0.18em]
+
+                      text-slate-500
+                    "
+                  >
+                    ${this.t("searchEnginesTitle")}
+                  </div>
+                `
+              : ""
+          }
+
+
+          ${items.map(
+            (item, i) =>
+              item.render(i === this.selectedIndex),
+          )}
+
+
+          ${
+            this.searchQuery &&
+            items.length === 0
+              ? html`
+                  <div
+                    class="
+                      flex
+                      flex-col
+                      items-center
+                      justify-center
+
+                      py-10
+
+                      text-slate-500
+                    "
+                  >
+                    <jk-icon
+                      icon="search-x"
+                      class="size-8 mb-3 opacity-50"
+                    ></jk-icon>
+
+                    <span class="text-sm">
+                      ${this.t("noServices")}
+                    </span>
+                  </div>
+                `
+              : ""
+          }
+
+        </div>
+
       </div>
-    `;
-  }
+
+    </div>
+  `;
+}
 }
 
 customElements.define("jk-search-modal", JkSearchModal);

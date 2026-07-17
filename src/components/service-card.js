@@ -1,9 +1,9 @@
 import { LitElement, html } from "lit";
-import "./icon.js"; // Standardized imported dashboard icon wrapper
+import "./icon.js";
 
 export class JkServiceCard extends LitElement {
   createRenderRoot() {
-    return this; // Preserves global Tailwind configuration styles
+    return this; // Tailwind global verwenden
   }
 
   static properties = {
@@ -35,47 +35,199 @@ export class JkServiceCard extends LitElement {
   render() {
     const isUrl =
       this.subtitle &&
-      (this.subtitle.includes(".") || this.subtitle.includes("/")); //
+      (this.subtitle.includes(".") || this.subtitle.includes("/"));
+
     const displaySubtitle = isUrl
-      ? this.subtitle.replace(/^https?:\/\/(www\.)?/, "") //
-      : this.subtitle || ""; //
+      ? this.subtitle.replace(/^https?:\/\/(www\.)?/, "")
+      : this.subtitle || "";
 
     return html`
       <div
-        @click="${this._handleClick}"
-        class="group relative bg-slate-800 border border-slate-700 hover:border-indigo-500 rounded-2xl p-4 flex flex-row items-center gap-4 text-left cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/5 active:scale-[0.98] w-full"
+        @click=${this._handleClick}
+        class="
+          group
+          relative
+          flex
+          items-center
+          gap-4
+          w-full
+          overflow-hidden
+          rounded-2xl
+          border
+          border-slate-700/70
+          bg-gradient-to-br
+          from-slate-800
+          to-slate-900
+          px-5
+          py-4
+          cursor-pointer
+          transition-all
+          duration-300
+          ease-out
+          hover:-translate-y-1
+          hover:border-indigo-500/60
+          hover:shadow-xl
+          hover:shadow-indigo-500/10
+          active:scale-[0.98]
+        "
       >
-        <!-- Icon Shell using Web Awesome Custom Styles -->
+        <!-- Hover Accent -->
         <div
-          class="flex items-center justify-center size-18 rounded-2xl bg-slate-800 text-indigo-500 shadow-sm transition duration-300 group-hover:bg-slate-700 group-hover:text-slate-200 group-hover:scale-105 shrink-0 overflow-hidden"
+          class="
+            absolute
+            left-0
+            top-4
+            bottom-4
+            w-1
+            rounded-r-full
+            bg-indigo-500
+            opacity-0
+            group-hover:opacity-100
+            transition-opacity
+            duration-300
+          "
+        ></div>
+
+        <!-- Hover Glow -->
+        <div
+          class="
+            pointer-events-none
+            absolute
+            inset-0
+            rounded-2xl
+            bg-gradient-to-r
+            from-indigo-500/0
+            via-indigo-500/5
+            to-indigo-500/0
+            opacity-0
+            group-hover:opacity-100
+            transition-opacity
+            duration-500
+          "
+        ></div>
+
+        <!-- Icon -->
+        <div
+          class="
+            relative
+            z-10
+            flex
+            items-center
+            justify-center
+            size-14
+            shrink-0
+            overflow-hidden
+            rounded-xl
+            bg-slate-700/60
+            ring-1
+            ring-slate-600/70
+            text-indigo-400
+            transition-all
+            duration-300
+            ease-out
+            group-hover:bg-indigo-500/15
+            group-hover:ring-indigo-500/40
+            group-hover:text-white
+            group-hover:-translate-y-0.5
+          "
         >
-          <jk-icon .icon=${this.icon} class="size-full"></jk-icon>
+          <jk-icon
+            .icon=${this.icon}
+            class="
+              size-8
+              transition-transform
+              duration-300
+              group-hover:scale-105
+            "
+          >
+          </jk-icon>
         </div>
 
-        <!-- Content Area -->
-        <div class="min-w-0 grow pr-8">
+        <!-- Content -->
+        <div
+          class="
+            relative
+            z-10
+            flex
+            min-w-0
+            grow
+            flex-col
+            justify-center
+            pr-10
+          "
+        >
           <span
-            class="font-bold text-white block text-base truncate tracking-wide mb-0.5 group-hover:text-indigo-300 transition-colors"
+            class="
+              truncate
+              text-lg
+              font-semibold
+              leading-tight
+              tracking-tight
+              text-white
+              transition-colors
+              duration-300
+              group-hover:text-indigo-200
+            "
           >
             ${this.name}
           </span>
+
           <span
-            class="text-xs text-slate-400 truncate block font-mono opacity-80 group-hover:text-slate-300 transition-colors"
+            class="
+              mt-1
+              truncate
+              text-sm
+              leading-snug
+              text-slate-400
+              transition-colors
+              duration-300
+              group-hover:text-slate-300
+            "
           >
             ${displaySubtitle}
           </span>
         </div>
 
-        <!-- Shortcut Keyboard Badge -->
         ${
           this.badgeText
             ? html`
                 <kbd
-                  class=${`absolute top-4 right-4 px-2 py-0.5 font-bold font-mono text-lg border rounded shadow-md hidden sm:inline ${
-                    this.isFavorite
-                      ? "bg-indigo-600 text-white border-indigo-600 shadow-indigo-500/50"
-                      : "bg-slate-900 text-indigo-400 border-slate-700 shadow-black/40"
-                  }`}
+                  class="
+                    absolute
+                    top-4
+                    right-4
+                    z-20
+                    hidden
+                    sm:flex
+                    items-center
+                    justify-center
+                    min-w-7
+                    h-7
+                    px-2
+                    rounded-lg
+                    text-xs
+                    font-semibold
+                    tracking-widest
+                    uppercase
+                    transition-all
+                    duration-300
+                    ${this.isFavorite
+                      ? `
+                        border border-indigo-500
+                        bg-indigo-500/20
+                        text-indigo-200
+                        shadow-lg
+                        shadow-indigo-500/20
+                        group-hover:bg-indigo-500/30
+                      `
+                      : `
+                        border border-slate-600
+                        bg-slate-900/80
+                        text-slate-300
+                        group-hover:border-indigo-500/40
+                        group-hover:text-indigo-300
+                      `}
+                  "
                 >
                   ${this.badgeText.toUpperCase()}
                 </kbd>

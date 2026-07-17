@@ -109,73 +109,182 @@ export class JkDialog extends LitElement {
     this.show = false;
   }
 
-  render() {
-    if (!this.show) return html``;
+render() {
+  if (!this.show) return html``;
 
-    return html`
+  return html`
+    <div
+      @click=${this._handleCancel}
+      class="
+        fixed inset-0 z-[100]
+        flex items-center justify-center
+        bg-slate-950/80
+        backdrop-blur-md
+        p-6
+      "
+    >
       <div
-        @click="${this._handleCancel}"
-        class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-fadeIn"
+        @click=${(e) => e.stopPropagation()}
+        class="
+          relative
+          w-full
+          max-w-lg
+          overflow-hidden
+          rounded-2xl
+          border
+          border-slate-700/70
+          bg-gradient-to-br
+          from-slate-800
+          to-slate-900
+          shadow-2xl
+          shadow-black/40
+        "
       >
-        <div
-          @click="${(e) => e.stopPropagation()}"
-          class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-2xl shadow-2xl p-6 flex flex-col items-center text-center font-mono relative"
-        >
-          <div class="absolute top-4 right-4">
-            <jk-icon-button
-              icon="x"
-              @click="${this._handleCancel}"
-            ></jk-icon-button>
-          </div>
+        <!-- Header -->
 
-          <div class="mb-4 mt-2 flex justify-center">
+        <div
+          class="
+            flex
+            items-start
+            gap-4
+            p-6
+            pb-5
+          "
+        >
+          <!-- Icon -->
+
+          <div
+            class="
+              flex
+              items-center
+              justify-center
+              size-12
+              shrink-0
+              rounded-xl
+              bg-slate-700/60
+              ring-1
+              ring-slate-600/70
+              ${this.iconColor}
+            "
+          >
             <jk-icon
-              .icon="${this.icon}"
-              class="${this.iconColor} w-14 h-14"
+              .icon=${this.icon}
+              class="size-6"
             ></jk-icon>
           </div>
 
-          <h3 class="text-lg font-bold text-white mb-2 px-4 w-full">
-            ${this.title}
-          </h3>
+          <!-- Title + Message -->
 
-          <p
-            class="text-sm text-slate-300 mb-6 leading-relaxed max-w-sm w-full"
-          >
-            ${this.message}
-          </p>
+          <div class="grow min-w-0">
 
-          <div class="flex items-center justify-center gap-3 w-full">
-            ${
-              this.variant === "confirm"
-                ? html`
-                    <button
-                      type="button"
-                      id="cancelBtn"
-                      @click="${this._handleCancel}"
-                      class="px-5 py-2 bg-slate-700 hover:bg-slate-650 border border-transparent focus:border-indigo-500 hover:border-indigo-500 rounded-xl text-sm font-medium text-slate-200 transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-indigo-500/20"
-                      title="ArrowLeft / Escape"
-                    >
-                      ${this.cancelLabel}
-                    </button>
-                  `
-                : ""
-            }
-
-            <button
-              type="button"
-              id="confirmBtn"
-              @click="${this._handleConfirm}"
-              class="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 border border-transparent focus:border-indigo-300 rounded-xl text-sm font-medium text-white transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-indigo-500/50"
-              title="ArrowRight / Enter"
+            <h2
+              class="
+                text-xl
+                font-semibold
+                tracking-tight
+                text-white
+              "
             >
-              ${this.confirmLabel}
-            </button>
+              ${this.title}
+            </h2>
+
+            <p
+              class="
+                mt-2
+                text-sm
+                leading-6
+                text-slate-300
+              "
+            >
+              ${this.message}
+            </p>
+
           </div>
+
+          <!-- Close -->
+
+          <jk-icon-button
+            icon="x"
+            @click=${this._handleCancel}
+          ></jk-icon-button>
+
+        </div>
+
+        <!-- Footer -->
+
+        <div
+          class="
+            flex
+            justify-end
+            gap-3
+            border-t
+            border-slate-700/70
+            bg-slate-900/30
+            px-6
+            py-4
+          "
+        >
+          ${
+            this.variant === "confirm"
+              ? html`
+                  <button
+                    id="cancelBtn"
+                    @click=${this._handleCancel}
+                    class="
+                      rounded-xl
+                      border
+                      border-slate-600
+                      bg-slate-800
+                      px-4
+                      py-2
+                      text-sm
+                      font-medium
+                      text-slate-200
+                      transition-all
+                      duration-200
+                      hover:border-indigo-500/50
+                      hover:bg-slate-700
+                      focus:outline-none
+                      focus:ring-2
+                      focus:ring-indigo-500/30
+                    "
+                  >
+                    ${this.cancelLabel}
+                  </button>
+                `
+              : ""
+          }
+
+          <button
+            id="confirmBtn"
+            @click=${this._handleConfirm}
+            class="
+              rounded-xl
+              border
+              border-indigo-500
+              bg-indigo-500/20
+              px-4
+              py-2
+              text-sm
+              font-medium
+              text-indigo-100
+              transition-all
+              duration-200
+              hover:bg-indigo-500/30
+              hover:border-indigo-400
+              focus:outline-none
+              focus:ring-2
+              focus:ring-indigo-500/40
+            "
+          >
+            ${this.confirmLabel}
+          </button>
         </div>
       </div>
-    `;
-  }
+    </div>
+  `;
+}  
+
 }
 
 customElements.define("jk-dialog", JkDialog);

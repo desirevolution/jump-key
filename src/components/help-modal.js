@@ -26,95 +26,323 @@ export class JkHelpModal extends LitElement {
     );
   }
 
-  render() {
-    if (!this.show) return "";
+render() {
+  if (!this.show) return html``;
 
-    // Collect the dynamic shortcuts list
-    const shortcuts = [
-      { keys: ["Space"], desc: this.t("hkSearch") },
-      { keys: ["#"], desc: this.t("hkToggleView") },
-    ];
 
-    if (!this.isGridView) {
-      shortcuts.push({ keys: ["1", "-", "0"], desc: this.t("hkFavs") });
-    }
+  const shortcuts = [
+    {
+      keys: ["Space"],
+      desc: this.t("hkSearch"),
+    },
+    {
+      keys: ["#"],
+      desc: this.t("hkToggleView"),
+    },
+  ];
 
-    shortcuts.push(
-      { keys: ["A-Z"], desc: this.t("hkCat") },
-      { keys: ["A-Z"], desc: this.t("hkService"), context: true },
-      { keys: [":"], desc: this.t("hkSearchEngines") },
-      { keys: ["↑", "↓"], desc: this.t("hkNavigate") },
-      { keys: ["ESC"], desc: this.t("hkReset") },
-    );
 
-    return html`
+  if (!this.isGridView) {
+    shortcuts.push({
+      keys: ["1", "-", "0"],
+      desc: this.t("hkFavs"),
+    });
+  }
+
+
+  shortcuts.push(
+    {
+      keys: ["A-Z"],
+      desc: this.t("hkCat"),
+    },
+    {
+      keys: ["A-Z"],
+      desc: this.t("hkService"),
+      context: true,
+    },
+    {
+      keys: [":"],
+      desc: this.t("hkSearchEngines"),
+    },
+    {
+      keys: ["↑", "↓"],
+      desc: this.t("hkNavigate"),
+    },
+    {
+      keys: ["ESC"],
+      desc: this.t("hkReset"),
+    },
+  );
+
+
+  return html`
+
+    <div
+      @click=${this._handleClose}
+      class="
+        fixed
+        inset-0
+        z-50
+
+        flex
+        items-center
+        justify-center
+
+        p-4
+
+        bg-slate-950/70
+
+        backdrop-blur-md
+      "
+    >
+
       <div
-        @click="${this._handleClose}"
-        class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+        @click=${(e) => e.stopPropagation()}
+        class="
+          w-full
+          max-w-md
+
+          rounded-2xl
+
+          border
+          border-slate-700/70
+
+          bg-gradient-to-br
+          from-slate-800
+          to-slate-900
+
+          shadow-2xl
+          shadow-black/40
+
+          p-5
+
+          font-mono
+        "
       >
+
+
+        <!-- Header -->
+
         <div
-          @click="${(e) => e.stopPropagation()}"
-          class="bg-slate-800 border border-slate-700 w-full max-w-md rounded-2xl shadow-2xl p-6 relative font-mono text-slate-300"
+          class="
+            flex
+            items-center
+            justify-between
+
+            mb-5
+          "
         >
+
           <div
-            class="flex items-center justify-between mb-6 border-b border-slate-700 pb-3"
+            class="
+              flex
+              items-center
+              gap-3
+            "
           >
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+
+            <div
+              class="
+                flex
+                items-center
+                justify-center
+
+                size-9
+
+                rounded-xl
+
+                bg-indigo-500/10
+
+                ring-1
+                ring-indigo-500/20
+              "
+            >
               <jk-icon
                 icon="keyboard"
-                class="text-indigo-400 w-5 h-5"
+                class="
+                  size-5
+                  text-indigo-300
+                "
               ></jk-icon>
+            </div>
+
+
+            <h3
+              class="
+                text-base
+
+                font-semibold
+
+                text-white
+              "
+            >
               ${this.t("helpTitle")}
             </h3>
-            <button
-              @click="${this._handleClose}"
-              class="text-slate-400 hover:text-white bg-slate-700 hover:bg-slate-600 p-1.5 rounded-lg transition-colors"
-            >
-              <jk-icon icon="x" class="w-4 h-4"></jk-icon>
-            </button>
+
           </div>
 
-          <div class="space-y-4">
-            ${shortcuts.map(
-              (item) => html`
-                <div
-                  class="flex items-center justify-between gap-4 py-2 border-b border-slate-700/30 last:border-b-0"
-                >
-                  <span class="text-sm text-slate-400">${item.desc}</span>
-                  <div class="flex items-center gap-1 shrink-0">
-                    ${
-                      item.context
-                        ? html`
-                            <span
-                              class="text-[10px] bg-slate-900 px-1 py-0.5 rounded text-indigo-400 mr-1 uppercase font-bold border border-indigo-500/10"
-                            >
-                              ${this.t("contextInCat")}
-                            </span>
-                          `
-                        : ""
-                    }
-                    ${item.keys.map(
-                      (k) => html`
-                        <kbd
-                          class="px-2 py-1 bg-slate-900 border border-slate-700 rounded text-xs font-bold text-indigo-400 shadow shadow-black/40"
-                        >
-                          ${k}
-                        </kbd>
-                      `,
-                    )}
-                  </div>
-                </div>
-              `,
-            )}
-          </div>
 
-          <div class="text-[11px] text-slate-500 text-center mt-6">
-            ${this.t("helpExit")}
-          </div>
+          <jk-icon-button
+            icon="x"
+            label="Close"
+            @click=${this._handleClose}
+          ></jk-icon-button>
+
+
         </div>
+
+
+
+        <!-- Shortcuts -->
+
+        <div
+          class="
+            space-y-1
+          "
+        >
+
+          ${shortcuts.map(
+            (item) => html`
+
+              <div
+                class="
+                  flex
+                  items-center
+                  justify-between
+
+                  gap-4
+
+                  rounded-xl
+
+                  px-3
+                  py-2.5
+
+                  transition-colors
+
+                  hover:bg-slate-800/60
+                "
+              >
+
+                <span
+                  class="
+                    text-sm
+
+                    text-slate-400
+                  "
+                >
+                  ${item.desc}
+                </span>
+
+
+                <div
+                  class="
+                    flex
+                    items-center
+                    gap-1
+
+                    shrink-0
+                  "
+                >
+
+                  ${
+                    item.context
+                      ? html`
+                          <span
+                            class="
+                              mr-1
+
+                              rounded-lg
+
+                              border
+                              border-indigo-500/20
+
+                              bg-indigo-500/10
+
+                              px-1.5
+                              py-0.5
+
+                              text-[10px]
+
+                              font-bold
+
+                              text-indigo-300
+                            "
+                          >
+                            ${this.t("contextInCat")}
+                          </span>
+                        `
+                      : ""
+                  }
+
+
+                  ${item.keys.map(
+                    (key) => html`
+                      <kbd
+                        class="
+                          inline-flex
+                          items-center
+                          justify-center
+
+                          min-w-8
+                          h-7
+
+                          rounded-lg
+
+                          border
+                          border-slate-700
+
+                          bg-slate-950
+
+                          px-2
+
+                          text-xs
+
+                          font-bold
+
+                          text-indigo-300
+
+                          shadow-inner
+                          shadow-black/40
+                        "
+                      >
+                        ${key}
+                      </kbd>
+                    `,
+                  )}
+
+                </div>
+
+              </div>
+
+            `,
+          )}
+
+        </div>
+
+
+
+        <div
+          class="
+            mt-5
+
+            text-center
+
+            text-[11px]
+
+            text-slate-500
+          "
+        >
+          ${this.t("helpExit")}
+        </div>
+
+
       </div>
-    `;
-  }
+
+    </div>
+
+  `;
+}
+
 }
 
 customElements.define("jk-help-modal", JkHelpModal);

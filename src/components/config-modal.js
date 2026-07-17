@@ -218,163 +218,590 @@ export class JkConfigModal extends LitElement {
     }
   }
 
-  render() {
-    if (!this.show) return html``;
+render() {
+  if (!this.show) return html``;
 
-    return html`
+  return html`
+
+    <div
+      @click="${this._handleClose}"
+      class="
+        fixed
+        inset-0
+
+        z-50
+
+        flex
+        items-center
+        justify-center
+
+        p-4
+
+        bg-slate-950/80
+
+        backdrop-blur-md
+
+        animate-fadeIn
+      "
+    >
+
       <div
-        @click="${this._handleClose}"
-        class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn"
+        @click="${(e) => e.stopPropagation()}"
+
+        class="
+          w-full
+          max-w-7xl
+
+          h-[88vh]
+          max-h-[900px]
+
+          flex
+          flex-col
+
+          rounded-3xl
+
+          border
+          border-slate-700/70
+
+          bg-slate-900/95
+
+          shadow-2xl
+          shadow-black/50
+
+          p-5
+          sm:p-6
+        "
       >
+
+
+        <!-- Header -->
+
         <div
-          @click="${(e) => e.stopPropagation()}"
-          class="bg-slate-800 border border-slate-700 w-full max-w-7xl rounded-2xl shadow-2xl p-6 flex flex-col h-[85vh] font-sans"
+          class="
+            flex
+            items-center
+            justify-between
+
+            mb-5
+            pb-4
+
+            border-b
+            border-slate-700/50
+          "
         >
+
           <div
-            class="flex items-center justify-between mb-6 pb-4 border-b border-slate-700/60"
+            class="
+              flex
+              items-center
+              gap-3
+            "
           >
-            <span class="text-lg font-bold text-white flex items-center gap-2">
-              <jk-icon
-                icon="settings"
-                class="text-indigo-400 w-5 h-5"
-              ></jk-icon>
-              ${this.t("dashboardSettings") || "Dashboard-Einstellungen"}
-            </span>
 
-            <div class="flex items-center gap-3">
-              ${
-                this._activeTab === "editor"
-                  ? html`
-                      <div
-                        class="p-2 transition-all duration-300 ${
-                          this._isEditorConfigValid
-                            ? "text-emerald-400"
-                            : "text-rose-400"
-                        }"
-                        title="${
-                          this._isEditorConfigValid
-                            ? this.t("editConfigValid")
-                            : this.t("editConfigInvalid")
-                        }"
-                      >
-                        <jk-icon
-                          .icon="${this._isEditorConfigValid ? "circle-check" : "triangle-alert"}"
-                          class="w-5 h-5"
-                        ></jk-icon>
-                      </div>
-                    `
-                  : html``
-              }
-
-              <jk-icon-button
-                icon="x"
-                class="hover:bg-slate-700 rounded-lg transition-colors duration-200"
-                @click="${this._handleClose}"
-              ></jk-icon-button>
-            </div>
-          </div>
-
-          <div class="flex flex-1 gap-6 overflow-hidden min-h-0">
             <div
-              class="w-56 flex flex-col gap-1 shrink-0 border-r border-slate-700/60 pr-4"
+              class="
+                flex
+                items-center
+                justify-center
+
+                size-10
+
+                rounded-xl
+
+                bg-indigo-500/10
+
+                ring-1
+                ring-indigo-500/20
+              "
             >
-              <button
-                @click="${() => this._setActiveTab("data")}"
-                title="Ctrl + 1"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-left outline-none ${
-                  this._activeTab === "data"
-                    ? "bg-indigo-600/15 text-indigo-400"
-                    : "text-slate-400 hover:bg-slate-700/50 hover:text-white"
-                }"
-              >
-                💾 ${this.t("tabData")}
-              </button>
 
-              <button
-                @click="${() => this._setActiveTab("editor")}"
-                title="Ctrl + 2"
-                class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors text-left outline-none ${
-                  this._activeTab === "editor"
-                    ? "bg-indigo-600/15 text-indigo-400"
-                    : "text-slate-400 hover:bg-slate-700/50 hover:text-white"
-                }"
-              >
-                💻 ${this.t("tabEditor") || "JSON-Editor"}
-              </button>
+              <jk-icon
+                icon="settings-2"
+
+                class="
+                  size-5
+
+                  text-indigo-300
+                "
+              ></jk-icon>
+
             </div>
 
-            <div class="flex-1 flex flex-col overflow-y-hidden pr-1">
-              ${this._renderActiveTabContent()}
+
+            <div>
+
+              <h2
+                class="
+                  text-base
+                  font-semibold
+                  text-white
+                "
+              >
+                ${this.t("dashboardSettings") || "Dashboard Settings"}
+              </h2>
+
+
+              <p
+                class="
+                  text-xs
+                  text-slate-500
+                "
+              >
+                Configuration & Backup
+              </p>
+
             </div>
+
           </div>
+
+
+
+          <div
+            class="
+              flex
+              items-center
+              gap-2
+            "
+          >
+
+            ${
+              this._activeTab === "editor"
+                ? html`
+
+                    <div
+                      class="
+                        flex
+                        items-center
+                        gap-2
+
+                        px-3
+                        py-1.5
+
+                        rounded-xl
+
+                        ${
+                          this._isEditorConfigValid
+                            ? `
+                              bg-emerald-500/10
+                              text-emerald-400
+                              ring-1
+                              ring-emerald-500/20
+                            `
+                            : `
+                              bg-rose-500/10
+                              text-rose-400
+                              ring-1
+                              ring-rose-500/20
+                            `
+                        }
+                      "
+                    >
+
+                      <jk-icon
+                        .icon="${this._isEditorConfigValid
+                          ? "circle-check"
+                          : "triangle-alert"}"
+
+                        class="size-4"
+                      ></jk-icon>
+
+
+                      <span
+                        class="
+                          text-xs
+                          font-medium
+                        "
+                      >
+                        ${
+                          this._isEditorConfigValid
+                            ? "Valid"
+                            : "Invalid"
+                        }
+                      </span>
+
+                    </div>
+
+                  `
+                : ""
+            }
+
+
+            <jk-icon-button
+              icon="x"
+
+              label="Close"
+
+              @click="${this._handleClose}"
+            ></jk-icon-button>
+
+
+          </div>
+
+        </div>
+
+
+
+
+        <!-- Main Area -->
+
+        <div
+          class="
+            flex
+            flex-1
+
+            gap-5
+
+            min-h-0
+          "
+        >
+
+
+          <!-- Navigation -->
+
+          <aside
+            class="
+              w-52
+
+              shrink-0
+
+              flex
+              flex-col
+
+              gap-2
+            "
+          >
+
+
+            <button
+
+              @click="${() => this._setActiveTab("data")}"
+
+              title="Ctrl + 1"
+
+              class="
+                flex
+                items-center
+                gap-3
+
+                px-4
+                py-3
+
+                rounded-xl
+
+                text-sm
+
+                font-medium
+
+                transition-all
+
+                ${
+                  this._activeTab === "data"
+                    ? `
+                      bg-indigo-500/10
+                      border
+                      border-indigo-500/20
+                      text-indigo-300
+                    `
+                    : `
+                      border
+                      border-transparent
+                      text-slate-400
+                      hover:text-white
+                      hover:bg-slate-800/70
+                    `
+                }
+              "
+            >
+
+              <jk-icon
+                icon="database"
+
+                class="size-4"
+              ></jk-icon>
+
+
+              ${this.t("tabData")}
+
+              <kbd
+                class="
+                  ml-auto
+
+                  hidden
+                  sm:inline-flex
+
+                  text-[10px]
+
+                  text-slate-500
+                "
+              >
+                1
+              </kbd>
+
+            </button>
+
+
+
+            <button
+
+              @click="${() => this._setActiveTab("editor")}"
+
+              title="Ctrl + 2"
+
+              class="
+                flex
+                items-center
+                gap-3
+
+                px-4
+                py-3
+
+                rounded-xl
+
+                text-sm
+
+                font-medium
+
+                transition-all
+
+                ${
+                  this._activeTab === "editor"
+                    ? `
+                      bg-indigo-500/10
+                      border
+                      border-indigo-500/20
+                      text-indigo-300
+                    `
+                    : `
+                      border
+                      border-transparent
+                      text-slate-400
+                      hover:text-white
+                      hover:bg-slate-800/70
+                    `
+                }
+              "
+            >
+
+              <jk-icon
+                icon="code-2"
+
+                class="size-4"
+              ></jk-icon>
+
+
+              ${this.t("tabEditor") || "JSON Editor"}
+
+
+              <kbd
+                class="
+                  ml-auto
+
+                  hidden
+                  sm:inline-flex
+
+                  text-[10px]
+
+                  text-slate-500
+                "
+              >
+                2
+              </kbd>
+
+
+            </button>
+
+
+          </aside>
+
+
+
+
+          <!-- Content -->
+
+          <main
+            class="
+              flex-1
+
+              min-w-0
+
+              overflow-hidden
+            "
+          >
+
+            ${this._renderActiveTabContent()}
+
+          </main>
+
+
+        </div>
+
+
+
+
+        <!-- Footer -->
+
+        <div
+          class="
+            flex
+            justify-end
+            gap-3
+
+            mt-5
+            pt-4
+
+            border-t
+            border-slate-700/50
+          "
+        >
 
           ${
             this._activeTab === "editor"
               ? html`
-                  <div
-                    class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-700/60"
-                  >
-                    <button
-                      type="button"
-                      id="cancelModalBtn"
-                      @click="${this._handleClose}"
-                      class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 border border-transparent focus:border-indigo-500 rounded-xl text-sm font-medium transition-colors outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer text-white"
-                    >
-                      ${this.t("editConfigCancel") || "Abbrechen"}
-                    </button>
 
-                    <button
-                      type="button"
-                      id="saveModalBtn"
-                      @click="${this._handleSave}"
-                      ?disabled="${!this._isEditorConfigValid || !this._hasEditorConfigChanged}"
-                      class="px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-all outline-none focus:ring-2 focus:ring-indigo-500/50 ${
+                  <button
+                    type="button"
+
+                    id="cancelModalBtn"
+
+                    @click="${this._handleClose}"
+
+                    class="
+                      px-5
+                      py-2.5
+
+                      rounded-xl
+
+                      text-sm
+
+                      font-medium
+
+                      text-slate-300
+
+                      bg-slate-800
+
+                      border
+                      border-slate-700
+
+                      hover:bg-slate-700
+
+                      transition-all
+                    "
+                  >
+                    ${this.t("editConfigCancel") || "Cancel"}
+                  </button>
+
+
+
+                  <button
+                    type="button"
+
+                    id="saveModalBtn"
+
+                    @click="${this._handleSave}"
+
+                    ?disabled="${!this._isEditorConfigValid ||
+                    !this._hasEditorConfigChanged}"
+
+                    class="
+                      px-5
+                      py-2.5
+
+                      rounded-xl
+
+                      text-sm
+
+                      font-medium
+
+                      text-white
+
+                      transition-all
+
+                      ${
                         this._isEditorConfigValid &&
                         this._hasEditorConfigChanged
-                          ? "bg-indigo-600 hover:bg-indigo-500 cursor-pointer border border-transparent focus:border-indigo-300"
-                          : "bg-slate-700 text-slate-500 cursor-not-allowed opacity-50 border border-transparent"
-                      }"
-                      title="${
-                        this._isEditorConfigValid &&
-                        this._hasEditorConfigChanged
-                          ? "Ctrl + S"
-                          : ""
-                      }"
-                    >
-                      ${this.t("editConfigSave") || "Speichern"}
-                    </button>
-                  </div>
+                          ? `
+                            bg-indigo-600
+                            hover:bg-indigo-500
+                            cursor-pointer
+                          `
+                          : `
+                            bg-slate-700
+                            text-slate-500
+                            cursor-not-allowed
+                            opacity-50
+                          `
+                      }
+                    "
+                  >
+                    ${this.t("editConfigSave") || "Save"}
+                  </button>
+
                 `
               : html`
-                  <div
-                    class="flex justify-end gap-3 mt-6 pt-4 border-t border-slate-700/60"
+
+                  <button
+                    type="button"
+
+                    @click="${this._handleClose}"
+
+                    class="
+                      px-5
+                      py-2.5
+
+                      rounded-xl
+
+                      text-sm
+
+                      font-medium
+
+                      text-white
+
+                      bg-slate-800
+
+                      border
+                      border-slate-700
+
+                      hover:bg-slate-700
+                    "
                   >
-                    <button
-                      type="button"
-                      @click="${this._handleClose}"
-                      class="px-5 py-2.5 bg-slate-700 hover:bg-slate-600 rounded-xl text-sm font-medium transition-colors cursor-pointer text-white"
-                    >
-                      ${this.t("close") || "Schließen"}
-                    </button>
-                  </div>
+                    ${this.t("close") || "Close"}
+                  </button>
+
                 `
           }
+
         </div>
+
+
       </div>
+
+
 
       <jk-dialog
         .show="${this._showDiscardDialog}"
+
         title="${this.t("tabEditorDiscardChangesTitle")}"
+
         message="${this.t("tabEditorDiscardChangesMsg")}"
+
         icon="triangle-alert"
+
         iconColor="text-rose-400"
+
         confirmLabel="${this.t("tabEditorDiscardChangesConfirm")}"
+
         cancelLabel="${this.t("tabEditorDiscardChangesCancel")}"
+
         @confirm="${this._forceClose}"
+
         @cancel="${() => (this._showDiscardDialog = false)}"
       ></jk-dialog>
-    `;
-  }
+
+
+    </div>
+
+  `;
+}
 }
 
 customElements.define("jk-config-modal", JkConfigModal);

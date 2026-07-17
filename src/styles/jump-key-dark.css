@@ -1,0 +1,105 @@
+.prism-code-editor {
+  font-family:
+    "JetBrains Mono",
+    "Fira Code",
+    Consolas,
+    monospace;
+
+  /* Editor */
+  --pce-bg: #0f172a;
+  --pce-cursor: #818cf8;
+
+  /* Widgets / Popup */
+  --pce-widget-border: #334155;
+  --pce-widget-bg: #1e293b;
+  --pce-widget-color: #e2e8f0;
+  --pce-widget-color-active: #ffffff;
+  --pce-widget-color-options: #94a3b8;
+  --pce-widget-bg-hover: #334155;
+  --pce-widget-bg-active: #4338ca55;
+  --pce-widget-focus: #6366f1;
+
+  /* Search */
+  --pce-search-match: #6366f166;
+
+  /* Selection */
+  --pce-selection: #3730a366;
+  --pce-selection-match: #6366f166;
+
+  /* Highlight / active line */
+  --pce-bg-highlight: #818cf133;
+  --pce-line-number: #64748b;
+
+  /* Scrollbar */
+  --pce-scrollbar: 226, 232, 240%;
+
+  /* Folding */
+  --pce-bg-fold: #94a3b8;
+
+  /* Indent guides */
+  --pce-guide-indent: #6366f155;
+
+  color-scheme: dark;
+}
+
+
+/* aktive Zeile */
+.active-line {
+  --pce-line-number: #c7d2fe;
+}
+
+
+/* aktive Einrückung */
+.active-indent {
+  --pce-guide-indent: #818cf8cc;
+}
+
+
+/*
+ * Bracket Highlighting
+ *
+ * Diese Klassen werden von
+ * highlightBracketPairs()
+ * erzeugt
+ */
+
+.token.bracket-level-0,
+.token.bracket-level-3,
+.token.bracket-level-6,
+.token.bracket-level-9 {
+  color: #fbbf24;
+}
+
+.token.bracket-level-1,
+.token.bracket-level-4,
+.token.bracket-level-7,
+.token.bracket-level-10 {
+  color: #c084fc;
+}
+
+.token.bracket-level-2,
+.token.bracket-level-5,
+.token.bracket-level-8,
+.token.bracket-level-11 {
+  color: #38bdf8;
+}
+
+
+/* aktive Cursor-Klammer */
+.active-bracket {
+  box-shadow:
+    inset 0 0 0 1px #a5b4fc,
+    inset 0 0 0 999px #6366f133;
+}
+
+
+/* fehlerhafte Klammer */
+.token.bracket-error {
+  color: #fb7185;
+}
+
+
+/* Match Highlight */
+.match-highlight {
+  --pce-bg-highlight: #8b5cf655;
+}

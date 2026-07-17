@@ -31,7 +31,7 @@ export class JkDashboardHeader extends LitElement {
     this._now = new Date();
     this._timeInterval = setInterval(() => {
       this._now = new Date();
-    }, 1000);
+    }, 60 * 1000);
   }
 
   disconnectedCallback() {
@@ -75,91 +75,276 @@ export class JkDashboardHeader extends LitElement {
     );
   }
 
-  render() {
-    return html`
+render() {
+  return html`
+    <div
+      class="
+        mb-8
+        sm:mb-10
+        flex
+        items-center
+        justify-between
+        gap-4
+
+        rounded-2xl
+        border
+        border-slate-700/70
+
+        bg-gradient-to-br
+        from-slate-900/80
+        to-slate-800/60
+
+        px-4
+        py-4
+        sm:px-6
+        sm:py-5
+
+        shadow-xl
+        shadow-black/20
+
+        backdrop-blur-md
+      "
+    >
+
+      <!-- Left: Branding -->
       <div
-        class="flex flex-row justify-between items-center mb-8 sm:mb-12 border-b border-slate-800 pb-6 gap-4"
+        class="
+          flex
+          items-center
+          gap-3
+          min-w-0
+        "
       >
-        <!-- Left Side: Logo and Title -->
-        <div class="flex items-center gap-4 shrink-0">
-          <a
-            href="https://github.com/desirevolution/jump-key"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="transition-transform hover:scale-105 active:scale-95 block shrink-0"
-          >
-            <img
-              src="./jump-key.png"
-              alt="JumpKey Logo"
-              class="w-12 h-12 sm:w-16 sm:h-16 object-contain rounded-lg shadow-md cursor-pointer"
-            />
-          </a>
-          <div class="flex items-center gap-2">
-            <h1
-              class="text-2xl sm:text-3xl font-bold tracking-tight text-white"
-            >
-              JumpKey
-            </h1>
-            <button
-              @click="${() => this._dispatchEvent("open-help")}"
-              class="text-slate-500 hover:text-indigo-400 transition-colors flex items-center alignment-baseline dynamic-icon hidden md:block"
-              title="${this.t ? this.t("helpHint") : ""}"
-            >
-              <jk-icon
-                icon="help-circle"
-                class="w-5 h-5 sm:w-6 sm:h-6"
-              ></jk-icon>
-            </button>
-          </div>
-        </div>
 
-        <!-- Right Side: Optimized spacing container -->
-        <div
-          class="flex flex-1 justify-end items-center gap-4 sm:gap-6 font-mono min-w-0"
+        <!-- Logo Shell -->
+        <a
+          href="https://github.com/desirevolution/jump-key"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="
+            group
+            flex
+            items-center
+            justify-center
+
+            size-12
+            sm:size-14
+
+            shrink-0
+
+            rounded-xl
+
+            bg-slate-700/60
+            ring-1
+            ring-slate-600/70
+
+            transition-all
+            duration-300
+
+            hover:bg-indigo-500/15
+            hover:ring-indigo-500/40
+            hover:-translate-y-0.5
+          "
         >
-          <!-- Icons Group: uses responsive gaps to breathe on larger screens -->
-          <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
-            <jk-icon-button
-              icon="${this.isGridView ? "rows-2" : "layout-grid"}"
-              title="${this.t ? this.t("hkToggleView") : ""} [#]"
-              @click="${() => this._dispatchEvent("toggle-view")}"
-            ></jk-icon-button>
+          <img
+            src="/jump-key.png"
+            alt="JumpKey"
+            class="
+              size-9
+              sm:size-11
+              object-contain
 
-            <jk-icon-button
-              icon="search"
-              title="${this.t ? this.t("hkSearch") : ""} [Space]"
-              @click="${() => this._dispatchEvent("open-search")}"
-            ></jk-icon-button>
+              transition-transform
+              duration-300
 
-            <jk-icon-button
-              icon="settings"
-              title="${this.t ? this.t("editConfig") : ""}"
-              .hideOnMobile="${true}"
-              @click="${() => this._dispatchEvent("open-config")}"
-            ></jk-icon-button>
-          </div>
+              group-hover:scale-105
+            "
+          />
+        </a>
 
-          <!-- Time Display -->
-          <div
-            class="text-right select-none shrink-0 pl-1 border-l border-slate-800/50 sm:border-0"
+
+        <!-- Title -->
+        <div
+          class="
+            flex
+            items-center
+            gap-2
+            min-w-0
+          "
+        >
+
+<div
+  class="
+    flex
+    items-center
+    gap-1
+    font-mono
+    font-bold
+    text-2xl
+    sm:text-3xl
+  "
+>
+  <span class="text-white">
+    Jump
+  </span>
+
+  <span
+    class="
+      text-indigo-400
+    "
+  >
+    Key
+  </span>
+</div>
+
+          <button
+            @click=${() => this._dispatchEvent("open-help")}
+            title="${this.t ? this.t("helpHint") : ""}"
+            class="
+              hidden
+              md:flex
+
+              items-center
+              justify-center
+
+              size-7
+
+              rounded-lg
+
+              text-slate-500
+
+              transition-all
+              duration-200
+
+              hover:bg-slate-700/60
+              hover:text-indigo-300
+
+              focus:outline-none
+              focus:ring-2
+              focus:ring-indigo-500/40
+            "
           >
-            <div
-              class="text-2xl sm:text-4xl font-bold text-indigo-400 tracking-wider flex items-center justify-end"
-            >
-              <span>${this._hours}</span>
-              <span class="mx-[1px] relative -top-[2px]">:</span>
-              <span>${this._minutes}</span>
-            </div>
-            <div
-              class="text-[10px] sm:text-xs text-slate-400 font-medium mt-0.5 whitespace-nowrap"
-            >
-              ${this._dateString}
-            </div>
-          </div>
+            <jk-icon
+              icon="help-circle"
+              class="size-5"
+            ></jk-icon>
+          </button>
+
         </div>
+
       </div>
-    `;
-  }
+
+
+
+      <!-- Right -->
+      <div
+        class="
+          flex
+          items-center
+          gap-3
+          sm:gap-5
+          shrink-0
+        "
+      >
+
+        <!-- Action Group -->
+        <div
+          class="
+            flex
+            items-center
+            gap-1
+
+            rounded-xl
+
+            border
+            border-slate-700/60
+
+            bg-slate-800/50
+
+            p-1
+          "
+        >
+
+          <jk-icon-button
+            icon="${this.isGridView ? "rows-2" : "layout-grid"}"
+            title="${this.t ? this.t("hkToggleView") : ""} [#]"
+            @click=${() => this._dispatchEvent("toggle-view")}
+          ></jk-icon-button>
+
+
+          <jk-icon-button
+            icon="search"
+            title="${this.t ? this.t("hkSearch") : ""} [Space]"
+            @click=${() => this._dispatchEvent("open-search")}
+          ></jk-icon-button>
+
+
+          <jk-icon-button
+            icon="settings"
+            title="${this.t ? this.t("editConfig") : ""}"
+            .hideOnMobile=${true}
+            @click=${() => this._dispatchEvent("open-config")}
+          ></jk-icon-button>
+
+        </div>
+
+
+
+        <!-- Clock -->
+        <div
+          class="
+            hidden
+            sm:block
+
+            text-right
+            select-none
+          "
+        >
+
+          <div
+            class="
+              flex
+              items-center
+              justify-end
+
+              text-3xl
+
+              font-semibold
+              tracking-tight
+
+              text-indigo-300
+            "
+          >
+            <span>${this._hours}</span>
+            <span class="mx-0.5 opacity-70">:</span>
+            <span>${this._minutes}</span>
+          </div>
+
+
+          <div
+            class="
+              mt-1
+
+              text-xs
+
+              font-medium
+
+              text-slate-400
+
+              whitespace-nowrap
+            "
+          >
+            ${this._dateString}
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
+
 }
 
 customElements.define("jk-dashboard-header", JkDashboardHeader);

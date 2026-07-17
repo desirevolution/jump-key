@@ -10,7 +10,7 @@ import { indentGuides } from "prism-code-editor/guides";
 import "prism-code-editor/layout.css";
 import "prism-code-editor/guides.css";
 import "prism-code-editor/prism/languages/json";
-import "prism-code-editor/themes/night-owl.css";
+import "../styles/jump-key-dark.css";
 import { cursorPosition } from "prism-code-editor/cursor";
 
 export class JkConfigEditor extends LitElement {
@@ -64,7 +64,7 @@ export class JkConfigEditor extends LitElement {
       {
         value: this.value,
         language: "json",
-        theme: "night-owl",
+        theme: "jump-key-dark",
         onUpdate: (val) => {
           this.value = val;
           let valid = false;
@@ -104,12 +104,16 @@ export class JkConfigEditor extends LitElement {
     );
 
     const editor = this._editorInstance;
+  
+    /*
     addEditorHotkey(editor, "PageDown", () => {
-      editor.container.scrollBy(0, 1);
-      requestAnimationFrame(() => {
-        this._editorInstance?.textarea?.focus();
-      });
-    });
+    editor.textarea.dispatchEvent(
+    new KeyboardEvent("keydown", {
+      key: "PageDown",
+      bubbles: true,
+    }),
+  );
+    });*/
     /*
     const rows = this.editorRows(editor);
     addEditorHotkey(editor, "PageUp", () =>
@@ -121,24 +125,31 @@ export class JkConfigEditor extends LitElement {
     */
   }
 
-  render() {
-    return html`
-      <div id="test">
-        <style>
-          height: 300px; /* oder max-height: 300px; */
-          overflow: auto; /* Wichtig, damit Scrollbalken erscheinen */
-        </style>
-        <div
-          id="editorContainer"
-          class="w-full h-full rounded-xl overflow-hidden bg-slate-900 border ${
-            this.isValid
-              ? "border-slate-700 focus-within:border-indigo-500"
-              : "border-rose-500 focus-within:border-rose-500"
-          } transition-colors"
-        ></div>
-      </div>
-    `;
-  }
+render() {
+  return html`
+    <div
+      id="editorContainer"
+class="
+w-full
+h-full
+rounded-xl
+overflow-hidden
+
+bg-slate-950
+
+border
+
+shadow-inner
+
+${this.isValid
+  ? "border-slate-700 focus-within:border-indigo-500"
+  : "border-rose-500 focus-within:border-rose-500"}
+
+transition-colors
+"
+    ></div>
+  `;
+}
 }
 
 customElements.define("jk-config-editor", JkConfigEditor);
