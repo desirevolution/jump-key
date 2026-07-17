@@ -1,5 +1,5 @@
-import { LitElement, html } from "lit";
-import "./icon.js";
+import { LitElement, html } from 'lit';
+import './icon.js';
 
 export class JkServiceCard extends LitElement {
   createRenderRoot() {
@@ -16,16 +16,16 @@ export class JkServiceCard extends LitElement {
 
   constructor() {
     super();
-    this.name = "";
-    this.subtitle = "";
-    this.icon = "";
-    this.badgeText = "";
+    this.name = '';
+    this.subtitle = '';
+    this.icon = '';
+    this.badgeText = '';
     this.isFavorite = false;
   }
 
   _handleClick() {
     this.dispatchEvent(
-      new CustomEvent("card-click", {
+      new CustomEvent('card-click', {
         bubbles: true,
         composed: true,
       }),
@@ -33,13 +33,11 @@ export class JkServiceCard extends LitElement {
   }
 
   render() {
-    const isUrl =
-      this.subtitle &&
-      (this.subtitle.includes(".") || this.subtitle.includes("/"));
+    const isUrl = this.subtitle && (this.subtitle.includes('.') || this.subtitle.includes('/'));
 
     const displaySubtitle = isUrl
-      ? this.subtitle.replace(/^https?:\/\/(www\.)?/, "")
-      : this.subtitle || "";
+      ? this.subtitle.replace(/^https?:\/\/(www\.)?/, '')
+      : this.subtitle || '';
 
     return html`
       <div
@@ -234,11 +232,11 @@ export class JkServiceCard extends LitElement {
                   ${this.badgeText.toUpperCase()}
                 </kbd>
               `
-            : ""
+            : ''
         }
       </div>
     `;
   }
 }
 
-customElements.define("jk-service-card", JkServiceCard);
+customElements.define('jk-service-card', JkServiceCard);

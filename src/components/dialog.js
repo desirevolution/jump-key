@@ -1,6 +1,6 @@
-import { LitElement, html } from "lit";
-import "./icon.js";
-import "./icon-button.js";
+import { LitElement, html } from 'lit';
+import './icon.js';
+import './icon-button.js';
 
 export class JkDialog extends LitElement {
   createRenderRoot() {
@@ -21,32 +21,32 @@ export class JkDialog extends LitElement {
   constructor() {
     super();
     this.show = false;
-    this.title = "Are you sure?";
-    this.message = "";
-    this.icon = "info";
-    this.iconColor = "text-indigo-400";
-    this.variant = "confirm";
-    this.confirmLabel = "Confirm";
-    this.cancelLabel = "Cancel";
+    this.title = 'Are you sure?';
+    this.message = '';
+    this.icon = 'info';
+    this.iconColor = 'text-indigo-400';
+    this.variant = 'confirm';
+    this.confirmLabel = 'Confirm';
+    this.cancelLabel = 'Cancel';
 
     this._handleKeyDown = this._handleKeyDown.bind(this);
   }
 
   willUpdate(changed) {
-    if (changed.has("show")) {
+    if (changed.has('show')) {
       if (this.show) {
-        window.addEventListener("keydown", this._handleKeyDown, true);
+        window.addEventListener('keydown', this._handleKeyDown, true);
         // Autofocus the primary action button on open
-        this._focusButton("confirmBtn");
+        this._focusButton('confirmBtn');
       } else {
-        window.removeEventListener("keydown", this._handleKeyDown, true);
+        window.removeEventListener('keydown', this._handleKeyDown, true);
       }
     }
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    window.removeEventListener("keydown", this._handleKeyDown, true);
+    window.removeEventListener('keydown', this._handleKeyDown, true);
   }
 
   // Helper utility to safely query and focus our buttons
@@ -62,25 +62,22 @@ export class JkDialog extends LitElement {
     if (!this.show) return;
 
     // 1. Arrow Key Navigation (Only active if we have two buttons)
-    if (
-      this.variant === "confirm" &&
-      (e.key === "ArrowLeft" || e.key === "ArrowRight")
-    ) {
+    if (this.variant === 'confirm' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
       e.preventDefault();
       e.stopPropagation();
 
       const activeElementId = document.activeElement?.id;
 
-      if (e.key === "ArrowLeft" && activeElementId === "confirmBtn") {
-        this._focusButton("cancelBtn");
-      } else if (e.key === "ArrowRight" && activeElementId === "cancelBtn") {
-        this._focusButton("confirmBtn");
+      if (e.key === 'ArrowLeft' && activeElementId === 'confirmBtn') {
+        this._focusButton('cancelBtn');
+      } else if (e.key === 'ArrowRight' && activeElementId === 'cancelBtn') {
+        this._focusButton('confirmBtn');
       }
       return;
     }
 
     // 2. Escape -> Cancel action
-    if (e.key === "Escape") {
+    if (e.key === 'Escape') {
       e.preventDefault();
       e.stopPropagation();
       this._handleCancel();
@@ -92,16 +89,12 @@ export class JkDialog extends LitElement {
   }
 
   _handleCancel() {
-    this.dispatchEvent(
-      new CustomEvent("cancel", { bubbles: true, composed: true }),
-    );
+    this.dispatchEvent(new CustomEvent('cancel', { bubbles: true, composed: true }));
     this._close();
   }
 
   _handleConfirm() {
-    this.dispatchEvent(
-      new CustomEvent("confirm", { bubbles: true, composed: true }),
-    );
+    this.dispatchEvent(new CustomEvent('confirm', { bubbles: true, composed: true }));
     this._close();
   }
 
@@ -198,10 +191,7 @@ export class JkDialog extends LitElement {
 
             <!-- Close -->
 
-            <jk-icon-button
-              icon="x"
-              @click=${this._handleCancel}
-            ></jk-icon-button>
+            <jk-icon-button icon="x" @click=${this._handleCancel}></jk-icon-button>
           </div>
 
           <!-- Footer -->
@@ -219,7 +209,7 @@ export class JkDialog extends LitElement {
           "
           >
             ${
-              this.variant === "confirm"
+              this.variant === 'confirm'
                 ? html`
                     <button
                       id="cancelBtn"
@@ -246,7 +236,7 @@ export class JkDialog extends LitElement {
                       ${this.cancelLabel}
                     </button>
                   `
-                : ""
+                : ''
             }
 
             <button
@@ -280,4 +270,4 @@ export class JkDialog extends LitElement {
   }
 }
 
-customElements.define("jk-dialog", JkDialog);
+customElements.define('jk-dialog', JkDialog);

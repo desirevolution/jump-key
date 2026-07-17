@@ -1,6 +1,6 @@
-import { LitElement, html } from "lit";
-import { unsafeSVG } from "lit/directives/unsafe-svg.js";
-import { createIcons, icons } from "lucide";
+import { LitElement, html } from 'lit';
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
+import { createIcons, icons } from 'lucide';
 
 createIcons({ icons });
 
@@ -13,8 +13,8 @@ export class JkIcon extends LitElement {
   constructor() {
     super();
 
-    this.icon = "";
-    this.alt = "";
+    this.icon = '';
+    this.alt = '';
   }
 
   createRenderRoot() {
@@ -60,11 +60,11 @@ export class JkIcon extends LitElement {
       .map(([tag, attrs]) => {
         const attributes = Object.entries(attrs)
           .map(([key, value]) => `${key}="${value}"`)
-          .join(" ");
+          .join(' ');
 
         return `<${tag} ${attributes}></${tag}>`;
       })
-      .join("");
+      .join('');
 
     return `
       <svg
@@ -83,15 +83,15 @@ export class JkIcon extends LitElement {
   }
 
   get className() {
-    return this.getAttribute("class") || "size-6";
+    return this.getAttribute('class') || 'size-6';
   }
 
   toPascalCase(name) {
     return name
-      .split("-")
+      .split('-')
       .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join("");
+      .join('');
   }
 }
 
-customElements.define("jk-icon", JkIcon);
+customElements.define('jk-icon', JkIcon);

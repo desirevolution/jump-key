@@ -1,22 +1,18 @@
-import { LitElement, html } from "lit";
-import { t, detectLang } from "./utils/i18n.js";
-import {
-  generateShortcuts,
-  getFilteredServices,
-  getTopFavorites,
-} from "./utils/shortcuts.js";
+import { LitElement, html } from 'lit';
+import { t, detectLang } from './utils/i18n.js';
+import { generateShortcuts, getFilteredServices, getTopFavorites } from './utils/shortcuts.js';
 
 // Import Sub-Components
-import "./components/dashboard-header.js";
-import "./components/config-modal.js";
-import "./components/search-modal.js";
-import "./components/service-card.js";
-import "./components/help-modal.js";
-import "./components/icon.js";
-import "./components/dialog.js";
-import "./components/service-group.js";
-import "./components/favorites-view.js";
-import "./components/grid-view.js";
+import './components/dashboard-header.js';
+import './components/config-modal.js';
+import './components/search-modal.js';
+import './components/service-card.js';
+import './components/help-modal.js';
+import './components/icon.js';
+import './components/dialog.js';
+import './components/service-group.js';
+import './components/favorites-view.js';
+import './components/grid-view.js';
 
 class DashboardApp extends LitElement {
   createRenderRoot() {
@@ -50,17 +46,16 @@ class DashboardApp extends LitElement {
     this.categories = [];
     this.searchEngines = [];
     this.showConfigModal = false;
-    this.activeCategoryKey = "";
-    this.currentInput = "";
+    this.activeCategoryKey = '';
+    this.currentInput = '';
     this.isInvalidInput = false;
     this.isValidInput = false;
-    this.searchQuery = "";
+    this.searchQuery = '';
     this.showSearch = false;
     this.showHelp = false;
-    this.isGridView =
-      JSON.parse(localStorage.getItem("dashboard_grid_view")) || false;
+    this.isGridView = JSON.parse(localStorage.getItem('dashboard_grid_view')) || false;
     this.selectedIndex = 0;
-    this.favorites = JSON.parse(localStorage.getItem("dashboard_favs")) || {};
+    this.favorites = JSON.parse(localStorage.getItem('dashboard_favs')) || {};
     this.resetTimeout = null;
     this.lang = detectLang();
 
@@ -70,7 +65,7 @@ class DashboardApp extends LitElement {
 
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
-    this.originalConfigString = "";
+    this.originalConfigString = '';
     this.hasEditorConfigChanged = false;
     this.showClearFavoritesDialog = false;
   }
@@ -84,13 +79,13 @@ class DashboardApp extends LitElement {
   async connectedCallback() {
     super.connectedCallback();
     try {
-      const res = await fetch("./config/services.json");
+      const res = await fetch('./config/services.json');
       const data = await res.json();
-      localStorage.setItem("services-cache", JSON.stringify(data));
+      localStorage.setItem('services-cache', JSON.stringify(data));
       this.categories = generateShortcuts(data.categories || data);
       this.searchEngines = data.searchEngines || [];
     } catch {
-      const cached = localStorage.getItem("services-cache");
+      const cached = localStorage.getItem('services-cache');
       if (cached) {
         const data = JSON.parse(cached);
         this.categories = generateShortcuts(data.categories || data);
@@ -98,33 +93,30 @@ class DashboardApp extends LitElement {
       }
     }
 
-    window.addEventListener("keydown", this.handleKeyDown);
-    window.addEventListener("popstate", this.handlePopState);
+    window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('popstate', this.handlePopState);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    window.removeEventListener("keydown", this.handleKeyDown);
-    window.removeEventListener("popstate", this.handlePopState);
+    window.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener('popstate', this.handlePopState);
   }
 
   // --- Core Actions & Resets ---
 
   resetInput(updateHistory = true) {
-    this.activeCategoryKey = "";
-    this.currentInput = "";
+    this.activeCategoryKey = '';
+    this.currentInput = '';
     this.isInvalidInput = false;
     this.isValidInput = false;
     this.showSearch = false;
     this.showHelp = false;
-    this.searchQuery = "";
+    this.searchQuery = '';
     this.selectedIndex = 0;
 
     if (updateHistory) {
-      if (
-        window.history.state?.view === "category" ||
-        window.history.state?.view === "search"
-      ) {
+      if (window.history.state?.view === 'category' || window.history.state?.view === 'search') {
         window.history.back();
       }
     }
@@ -132,10 +124,7 @@ class DashboardApp extends LitElement {
 
   toggleViewMode() {
     this.isGridView = !this.isGridView;
-    localStorage.setItem(
-      "dashboard_grid_view",
-      JSON.stringify(this.isGridView),
-    );
+    localStorage.setItem('dashboard_grid_view', JSON.stringify(this.isGridView));
     this.resetInput(true);
   }
 
@@ -147,12 +136,12 @@ class DashboardApp extends LitElement {
   trackClick(service, isFavClick = false) {
     if (!isFavClick) {
       this.favorites[service.name] = (this.favorites[service.name] || 0) + 1;
-      localStorage.setItem("dashboard_favs", JSON.stringify(this.favorites));
+      localStorage.setItem('dashboard_favs', JSON.stringify(this.favorites));
     }
     this.isValidInput = true;
     this.requestUpdate();
     setTimeout(() => {
-      window.open(service.url, "_blank");
+      window.open(service.url, '_blank');
       setTimeout(() => this.resetInput(true), 100);
     }, 150);
   }
@@ -160,7 +149,7 @@ class DashboardApp extends LitElement {
   handlePopState(e) {
     if (!e.state?.view) {
       this.resetInput(false);
-    } else if (e.state.view === "category") {
+    } else if (e.state.view === 'category') {
       this.activeCategoryKey = e.state.key;
       this.showSearch = false;
     }
@@ -170,8 +159,8 @@ class DashboardApp extends LitElement {
     this.showHelp = false;
     this.showSearch = true;
     this.selectedIndex = 0;
-    window.history.pushState({ view: "search" }, "");
-    setTimeout(() => this.querySelector("#searchInput")?.focus(), 100);
+    window.history.pushState({ view: 'search' }, '');
+    setTimeout(() => this.querySelector('#searchInput')?.focus(), 100);
   }
 
   clearFavorites() {
@@ -180,7 +169,7 @@ class DashboardApp extends LitElement {
 
   _confirmClearFavorites() {
     this.favorites = {};
-    localStorage.removeItem("dashboard_favs");
+    localStorage.removeItem('dashboard_favs');
 
     this.showClearFavoritesDialog = false;
     this.requestUpdate();
@@ -189,10 +178,10 @@ class DashboardApp extends LitElement {
   // --- Keyboard Event Dispatcher ---
 
   handleKeyDown(e) {
-    if ((e.ctrlKey && e.key !== ",") || e.altKey || e.metaKey) {
+    if ((e.ctrlKey && e.key !== ',') || e.altKey || e.metaKey) {
       return;
     }
-    if (e.key === "Escape") {
+    if (e.key === 'Escape') {
       if (this.showConfigModal) {
         this.showConfigModal = false;
         return;
@@ -214,24 +203,24 @@ class DashboardApp extends LitElement {
       return;
     }
 
-    if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-    if (e.key === "?") {
+    if (e.key === '?') {
       e.preventDefault();
       this.showHelp = true;
       return;
     }
-    if (e.ctrlKey && e.key === ",") {
+    if (e.ctrlKey && e.key === ',') {
       e.preventDefault();
       this.showConfigModal = true;
       return;
     }
-    if (e.key === " " || e.key === "Spacebar") {
+    if (e.key === ' ' || e.key === 'Spacebar') {
       e.preventDefault();
       this.openSearch();
       return;
     }
-    if (e.key === "#" && !this.activeCategoryKey) {
+    if (e.key === '#' && !this.activeCategoryKey) {
       e.preventDefault();
       this.toggleViewMode();
       return;
@@ -245,26 +234,22 @@ class DashboardApp extends LitElement {
   handleSearchKeyDown(e) {
     const filtered = getFilteredServices(this.categories, this.searchQuery);
     const queryTrimmed = this.searchQuery.trim();
-    const showAllEngines = queryTrimmed === ":";
+    const showAllEngines = queryTrimmed === ':';
 
     let matchedEngine = null;
-    let searchTermsPreview = "";
+    let searchTermsPreview = '';
     let candidateEngines = [];
     let isFilteringEngines = false;
     let showPreviewBlock = false;
 
-    if (this.searchQuery.startsWith(":")) {
+    if (this.searchQuery.startsWith(':')) {
       const commandString = this.searchQuery.substring(1);
-      const firstSpaceIndex = commandString.indexOf(" ");
+      const firstSpaceIndex = commandString.indexOf(' ');
 
       if (firstSpaceIndex !== -1) {
-        const prefix = commandString
-          .substring(0, firstSpaceIndex)
-          .toLowerCase();
+        const prefix = commandString.substring(0, firstSpaceIndex).toLowerCase();
         searchTermsPreview = commandString.substring(firstSpaceIndex + 1);
-        matchedEngine = this.searchEngines.find(
-          (eng) => eng.prefix.toLowerCase() === prefix,
-        );
+        matchedEngine = this.searchEngines.find((eng) => eng.prefix.toLowerCase() === prefix);
         if (matchedEngine) showPreviewBlock = true;
       } else {
         isFilteringEngines = true;
@@ -286,7 +271,7 @@ class DashboardApp extends LitElement {
       items.push({
         action: () => {
           this.searchQuery = `:${engine.prefix} `;
-          this.querySelector("#searchInput")?.focus();
+          this.querySelector('#searchInput')?.focus();
         },
       });
     });
@@ -295,10 +280,10 @@ class DashboardApp extends LitElement {
       items.push({
         action: () => {
           const finalUrl = matchedEngine.url.replace(
-            "%s",
+            '%s',
             encodeURIComponent(searchTermsPreview.trim()),
           );
-          window.open(finalUrl, "_blank");
+          window.open(finalUrl, '_blank');
           this.resetInput(true);
         },
       });
@@ -314,7 +299,7 @@ class DashboardApp extends LitElement {
 
     const totalItems = items.length;
 
-    if (e.key === "ArrowDown") {
+    if (e.key === 'ArrowDown') {
       e.preventDefault();
       if (totalItems > 0) {
         this.selectedIndex = (this.selectedIndex + 1) % totalItems;
@@ -322,7 +307,7 @@ class DashboardApp extends LitElement {
       }
       return;
     }
-    if (e.key === "ArrowUp") {
+    if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (totalItems > 0) {
         this.selectedIndex = (this.selectedIndex - 1 + totalItems) % totalItems;
@@ -330,7 +315,7 @@ class DashboardApp extends LitElement {
       }
       return;
     }
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       e.preventDefault();
       const item = items[this.selectedIndex];
       if (item) item.action();
@@ -340,10 +325,9 @@ class DashboardApp extends LitElement {
   handleNavigationKeyDown(key) {
     if (!this.activeCategoryKey) {
       if (/^[0-9]$/.test(key) && !this.isGridView) {
-        const favService = getTopFavorites(
-          this.categories,
-          this.favorites,
-        ).find((s) => s.key === key);
+        const favService = getTopFavorites(this.categories, this.favorites).find(
+          (s) => s.key === key,
+        );
         if (favService) {
           this.currentInput = key.toUpperCase();
           this.trackClick(favService, true);
@@ -356,7 +340,7 @@ class DashboardApp extends LitElement {
         this.currentInput = key.toUpperCase();
         this.isInvalidInput = false;
         this.startResetTimer();
-        window.history.pushState({ view: "category", key }, "");
+        window.history.pushState({ view: 'category', key }, '');
       } else {
         this.currentInput = key.toUpperCase();
         this.isInvalidInput = true;
@@ -366,9 +350,7 @@ class DashboardApp extends LitElement {
     }
 
     this.currentInput += ` → ${key.toUpperCase()}`;
-    const cat = this.categories.find(
-      (c) => c.categoryKey === this.activeCategoryKey,
-    );
+    const cat = this.categories.find((c) => c.categoryKey === this.activeCategoryKey);
     const service = cat?.services?.find((s) => s.key === key);
 
     if (service) {
@@ -382,8 +364,8 @@ class DashboardApp extends LitElement {
 
   scrollToSelected() {
     setTimeout(() => {
-      const active = this.querySelector(".search-item-active");
-      const container = this.querySelector(".search-results");
+      const active = this.querySelector('.search-item-active');
+      const container = this.querySelector('.search-results');
 
       if (!active || !container) return;
 
@@ -404,24 +386,21 @@ class DashboardApp extends LitElement {
 
   async saveConfiguration(newConfig, oldConfig) {
     try {
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
 
-      const backupResponse = await fetch(
-        `/config/services.backup-${timestamp}.json`,
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(oldConfig, null, 2),
-        },
-      );
+      const backupResponse = await fetch(`/config/services.backup-${timestamp}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(oldConfig, null, 2),
+      });
 
       if (!backupResponse.ok) {
-        throw new Error("Failed to create configuration backup.");
+        throw new Error('Failed to create configuration backup.');
       }
 
-      const response = await fetch("/config/services.json", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/config/services.json', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newConfig, null, 2),
       });
 
@@ -442,7 +421,7 @@ class DashboardApp extends LitElement {
         this.showSaveErrorDialog = true;
       }
     } catch (error) {
-      console.error("WebDAV Error:", error);
+      console.error('WebDAV Error:', error);
       this.showSaveErrorDialog = true;
     }
   }
@@ -495,7 +474,7 @@ class DashboardApp extends LitElement {
         @service-click=${(e) => this.trackClick(e.detail.service)}
         @execute-submit=${() => {
           this.handleKeyDown({
-            key: "Enter",
+            key: 'Enter',
             preventDefault: () => {},
             ctrlKey: false,
             altKey: false,
@@ -510,12 +489,12 @@ class DashboardApp extends LitElement {
     return html`
       <jk-dialog
         .show=${this.showClearFavoritesDialog}
-        title="${this.t("confirmResetTitle")}"
-        message="${this.t("confirmReset")}"
+        title="${this.t('confirmResetTitle')}"
+        message="${this.t('confirmReset')}"
         icon="trash-2"
         iconColor="text-rose-400"
-        confirmLabel="${this.t("confirmResetConfirm")}"
-        cancelLabel="${this.t("cancel")}"
+        confirmLabel="${this.t('confirmResetConfirm')}"
+        cancelLabel="${this.t('cancel')}"
         @confirm=${this._confirmClearFavorites}
         @cancel=${() => {
           this.showClearFavoritesDialog = false;
@@ -527,11 +506,11 @@ class DashboardApp extends LitElement {
     return html`
       <jk-dialog
         .show="${this.showSaveSuccessDialog}"
-        title="${this.t("tabEditorSaveDoneTitle")}"
-        message="${this.t("tabEditorSaveDone")}"
+        title="${this.t('tabEditorSaveDoneTitle')}"
+        message="${this.t('tabEditorSaveDone')}"
         icon="circle-check"
         iconColor="text-emerald-400"
-        confirmLabel="${this.t("tabEditorOk")}"
+        confirmLabel="${this.t('tabEditorOk')}"
         @confirm="${() => (this.showSaveSuccessDialog = false)}"
         @cancel="${() => (this.showSaveSuccessDialog = false)}"
       ></jk-dialog>
@@ -542,11 +521,11 @@ class DashboardApp extends LitElement {
     return html`
       <jk-dialog
         .show="${this.showSaveErrorDialog}"
-        title="${this.t("tabEditorSaveFailedTitle")}"
-        message="${this.t("tabEditorSaveFailed")}"
+        title="${this.t('tabEditorSaveFailedTitle')}"
+        message="${this.t('tabEditorSaveFailed')}"
         icon="triangle-alert"
         iconColor="text-rose-400"
-        confirmLabel="${this.t("tabEditorOk")}"
+        confirmLabel="${this.t('tabEditorOk')}"
         @confirm="${() => (this.showSaveErrorDialog = false)}"
         @cancel="${() => (this.showSaveErrorDialog = false)}"
       ></jk-dialog>
@@ -554,7 +533,7 @@ class DashboardApp extends LitElement {
   }
 
   templateKeyBadge() {
-    if (!this.currentInput || this.showSearch || this.showHelp) return "";
+    if (!this.currentInput || this.showSearch || this.showHelp) return '';
 
     const stateClass = this.isInvalidInput
       ? `
@@ -635,18 +614,13 @@ class DashboardApp extends LitElement {
 
         ${
           this.isValidInput
-            ? html`
-                <jk-icon
-                  icon="check"
-                  class="w-4 h-4 text-emerald-400"
-                ></jk-icon>
-              `
-            : ""
+            ? html` <jk-icon icon="check" class="w-4 h-4 text-emerald-400"></jk-icon> `
+            : ''
         }
         ${
           this.isInvalidInput
             ? html` <jk-icon icon="x" class="w-4 h-4 text-rose-400"></jk-icon> `
-            : ""
+            : ''
         }
       </div>
     `;
@@ -654,12 +628,8 @@ class DashboardApp extends LitElement {
 
   render_() {
     const favs = getTopFavorites(this.categories, this.favorites);
-    const filteredServices = getFilteredServices(
-      this.categories,
-      this.searchQuery,
-    );
-    const showMain =
-      !this.activeCategoryKey && !this.showSearch && !this.showHelp;
+    const filteredServices = getFilteredServices(this.categories, this.searchQuery);
+    const showMain = !this.activeCategoryKey && !this.showSearch && !this.showHelp;
 
     return html` ${this.templateHelpModal()} `;
   }
@@ -667,23 +637,16 @@ class DashboardApp extends LitElement {
   render() {
     const favs = getTopFavorites(this.categories, this.favorites);
 
-    const filteredServices = getFilteredServices(
-      this.categories,
-      this.searchQuery,
-    );
+    const filteredServices = getFilteredServices(this.categories, this.searchQuery);
 
     const showMain =
-      !this.activeCategoryKey &&
-      !this.showSearch &&
-      !this.showHelp &&
-      !this.showConfigModal;
+      !this.activeCategoryKey && !this.showSearch && !this.showHelp && !this.showConfigModal;
 
     return html`
       <!-- Global Overlays -->
       ${this.templateKeyBadge()} ${this.templateHelpModal()}
-      ${this.templateSearchModal(filteredServices)}
-      ${this.templateConfigModal()} ${this.templateSaveSuccessDialog()}
-      ${this.templateSaveErrorDialog()}
+      ${this.templateSearchModal(filteredServices)} ${this.templateConfigModal()}
+      ${this.templateSaveSuccessDialog()} ${this.templateSaveErrorDialog()}
 
       <!-- Header -->
       <jk-dashboard-header
@@ -722,28 +685,28 @@ class DashboardApp extends LitElement {
 
                 <!-- Categories -->
                 <jk-service-group
-                  title="${this.t("categories")}"
+                  title="${this.t('categories')}"
                   icon="folder"
                   .services=${this.categories.map((cat) => ({
-                  name: cat.category,
-                  url: `${cat.services?.length ?? 0} Services`,
-                  icon: cat.icon,
-                  key: cat.categoryKey,
-                }))}
+                    name: cat.category,
+                    url: `${cat.services?.length ?? 0} Services`,
+                    icon: cat.icon,
+                    key: cat.categoryKey,
+                  }))}
                   @service-click=${(e) => {
-                  const key = e.detail.service.key;
+                    const key = e.detail.service.key;
 
-                  this.activeCategoryKey = key;
-                  this.currentInput = key.toUpperCase();
+                    this.activeCategoryKey = key;
+                    this.currentInput = key.toUpperCase();
 
-                  window.history.pushState(
-                    {
-                      view: "category",
-                      key,
-                    },
-                    "",
-                  );
-                }}
+                    window.history.pushState(
+                      {
+                        view: 'category',
+                        key,
+                      },
+                      '',
+                    );
+                  }}
                 ></jk-service-group>
               `
             : html`
@@ -761,4 +724,4 @@ class DashboardApp extends LitElement {
   }
 }
 
-customElements.define("dashboard-app", DashboardApp);
+customElements.define('dashboard-app', DashboardApp);

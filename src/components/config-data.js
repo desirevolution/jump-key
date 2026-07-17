@@ -1,5 +1,5 @@
-import { LitElement, html } from "lit";
-import { validateConfig } from "../utils/config-validator.js";
+import { LitElement, html } from 'lit';
+import { validateConfig } from '../utils/config-validator.js';
 
 export class JkConfigData extends LitElement {
   createRenderRoot() {
@@ -23,17 +23,17 @@ export class JkConfigData extends LitElement {
         2,
       );
 
-      const blob = new Blob([configData], { type: "application/json" });
+      const blob = new Blob([configData], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = url;
-      link.download = "dashboard-config.json";
+      link.download = 'dashboard-config.json';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (e) {
-      console.error("Failed to export config", e);
+      console.error('Failed to export config', e);
     }
   }
 
@@ -49,22 +49,22 @@ export class JkConfigData extends LitElement {
 
         if (validateConfig(parsed)) {
           this.dispatchEvent(
-            new CustomEvent("config-imported", {
+            new CustomEvent('config-imported', {
               detail: parsed,
               bubbles: true,
               composed: true,
             }),
           );
-          alert(this.t("tabDataImportSuccess"));
+          alert(this.t('tabDataImportSuccess'));
         } else {
-          alert(this.t("tabDataImportInvalidStructure"));
+          alert(this.t('tabDataImportInvalidStructure'));
         }
       } catch (err) {
-        alert(this.t("tabDataImportJsonError"));
+        alert(this.t('tabDataImportJsonError'));
       }
     };
     reader.readAsText(file);
-    e.target.value = "";
+    e.target.value = '';
   }
 
   render() {
@@ -93,11 +93,11 @@ export class JkConfigData extends LitElement {
             <!-- Text -->
             <div class="grow min-w-0">
               <h3 class="text-sm font-bold text-white tracking-wide">
-                ${this.t("tabDataBackupTitle")}
+                ${this.t('tabDataBackupTitle')}
               </h3>
 
               <p class="text-xs text-slate-400 mt-1 leading-relaxed">
-                ${this.t("tabDataBackupDesc")}
+                ${this.t('tabDataBackupDesc')}
               </p>
             </div>
 
@@ -128,7 +128,7 @@ export class JkConfigData extends LitElement {
             >
               <jk-icon icon="download" class="w-4 h-4"></jk-icon>
 
-              ${this.t("tabDataExport")}
+              ${this.t('tabDataExport')}
             </button>
           </div>
         </section>
@@ -164,7 +164,7 @@ export class JkConfigData extends LitElement {
                 text-white
               "
               >
-                ${this.t("tabDataRestoreTitle")}
+                ${this.t('tabDataRestoreTitle')}
               </h3>
 
               <p
@@ -174,7 +174,7 @@ export class JkConfigData extends LitElement {
                 mt-0.5
               "
               >
-                ${this.t("tabDataRestoreDesc")}
+                ${this.t('tabDataRestoreDesc')}
               </p>
             </div>
           </div>
@@ -254,7 +254,7 @@ export class JkConfigData extends LitElement {
               text-slate-200
             "
             >
-              ${this.t("tabDataSelectFile")}
+              ${this.t('tabDataSelectFile')}
             </span>
 
             <span
@@ -264,7 +264,7 @@ export class JkConfigData extends LitElement {
               mt-1
             "
             >
-              ${this.t("tabDataOnlyJsonFiles")}
+              ${this.t('tabDataOnlyJsonFiles')}
             </span>
           </div>
         </section>
@@ -273,4 +273,4 @@ export class JkConfigData extends LitElement {
   }
 }
 
-customElements.define("jk-config-data", JkConfigData);
+customElements.define('jk-config-data', JkConfigData);

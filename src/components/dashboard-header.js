@@ -1,6 +1,6 @@
-import { LitElement, html } from "lit";
-import "./icon.js";
-import "./icon-button.js";
+import { LitElement, html } from 'lit';
+import './icon.js';
+import './icon-button.js';
 
 export class JkDashboardHeader extends LitElement {
   createRenderRoot() {
@@ -20,7 +20,7 @@ export class JkDashboardHeader extends LitElement {
   constructor() {
     super();
     this.isGridView = false;
-    this.lang = "en";
+    this.lang = 'en';
     this._now = new Date();
     this._timeInterval = null;
   }
@@ -43,36 +43,34 @@ export class JkDashboardHeader extends LitElement {
 
   // Clean, reactive getters to derive formatted strings on the fly
   get _hours() {
-    return String(this._now.getHours()).padStart(2, "0");
+    return String(this._now.getHours()).padStart(2, '0');
   }
 
   get _minutes() {
-    return String(this._now.getMinutes()).padStart(2, "0");
+    return String(this._now.getMinutes()).padStart(2, '0');
   }
 
   get _dateString() {
-    const locale = this.lang === "de" ? "de-DE" : "en-US";
-    const isMobile = window.matchMedia("(max-width: 639px)").matches;
+    const locale = this.lang === 'de' ? 'de-DE' : 'en-US';
+    const isMobile = window.matchMedia('(max-width: 639px)').matches;
 
     if (isMobile) {
       return this._now.toLocaleDateString(locale, {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
       });
     }
 
     return this._now.toLocaleDateString(locale, {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
     });
   }
 
   _dispatchEvent(eventName) {
-    this.dispatchEvent(
-      new CustomEvent(eventName, { bubbles: true, composed: true }),
-    );
+    this.dispatchEvent(new CustomEvent(eventName, { bubbles: true, composed: true }));
   }
 
   render() {
@@ -192,8 +190,8 @@ export class JkDashboardHeader extends LitElement {
             </div>
 
             <button
-              @click=${() => this._dispatchEvent("open-help")}
-              title="${this.t ? this.t("helpHint") : ""}"
+              @click=${() => this._dispatchEvent('open-help')}
+              title="${this.t ? this.t('helpHint') : ''}"
               class="
               hidden
               md:flex
@@ -251,22 +249,22 @@ export class JkDashboardHeader extends LitElement {
           "
           >
             <jk-icon-button
-              icon="${this.isGridView ? "rows-2" : "layout-grid"}"
-              title="${this.t ? this.t("hkToggleView") : ""} [#]"
-              @click=${() => this._dispatchEvent("toggle-view")}
+              icon="${this.isGridView ? 'rows-2' : 'layout-grid'}"
+              title="${this.t ? this.t('hkToggleView') : ''} [#]"
+              @click=${() => this._dispatchEvent('toggle-view')}
             ></jk-icon-button>
 
             <jk-icon-button
               icon="search"
-              title="${this.t ? this.t("hkSearch") : ""} [Space]"
-              @click=${() => this._dispatchEvent("open-search")}
+              title="${this.t ? this.t('hkSearch') : ''} [Space]"
+              @click=${() => this._dispatchEvent('open-search')}
             ></jk-icon-button>
 
             <jk-icon-button
               icon="settings"
-              title="${this.t ? this.t("editConfig") : ""}"
+              title="${this.t ? this.t('editConfig') : ''}"
               .hideOnMobile=${true}
-              @click=${() => this._dispatchEvent("open-config")}
+              @click=${() => this._dispatchEvent('open-config')}
             ></jk-icon-button>
           </div>
 
@@ -321,4 +319,4 @@ export class JkDashboardHeader extends LitElement {
   }
 }
 
-customElements.define("jk-dashboard-header", JkDashboardHeader);
+customElements.define('jk-dashboard-header', JkDashboardHeader);

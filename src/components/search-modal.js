@@ -1,7 +1,7 @@
-import { LitElement, html } from "lit";
-import "./icon.js";
-import "./icon-button.js";
-import "./search-item.js";
+import { LitElement, html } from 'lit';
+import './icon.js';
+import './icon-button.js';
+import './search-item.js';
 
 export class JkSearchModal extends LitElement {
   createRenderRoot() {
@@ -20,7 +20,7 @@ export class JkSearchModal extends LitElement {
   constructor() {
     super();
     this.show = false;
-    this.searchQuery = "";
+    this.searchQuery = '';
     this.searchEngines = [];
     this.filteredServices = [];
     this.selectedIndex = 0;
@@ -28,22 +28,42 @@ export class JkSearchModal extends LitElement {
   }
 
   updated(changedProperties) {
-    if (changedProperties.has("selectedIndex")) {
+    if (changedProperties.has('selectedIndex')) {
       requestAnimationFrame(() => {
-        const active = this.querySelector(".search-item-active");
-        const container = this.querySelector(".search-results");
+        const container = this.querySelector('.search-results');
+        if (!container) return;
 
-        if (active && container) {
+        const items = container.querySelectorAll('jk-dashboard-search-item');
+        const active = items[this.selectedIndex];
+
+        if (active) {
+          // 1. Wenn wir ganz oben sind (Index 0 oder 1), erzwinge den absoluten Anfang
+          if (this.selectedIndex <= 1) {
+            container.scrollTop = 0;
+            return;
+          }
+
+          // 2. Wenn wir beim allerletzten Element sind, scrolle komplett nach unten
+          if (this.selectedIndex === items.length - 1) {
+            container.scrollTop = container.scrollHeight;
+            return;
+          }
+
+          // 3. Für alle Elemente dazwischen: Präzise manuelle Berechnung mit Puffer
           const activeTop = active.offsetTop;
           const activeBottom = activeTop + active.offsetHeight;
-
           const visibleTop = container.scrollTop;
           const visibleBottom = visibleTop + container.clientHeight;
 
-          if (activeTop < visibleTop) {
-            container.scrollTop = activeTop;
-          } else if (activeBottom > visibleBottom) {
-            container.scrollTop = activeBottom - container.clientHeight;
+          // Puffer-Zone, damit Elemente oben/unten nicht an die Kante gequetscht werden
+          const padding = 12;
+
+          if (activeTop < visibleTop + padding) {
+            // Scrollt nach oben, wenn das Element die obere Puffer-Zone berührt
+            container.scrollTop = activeTop - padding;
+          } else if (activeBottom > visibleBottom - padding) {
+            // Scrollt nach unten, wenn das Element die untere Puffer-Zone berührt
+            container.scrollTop = activeBottom - container.clientHeight + padding;
           }
         }
       });
@@ -51,14 +71,12 @@ export class JkSearchModal extends LitElement {
   }
 
   _handleClose() {
-    this.dispatchEvent(
-      new CustomEvent("close", { bubbles: true, composed: true }),
-    );
+    this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
   }
 
   _handleInput(e) {
     this.dispatchEvent(
-      new CustomEvent("search-change", {
+      new CustomEvent('search-change', {
         detail: { value: e.target.value },
         bubbles: true,
         composed: true,
@@ -68,18 +86,18 @@ export class JkSearchModal extends LitElement {
 
   _selectEngine(prefix) {
     this.dispatchEvent(
-      new CustomEvent("search-change", {
+      new CustomEvent('search-change', {
         detail: { value: `:${prefix} ` },
         bubbles: true,
         composed: true,
       }),
     );
-    setTimeout(() => this.querySelector("#searchInput")?.focus(), 10);
+    setTimeout(() => this.querySelector('#searchInput')?.focus(), 10);
   }
 
   _triggerServiceClick(service) {
     this.dispatchEvent(
-      new CustomEvent("service-click", {
+      new CustomEvent('service-click', {
         detail: { service },
         bubbles: true,
         composed: true,
@@ -89,9 +107,7 @@ export class JkSearchModal extends LitElement {
 
   _handleSubmit(e) {
     e.preventDefault();
-    this.dispatchEvent(
-      new CustomEvent("execute-submit", { bubbles: true, composed: true }),
-    );
+    this.dispatchEvent(new CustomEvent('execute-submit', { bubbles: true, composed: true }));
   }
 
   _renderEngine(engine, active) {
@@ -116,10 +132,10 @@ export class JkSearchModal extends LitElement {
         .t=${this.t}
         @click="${() => {
           const finalUrl = matchedEngine.url.replace(
-            "%s",
+            '%s',
             encodeURIComponent(searchTermsPreview.trim()),
           );
-          window.open(finalUrl, "_blank");
+          window.open(finalUrl, '_blank');
           this._handleClose();
         }}"
       ></jk-dashboard-search-item>
@@ -140,23 +156,19 @@ export class JkSearchModal extends LitElement {
   _buildItems() {
     const queryTrimmed = this.searchQuery.trim();
     let matchedEngine = null;
-    let searchTermsPreview = "";
+    let searchTermsPreview = '';
     let candidateEngines = [];
     let isFilteringEngines = false;
     let showPreviewBlock = false;
 
-    if (this.searchQuery.startsWith(":")) {
+    if (this.searchQuery.startsWith(':')) {
       const commandString = this.searchQuery.substring(1);
-      const firstSpaceIndex = commandString.indexOf(" ");
+      const firstSpaceIndex = commandString.indexOf(' ');
 
       if (firstSpaceIndex !== -1) {
-        const prefix = commandString
-          .substring(0, firstSpaceIndex)
-          .toLowerCase();
+        const prefix = commandString.substring(0, firstSpaceIndex).toLowerCase();
         searchTermsPreview = commandString.substring(firstSpaceIndex + 1);
-        matchedEngine = this.searchEngines.find(
-          (e) => e.prefix.toLowerCase() === prefix,
-        );
+        matchedEngine = this.searchEngines.find((e) => e.prefix.toLowerCase() === prefix);
         if (matchedEngine) showPreviewBlock = true;
       } else {
         isFilteringEngines = true;
@@ -167,7 +179,7 @@ export class JkSearchModal extends LitElement {
       }
     }
 
-    const showAllEngines = queryTrimmed === ":";
+    const showAllEngines = queryTrimmed === ':';
     const enginesToRender = showAllEngines
       ? this.searchEngines
       : isFilteringEngines
@@ -185,8 +197,7 @@ export class JkSearchModal extends LitElement {
 
     if (showPreviewBlock) {
       items.push({
-        render: (active) =>
-          this._renderPreview(matchedEngine, searchTermsPreview, active),
+        render: (active) => this._renderPreview(matchedEngine, searchTermsPreview, active),
       });
     }
 
@@ -205,7 +216,7 @@ export class JkSearchModal extends LitElement {
     if (!this.show) return html``;
 
     const queryTrimmed = this.searchQuery.trim();
-    const showQuickTrigger = queryTrimmed === "";
+    const showQuickTrigger = queryTrimmed === '';
 
     const { items, showAllEngines, isFilteringEngines } = this._buildItems();
 
@@ -302,7 +313,7 @@ export class JkSearchModal extends LitElement {
                 type="text"
                 inputmode="search"
                 enterkeyhint="search"
-                placeholder="${this.t("searchPlaceholder")}"
+                placeholder="${this.t('searchPlaceholder')}"
                 .value=${this.searchQuery}
                 @input=${this._handleInput}
                 class="
@@ -330,17 +341,13 @@ export class JkSearchModal extends LitElement {
                     <jk-icon-button
                       icon="globe"
                       title="Search engines"
-                      @click=${() => this._selectEngine("")}
+                      @click=${() => this._selectEngine('')}
                     ></jk-icon-button>
                   `
-                : ""
+                : ''
             }
 
-            <jk-icon-button
-              icon="x"
-              title="Close"
-              @click=${this._handleClose}
-            ></jk-icon-button>
+            <jk-icon-button icon="x" title="Close" @click=${this._handleClose}></jk-icon-button>
           </div>
 
           <!-- Results -->
@@ -352,6 +359,7 @@ export class JkSearchModal extends LitElement {
     p-2
     space-y-1
     grow
+scroll-py-2    
           "
           >
             ${
@@ -374,10 +382,10 @@ export class JkSearchModal extends LitElement {
                       text-slate-500
                     "
                     >
-                      ${this.t("searchEnginesTitle")}
+                      ${this.t('searchEnginesTitle')}
                     </div>
                   `
-                : ""
+                : ''
             }
             ${items.map((item, i) => item.render(i === this.selectedIndex))}
             ${
@@ -395,15 +403,12 @@ export class JkSearchModal extends LitElement {
                       text-slate-500
                     "
                     >
-                      <jk-icon
-                        icon="search-x"
-                        class="size-8 mb-3 opacity-50"
-                      ></jk-icon>
+                      <jk-icon icon="search-x" class="size-8 mb-3 opacity-50"></jk-icon>
 
-                      <span class="text-sm"> ${this.t("noServices")} </span>
+                      <span class="text-sm"> ${this.t('noServices')} </span>
                     </div>
                   `
-                : ""
+                : ''
             }
           </div>
         </div>
@@ -412,4 +417,4 @@ export class JkSearchModal extends LitElement {
   }
 }
 
-customElements.define("jk-search-modal", JkSearchModal);
+customElements.define('jk-search-modal', JkSearchModal);

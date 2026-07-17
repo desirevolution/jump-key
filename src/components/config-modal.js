@@ -1,9 +1,9 @@
-import { LitElement, html } from "lit";
-import "./icon.js";
-import "./icon-button.js";
-import "./dialog.js";
-import "./config-data.js";
-import "./config-editor.js";
+import { LitElement, html } from 'lit';
+import './icon.js';
+import './icon-button.js';
+import './dialog.js';
+import './config-data.js';
+import './config-editor.js';
 
 export class JkConfigModal extends LitElement {
   createRenderRoot() {
@@ -29,11 +29,11 @@ export class JkConfigModal extends LitElement {
     this.categories = [];
     this.searchEngines = [];
 
-    this._activeTab = "data"; // Start-Tab ist jetzt "Daten & Backup"
+    this._activeTab = 'data'; // Start-Tab ist jetzt "Daten & Backup"
     this._isEditorConfigValid = true;
     this._hasEditorConfigChanged = false;
-    this._editorValue = "";
-    this._originalConfigString = "";
+    this._editorValue = '';
+    this._originalConfigString = '';
     this._showDiscardDialog = false;
     this.t = (key) => key;
 
@@ -41,7 +41,7 @@ export class JkConfigModal extends LitElement {
   }
 
   willUpdate(changed) {
-    if (changed.has("show")) {
+    if (changed.has('show')) {
       if (this.show) {
         this._editorValue = JSON.stringify(
           {
@@ -55,18 +55,18 @@ export class JkConfigModal extends LitElement {
         this._isEditorConfigValid = true;
         this._hasEditorConfigChanged = false;
         this._showDiscardDialog = false;
-        this._activeTab = "data";
+        this._activeTab = 'data';
 
-        window.addEventListener("keydown", this._handleKeyDown, true);
+        window.addEventListener('keydown', this._handleKeyDown, true);
       } else {
-        window.removeEventListener("keydown", this._handleKeyDown, true);
+        window.removeEventListener('keydown', this._handleKeyDown, true);
       }
     }
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    window.removeEventListener("keydown", this._handleKeyDown, true);
+    window.removeEventListener('keydown', this._handleKeyDown, true);
   }
 
   async _focusButton(id) {
@@ -80,23 +80,22 @@ export class JkConfigModal extends LitElement {
 
     // Tab-Wechsel Shortcuts: Ctrl + 1 (Daten & Backup) oder Ctrl + 2 (JSON-Editor)
     if (e.ctrlKey || e.metaKey) {
-      if (e.key === "1") {
+      if (e.key === '1') {
         e.preventDefault();
         e.stopPropagation();
-        this._setActiveTab("data");
+        this._setActiveTab('data');
         return;
-      } else if (e.key === "2") {
+      } else if (e.key === '2') {
         e.preventDefault();
         e.stopPropagation();
-        this._setActiveTab("editor");
+        this._setActiveTab('editor');
         return;
       }
     }
 
     // Shortcuts nur verarbeiten, wenn wir uns im Editor-Tab befinden
-    if (this._activeTab === "editor") {
-      const isSaveShortcut =
-        (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s";
+    if (this._activeTab === 'editor') {
+      const isSaveShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's';
       if (isSaveShortcut) {
         e.preventDefault();
         e.stopPropagation();
@@ -106,33 +105,29 @@ export class JkConfigModal extends LitElement {
         return;
       }
 
-      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         const activeElementId = document.activeElement?.id;
-        const isSaveEnabled =
-          this._isEditorConfigValid && this._hasEditorConfigChanged;
+        const isSaveEnabled = this._isEditorConfigValid && this._hasEditorConfigChanged;
 
-        if (
-          activeElementId === "cancelModalBtn" ||
-          activeElementId === "saveModalBtn"
-        ) {
+        if (activeElementId === 'cancelModalBtn' || activeElementId === 'saveModalBtn') {
           e.preventDefault();
           e.stopPropagation();
 
-          if (e.key === "ArrowLeft" && activeElementId === "saveModalBtn") {
-            this._focusButton("cancelModalBtn");
+          if (e.key === 'ArrowLeft' && activeElementId === 'saveModalBtn') {
+            this._focusButton('cancelModalBtn');
           } else if (
-            e.key === "ArrowRight" &&
-            activeElementId === "cancelModalBtn" &&
+            e.key === 'ArrowRight' &&
+            activeElementId === 'cancelModalBtn' &&
             isSaveEnabled
           ) {
-            this._focusButton("saveModalBtn");
+            this._focusButton('saveModalBtn');
           }
           return;
         }
       }
     }
 
-    if (e.key === "Escape") {
+    if (e.key === 'Escape') {
       e.preventDefault();
       e.stopPropagation();
       this._handleClose();
@@ -157,7 +152,7 @@ export class JkConfigModal extends LitElement {
     this._hasEditorConfigChanged = true;
 
     // Nach erfolgreichem Import direkt in den Editor wechseln
-    this._setActiveTab("editor");
+    this._setActiveTab('editor');
   }
 
   _handleClose() {
@@ -170,17 +165,15 @@ export class JkConfigModal extends LitElement {
 
   _forceClose() {
     this._showDiscardDialog = false;
-    window.removeEventListener("keydown", this._handleKeyDown, true);
-    this.dispatchEvent(
-      new CustomEvent("close", { bubbles: true, composed: true }),
-    );
+    window.removeEventListener('keydown', this._handleKeyDown, true);
+    this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
   }
 
   _handleSave() {
     try {
       const parsedJson = JSON.parse(this._editorValue);
       this.dispatchEvent(
-        new CustomEvent("save", {
+        new CustomEvent('save', {
           detail: {
             newConfig: parsedJson,
             oldConfig: this._originalConfigString,
@@ -190,13 +183,13 @@ export class JkConfigModal extends LitElement {
         }),
       );
     } catch (e) {
-      console.error("Failed to parse editor JSON on save", e);
+      console.error('Failed to parse editor JSON on save', e);
     }
   }
 
   _renderActiveTabContent() {
     switch (this._activeTab) {
-      case "data":
+      case 'data':
         return html`
           <jk-config-data
             .categories="${this.categories}"
@@ -205,7 +198,7 @@ export class JkConfigModal extends LitElement {
             @config-imported="${this._handleConfigImported}"
           ></jk-config-data>
         `;
-      case "editor":
+      case 'editor':
       default:
         return html`
           <jk-config-editor
@@ -325,7 +318,7 @@ export class JkConfigModal extends LitElement {
                   text-white
                 "
                 >
-                  ${this.t("dashboardSettings") || "Dashboard Settings"}
+                  ${this.t('dashboardSettings') || 'Dashboard Settings'}
                 </h2>
 
                 <p
@@ -347,7 +340,7 @@ export class JkConfigModal extends LitElement {
             "
             >
               ${
-                this._activeTab === "editor"
+                this._activeTab === 'editor'
                   ? html`
                       <div
                         class="
@@ -378,11 +371,7 @@ export class JkConfigModal extends LitElement {
                       "
                       >
                         <jk-icon
-                          .icon="${
-                          this._isEditorConfigValid
-                            ? "circle-check"
-                            : "triangle-alert"
-                        }"
+                          .icon="${this._isEditorConfigValid ? 'circle-check' : 'triangle-alert'}"
                           class="size-4"
                         ></jk-icon>
 
@@ -392,18 +381,14 @@ export class JkConfigModal extends LitElement {
                           font-medium
                         "
                         >
-                          ${this._isEditorConfigValid ? "Valid" : "Invalid"}
+                          ${this._isEditorConfigValid ? 'Valid' : 'Invalid'}
                         </span>
                       </div>
                     `
-                  : ""
+                  : ''
               }
 
-              <jk-icon-button
-                icon="x"
-                label="Close"
-                @click="${this._handleClose}"
-              ></jk-icon-button>
+              <jk-icon-button icon="x" label="Close" @click="${this._handleClose}"></jk-icon-button>
             </div>
           </div>
 
@@ -434,7 +419,7 @@ export class JkConfigModal extends LitElement {
             "
             >
               <button
-                @click="${() => this._setActiveTab("data")}"
+                @click="${() => this._setActiveTab('data')}"
                 title="Ctrl + 1"
                 class="
                 flex
@@ -453,7 +438,7 @@ export class JkConfigModal extends LitElement {
                 transition-all
 
                 ${
-                  this._activeTab === "data"
+                  this._activeTab === 'data'
                     ? `
                       bg-indigo-500/10
                       border
@@ -472,7 +457,7 @@ export class JkConfigModal extends LitElement {
               >
                 <jk-icon icon="database" class="size-4"></jk-icon>
 
-                ${this.t("tabData")}
+                ${this.t('tabData')}
 
                 <kbd
                   class="
@@ -491,7 +476,7 @@ export class JkConfigModal extends LitElement {
               </button>
 
               <button
-                @click="${() => this._setActiveTab("editor")}"
+                @click="${() => this._setActiveTab('editor')}"
                 title="Ctrl + 2"
                 class="
                 flex
@@ -510,7 +495,7 @@ export class JkConfigModal extends LitElement {
                 transition-all
 
                 ${
-                  this._activeTab === "editor"
+                  this._activeTab === 'editor'
                     ? `
                       bg-indigo-500/10
                       border
@@ -529,7 +514,7 @@ export class JkConfigModal extends LitElement {
               >
                 <jk-icon icon="code-2" class="size-4"></jk-icon>
 
-                ${this.t("tabEditor") || "JSON Editor"}
+                ${this.t('tabEditor') || 'JSON Editor'}
 
                 <kbd
                   class="
@@ -579,7 +564,7 @@ export class JkConfigModal extends LitElement {
           "
           >
             ${
-              this._activeTab === "editor"
+              this._activeTab === 'editor'
                 ? html`
                     <button
                       type="button"
@@ -607,17 +592,14 @@ export class JkConfigModal extends LitElement {
                       transition-all
                     "
                     >
-                      ${this.t("editConfigCancel") || "Cancel"}
+                      ${this.t('editConfigCancel') || 'Cancel'}
                     </button>
 
                     <button
                       type="button"
                       id="saveModalBtn"
                       @click="${this._handleSave}"
-                      ?disabled="${
-                      !this._isEditorConfigValid ||
-                      !this._hasEditorConfigChanged
-                    }"
+                      ?disabled="${!this._isEditorConfigValid || !this._hasEditorConfigChanged}"
                       class="
                       px-5
                       py-2.5
@@ -633,8 +615,7 @@ export class JkConfigModal extends LitElement {
                       transition-all
 
                       ${
-                        this._isEditorConfigValid &&
-                        this._hasEditorConfigChanged
+                        this._isEditorConfigValid && this._hasEditorConfigChanged
                           ? `
                             bg-indigo-600
                             hover:bg-indigo-500
@@ -649,7 +630,7 @@ export class JkConfigModal extends LitElement {
                       }
                     "
                     >
-                      ${this.t("editConfigSave") || "Save"}
+                      ${this.t('editConfigSave') || 'Save'}
                     </button>
                   `
                 : html`
@@ -676,7 +657,7 @@ export class JkConfigModal extends LitElement {
                       hover:bg-slate-700
                     "
                     >
-                      ${this.t("close") || "Close"}
+                      ${this.t('close') || 'Close'}
                     </button>
                   `
             }
@@ -685,12 +666,12 @@ export class JkConfigModal extends LitElement {
 
         <jk-dialog
           .show="${this._showDiscardDialog}"
-          title="${this.t("tabEditorDiscardChangesTitle")}"
-          message="${this.t("tabEditorDiscardChangesMsg")}"
+          title="${this.t('tabEditorDiscardChangesTitle')}"
+          message="${this.t('tabEditorDiscardChangesMsg')}"
           icon="triangle-alert"
           iconColor="text-rose-400"
-          confirmLabel="${this.t("tabEditorDiscardChangesConfirm")}"
-          cancelLabel="${this.t("tabEditorDiscardChangesCancel")}"
+          confirmLabel="${this.t('tabEditorDiscardChangesConfirm')}"
+          cancelLabel="${this.t('tabEditorDiscardChangesCancel')}"
           @confirm="${this._forceClose}"
           @cancel="${() => (this._showDiscardDialog = false)}"
         ></jk-dialog>
@@ -699,4 +680,4 @@ export class JkConfigModal extends LitElement {
   }
 }
 
-customElements.define("jk-config-modal", JkConfigModal);
+customElements.define('jk-config-modal', JkConfigModal);

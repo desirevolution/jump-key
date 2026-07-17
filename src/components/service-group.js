@@ -1,6 +1,6 @@
-import { LitElement, html } from "lit";
-import "./service-card.js";
-import "./icon.js";
+import { LitElement, html } from 'lit';
+import './service-card.js';
+import './icon.js';
 
 export class JkServiceGroup extends LitElement {
   createRenderRoot() {
@@ -62,7 +62,7 @@ export class JkServiceGroup extends LitElement {
             "
           >
             <jk-icon
-              .icon=${this.icon || "folder"}
+              .icon=${this.icon || 'folder'}
               class="
                 size-4
 
@@ -130,7 +130,7 @@ export class JkServiceGroup extends LitElement {
                       ${this.badgeText.toUpperCase()}
                     </kbd>
                   `
-                : ""
+                : ''
             }
           </div>
         </div>
@@ -159,7 +159,7 @@ export class JkServiceGroup extends LitElement {
                 .badgeText=${service.key}
                 @card-click=${() => {
                   this.dispatchEvent(
-                    new CustomEvent("service-click", {
+                    new CustomEvent('service-click', {
                       detail: { service },
                       bubbles: true,
                       composed: true,
@@ -175,4 +175,4 @@ export class JkServiceGroup extends LitElement {
   }
 }
 
-customElements.define("jk-service-group", JkServiceGroup);
+customElements.define('jk-service-group', JkServiceGroup);

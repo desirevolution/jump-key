@@ -1,7 +1,7 @@
-import { LitElement, html } from "lit";
-import "./service-card.js";
-import "./icon.js";
-import "./icon-button.js";
+import { LitElement, html } from 'lit';
+import './service-card.js';
+import './icon.js';
+import './icon-button.js';
 
 export class JkFavoritesView extends LitElement {
   createRenderRoot() {
@@ -88,7 +88,7 @@ export class JkFavoritesView extends LitElement {
               text-slate-200
             "
           >
-            ${this.t("frequent")}
+            ${this.t('frequent')}
           </h2>
 
           <!-- Reset -->
@@ -96,11 +96,11 @@ export class JkFavoritesView extends LitElement {
           <jk-icon-button
             icon="trash-2"
             variant="text"
-            .text=${this.t("resetFavs")}
+            .text=${this.t('resetFavs')}
             class="ml-auto"
             @click=${() => {
               this.dispatchEvent(
-                new CustomEvent("clear-favorites", {
+                new CustomEvent('clear-favorites', {
                   bubbles: true,
                   composed: true,
                 }),
@@ -134,7 +134,7 @@ export class JkFavoritesView extends LitElement {
                 .isFavorite=${true}
                 @card-click=${() => {
                   this.dispatchEvent(
-                    new CustomEvent("service-click", {
+                    new CustomEvent('service-click', {
                       detail: {
                         service,
                       },
@@ -154,4 +154,4 @@ export class JkFavoritesView extends LitElement {
   }
 }
 
-customElements.define("jk-favorites-view", JkFavoritesView);
+customElements.define('jk-favorites-view', JkFavoritesView);

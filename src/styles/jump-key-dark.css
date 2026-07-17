@@ -1,5 +1,5 @@
 .prism-code-editor {
-  font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
 
   /* Editor */
   --pce-bg: #0f172a;

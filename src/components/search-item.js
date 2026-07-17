@@ -1,5 +1,5 @@
-import { LitElement, html } from "lit";
-import "./icon.js";
+import { LitElement, html } from 'lit';
+import './icon.js';
 
 export class JkDashboardSearchItem extends LitElement {
   createRenderRoot() {
@@ -16,7 +16,7 @@ export class JkDashboardSearchItem extends LitElement {
   constructor() {
     super();
     this.active = false;
-    this.type = "service";
+    this.type = 'service';
     this.data = {};
     this.t = (key) => key;
   }
@@ -74,7 +74,7 @@ export class JkDashboardSearchItem extends LitElement {
                 "
                 ></div>
               `
-            : ""
+            : ''
         }
 
         <div class="flex items-center gap-3 min-w-0 grow">
@@ -113,7 +113,7 @@ export class JkDashboardSearchItem extends LitElement {
                     <jk-icon .icon=${this.data.icon} class="size-5"></jk-icon>
                   </div>
                 `
-              : ""
+              : ''
           }
 
           <div class="min-w-0 grow">${this._renderContent()}</div>
@@ -126,7 +126,7 @@ export class JkDashboardSearchItem extends LitElement {
 
   _renderContent() {
     switch (this.type) {
-      case "engine":
+      case 'engine':
         return html`
           <div class="min-w-0">
             <div
@@ -154,8 +154,8 @@ export class JkDashboardSearchItem extends LitElement {
           </div>
         `;
 
-      case "preview": {
-        const terms = this.data.searchTerms?.trim() || "...";
+      case 'preview': {
+        const terms = this.data.searchTerms?.trim() || '...';
 
         return html`
           <div class="min-w-0">
@@ -165,7 +165,7 @@ export class JkDashboardSearchItem extends LitElement {
                 text-slate-400
               "
             >
-              ${this.t("searchEnginePreviewPrefix")}
+              ${this.t('searchEnginePreviewPrefix')}
             </div>
 
             <div
@@ -191,7 +191,7 @@ export class JkDashboardSearchItem extends LitElement {
         `;
       }
 
-      case "service":
+      case 'service':
       default:
         return html`
           <div class="min-w-0">
@@ -226,7 +226,7 @@ export class JkDashboardSearchItem extends LitElement {
 
   _renderMeta() {
     switch (this.type) {
-      case "engine":
+      case 'engine':
         return html`
           <kbd
             class="
@@ -262,8 +262,8 @@ export class JkDashboardSearchItem extends LitElement {
           </kbd>
         `;
 
-      case "preview":
-      case "service":
+      case 'preview':
+      case 'service':
       default:
         return this.active
           ? html`
@@ -289,9 +289,9 @@ export class JkDashboardSearchItem extends LitElement {
                 Enter
               </kbd>
             `
-          : "";
+          : '';
     }
   }
 }
 
-customElements.define("jk-dashboard-search-item", JkDashboardSearchItem);
+customElements.define('jk-dashboard-search-item', JkDashboardSearchItem);

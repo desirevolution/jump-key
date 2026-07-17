@@ -1,5 +1,5 @@
-import { LitElement, html } from "lit";
-import "./service-group.js";
+import { LitElement, html } from 'lit';
+import './service-group.js';
 
 export class JkGridView extends LitElement {
   createRenderRoot() {
@@ -30,9 +30,7 @@ export class JkGridView extends LitElement {
         >
           <jk-icon icon="folder-open" class="size-10 mb-3 opacity-40"></jk-icon>
 
-          <span class="text-sm">
-            ${this.t ? this.t("noServices") : "No services"}
-          </span>
+          <span class="text-sm"> ${this.t ? this.t('noServices') : 'No services'} </span>
         </div>
       `;
     }
@@ -97,4 +95,4 @@ export class JkGridView extends LitElement {
   }
 }
 
-customElements.define("jk-grid-view", JkGridView);
+customElements.define('jk-grid-view', JkGridView);

@@ -1,7 +1,7 @@
-import "./style.css";
-import "./app.js";
+import './style.css';
+import './app.js';
 
-import { registerSW } from "virtual:pwa-register";
+import { registerSW } from 'virtual:pwa-register';
 
 registerSW({
   immediate: true,

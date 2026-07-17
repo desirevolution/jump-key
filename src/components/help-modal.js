@@ -1,5 +1,5 @@
-import { LitElement, html } from "lit";
-import "./icon.js";
+import { LitElement, html } from 'lit';
+import './icon.js';
 
 export class JkHelpModal extends LitElement {
   createRenderRoot() {
@@ -21,9 +21,7 @@ export class JkHelpModal extends LitElement {
 
   _handleClose() {
     this.show = false; // Close locally
-    this.dispatchEvent(
-      new CustomEvent("close", { bubbles: true, composed: true }),
-    );
+    this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
   }
 
   render() {
@@ -31,43 +29,43 @@ export class JkHelpModal extends LitElement {
 
     const shortcuts = [
       {
-        keys: ["Space"],
-        desc: this.t("hkSearch"),
+        keys: ['Space'],
+        desc: this.t('hkSearch'),
       },
       {
-        keys: ["#"],
-        desc: this.t("hkToggleView"),
+        keys: ['#'],
+        desc: this.t('hkToggleView'),
       },
     ];
 
     if (!this.isGridView) {
       shortcuts.push({
-        keys: ["1", "-", "0"],
-        desc: this.t("hkFavs"),
+        keys: ['1', '-', '0'],
+        desc: this.t('hkFavs'),
       });
     }
 
     shortcuts.push(
       {
-        keys: ["A-Z"],
-        desc: this.t("hkCat"),
+        keys: ['A-Z'],
+        desc: this.t('hkCat'),
       },
       {
-        keys: ["A-Z"],
-        desc: this.t("hkService"),
+        keys: ['A-Z'],
+        desc: this.t('hkService'),
         context: true,
       },
       {
-        keys: [":"],
-        desc: this.t("hkSearchEngines"),
+        keys: [':'],
+        desc: this.t('hkSearchEngines'),
       },
       {
-        keys: ["↑", "↓"],
-        desc: this.t("hkNavigate"),
+        keys: ['↑', '↓'],
+        desc: this.t('hkNavigate'),
       },
       {
-        keys: ["ESC"],
-        desc: this.t("hkReset"),
+        keys: ['ESC'],
+        desc: this.t('hkReset'),
       },
     );
 
@@ -165,15 +163,11 @@ export class JkHelpModal extends LitElement {
                 text-white
               "
               >
-                ${this.t("helpTitle")}
+                ${this.t('helpTitle')}
               </h3>
             </div>
 
-            <jk-icon-button
-              icon="x"
-              label="Close"
-              @click=${this._handleClose}
-            ></jk-icon-button>
+            <jk-icon-button icon="x" label="Close" @click=${this._handleClose}></jk-icon-button>
           </div>
 
           <!-- Shortcuts -->
@@ -223,10 +217,10 @@ export class JkHelpModal extends LitElement {
                   "
                   >
                     ${
-                    item.context
-                      ? html`
-                          <span
-                            class="
+                      item.context
+                        ? html`
+                            <span
+                              class="
                               mr-1
 
                               rounded-lg
@@ -245,16 +239,16 @@ export class JkHelpModal extends LitElement {
 
                               text-indigo-300
                             "
-                          >
-                            ${this.t("contextInCat")}
-                          </span>
-                        `
-                      : ""
-                  }
+                            >
+                              ${this.t('contextInCat')}
+                            </span>
+                          `
+                        : ''
+                    }
                     ${item.keys.map(
-                    (key) => html`
-                      <kbd
-                        class="
+                      (key) => html`
+                        <kbd
+                          class="
                           inline-flex
                           items-center
                           justify-center
@@ -280,11 +274,11 @@ export class JkHelpModal extends LitElement {
                           shadow-inner
                           shadow-black/40
                         "
-                      >
-                        ${key}
-                      </kbd>
-                    `,
-                  )}
+                        >
+                          ${key}
+                        </kbd>
+                      `,
+                    )}
                   </div>
                 </div>
               `,
@@ -302,7 +296,7 @@ export class JkHelpModal extends LitElement {
             text-slate-500
           "
           >
-            ${this.t("helpExit")}
+            ${this.t('helpExit')}
           </div>
         </div>
       </div>
@@ -310,4 +304,4 @@ export class JkHelpModal extends LitElement {
   }
 }
 
-customElements.define("jk-help-modal", JkHelpModal);
+customElements.define('jk-help-modal', JkHelpModal);
