@@ -1,14 +1,14 @@
-import { LitElement, html } from "lit";
-import "./icon.js";
+import { LitElement, html } from 'lit';
+import './icon.js';
 
 export class JkDashboardSearchItem extends LitElement {
   createRenderRoot() {
-    return this; // Preserves global Tailwind styling classes
+    return this;
   }
 
   static properties = {
     active: { type: Boolean },
-    type: { type: String }, // 'engine' | 'preview' | 'service'
+    type: { type: String }, // engine | preview | service
     data: { type: Object },
     t: { type: Function },
   };
@@ -16,80 +16,209 @@ export class JkDashboardSearchItem extends LitElement {
   constructor() {
     super();
     this.active = false;
-    this.type = "service";
+    this.type = 'service';
     this.data = {};
     this.t = (key) => key;
   }
 
   render() {
-    // We apply consistent interactive utility styles for active states
-    const itemClasses = `w-full flex items-center justify-between p-4 rounded-xl text-left font-mono text-base ${
-      this.active
-        ? "search-item-active sm:bg-indigo-600 text-white"
-        : "hover:bg-slate-700/30 text-slate-300"
-    } active:bg-indigo-600 active:text-white`;
+    const itemClasses = `
+      group
+      relative
+      w-full
+      flex
+      items-center
+      justify-between
+      px-4
+      py-3
+      rounded-xl
+      border
+      transition-all
+      duration-200
+      text-left
+      overflow-hidden
+
+      ${
+        this.active
+          ? `
+            border-indigo-500/40
+            bg-gradient-to-r
+            from-indigo-500/15
+            via-slate-800
+            to-slate-900
+            shadow-lg
+            shadow-indigo-500/10
+          `
+          : `
+            border-transparent
+            hover:border-slate-700
+            hover:bg-slate-800/70
+          `
+      }
+    `;
 
     return html`
       <button class="${itemClasses}">
+        ${
+          this.active
+            ? html`
+                <div
+                  class="
+                  absolute
+                  left-0
+                  top-2
+                  bottom-2
+                  w-1
+                  rounded-r-full
+                  bg-indigo-500
+                "
+                ></div>
+              `
+            : ''
+        }
+
         <div class="flex items-center gap-3 min-w-0 grow">
           ${
             this.data.icon
               ? html`
-                  <jk-icon
-                    .icon=${this.data.icon}
-                    class="w-5 h-5 shrink-0 ${this.active ? "text-white" : "text-indigo-400"}"
-                  ></jk-icon>
+                  <div
+                    class="
+                    flex
+                    items-center
+                    justify-center
+                    size-10
+                    shrink-0
+                    rounded-lg
+                    bg-slate-700/60
+                    ring-1
+                    transition-all
+                    duration-200
+
+                    ${
+                      this.active
+                        ? `
+                          ring-indigo-500/40
+                          bg-indigo-500/20
+                          text-white
+                        `
+                        : `
+                          ring-slate-600/70
+                          text-indigo-400
+                          group-hover:text-white
+                          group-hover:bg-indigo-500/15
+                        `
+                    }
+                  "
+                  >
+                    <jk-icon .icon=${this.data.icon} class="size-5"></jk-icon>
+                  </div>
                 `
-              : ""
+              : ''
           }
 
-          <div class="min-w-0 text-sm sm:text-base">
-            ${this._renderContent()}
-          </div>
+          <div class="min-w-0 grow">${this._renderContent()}</div>
         </div>
-        <div class="flex items-center shrink-0 ml-3">${this._renderMeta()}</div>
+
+        <div class="ml-4 shrink-0">${this._renderMeta()}</div>
       </button>
     `;
   }
 
   _renderContent() {
     switch (this.type) {
-      case "engine":
+      case 'engine':
         return html`
-          <div class="flex items-center gap-2 min-w-0">
-            <span class="font-bold text-white shrink-0">${this.data.name}</span>
-            <span
-              class="truncate text-sm ${this.active ? "text-indigo-200" : "text-slate-500"}"
+          <div class="min-w-0">
+            <div
+              class="
+                truncate
+                text-base
+                font-semibold
+                tracking-tight
+                text-white
+              "
             >
-              (${this.data.url})
-            </span>
+              ${this.data.name}
+            </div>
+
+            <div
+              class="
+                mt-0.5
+                truncate
+                text-sm
+                text-slate-400
+              "
+            >
+              ${this.data.url}
+            </div>
           </div>
         `;
 
-      case "preview":
-        const terms = this.data.searchTerms?.trim() || "...";
+      case 'preview': {
+        const terms = this.data.searchTerms?.trim() || '...';
+
         return html`
-          <div class="truncate">
-            ${this.t("searchEnginePreviewPrefix")}
-            <span class="font-bold text-white">${this.data.name}</span>:
-            <span
-              class="italic ${this.active ? "text-indigo-100" : "text-indigo-300"}"
+          <div class="min-w-0">
+            <div
+              class="
+                text-sm
+                text-slate-400
+              "
             >
-              "${terms}"
-            </span>
+              ${this.t('searchEnginePreviewPrefix')}
+            </div>
+
+            <div
+              class="
+                truncate
+                mt-0.5
+                text-white
+              "
+            >
+              <span class="font-semibold">${this.data.name}</span>
+
+              <span
+                class="
+                  italic
+                  text-indigo-300
+                  ml-2
+                "
+              >
+                "${terms}"
+              </span>
+            </div>
           </div>
         `;
+      }
 
-      case "service":
+      case 'service':
       default:
         return html`
-          <div class="truncate">
-            <span class="font-medium block sm:inline text-white"
-              >${this.data.name}</span
+          <div class="min-w-0">
+            <div
+              class="
+                truncate
+                text-base
+                font-semibold
+                tracking-tight
+                text-white
+              "
             >
-            <span class="text-sm opacity-60 sm:ml-1"
-              >(${this.data.category})</span
+              ${this.data.name}
+            </div>
+
+            <div
+              class="
+                mt-0.5
+                truncate
+                text-xs
+                uppercase
+                tracking-widest
+                text-slate-500
+              "
             >
+              ${this.data.category}
+            </div>
           </div>
         `;
     }
@@ -97,33 +226,72 @@ export class JkDashboardSearchItem extends LitElement {
 
   _renderMeta() {
     switch (this.type) {
-      case "engine":
+      case 'engine':
         return html`
           <kbd
-            class="px-2 py-0.5 text-xs font-bold rounded shadow ${
-              this.active
-                ? "bg-indigo-700 text-white border-indigo-500"
-                : "bg-slate-900 border border-slate-700 text-indigo-400"
-            }"
+            class="
+              flex
+              items-center
+              justify-center
+              h-7
+              min-w-8
+              px-2
+              rounded-lg
+              border
+              text-xs
+              font-semibold
+              tracking-widest
+              uppercase
+
+              ${
+                this.active
+                  ? `
+                    border-indigo-500
+                    bg-indigo-500/20
+                    text-indigo-200
+                  `
+                  : `
+                    border-slate-600
+                    bg-slate-900/80
+                    text-slate-300
+                  `
+              }
+            "
           >
             :${this.data.prefix}
           </kbd>
         `;
 
-      case "preview":
-      case "service":
+      case 'preview':
+      case 'service':
       default:
         return this.active
           ? html`
-              <span
-                class="text-xs font-mono bg-indigo-700 px-2 py-0.5 rounded shadow hidden sm:inline"
+              <kbd
+                class="
+                  hidden
+                  sm:flex
+                  items-center
+                  justify-center
+                  h-7
+                  px-3
+                  rounded-lg
+                  border
+                  border-indigo-500
+                  bg-indigo-500/20
+                  text-xs
+                  font-semibold
+                  tracking-widest
+                  uppercase
+                  text-indigo-200
+                "
               >
                 Enter
-              </span>
+              </kbd>
             `
-          : "";
+          : '';
     }
   }
 }
 
-customElements.define("jk-dashboard-search-item", JkDashboardSearchItem);
+customElements.define('jk-dashboard-search-item', JkDashboardSearchItem);

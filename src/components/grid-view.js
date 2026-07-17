@@ -1,5 +1,5 @@
-import { LitElement, html } from "lit";
-import "./service-group.js";
+import { LitElement, html } from 'lit';
+import './service-group.js';
 
 export class JkGridView extends LitElement {
   createRenderRoot() {
@@ -14,15 +14,49 @@ export class JkGridView extends LitElement {
   };
 
   render() {
-    // Context A: Single selected active category layout
+    if (!this.categories || this.categories.length === 0) {
+      return html`
+        <div
+          class="
+            flex
+            flex-col
+            items-center
+            justify-center
+
+            py-16
+
+            text-slate-500
+          "
+        >
+          <jk-icon icon="folder-open" class="size-10 mb-3 opacity-40"></jk-icon>
+
+          <span class="text-sm"> ${this.t ? this.t('noServices') : 'No services'} </span>
+        </div>
+      `;
+    }
+
+    /*
+      Single Category Mode
+    */
+
     if (this.activeCategoryKey) {
       const activeGroup = this.categories.find(
-        (c) => c.categoryKey === this.activeCategoryKey,
+        (category) => category.categoryKey === this.activeCategoryKey,
       );
-      if (!activeGroup) return html``;
+
+      if (!activeGroup) {
+        return html``;
+      }
 
       return html`
-        <div class="animate-fadeIn">
+        <div
+          class="
+            animate-fadeIn
+
+            transition-all
+            duration-300
+          "
+        >
           <jk-service-group
             .title=${activeGroup.category}
             .icon=${activeGroup.icon}
@@ -33,9 +67,19 @@ export class JkGridView extends LitElement {
       `;
     }
 
-    // Context B: Full Expanded Grid layout across all categories
+    /*
+      Full Dashboard Mode
+    */
+
     return html`
-      <div class="space-y-6 animate-fadeIn">
+      <div
+        class="
+          space-y-5
+          sm:space-y-6
+
+          animate-fadeIn
+        "
+      >
         ${this.categories.map(
           (cat) => html`
             <jk-service-group
@@ -51,4 +95,4 @@ export class JkGridView extends LitElement {
   }
 }
 
-customElements.define("jk-grid-view", JkGridView);
+customElements.define('jk-grid-view', JkGridView);

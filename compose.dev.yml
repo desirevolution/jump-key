@@ -9,4 +9,4 @@ services:
       - ./config:/app/public/config
       - ./icons:/app/public/icons
     ports:
-      - "8080:8080"
+      - '8080:8080'

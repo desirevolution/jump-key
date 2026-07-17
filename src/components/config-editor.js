@@ -1,17 +1,17 @@
-import { LitElement, html } from "lit";
-import { validateConfig } from "../utils/config-validator.js";
+import { LitElement, html } from 'lit';
+import { validateConfig } from '../utils/config-validator.js';
 
-import { createEditor } from "prism-code-editor";
-import { matchBrackets } from "prism-code-editor/match-brackets";
-import { defaultCommands, addEditorHotkey } from "prism-code-editor/commands";
-import { highlightBracketPairs } from "prism-code-editor/highlight-brackets";
-import { indentGuides } from "prism-code-editor/guides";
+import { createEditor } from 'prism-code-editor';
+import { matchBrackets } from 'prism-code-editor/match-brackets';
+import { defaultCommands, addEditorHotkey } from 'prism-code-editor/commands';
+import { highlightBracketPairs } from 'prism-code-editor/highlight-brackets';
+import { indentGuides } from 'prism-code-editor/guides';
 
-import "prism-code-editor/layout.css";
-import "prism-code-editor/guides.css";
-import "prism-code-editor/prism/languages/json";
-import "prism-code-editor/themes/night-owl.css";
-import { cursorPosition } from "prism-code-editor/cursor";
+import 'prism-code-editor/layout.css';
+import 'prism-code-editor/guides.css';
+import 'prism-code-editor/prism/languages/json';
+import '../styles/jump-key-dark.css';
+import { cursorPosition } from 'prism-code-editor/cursor';
 
 export class JkConfigEditor extends LitElement {
   createRenderRoot() {
@@ -26,8 +26,8 @@ export class JkConfigEditor extends LitElement {
 
   constructor() {
     super();
-    this.value = "";
-    this.originalValue = "";
+    this.value = '';
+    this.originalValue = '';
     this.isValid = true;
     this._editorInstance = null;
   }
@@ -47,24 +47,24 @@ export class JkConfigEditor extends LitElement {
     const lineHeight = parseFloat(style.lineHeight);
     console.error(clientHeight);
     console.error(lineHeight);
-    const editorWrapper = editor.textarea.closest(".prism-code-editor");
+    const editorWrapper = editor.textarea.closest('.prism-code-editor');
     const korrekteHoehe = editorWrapper.clientHeight;
 
     return Math.floor(clientHeight / lineHeight);
   }
 
   initEditor() {
-    const container = this.querySelector("#editorContainer");
+    const container = this.querySelector('#editorContainer');
     if (!container) return;
 
-    container.innerHTML = "";
+    container.innerHTML = '';
 
     this._editorInstance = createEditor(
       container,
       {
         value: this.value,
-        language: "json",
-        theme: "night-owl",
+        language: 'json',
+        theme: 'jump-key-dark',
         onUpdate: (val) => {
           this.value = val;
           let valid = false;
@@ -79,7 +79,7 @@ export class JkConfigEditor extends LitElement {
 
           // Event an Modal senden, damit dieses über Änderungen Bescheid weiß
           this.dispatchEvent(
-            new CustomEvent("editor-change", {
+            new CustomEvent('editor-change', {
               detail: {
                 value: val,
                 isValid: valid,
@@ -104,12 +104,16 @@ export class JkConfigEditor extends LitElement {
     );
 
     const editor = this._editorInstance;
+
+    /*
     addEditorHotkey(editor, "PageDown", () => {
-      editor.container.scrollBy(0, 1);
-      requestAnimationFrame(() => {
-        this._editorInstance?.textarea?.focus();
-      });
-    });
+    editor.textarea.dispatchEvent(
+    new KeyboardEvent("keydown", {
+      key: "PageDown",
+      bubbles: true,
+    }),
+  );
+    });*/
     /*
     const rows = this.editorRows(editor);
     addEditorHotkey(editor, "PageUp", () =>
@@ -123,22 +127,31 @@ export class JkConfigEditor extends LitElement {
 
   render() {
     return html`
-      <div id="test">
-        <style>
-          height: 300px; /* oder max-height: 300px; */
-          overflow: auto; /* Wichtig, damit Scrollbalken erscheinen */
-        </style>
-        <div
-          id="editorContainer"
-          class="w-full h-full rounded-xl overflow-hidden bg-slate-900 border ${
-            this.isValid
-              ? "border-slate-700 focus-within:border-indigo-500"
-              : "border-rose-500 focus-within:border-rose-500"
-          } transition-colors"
-        ></div>
-      </div>
+      <div
+        id="editorContainer"
+        class="
+w-full
+h-full
+rounded-xl
+overflow-hidden
+
+bg-slate-950
+
+border
+
+shadow-inner
+
+${
+  this.isValid
+    ? 'border-slate-700 focus-within:border-indigo-500'
+    : 'border-rose-500 focus-within:border-rose-500'
+}
+
+transition-colors
+"
+      ></div>
     `;
   }
 }
 
-customElements.define("jk-config-editor", JkConfigEditor);
+customElements.define('jk-config-editor', JkConfigEditor);

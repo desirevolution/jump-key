@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 .animate-fadeIn {
   animation: fadeIn 0.12s ease-out forwards;

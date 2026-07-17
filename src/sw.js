@@ -1,19 +1,19 @@
 /// <reference lib="webworker" />
 
-import { clientsClaim } from "workbox-core";
+import { clientsClaim } from 'workbox-core';
 import {
   cleanupOutdatedCaches,
   createHandlerBoundToURL,
   precacheAndRoute,
-} from "workbox-precaching";
+} from 'workbox-precaching';
 
-import { NavigationRoute, registerRoute } from "workbox-routing";
+import { NavigationRoute, registerRoute } from 'workbox-routing';
 
-import { CacheFirst, NetworkFirst } from "workbox-strategies";
+import { CacheFirst, NetworkFirst } from 'workbox-strategies';
 
-import { CacheableResponsePlugin } from "workbox-cacheable-response";
+import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 
-import { ExpirationPlugin } from "workbox-expiration";
+import { ExpirationPlugin } from 'workbox-expiration';
 
 self.skipWaiting();
 clientsClaim();
@@ -26,9 +26,7 @@ precacheAndRoute(self.__WB_MANIFEST);
 //
 // SPA-Navigation immer aus dem Precache
 //
-const navigationHandler = createHandlerBoundToURL(
-  import.meta.env.BASE_URL + "index.html",
-);
+const navigationHandler = createHandlerBoundToURL(import.meta.env.BASE_URL + 'index.html');
 
 registerRoute(new NavigationRoute(navigationHandler));
 
@@ -36,10 +34,10 @@ registerRoute(new NavigationRoute(navigationHandler));
 // Bilder
 //
 registerRoute(
-  ({ request }) => request.destination === "image",
+  ({ request }) => request.destination === 'image',
 
   new CacheFirst({
-    cacheName: "images",
+    cacheName: 'images',
 
     plugins: [
       new ExpirationPlugin({
@@ -54,10 +52,10 @@ registerRoute(
 // Fonts
 //
 registerRoute(
-  ({ request }) => request.destination === "font",
+  ({ request }) => request.destination === 'font',
 
   new CacheFirst({
-    cacheName: "fonts",
+    cacheName: 'fonts',
   }),
 );
 
@@ -70,15 +68,15 @@ registerRoute(
 // Offline -> Cache verwenden
 //
 registerRoute(
-  ({ url }) => url.pathname.endsWith("/config/services.json"),
+  ({ url }) => url.pathname.endsWith('/config/services.json'),
 
   new NetworkFirst({
-    cacheName: "services",
+    cacheName: 'services',
 
     networkTimeoutSeconds: 3,
 
     fetchOptions: {
-      cache: "reload",
+      cache: 'reload',
     },
 
     plugins: [
@@ -96,7 +94,7 @@ registerRoute(
       {
         async fetchDidSucceed({ response }) {
           if (response.status >= 500) {
-            throw new Error("Server Error");
+            throw new Error('Server Error');
           }
 
           return response;

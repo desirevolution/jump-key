@@ -1,48 +1,70 @@
-import { LitElement, html } from "lit";
-import { unsafeSVG } from "lit/directives/unsafe-svg.js";
-import { createIcons, icons } from "lucide";
+import { LitElement, html } from 'lit';
+import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
+import { createIcons, icons } from 'lucide';
 
 createIcons({ icons });
 
-class JkIcon extends LitElement {
+export class JkIcon extends LitElement {
   static properties = {
     icon: { type: String },
+    alt: { type: String },
   };
+
+  constructor() {
+    super();
+
+    this.icon = '';
+    this.alt = '';
+  }
 
   createRenderRoot() {
     return this;
   }
 
   render() {
-    const isUrl = /^https?:\/\//i.test(this.icon);
-    const isImageFile = /\.(png|jpe?g|svg|webp)$/i.test(this.icon);
+    if (!this.icon) {
+      return html``;
+    }
+
+    const isUrl = /^https?:\/\/|^\//i.test(this.icon);
+
+    const isImageFile = /\.(png|jpe?g|svg|webp|gif)$/i.test(this.icon);
 
     if (isUrl || isImageFile) {
-      const imgSrc = isUrl ? this.icon : `./icons/${this.icon}`;
+      const src = isUrl ? this.icon : `./icons/${this.icon}`;
 
       return html`
-        <img src="${imgSrc}" alt="" class="${this.svgClass} object-contain" />
+        <img
+          src=${src}
+          alt=${this.alt}
+          class="
+            block
+            object-contain
+            ${this.className}
+          "
+        />
       `;
     }
-    const node = this.icon && icons[this.toPascalCase(this.icon)];
 
-    if (!node) {
-      return null;
+    const iconNode = icons[this.toPascalCase(this.icon)];
+
+    if (!iconNode) {
+      return html``;
     }
 
-    return html`${unsafeSVG(this.renderIcon(node))}`;
+    return html` ${unsafeSVG(this.renderIcon(iconNode))} `;
   }
 
   renderIcon(node) {
     const children = node
       .map(([tag, attrs]) => {
         const attributes = Object.entries(attrs)
-          .map(([k, v]) => `${k}="${v}"`)
-          .join(" ");
+          .map(([key, value]) => `${key}="${value}"`)
+          .join(' ');
 
         return `<${tag} ${attributes}></${tag}>`;
       })
-      .join("");
+      .join('');
 
     return `
       <svg
@@ -53,26 +75,23 @@ class JkIcon extends LitElement {
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="${this.svgClass}"
+        class="${this.className}"
       >
         ${children}
       </svg>
     `;
   }
 
-  get svgClass() {
-    if (!this.className.trim()) {
-      return "w-6 h-6";
-    }
-    return `${this.className}`;
+  get className() {
+    return this.getAttribute('class') || 'size-6';
   }
 
   toPascalCase(name) {
     return name
-      .split("-")
-      .map((p) => p[0].toUpperCase() + p.slice(1))
-      .join("");
+      .split('-')
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join('');
   }
 }
 
-customElements.define("jk-icon", JkIcon);
+customElements.define('jk-icon', JkIcon);
