@@ -120,7 +120,8 @@ export const translations = {
     tabEditorgSaveFailedTitle: "Save Failed",
     tabEditorSaveFailed: "Could not write the changes to services.json.",
     tabEditorDiscardChangesTitle: "Unsaved Changes",
-    tabEditorDiscardChangesMsg: "You have unsaved changes. Do you really want to discard them?",
+    tabEditorDiscardChangesMsg:
+      "You have unsaved changes. Do you really want to discard them?",
     tabEditorDiscardChangesConfirm: "Discard changes",
     tabEditorDiscardChangesCancel: "Continue editing",
   },
