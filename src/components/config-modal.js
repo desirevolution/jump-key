@@ -347,10 +347,10 @@ export class JkConfigModal extends LitElement {
             "
             >
               ${
-              this._activeTab === "editor"
-                ? html`
-                    <div
-                      class="
+                this._activeTab === "editor"
+                  ? html`
+                      <div
+                        class="
                         flex
                         items-center
                         gap-2
@@ -376,28 +376,28 @@ export class JkConfigModal extends LitElement {
                             `
                         }
                       "
-                    >
-                      <jk-icon
-                        .icon="${
+                      >
+                        <jk-icon
+                          .icon="${
                           this._isEditorConfigValid
                             ? "circle-check"
                             : "triangle-alert"
                         }"
-                        class="size-4"
-                      ></jk-icon>
+                          class="size-4"
+                        ></jk-icon>
 
-                      <span
-                        class="
+                        <span
+                          class="
                           text-xs
                           font-medium
                         "
-                      >
-                        ${this._isEditorConfigValid ? "Valid" : "Invalid"}
-                      </span>
-                    </div>
-                  `
-                : ""
-            }
+                        >
+                          ${this._isEditorConfigValid ? "Valid" : "Invalid"}
+                        </span>
+                      </div>
+                    `
+                  : ""
+              }
 
               <jk-icon-button
                 icon="x"
@@ -579,13 +579,13 @@ export class JkConfigModal extends LitElement {
           "
           >
             ${
-            this._activeTab === "editor"
-              ? html`
-                  <button
-                    type="button"
-                    id="cancelModalBtn"
-                    @click="${this._handleClose}"
-                    class="
+              this._activeTab === "editor"
+                ? html`
+                    <button
+                      type="button"
+                      id="cancelModalBtn"
+                      @click="${this._handleClose}"
+                      class="
                       px-5
                       py-2.5
 
@@ -606,19 +606,19 @@ export class JkConfigModal extends LitElement {
 
                       transition-all
                     "
-                  >
-                    ${this.t("editConfigCancel") || "Cancel"}
-                  </button>
+                    >
+                      ${this.t("editConfigCancel") || "Cancel"}
+                    </button>
 
-                  <button
-                    type="button"
-                    id="saveModalBtn"
-                    @click="${this._handleSave}"
-                    ?disabled="${
+                    <button
+                      type="button"
+                      id="saveModalBtn"
+                      @click="${this._handleSave}"
+                      ?disabled="${
                       !this._isEditorConfigValid ||
                       !this._hasEditorConfigChanged
                     }"
-                    class="
+                      class="
                       px-5
                       py-2.5
 
@@ -648,15 +648,15 @@ export class JkConfigModal extends LitElement {
                           `
                       }
                     "
-                  >
-                    ${this.t("editConfigSave") || "Save"}
-                  </button>
-                `
-              : html`
-                  <button
-                    type="button"
-                    @click="${this._handleClose}"
-                    class="
+                    >
+                      ${this.t("editConfigSave") || "Save"}
+                    </button>
+                  `
+                : html`
+                    <button
+                      type="button"
+                      @click="${this._handleClose}"
+                      class="
                       px-5
                       py-2.5
 
@@ -675,11 +675,11 @@ export class JkConfigModal extends LitElement {
 
                       hover:bg-slate-700
                     "
-                  >
-                    ${this.t("close") || "Close"}
-                  </button>
-                `
-          }
+                    >
+                      ${this.t("close") || "Close"}
+                    </button>
+                  `
+            }
           </div>
         </div>
 

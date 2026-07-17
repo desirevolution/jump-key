@@ -219,12 +219,12 @@ export class JkDialog extends LitElement {
           "
           >
             ${
-            this.variant === "confirm"
-              ? html`
-                  <button
-                    id="cancelBtn"
-                    @click=${this._handleCancel}
-                    class="
+              this.variant === "confirm"
+                ? html`
+                    <button
+                      id="cancelBtn"
+                      @click=${this._handleCancel}
+                      class="
                       rounded-xl
                       border
                       border-slate-600
@@ -242,12 +242,12 @@ export class JkDialog extends LitElement {
                       focus:ring-2
                       focus:ring-indigo-500/30
                     "
-                  >
-                    ${this.cancelLabel}
-                  </button>
-                `
-              : ""
-          }
+                    >
+                      ${this.cancelLabel}
+                    </button>
+                  `
+                : ""
+            }
 
             <button
               id="confirmBtn"

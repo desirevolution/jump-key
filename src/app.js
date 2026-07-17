@@ -518,8 +518,8 @@ class DashboardApp extends LitElement {
         cancelLabel="${this.t("cancel")}"
         @confirm=${this._confirmClearFavorites}
         @cancel=${() => {
-        this.showClearFavoritesDialog = false;
-      }}
+          this.showClearFavoritesDialog = false;
+        }}
       ></jk-dialog>
     `;
   }
@@ -634,17 +634,20 @@ class DashboardApp extends LitElement {
         </kbd>
 
         ${
-        this.isValidInput
-          ? html`
-              <jk-icon icon="check" class="w-4 h-4 text-emerald-400"></jk-icon>
-            `
-          : ""
-      }
+          this.isValidInput
+            ? html`
+                <jk-icon
+                  icon="check"
+                  class="w-4 h-4 text-emerald-400"
+                ></jk-icon>
+              `
+            : ""
+        }
         ${
-        this.isInvalidInput
-          ? html` <jk-icon icon="x" class="w-4 h-4 text-rose-400"></jk-icon> `
-          : ""
-      }
+          this.isInvalidInput
+            ? html` <jk-icon icon="x" class="w-4 h-4 text-rose-400"></jk-icon> `
+            : ""
+        }
       </div>
     `;
   }
@@ -688,12 +691,12 @@ class DashboardApp extends LitElement {
         .lang=${this.lang}
         .t=${(key) => this.t(key)}
         @open-help=${() => {
-        this.showHelp = true;
-      }}
+          this.showHelp = true;
+        }}
         @open-search=${this.openSearch}
         @open-config=${() => {
-        this.showConfigModal = true;
-      }}
+          this.showConfigModal = true;
+        }}
         @toggle-view=${this.toggleViewMode}
       ></jk-dashboard-header>
 
@@ -707,27 +710,27 @@ class DashboardApp extends LitElement {
       "
       >
         ${
-        showMain && !this.isGridView
-          ? html`
-              <!-- Favorites -->
-              <jk-favorites-view
-                .favorites=${favs}
-                .t=${(key) => this.t(key)}
-                @service-click=${(e) => this.trackClick(e.detail.service)}
-                @clear-favorites=${this.clearFavorites}
-              ></jk-favorites-view>
+          showMain && !this.isGridView
+            ? html`
+                <!-- Favorites -->
+                <jk-favorites-view
+                  .favorites=${favs}
+                  .t=${(key) => this.t(key)}
+                  @service-click=${(e) => this.trackClick(e.detail.service)}
+                  @clear-favorites=${this.clearFavorites}
+                ></jk-favorites-view>
 
-              <!-- Categories -->
-              <jk-service-group
-                title="${this.t("categories")}"
-                icon="folder"
-                .services=${this.categories.map((cat) => ({
+                <!-- Categories -->
+                <jk-service-group
+                  title="${this.t("categories")}"
+                  icon="folder"
+                  .services=${this.categories.map((cat) => ({
                   name: cat.category,
                   url: `${cat.services?.length ?? 0} Services`,
                   icon: cat.icon,
                   key: cat.categoryKey,
                 }))}
-                @service-click=${(e) => {
+                  @service-click=${(e) => {
                   const key = e.detail.service.key;
 
                   this.activeCategoryKey = key;
@@ -741,18 +744,18 @@ class DashboardApp extends LitElement {
                     "",
                   );
                 }}
-              ></jk-service-group>
-            `
-          : html`
-              <!-- Grid / Category Detail View -->
-              <jk-grid-view
-                .categories=${this.categories}
-                .activeCategoryKey=${this.activeCategoryKey}
-                .t=${(key) => this.t(key)}
-                @service-click=${(e) => this.trackClick(e.detail.service)}
-              ></jk-grid-view>
-            `
-      }
+                ></jk-service-group>
+              `
+            : html`
+                <!-- Grid / Category Detail View -->
+                <jk-grid-view
+                  .categories=${this.categories}
+                  .activeCategoryKey=${this.activeCategoryKey}
+                  .t=${(key) => this.t(key)}
+                  @service-click=${(e) => this.trackClick(e.detail.service)}
+                ></jk-grid-view>
+              `
+        }
       </main>
     `;
   }

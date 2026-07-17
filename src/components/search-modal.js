@@ -325,16 +325,16 @@ export class JkSearchModal extends LitElement {
             </form>
 
             ${
-            showQuickTrigger
-              ? html`
-                  <jk-icon-button
-                    icon="globe"
-                    title="Search engines"
-                    @click=${() => this._selectEngine("")}
-                  ></jk-icon-button>
-                `
-              : ""
-          }
+              showQuickTrigger
+                ? html`
+                    <jk-icon-button
+                      icon="globe"
+                      title="Search engines"
+                      @click=${() => this._selectEngine("")}
+                    ></jk-icon-button>
+                  `
+                : ""
+            }
 
             <jk-icon-button
               icon="x"
@@ -355,10 +355,10 @@ export class JkSearchModal extends LitElement {
           "
           >
             ${
-            (showAllEngines || isFilteringEngines) && items.length > 0
-              ? html`
-                  <div
-                    class="
+              (showAllEngines || isFilteringEngines) && items.length > 0
+                ? html`
+                    <div
+                      class="
                       px-3
                       pt-2
                       pb-1
@@ -373,18 +373,18 @@ export class JkSearchModal extends LitElement {
 
                       text-slate-500
                     "
-                  >
-                    ${this.t("searchEnginesTitle")}
-                  </div>
-                `
-              : ""
-          }
+                    >
+                      ${this.t("searchEnginesTitle")}
+                    </div>
+                  `
+                : ""
+            }
             ${items.map((item, i) => item.render(i === this.selectedIndex))}
             ${
-            this.searchQuery && items.length === 0
-              ? html`
-                  <div
-                    class="
+              this.searchQuery && items.length === 0
+                ? html`
+                    <div
+                      class="
                       flex
                       flex-col
                       items-center
@@ -394,17 +394,17 @@ export class JkSearchModal extends LitElement {
 
                       text-slate-500
                     "
-                  >
-                    <jk-icon
-                      icon="search-x"
-                      class="size-8 mb-3 opacity-50"
-                    ></jk-icon>
+                    >
+                      <jk-icon
+                        icon="search-x"
+                        class="size-8 mb-3 opacity-50"
+                      ></jk-icon>
 
-                    <span class="text-sm"> ${this.t("noServices")} </span>
-                  </div>
-                `
-              : ""
-          }
+                      <span class="text-sm"> ${this.t("noServices")} </span>
+                    </div>
+                  `
+                : ""
+            }
           </div>
         </div>
       </div>

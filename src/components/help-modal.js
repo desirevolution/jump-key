@@ -184,9 +184,9 @@ export class JkHelpModal extends LitElement {
           "
           >
             ${shortcuts.map(
-            (item) => html`
-              <div
-                class="
+              (item) => html`
+                <div
+                  class="
                   flex
                   items-center
                   justify-between
@@ -202,27 +202,27 @@ export class JkHelpModal extends LitElement {
 
                   hover:bg-slate-800/60
                 "
-              >
-                <span
-                  class="
+                >
+                  <span
+                    class="
                     text-sm
 
                     text-slate-400
                   "
-                >
-                  ${item.desc}
-                </span>
+                  >
+                    ${item.desc}
+                  </span>
 
-                <div
-                  class="
+                  <div
+                    class="
                     flex
                     items-center
                     gap-1
 
                     shrink-0
                   "
-                >
-                  ${
+                  >
+                    ${
                     item.context
                       ? html`
                           <span
@@ -251,7 +251,7 @@ export class JkHelpModal extends LitElement {
                         `
                       : ""
                   }
-                  ${item.keys.map(
+                    ${item.keys.map(
                     (key) => html`
                       <kbd
                         class="
@@ -285,10 +285,10 @@ export class JkHelpModal extends LitElement {
                       </kbd>
                     `,
                   )}
+                  </div>
                 </div>
-              </div>
-            `,
-          )}
+              `,
+            )}
           </div>
 
           <div
