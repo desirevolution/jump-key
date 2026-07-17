@@ -211,8 +211,9 @@ export class JkServiceCard extends LitElement {
                     uppercase
                     transition-all
                     duration-300
-                    ${this.isFavorite
-                      ? `
+                    ${
+                      this.isFavorite
+                        ? `
                         border border-indigo-500
                         bg-indigo-500/20
                         text-indigo-200
@@ -220,13 +221,14 @@ export class JkServiceCard extends LitElement {
                         shadow-indigo-500/20
                         group-hover:bg-indigo-500/30
                       `
-                      : `
+                        : `
                         border border-slate-600
                         bg-slate-900/80
                         text-slate-300
                         group-hover:border-indigo-500/40
                         group-hover:text-indigo-300
-                      `}
+                      `
+                    }
                   "
                 >
                   ${this.badgeText.toUpperCase()}

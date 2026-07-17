@@ -218,14 +218,13 @@ export class JkConfigModal extends LitElement {
     }
   }
 
-render() {
-  if (!this.show) return html``;
+  render() {
+    if (!this.show) return html``;
 
-  return html`
-
-    <div
-      @click="${this._handleClose}"
-      class="
+    return html`
+      <div
+        @click="${this._handleClose}"
+        class="
         fixed
         inset-0
 
@@ -243,12 +242,10 @@ render() {
 
         animate-fadeIn
       "
-    >
-
-      <div
-        @click="${(e) => e.stopPropagation()}"
-
-        class="
+      >
+        <div
+          @click="${(e) => e.stopPropagation()}"
+          class="
           w-full
           max-w-7xl
 
@@ -271,13 +268,11 @@ render() {
           p-5
           sm:p-6
         "
-      >
+        >
+          <!-- Header -->
 
-
-        <!-- Header -->
-
-        <div
-          class="
+          <div
+            class="
             flex
             items-center
             justify-between
@@ -288,18 +283,16 @@ render() {
             border-b
             border-slate-700/50
           "
-        >
-
-          <div
-            class="
+          >
+            <div
+              class="
               flex
               items-center
               gap-3
             "
-          >
-
-            <div
-              class="
+            >
+              <div
+                class="
                 flex
                 items-center
                 justify-center
@@ -313,61 +306,49 @@ render() {
                 ring-1
                 ring-indigo-500/20
               "
-            >
-
-              <jk-icon
-                icon="settings-2"
-
-                class="
+              >
+                <jk-icon
+                  icon="settings-2"
+                  class="
                   size-5
 
                   text-indigo-300
                 "
-              ></jk-icon>
+                ></jk-icon>
+              </div>
 
-            </div>
-
-
-            <div>
-
-              <h2
-                class="
+              <div>
+                <h2
+                  class="
                   text-base
                   font-semibold
                   text-white
                 "
-              >
-                ${this.t("dashboardSettings") || "Dashboard Settings"}
-              </h2>
+                >
+                  ${this.t("dashboardSettings") || "Dashboard Settings"}
+                </h2>
 
-
-              <p
-                class="
+                <p
+                  class="
                   text-xs
                   text-slate-500
                 "
-              >
-                Configuration & Backup
-              </p>
-
+                >
+                  Configuration & Backup
+                </p>
+              </div>
             </div>
 
-          </div>
-
-
-
-          <div
-            class="
+            <div
+              class="
               flex
               items-center
               gap-2
             "
-          >
-
-            ${
+            >
+              ${
               this._activeTab === "editor"
                 ? html`
-
                     <div
                       class="
                         flex
@@ -396,15 +377,14 @@ render() {
                         }
                       "
                     >
-
                       <jk-icon
-                        .icon="${this._isEditorConfigValid
-                          ? "circle-check"
-                          : "triangle-alert"}"
-
+                        .icon="${
+                          this._isEditorConfigValid
+                            ? "circle-check"
+                            : "triangle-alert"
+                        }"
                         class="size-4"
                       ></jk-icon>
-
 
                       <span
                         class="
@@ -412,40 +392,25 @@ render() {
                           font-medium
                         "
                       >
-                        ${
-                          this._isEditorConfigValid
-                            ? "Valid"
-                            : "Invalid"
-                        }
+                        ${this._isEditorConfigValid ? "Valid" : "Invalid"}
                       </span>
-
                     </div>
-
                   `
                 : ""
             }
 
-
-            <jk-icon-button
-              icon="x"
-
-              label="Close"
-
-              @click="${this._handleClose}"
-            ></jk-icon-button>
-
-
+              <jk-icon-button
+                icon="x"
+                label="Close"
+                @click="${this._handleClose}"
+              ></jk-icon-button>
+            </div>
           </div>
 
-        </div>
+          <!-- Main Area -->
 
-
-
-
-        <!-- Main Area -->
-
-        <div
-          class="
+          <div
+            class="
             flex
             flex-1
 
@@ -453,13 +418,11 @@ render() {
 
             min-h-0
           "
-        >
+          >
+            <!-- Navigation -->
 
-
-          <!-- Navigation -->
-
-          <aside
-            class="
+            <aside
+              class="
               w-52
 
               shrink-0
@@ -469,16 +432,11 @@ render() {
 
               gap-2
             "
-          >
-
-
-            <button
-
-              @click="${() => this._setActiveTab("data")}"
-
-              title="Ctrl + 1"
-
-              class="
+            >
+              <button
+                @click="${() => this._setActiveTab("data")}"
+                title="Ctrl + 1"
+                class="
                 flex
                 items-center
                 gap-3
@@ -511,19 +469,13 @@ render() {
                     `
                 }
               "
-            >
+              >
+                <jk-icon icon="database" class="size-4"></jk-icon>
 
-              <jk-icon
-                icon="database"
+                ${this.t("tabData")}
 
-                class="size-4"
-              ></jk-icon>
-
-
-              ${this.t("tabData")}
-
-              <kbd
-                class="
+                <kbd
+                  class="
                   ml-auto
 
                   hidden
@@ -533,21 +485,15 @@ render() {
 
                   text-slate-500
                 "
-              >
-                1
-              </kbd>
+                >
+                  1
+                </kbd>
+              </button>
 
-            </button>
-
-
-
-            <button
-
-              @click="${() => this._setActiveTab("editor")}"
-
-              title="Ctrl + 2"
-
-              class="
+              <button
+                @click="${() => this._setActiveTab("editor")}"
+                title="Ctrl + 2"
+                class="
                 flex
                 items-center
                 gap-3
@@ -580,20 +526,13 @@ render() {
                     `
                 }
               "
-            >
+              >
+                <jk-icon icon="code-2" class="size-4"></jk-icon>
 
-              <jk-icon
-                icon="code-2"
+                ${this.t("tabEditor") || "JSON Editor"}
 
-                class="size-4"
-              ></jk-icon>
-
-
-              ${this.t("tabEditor") || "JSON Editor"}
-
-
-              <kbd
-                class="
+                <kbd
+                  class="
                   ml-auto
 
                   hidden
@@ -603,45 +542,31 @@ render() {
 
                   text-slate-500
                 "
-              >
-                2
-              </kbd>
+                >
+                  2
+                </kbd>
+              </button>
+            </aside>
 
+            <!-- Content -->
 
-            </button>
-
-
-          </aside>
-
-
-
-
-          <!-- Content -->
-
-          <main
-            class="
+            <main
+              class="
               flex-1
 
               min-w-0
 
               overflow-hidden
             "
-          >
+            >
+              ${this._renderActiveTabContent()}
+            </main>
+          </div>
 
-            ${this._renderActiveTabContent()}
+          <!-- Footer -->
 
-          </main>
-
-
-        </div>
-
-
-
-
-        <!-- Footer -->
-
-        <div
-          class="
+          <div
+            class="
             flex
             justify-end
             gap-3
@@ -652,19 +577,14 @@ render() {
             border-t
             border-slate-700/50
           "
-        >
-
-          ${
+          >
+            ${
             this._activeTab === "editor"
               ? html`
-
                   <button
                     type="button"
-
                     id="cancelModalBtn"
-
                     @click="${this._handleClose}"
-
                     class="
                       px-5
                       py-2.5
@@ -690,18 +610,14 @@ render() {
                     ${this.t("editConfigCancel") || "Cancel"}
                   </button>
 
-
-
                   <button
                     type="button"
-
                     id="saveModalBtn"
-
                     @click="${this._handleSave}"
-
-                    ?disabled="${!this._isEditorConfigValid ||
-                    !this._hasEditorConfigChanged}"
-
+                    ?disabled="${
+                      !this._isEditorConfigValid ||
+                      !this._hasEditorConfigChanged
+                    }"
                     class="
                       px-5
                       py-2.5
@@ -735,15 +651,11 @@ render() {
                   >
                     ${this.t("editConfigSave") || "Save"}
                   </button>
-
                 `
               : html`
-
                   <button
                     type="button"
-
                     @click="${this._handleClose}"
-
                     class="
                       px-5
                       py-2.5
@@ -766,42 +678,25 @@ render() {
                   >
                     ${this.t("close") || "Close"}
                   </button>
-
                 `
           }
-
+          </div>
         </div>
 
-
+        <jk-dialog
+          .show="${this._showDiscardDialog}"
+          title="${this.t("tabEditorDiscardChangesTitle")}"
+          message="${this.t("tabEditorDiscardChangesMsg")}"
+          icon="triangle-alert"
+          iconColor="text-rose-400"
+          confirmLabel="${this.t("tabEditorDiscardChangesConfirm")}"
+          cancelLabel="${this.t("tabEditorDiscardChangesCancel")}"
+          @confirm="${this._forceClose}"
+          @cancel="${() => (this._showDiscardDialog = false)}"
+        ></jk-dialog>
       </div>
-
-
-
-      <jk-dialog
-        .show="${this._showDiscardDialog}"
-
-        title="${this.t("tabEditorDiscardChangesTitle")}"
-
-        message="${this.t("tabEditorDiscardChangesMsg")}"
-
-        icon="triangle-alert"
-
-        iconColor="text-rose-400"
-
-        confirmLabel="${this.t("tabEditorDiscardChangesConfirm")}"
-
-        cancelLabel="${this.t("tabEditorDiscardChangesCancel")}"
-
-        @confirm="${this._forceClose}"
-
-        @cancel="${() => (this._showDiscardDialog = false)}"
-      ></jk-dialog>
-
-
-    </div>
-
-  `;
-}
+    `;
+  }
 }
 
 customElements.define("jk-config-modal", JkConfigModal);

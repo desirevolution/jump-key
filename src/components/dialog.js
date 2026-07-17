@@ -109,23 +109,23 @@ export class JkDialog extends LitElement {
     this.show = false;
   }
 
-render() {
-  if (!this.show) return html``;
+  render() {
+    if (!this.show) return html``;
 
-  return html`
-    <div
-      @click=${this._handleCancel}
-      class="
+    return html`
+      <div
+        @click=${this._handleCancel}
+        class="
         fixed inset-0 z-[100]
         flex items-center justify-center
         bg-slate-950/80
         backdrop-blur-md
         p-6
       "
-    >
-      <div
-        @click=${(e) => e.stopPropagation()}
-        class="
+      >
+        <div
+          @click=${(e) => e.stopPropagation()}
+          class="
           relative
           w-full
           max-w-lg
@@ -139,22 +139,22 @@ render() {
           shadow-2xl
           shadow-black/40
         "
-      >
-        <!-- Header -->
+        >
+          <!-- Header -->
 
-        <div
-          class="
+          <div
+            class="
             flex
             items-start
             gap-4
             p-6
             pb-5
           "
-        >
-          <!-- Icon -->
+          >
+            <!-- Icon -->
 
-          <div
-            class="
+            <div
+              class="
               flex
               items-center
               justify-center
@@ -166,54 +166,48 @@ render() {
               ring-slate-600/70
               ${this.iconColor}
             "
-          >
-            <jk-icon
-              .icon=${this.icon}
-              class="size-6"
-            ></jk-icon>
-          </div>
+            >
+              <jk-icon .icon=${this.icon} class="size-6"></jk-icon>
+            </div>
 
-          <!-- Title + Message -->
+            <!-- Title + Message -->
 
-          <div class="grow min-w-0">
-
-            <h2
-              class="
+            <div class="grow min-w-0">
+              <h2
+                class="
                 text-xl
                 font-semibold
                 tracking-tight
                 text-white
               "
-            >
-              ${this.title}
-            </h2>
+              >
+                ${this.title}
+              </h2>
 
-            <p
-              class="
+              <p
+                class="
                 mt-2
                 text-sm
                 leading-6
                 text-slate-300
               "
-            >
-              ${this.message}
-            </p>
+              >
+                ${this.message}
+              </p>
+            </div>
 
+            <!-- Close -->
+
+            <jk-icon-button
+              icon="x"
+              @click=${this._handleCancel}
+            ></jk-icon-button>
           </div>
 
-          <!-- Close -->
+          <!-- Footer -->
 
-          <jk-icon-button
-            icon="x"
-            @click=${this._handleCancel}
-          ></jk-icon-button>
-
-        </div>
-
-        <!-- Footer -->
-
-        <div
-          class="
+          <div
+            class="
             flex
             justify-end
             gap-3
@@ -223,8 +217,8 @@ render() {
             px-6
             py-4
           "
-        >
-          ${
+          >
+            ${
             this.variant === "confirm"
               ? html`
                   <button
@@ -255,10 +249,10 @@ render() {
               : ""
           }
 
-          <button
-            id="confirmBtn"
-            @click=${this._handleConfirm}
-            class="
+            <button
+              id="confirmBtn"
+              @click=${this._handleConfirm}
+              class="
               rounded-xl
               border
               border-indigo-500
@@ -276,15 +270,14 @@ render() {
               focus:ring-2
               focus:ring-indigo-500/40
             "
-          >
-            ${this.confirmLabel}
-          </button>
+            >
+              ${this.confirmLabel}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  `;
-}  
-
+    `;
+  }
 }
 
 customElements.define("jk-dialog", JkDialog);

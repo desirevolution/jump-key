@@ -1,9 +1,5 @@
 .prism-code-editor {
-  font-family:
-    "JetBrains Mono",
-    "Fira Code",
-    Consolas,
-    monospace;
+  font-family: "JetBrains Mono", "Fira Code", Consolas, monospace;
 
   /* Editor */
   --pce-bg: #0f172a;
@@ -42,18 +38,15 @@
   color-scheme: dark;
 }
 
-
 /* aktive Zeile */
 .active-line {
   --pce-line-number: #c7d2fe;
 }
 
-
 /* aktive Einrückung */
 .active-indent {
   --pce-guide-indent: #818cf8cc;
 }
-
 
 /*
  * Bracket Highlighting
@@ -84,7 +77,6 @@
   color: #38bdf8;
 }
 
-
 /* aktive Cursor-Klammer */
 .active-bracket {
   box-shadow:
@@ -92,12 +84,10 @@
     inset 0 0 0 999px #6366f133;
 }
 
-
 /* fehlerhafte Klammer */
 .token.bracket-error {
   color: #fb7185;
 }
-
 
 /* Match Highlight */
 .match-highlight {

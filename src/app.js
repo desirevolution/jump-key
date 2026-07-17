@@ -72,7 +72,7 @@ class DashboardApp extends LitElement {
     this.handlePopState = this.handlePopState.bind(this);
     this.originalConfigString = "";
     this.hasEditorConfigChanged = false;
-    this.showClearFavoritesDialog = false;    
+    this.showClearFavoritesDialog = false;
   }
 
   t(key) {
@@ -174,28 +174,24 @@ class DashboardApp extends LitElement {
     setTimeout(() => this.querySelector("#searchInput")?.focus(), 100);
   }
 
-clearFavorites() {
-  this.showClearFavoritesDialog = true;
-}
+  clearFavorites() {
+    this.showClearFavoritesDialog = true;
+  }
 
-_confirmClearFavorites() {
-  this.favorites = {};
-  localStorage.removeItem("dashboard_favs");
+  _confirmClearFavorites() {
+    this.favorites = {};
+    localStorage.removeItem("dashboard_favs");
 
-  this.showClearFavoritesDialog = false;
-  this.requestUpdate();
-}
+    this.showClearFavoritesDialog = false;
+    this.requestUpdate();
+  }
 
   // --- Keyboard Event Dispatcher ---
 
   handleKeyDown(e) {
-if (
-  (e.ctrlKey && e.key !== ",") ||
-  e.altKey ||
-  e.metaKey
-) {
-  return;
-}
+    if ((e.ctrlKey && e.key !== ",") || e.altKey || e.metaKey) {
+      return;
+    }
     if (e.key === "Escape") {
       if (this.showConfigModal) {
         this.showConfigModal = false;
@@ -384,28 +380,26 @@ if (
     }
   }
 
-scrollToSelected() {
-  setTimeout(() => {
-    const active = this.querySelector(".search-item-active");
-    const container = this.querySelector(".search-results");
+  scrollToSelected() {
+    setTimeout(() => {
+      const active = this.querySelector(".search-item-active");
+      const container = this.querySelector(".search-results");
 
-    if (!active || !container) return;
+      if (!active || !container) return;
 
-    const activeTop = active.offsetTop;
-    const activeBottom = activeTop + active.offsetHeight;
+      const activeTop = active.offsetTop;
+      const activeBottom = activeTop + active.offsetHeight;
 
-    const visibleTop = container.scrollTop;
-    const visibleBottom =
-      visibleTop + container.clientHeight;
+      const visibleTop = container.scrollTop;
+      const visibleBottom = visibleTop + container.clientHeight;
 
-    if (activeTop < visibleTop) {
-      container.scrollTop = activeTop;
-    } else if (activeBottom > visibleBottom) {
-      container.scrollTop =
-        activeBottom - container.clientHeight;
-    }
-  }, 10);
-}
+      if (activeTop < visibleTop) {
+        container.scrollTop = activeTop;
+      } else if (activeBottom > visibleBottom) {
+        container.scrollTop = activeBottom - container.clientHeight;
+      }
+    }, 10);
+  }
   // --- Backend Sync (WebDAV) ---
 
   async saveConfiguration(newConfig, oldConfig) {
@@ -513,22 +507,22 @@ scrollToSelected() {
   }
 
   templateClearFavoritesDialog() {
-  return html`
-    <jk-dialog
-      .show=${this.showClearFavoritesDialog}
-      title="${this.t("confirmResetTitle")}"
-      message="${this.t("confirmReset")}"
-      icon="trash-2"
-      iconColor="text-rose-400"
-      confirmLabel="${this.t("confirmResetConfirm")}"
-      cancelLabel="${this.t("cancel")}"
-      @confirm=${this._confirmClearFavorites}
-      @cancel=${() => {
+    return html`
+      <jk-dialog
+        .show=${this.showClearFavoritesDialog}
+        title="${this.t("confirmResetTitle")}"
+        message="${this.t("confirmReset")}"
+        icon="trash-2"
+        iconColor="text-rose-400"
+        confirmLabel="${this.t("confirmResetConfirm")}"
+        cancelLabel="${this.t("cancel")}"
+        @confirm=${this._confirmClearFavorites}
+        @cancel=${() => {
         this.showClearFavoritesDialog = false;
       }}
-    ></jk-dialog>
-  `;
-}
+      ></jk-dialog>
+    `;
+  }
   templateSaveSuccessDialog() {
     return html`
       <jk-dialog
@@ -559,30 +553,30 @@ scrollToSelected() {
     `;
   }
 
-templateKeyBadge() {
-  if (!this.currentInput || this.showSearch || this.showHelp) return "";
+  templateKeyBadge() {
+    if (!this.currentInput || this.showSearch || this.showHelp) return "";
 
-  const stateClass = this.isInvalidInput
-    ? `
+    const stateClass = this.isInvalidInput
+      ? `
       border-rose-500/50
       text-rose-300
       shadow-rose-950/50
     `
-    : this.isValidInput
-      ? `
+      : this.isValidInput
+        ? `
         border-emerald-500/50
         text-emerald-300
         shadow-emerald-950/50
       `
-      : `
+        : `
         border-indigo-500/50
         text-indigo-300
         shadow-indigo-950/50
       `;
 
-  return html`
-    <div
-      class="
+    return html`
+      <div
+        class="
         fixed
         bottom-6
         right-6
@@ -618,9 +612,9 @@ templateKeyBadge() {
 
         ${stateClass}
       "
-    >
-      <kbd
-        class="
+      >
+        <kbd
+          class="
           px-2
           py-1
 
@@ -635,34 +629,25 @@ templateKeyBadge() {
 
           tracking-wider
         "
-      >
-        ${this.currentInput}
-      </kbd>
+        >
+          ${this.currentInput}
+        </kbd>
 
-      ${
+        ${
         this.isValidInput
           ? html`
-              <jk-icon
-                icon="check"
-                class="w-4 h-4 text-emerald-400"
-              ></jk-icon>
+              <jk-icon icon="check" class="w-4 h-4 text-emerald-400"></jk-icon>
             `
           : ""
       }
-
-      ${
+        ${
         this.isInvalidInput
-          ? html`
-              <jk-icon
-                icon="x"
-                class="w-4 h-4 text-rose-400"
-              ></jk-icon>
-            `
+          ? html` <jk-icon icon="x" class="w-4 h-4 text-rose-400"></jk-icon> `
           : ""
       }
-    </div>
-  `;
-}
+      </div>
+    `;
+  }
 
   render_() {
     const favs = getTopFavorites(this.categories, this.favorites);
@@ -676,90 +661,72 @@ templateKeyBadge() {
     return html` ${this.templateHelpModal()} `;
   }
 
-render() {
-  const favs = getTopFavorites(this.categories, this.favorites);
+  render() {
+    const favs = getTopFavorites(this.categories, this.favorites);
 
-  const filteredServices = getFilteredServices(
-    this.categories,
-    this.searchQuery,
-  );
+    const filteredServices = getFilteredServices(
+      this.categories,
+      this.searchQuery,
+    );
 
-  const showMain =
-    !this.activeCategoryKey &&
-    !this.showSearch &&
-    !this.showHelp &&
-    !this.showConfigModal;
+    const showMain =
+      !this.activeCategoryKey &&
+      !this.showSearch &&
+      !this.showHelp &&
+      !this.showConfigModal;
 
-  return html`
-    <!-- Global Overlays -->
-    ${this.templateKeyBadge()}
-    ${this.templateHelpModal()}
-    ${this.templateSearchModal(filteredServices)}
-    ${this.templateConfigModal()}
-    ${this.templateSaveSuccessDialog()}
-    ${this.templateSaveErrorDialog()}
+    return html`
+      <!-- Global Overlays -->
+      ${this.templateKeyBadge()} ${this.templateHelpModal()}
+      ${this.templateSearchModal(filteredServices)}
+      ${this.templateConfigModal()} ${this.templateSaveSuccessDialog()}
+      ${this.templateSaveErrorDialog()}
 
-
-    <!-- Header -->
-    <jk-dashboard-header
-      .isGridView=${this.isGridView}
-      .lang=${this.lang}
-      .t=${(key) => this.t(key)}
-
-      @open-help=${() => {
+      <!-- Header -->
+      <jk-dashboard-header
+        .isGridView=${this.isGridView}
+        .lang=${this.lang}
+        .t=${(key) => this.t(key)}
+        @open-help=${() => {
         this.showHelp = true;
       }}
-
-      @open-search=${this.openSearch}
-
-      @open-config=${() => {
+        @open-search=${this.openSearch}
+        @open-config=${() => {
         this.showConfigModal = true;
       }}
+        @toggle-view=${this.toggleViewMode}
+      ></jk-dashboard-header>
 
-      @toggle-view=${this.toggleViewMode}
-    ></jk-dashboard-header>
-
-
-
-    <!-- Main Content -->
-    <main
-      class="
+      <!-- Main Content -->
+      <main
+        class="
         container
         mx-auto
         px-4
         py-6
       "
-    >
-
-      ${
+      >
+        ${
         showMain && !this.isGridView
           ? html`
-
               <!-- Favorites -->
               <jk-favorites-view
                 .favorites=${favs}
                 .t=${(key) => this.t(key)}
-
-                @service-click=${(e) =>
-                  this.trackClick(e.detail.service)}
-
+                @service-click=${(e) => this.trackClick(e.detail.service)}
                 @clear-favorites=${this.clearFavorites}
               ></jk-favorites-view>
-
-
 
               <!-- Categories -->
               <jk-service-group
                 title="${this.t("categories")}"
                 icon="folder"
-
                 .services=${this.categories.map((cat) => ({
                   name: cat.category,
                   url: `${cat.services?.length ?? 0} Services`,
                   icon: cat.icon,
                   key: cat.categoryKey,
                 }))}
-
                 @service-click=${(e) => {
                   const key = e.detail.service.key;
 
@@ -775,27 +742,20 @@ render() {
                   );
                 }}
               ></jk-service-group>
-
             `
           : html`
-
               <!-- Grid / Category Detail View -->
               <jk-grid-view
                 .categories=${this.categories}
                 .activeCategoryKey=${this.activeCategoryKey}
                 .t=${(key) => this.t(key)}
-
-                @service-click=${(e) =>
-                  this.trackClick(e.detail.service)}
+                @service-click=${(e) => this.trackClick(e.detail.service)}
               ></jk-grid-view>
-
             `
       }
-
-    </main>
-  `;
-}
-
+      </main>
+    `;
+  }
 }
 
 customElements.define("dashboard-app", DashboardApp);

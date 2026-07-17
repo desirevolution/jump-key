@@ -27,30 +27,28 @@ export class JkSearchModal extends LitElement {
     this.t = (key) => key;
   }
 
-updated(changedProperties) {
-  if (changedProperties.has("selectedIndex")) {
-    requestAnimationFrame(() => {
-      const active = this.querySelector(".search-item-active");
-      const container = this.querySelector(".search-results");
+  updated(changedProperties) {
+    if (changedProperties.has("selectedIndex")) {
+      requestAnimationFrame(() => {
+        const active = this.querySelector(".search-item-active");
+        const container = this.querySelector(".search-results");
 
-      if (active && container) {
-        const activeTop = active.offsetTop;
-        const activeBottom = activeTop + active.offsetHeight;
+        if (active && container) {
+          const activeTop = active.offsetTop;
+          const activeBottom = activeTop + active.offsetHeight;
 
-        const visibleTop = container.scrollTop;
-        const visibleBottom =
-          visibleTop + container.clientHeight;
+          const visibleTop = container.scrollTop;
+          const visibleBottom = visibleTop + container.clientHeight;
 
-        if (activeTop < visibleTop) {
-          container.scrollTop = activeTop;
-        } else if (activeBottom > visibleBottom) {
-          container.scrollTop =
-            activeBottom - container.clientHeight;
+          if (activeTop < visibleTop) {
+            container.scrollTop = activeTop;
+          } else if (activeBottom > visibleBottom) {
+            container.scrollTop = activeBottom - container.clientHeight;
+          }
         }
-      }
-    });
+      });
+    }
   }
-}
 
   _handleClose() {
     this.dispatchEvent(
@@ -203,23 +201,18 @@ updated(changedProperties) {
     return { items, showAllEngines, isFilteringEngines };
   }
 
-render() {
-  if (!this.show) return html``;
+  render() {
+    if (!this.show) return html``;
 
-  const queryTrimmed = this.searchQuery.trim();
-  const showQuickTrigger = queryTrimmed === "";
+    const queryTrimmed = this.searchQuery.trim();
+    const showQuickTrigger = queryTrimmed === "";
 
-  const {
-    items,
-    showAllEngines,
-    isFilteringEngines,
-  } = this._buildItems();
+    const { items, showAllEngines, isFilteringEngines } = this._buildItems();
 
-
-  return html`
-    <div
-      @click=${this._handleClose}
-      class="
+    return html`
+      <div
+        @click=${this._handleClose}
+        class="
         fixed
         inset-0
         z-50
@@ -236,11 +229,10 @@ render() {
         bg-slate-950/70
         backdrop-blur-md
       "
-    >
-
-      <div
-        @click=${(e) => e.stopPropagation()}
-        class="
+      >
+        <div
+          @click=${(e) => e.stopPropagation()}
+          class="
           w-full
           max-w-3xl
 
@@ -263,12 +255,11 @@ render() {
 
           max-h-[80vh]
         "
-      >
+        >
+          <!-- Search Header -->
 
-        <!-- Search Header -->
-
-        <div
-          class="
+          <div
+            class="
             flex
             items-center
             gap-3
@@ -283,10 +274,9 @@ render() {
 
             shrink-0
           "
-        >
-
-          <div
-            class="
+          >
+            <div
+              class="
               flex
               items-center
               justify-center
@@ -302,31 +292,20 @@ render() {
 
               text-indigo-300
             "
-          >
-            <jk-icon
-              icon="search"
-              class="size-5"
-            ></jk-icon>
-          </div>
+            >
+              <jk-icon icon="search" class="size-5"></jk-icon>
+            </div>
 
-
-          <form
-            @submit=${this._handleSubmit}
-            class="grow"
-          >
-            <input
-              id="searchInput"
-              type="text"
-              inputmode="search"
-              enterkeyhint="search"
-
-              placeholder="${this.t("searchPlaceholder")}"
-
-              .value=${this.searchQuery}
-
-              @input=${this._handleInput}
-
-              class="
+            <form @submit=${this._handleSubmit} class="grow">
+              <input
+                id="searchInput"
+                type="text"
+                inputmode="search"
+                enterkeyhint="search"
+                placeholder="${this.t("searchPlaceholder")}"
+                .value=${this.searchQuery}
+                @input=${this._handleInput}
+                class="
                 w-full
                 bg-transparent
 
@@ -342,11 +321,10 @@ render() {
 
                 focus:outline-none
               "
-            />
-          </form>
+              />
+            </form>
 
-
-          ${
+            ${
             showQuickTrigger
               ? html`
                   <jk-icon-button
@@ -358,31 +336,26 @@ render() {
               : ""
           }
 
+            <jk-icon-button
+              icon="x"
+              title="Close"
+              @click=${this._handleClose}
+            ></jk-icon-button>
+          </div>
 
-          <jk-icon-button
-            icon="x"
-            title="Close"
-            @click=${this._handleClose}
-          ></jk-icon-button>
+          <!-- Results -->
 
-        </div>
-
-
-        <!-- Results -->
-
-        <div
-          class="
+          <div
+            class="
     search-results
     overflow-y-auto
     p-2
     space-y-1
     grow
           "
-        >
-
-          ${
-            (showAllEngines || isFilteringEngines) &&
-            items.length > 0
+          >
+            ${
+            (showAllEngines || isFilteringEngines) && items.length > 0
               ? html`
                   <div
                     class="
@@ -406,17 +379,9 @@ render() {
                 `
               : ""
           }
-
-
-          ${items.map(
-            (item, i) =>
-              item.render(i === this.selectedIndex),
-          )}
-
-
-          ${
-            this.searchQuery &&
-            items.length === 0
+            ${items.map((item, i) => item.render(i === this.selectedIndex))}
+            ${
+            this.searchQuery && items.length === 0
               ? html`
                   <div
                     class="
@@ -435,21 +400,16 @@ render() {
                       class="size-8 mb-3 opacity-50"
                     ></jk-icon>
 
-                    <span class="text-sm">
-                      ${this.t("noServices")}
-                    </span>
+                    <span class="text-sm"> ${this.t("noServices")} </span>
                   </div>
                 `
               : ""
           }
-
+          </div>
         </div>
-
       </div>
-
-    </div>
-  `;
-}
+    `;
+  }
 }
 
 customElements.define("jk-search-modal", JkSearchModal);

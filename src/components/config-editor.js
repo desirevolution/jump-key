@@ -104,7 +104,7 @@ export class JkConfigEditor extends LitElement {
     );
 
     const editor = this._editorInstance;
-  
+
     /*
     addEditorHotkey(editor, "PageDown", () => {
     editor.textarea.dispatchEvent(
@@ -125,11 +125,11 @@ export class JkConfigEditor extends LitElement {
     */
   }
 
-render() {
-  return html`
-    <div
-      id="editorContainer"
-class="
+  render() {
+    return html`
+      <div
+        id="editorContainer"
+        class="
 w-full
 h-full
 rounded-xl
@@ -141,15 +141,17 @@ border
 
 shadow-inner
 
-${this.isValid
-  ? "border-slate-700 focus-within:border-indigo-500"
-  : "border-rose-500 focus-within:border-rose-500"}
+${
+  this.isValid
+    ? "border-slate-700 focus-within:border-indigo-500"
+    : "border-rose-500 focus-within:border-rose-500"
+}
 
 transition-colors
 "
-    ></div>
-  `;
-}
+      ></div>
+    `;
+  }
 }
 
 customElements.define("jk-config-editor", JkConfigEditor);

@@ -14,10 +14,8 @@ export class JkServiceGroup extends LitElement {
     services: { type: Array },
   };
 
-
   render() {
     return html`
-
       <section
         class="
           rounded-2xl
@@ -34,7 +32,6 @@ export class JkServiceGroup extends LitElement {
           duration-300
         "
       >
-
         <!-- Group Header -->
 
         <div
@@ -46,7 +43,6 @@ export class JkServiceGroup extends LitElement {
             mb-4
           "
         >
-
           <!-- Icon -->
 
           <div
@@ -65,7 +61,6 @@ export class JkServiceGroup extends LitElement {
               ring-slate-700/70
             "
           >
-
             <jk-icon
               .icon=${this.icon || "folder"}
               class="
@@ -74,10 +69,7 @@ export class JkServiceGroup extends LitElement {
                 text-indigo-300
               "
             ></jk-icon>
-
           </div>
-
-
 
           <!-- Title -->
 
@@ -90,7 +82,6 @@ export class JkServiceGroup extends LitElement {
               min-w-0
             "
           >
-
             <h2
               class="
                 text-sm
@@ -106,7 +97,6 @@ export class JkServiceGroup extends LitElement {
             >
               ${this.title}
             </h2>
-
 
             ${
               this.badgeText
@@ -142,12 +132,8 @@ export class JkServiceGroup extends LitElement {
                   `
                 : ""
             }
-
           </div>
-
         </div>
-
-
 
         <!-- Services Grid -->
 
@@ -164,44 +150,29 @@ export class JkServiceGroup extends LitElement {
             grid-cols-[repeat(auto-fill,minmax(280px,1fr))]
           "
         >
-
           ${(this.services ?? []).map(
             (service) => html`
-
               <jk-service-card
                 .name=${service.name}
                 .subtitle=${service.url}
                 .icon=${service.icon}
                 .badgeText=${service.key}
-
                 @card-click=${() => {
-
                   this.dispatchEvent(
-                    new CustomEvent(
-                      "service-click",
-                      {
-                        detail: { service },
-                        bubbles: true,
-                        composed: true,
-                      },
-                    ),
+                    new CustomEvent("service-click", {
+                      detail: { service },
+                      bubbles: true,
+                      composed: true,
+                    }),
                   );
-
                 }}
               ></jk-service-card>
-
             `,
           )}
-
         </div>
-
       </section>
-
     `;
   }
 }
 
-customElements.define(
-  "jk-service-group",
-  JkServiceGroup,
-);
+customElements.define("jk-service-group", JkServiceGroup);

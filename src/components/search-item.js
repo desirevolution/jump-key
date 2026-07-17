@@ -59,10 +59,11 @@ export class JkDashboardSearchItem extends LitElement {
 
     return html`
       <button class="${itemClasses}">
-        ${this.active
-          ? html`
-              <div
-                class="
+        ${
+          this.active
+            ? html`
+                <div
+                  class="
                   absolute
                   left-0
                   top-2
@@ -71,16 +72,17 @@ export class JkDashboardSearchItem extends LitElement {
                   rounded-r-full
                   bg-indigo-500
                 "
-              ></div>
-            `
-          : ""}
+                ></div>
+              `
+            : ""
+        }
 
         <div class="flex items-center gap-3 min-w-0 grow">
-
-          ${this.data.icon
-            ? html`
-                <div
-                  class="
+          ${
+            this.data.icon
+              ? html`
+                  <div
+                    class="
                     flex
                     items-center
                     justify-center
@@ -107,32 +109,23 @@ export class JkDashboardSearchItem extends LitElement {
                         `
                     }
                   "
-                >
-                  <jk-icon
-                    .icon=${this.data.icon}
-                    class="size-5"
-                  ></jk-icon>
-                </div>
-              `
-            : ""}
+                  >
+                    <jk-icon .icon=${this.data.icon} class="size-5"></jk-icon>
+                  </div>
+                `
+              : ""
+          }
 
-          <div class="min-w-0 grow">
-            ${this._renderContent()}
-          </div>
-
+          <div class="min-w-0 grow">${this._renderContent()}</div>
         </div>
 
-        <div class="ml-4 shrink-0">
-          ${this._renderMeta()}
-        </div>
-
+        <div class="ml-4 shrink-0">${this._renderMeta()}</div>
       </button>
     `;
   }
 
   _renderContent() {
     switch (this.type) {
-
       case "engine":
         return html`
           <div class="min-w-0">
@@ -166,7 +159,6 @@ export class JkDashboardSearchItem extends LitElement {
 
         return html`
           <div class="min-w-0">
-
             <div
               class="
                 text-sm
@@ -195,7 +187,6 @@ export class JkDashboardSearchItem extends LitElement {
                 "${terms}"
               </span>
             </div>
-
           </div>
         `;
       }
@@ -204,7 +195,6 @@ export class JkDashboardSearchItem extends LitElement {
       default:
         return html`
           <div class="min-w-0">
-
             <div
               class="
                 truncate
@@ -229,7 +219,6 @@ export class JkDashboardSearchItem extends LitElement {
             >
               ${this.data.category}
             </div>
-
           </div>
         `;
     }
@@ -237,7 +226,6 @@ export class JkDashboardSearchItem extends LitElement {
 
   _renderMeta() {
     switch (this.type) {
-
       case "engine":
         return html`
           <kbd
@@ -306,7 +294,4 @@ export class JkDashboardSearchItem extends LitElement {
   }
 }
 
-customElements.define(
-  "jk-dashboard-search-item",
-  JkDashboardSearchItem,
-);
+customElements.define("jk-dashboard-search-item", JkDashboardSearchItem);

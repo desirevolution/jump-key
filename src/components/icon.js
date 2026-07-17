@@ -28,14 +28,10 @@ export class JkIcon extends LitElement {
 
     const isUrl = /^https?:\/\/|^\//i.test(this.icon);
 
-    const isImageFile = /\.(png|jpe?g|svg|webp|gif)$/i.test(
-      this.icon,
-    );
+    const isImageFile = /\.(png|jpe?g|svg|webp|gif)$/i.test(this.icon);
 
     if (isUrl || isImageFile) {
-      const src = isUrl
-        ? this.icon
-        : `./icons/${this.icon}`;
+      const src = isUrl ? this.icon : `./icons/${this.icon}`;
 
       return html`
         <img
@@ -50,29 +46,20 @@ export class JkIcon extends LitElement {
       `;
     }
 
-    const iconNode =
-      icons[this.toPascalCase(this.icon)];
+    const iconNode = icons[this.toPascalCase(this.icon)];
 
     if (!iconNode) {
       return html``;
     }
 
-    return html`
-      ${unsafeSVG(
-        this.renderIcon(iconNode),
-      )}
-    `;
+    return html` ${unsafeSVG(this.renderIcon(iconNode))} `;
   }
-
 
   renderIcon(node) {
     const children = node
       .map(([tag, attrs]) => {
         const attributes = Object.entries(attrs)
-          .map(
-            ([key, value]) =>
-              `${key}="${value}"`,
-          )
+          .map(([key, value]) => `${key}="${value}"`)
           .join(" ");
 
         return `<${tag} ${attributes}></${tag}>`;
@@ -95,28 +82,16 @@ export class JkIcon extends LitElement {
     `;
   }
 
-
   get className() {
-    return (
-      this.getAttribute("class") ||
-      "size-6"
-    );
+    return this.getAttribute("class") || "size-6";
   }
-
 
   toPascalCase(name) {
     return name
       .split("-")
-      .map(
-        (part) =>
-          part.charAt(0).toUpperCase() +
-          part.slice(1),
-      )
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
       .join("");
   }
 }
 
-customElements.define(
-  "jk-icon",
-  JkIcon,
-);
+customElements.define("jk-icon", JkIcon);

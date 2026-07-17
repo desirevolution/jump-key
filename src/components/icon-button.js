@@ -56,10 +56,7 @@ export class JkIconButton extends LitElement {
         aria-label=${this.label || this.text || this.icon || "button"}
         class=${classMap(buttonClasses)}
       >
-        <jk-icon
-          .icon=${this.icon}
-          class=${iconClasses}
-        ></jk-icon>
+        <jk-icon .icon=${this.icon} class=${iconClasses}></jk-icon>
 
         ${
           this.text
@@ -82,7 +79,4 @@ export class JkIconButton extends LitElement {
   }
 }
 
-customElements.define(
-  "jk-icon-button",
-  JkIconButton,
-);
+customElements.define("jk-icon-button", JkIconButton);

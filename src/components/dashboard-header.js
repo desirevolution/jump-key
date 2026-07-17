@@ -75,10 +75,10 @@ export class JkDashboardHeader extends LitElement {
     );
   }
 
-render() {
-  return html`
-    <div
-      class="
+  render() {
+    return html`
+      <div
+        class="
         mb-8
         sm:mb-10
         flex
@@ -104,24 +104,22 @@ render() {
 
         backdrop-blur-md
       "
-    >
-
-      <!-- Left: Branding -->
-      <div
-        class="
+      >
+        <!-- Left: Branding -->
+        <div
+          class="
           flex
           items-center
           gap-3
           min-w-0
         "
-      >
-
-        <!-- Logo Shell -->
-        <a
-          href="https://github.com/desirevolution/jump-key"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="
+        >
+          <!-- Logo Shell -->
+          <a
+            href="https://github.com/desirevolution/jump-key"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="
             group
             flex
             items-center
@@ -145,11 +143,11 @@ render() {
             hover:ring-indigo-500/40
             hover:-translate-y-0.5
           "
-        >
-          <img
-            src="/jump-key.png"
-            alt="JumpKey"
-            class="
+          >
+            <img
+              src="/jump-key.png"
+              alt="JumpKey"
+              class="
               size-9
               sm:size-11
               object-contain
@@ -159,22 +157,20 @@ render() {
 
               group-hover:scale-105
             "
-          />
-        </a>
+            />
+          </a>
 
-
-        <!-- Title -->
-        <div
-          class="
+          <!-- Title -->
+          <div
+            class="
             flex
             items-center
             gap-2
             min-w-0
           "
-        >
-
-<div
-  class="
+          >
+            <div
+              class="
     flex
     items-center
     gap-1
@@ -183,24 +179,22 @@ render() {
     text-2xl
     sm:text-3xl
   "
->
-  <span class="text-white">
-    Jump
-  </span>
+            >
+              <span class="text-white"> Jump </span>
 
-  <span
-    class="
+              <span
+                class="
       text-indigo-400
     "
-  >
-    Key
-  </span>
-</div>
+              >
+                Key
+              </span>
+            </div>
 
-          <button
-            @click=${() => this._dispatchEvent("open-help")}
-            title="${this.t ? this.t("helpHint") : ""}"
-            class="
+            <button
+              @click=${() => this._dispatchEvent("open-help")}
+              title="${this.t ? this.t("helpHint") : ""}"
+              class="
               hidden
               md:flex
 
@@ -223,33 +217,25 @@ render() {
               focus:ring-2
               focus:ring-indigo-500/40
             "
-          >
-            <jk-icon
-              icon="help-circle"
-              class="size-5"
-            ></jk-icon>
-          </button>
-
+            >
+              <jk-icon icon="help-circle" class="size-5"></jk-icon>
+            </button>
+          </div>
         </div>
 
-      </div>
-
-
-
-      <!-- Right -->
-      <div
-        class="
+        <!-- Right -->
+        <div
+          class="
           flex
           items-center
           gap-3
           sm:gap-5
           shrink-0
         "
-      >
-
-        <!-- Action Group -->
-        <div
-          class="
+        >
+          <!-- Action Group -->
+          <div
+            class="
             flex
             items-center
             gap-1
@@ -263,46 +249,39 @@ render() {
 
             p-1
           "
-        >
+          >
+            <jk-icon-button
+              icon="${this.isGridView ? "rows-2" : "layout-grid"}"
+              title="${this.t ? this.t("hkToggleView") : ""} [#]"
+              @click=${() => this._dispatchEvent("toggle-view")}
+            ></jk-icon-button>
 
-          <jk-icon-button
-            icon="${this.isGridView ? "rows-2" : "layout-grid"}"
-            title="${this.t ? this.t("hkToggleView") : ""} [#]"
-            @click=${() => this._dispatchEvent("toggle-view")}
-          ></jk-icon-button>
+            <jk-icon-button
+              icon="search"
+              title="${this.t ? this.t("hkSearch") : ""} [Space]"
+              @click=${() => this._dispatchEvent("open-search")}
+            ></jk-icon-button>
 
+            <jk-icon-button
+              icon="settings"
+              title="${this.t ? this.t("editConfig") : ""}"
+              .hideOnMobile=${true}
+              @click=${() => this._dispatchEvent("open-config")}
+            ></jk-icon-button>
+          </div>
 
-          <jk-icon-button
-            icon="search"
-            title="${this.t ? this.t("hkSearch") : ""} [Space]"
-            @click=${() => this._dispatchEvent("open-search")}
-          ></jk-icon-button>
-
-
-          <jk-icon-button
-            icon="settings"
-            title="${this.t ? this.t("editConfig") : ""}"
-            .hideOnMobile=${true}
-            @click=${() => this._dispatchEvent("open-config")}
-          ></jk-icon-button>
-
-        </div>
-
-
-
-        <!-- Clock -->
-        <div
-          class="
+          <!-- Clock -->
+          <div
+            class="
             hidden
             sm:block
 
             text-right
             select-none
           "
-        >
-
-          <div
-            class="
+          >
+            <div
+              class="
               flex
               items-center
               justify-end
@@ -314,15 +293,14 @@ render() {
 
               text-indigo-300
             "
-          >
-            <span>${this._hours}</span>
-            <span class="mx-0.5 opacity-70">:</span>
-            <span>${this._minutes}</span>
-          </div>
+            >
+              <span>${this._hours}</span>
+              <span class="mx-0.5 opacity-70">:</span>
+              <span>${this._minutes}</span>
+            </div>
 
-
-          <div
-            class="
+            <div
+              class="
               mt-1
 
               text-xs
@@ -333,18 +311,14 @@ render() {
 
               whitespace-nowrap
             "
-          >
-            ${this._dateString}
+            >
+              ${this._dateString}
+            </div>
           </div>
-
         </div>
-
       </div>
-
-    </div>
-  `;
-}
-
+    `;
+  }
 }
 
 customElements.define("jk-dashboard-header", JkDashboardHeader);

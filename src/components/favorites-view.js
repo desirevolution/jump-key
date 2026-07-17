@@ -14,15 +14,12 @@ export class JkFavoritesView extends LitElement {
     renderIcon: { type: Function },
   };
 
-
   render() {
     if (!this.favorites || this.favorites.length === 0) {
       return html``;
     }
 
-
     return html`
-
       <section
         class="
           mb-8
@@ -38,8 +35,6 @@ export class JkFavoritesView extends LitElement {
           sm:p-5
         "
       >
-
-
         <!-- Header -->
 
         <div
@@ -51,7 +46,6 @@ export class JkFavoritesView extends LitElement {
             mb-4
           "
         >
-
           <!-- Icon -->
 
           <div
@@ -70,10 +64,8 @@ export class JkFavoritesView extends LitElement {
               ring-amber-500/20
             "
           >
-
             <jk-icon
               icon="star"
-
               class="
                 size-4
 
@@ -81,10 +73,7 @@ export class JkFavoritesView extends LitElement {
 
               "
             ></jk-icon>
-
           </div>
-
-
 
           <!-- Title -->
 
@@ -102,38 +91,23 @@ export class JkFavoritesView extends LitElement {
             ${this.t("frequent")}
           </h2>
 
-
-
           <!-- Reset -->
 
           <jk-icon-button
             icon="trash-2"
-
             variant="text"
-
             .text=${this.t("resetFavs")}
-
             class="ml-auto"
-
             @click=${() => {
-
               this.dispatchEvent(
-                new CustomEvent(
-                  "clear-favorites",
-                  {
-                    bubbles: true,
-                    composed: true,
-                  },
-                ),
+                new CustomEvent("clear-favorites", {
+                  bubbles: true,
+                  composed: true,
+                }),
               );
-
             }}
           ></jk-icon-button>
-
-
         </div>
-
-
 
         <!-- Cards -->
 
@@ -150,57 +124,34 @@ export class JkFavoritesView extends LitElement {
             grid-cols-[repeat(auto-fill,minmax(280px,1fr))]
           "
         >
-
           ${this.favorites.map(
             (service) => html`
-
               <jk-service-card
-
                 .name=${service.name}
-
                 .subtitle=${service.url}
-
                 .icon=${service.icon}
-
                 .badgeText=${service.key}
-
                 .isFavorite=${true}
-
                 @card-click=${() => {
-
                   this.dispatchEvent(
-                    new CustomEvent(
-                      "service-click",
-                      {
-                        detail: {
-                          service,
-                        },
-
-                        bubbles: true,
-
-                        composed: true,
+                    new CustomEvent("service-click", {
+                      detail: {
+                        service,
                       },
-                    ),
+
+                      bubbles: true,
+
+                      composed: true,
+                    }),
                   );
-
                 }}
-
               ></jk-service-card>
-
             `,
           )}
-
         </div>
-
-
       </section>
-
     `;
   }
 }
 
-
-customElements.define(
-  "jk-favorites-view",
-  JkFavoritesView,
-);
+customElements.define("jk-favorites-view", JkFavoritesView);

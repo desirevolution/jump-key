@@ -26,60 +26,55 @@ export class JkHelpModal extends LitElement {
     );
   }
 
-render() {
-  if (!this.show) return html``;
+  render() {
+    if (!this.show) return html``;
 
+    const shortcuts = [
+      {
+        keys: ["Space"],
+        desc: this.t("hkSearch"),
+      },
+      {
+        keys: ["#"],
+        desc: this.t("hkToggleView"),
+      },
+    ];
 
-  const shortcuts = [
-    {
-      keys: ["Space"],
-      desc: this.t("hkSearch"),
-    },
-    {
-      keys: ["#"],
-      desc: this.t("hkToggleView"),
-    },
-  ];
+    if (!this.isGridView) {
+      shortcuts.push({
+        keys: ["1", "-", "0"],
+        desc: this.t("hkFavs"),
+      });
+    }
 
+    shortcuts.push(
+      {
+        keys: ["A-Z"],
+        desc: this.t("hkCat"),
+      },
+      {
+        keys: ["A-Z"],
+        desc: this.t("hkService"),
+        context: true,
+      },
+      {
+        keys: [":"],
+        desc: this.t("hkSearchEngines"),
+      },
+      {
+        keys: ["↑", "↓"],
+        desc: this.t("hkNavigate"),
+      },
+      {
+        keys: ["ESC"],
+        desc: this.t("hkReset"),
+      },
+    );
 
-  if (!this.isGridView) {
-    shortcuts.push({
-      keys: ["1", "-", "0"],
-      desc: this.t("hkFavs"),
-    });
-  }
-
-
-  shortcuts.push(
-    {
-      keys: ["A-Z"],
-      desc: this.t("hkCat"),
-    },
-    {
-      keys: ["A-Z"],
-      desc: this.t("hkService"),
-      context: true,
-    },
-    {
-      keys: [":"],
-      desc: this.t("hkSearchEngines"),
-    },
-    {
-      keys: ["↑", "↓"],
-      desc: this.t("hkNavigate"),
-    },
-    {
-      keys: ["ESC"],
-      desc: this.t("hkReset"),
-    },
-  );
-
-
-  return html`
-
-    <div
-      @click=${this._handleClose}
-      class="
+    return html`
+      <div
+        @click=${this._handleClose}
+        class="
         fixed
         inset-0
         z-50
@@ -94,11 +89,10 @@ render() {
 
         backdrop-blur-md
       "
-    >
-
-      <div
-        @click=${(e) => e.stopPropagation()}
-        class="
+      >
+        <div
+          @click=${(e) => e.stopPropagation()}
+          class="
           w-full
           max-w-md
 
@@ -118,31 +112,27 @@ render() {
 
           font-mono
         "
-      >
+        >
+          <!-- Header -->
 
-
-        <!-- Header -->
-
-        <div
-          class="
+          <div
+            class="
             flex
             items-center
             justify-between
 
             mb-5
           "
-        >
-
-          <div
-            class="
+          >
+            <div
+              class="
               flex
               items-center
               gap-3
             "
-          >
-
-            <div
-              class="
+            >
+              <div
+                class="
                 flex
                 items-center
                 justify-center
@@ -156,54 +146,45 @@ render() {
                 ring-1
                 ring-indigo-500/20
               "
-            >
-              <jk-icon
-                icon="keyboard"
-                class="
+              >
+                <jk-icon
+                  icon="keyboard"
+                  class="
                   size-5
                   text-indigo-300
                 "
-              ></jk-icon>
-            </div>
+                ></jk-icon>
+              </div>
 
-
-            <h3
-              class="
+              <h3
+                class="
                 text-base
 
                 font-semibold
 
                 text-white
               "
-            >
-              ${this.t("helpTitle")}
-            </h3>
+              >
+                ${this.t("helpTitle")}
+              </h3>
+            </div>
 
+            <jk-icon-button
+              icon="x"
+              label="Close"
+              @click=${this._handleClose}
+            ></jk-icon-button>
           </div>
 
+          <!-- Shortcuts -->
 
-          <jk-icon-button
-            icon="x"
-            label="Close"
-            @click=${this._handleClose}
-          ></jk-icon-button>
-
-
-        </div>
-
-
-
-        <!-- Shortcuts -->
-
-        <div
-          class="
+          <div
+            class="
             space-y-1
           "
-        >
-
-          ${shortcuts.map(
+          >
+            ${shortcuts.map(
             (item) => html`
-
               <div
                 class="
                   flex
@@ -222,7 +203,6 @@ render() {
                   hover:bg-slate-800/60
                 "
               >
-
                 <span
                   class="
                     text-sm
@@ -233,7 +213,6 @@ render() {
                   ${item.desc}
                 </span>
 
-
                 <div
                   class="
                     flex
@@ -243,7 +222,6 @@ render() {
                     shrink-0
                   "
                 >
-
                   ${
                     item.context
                       ? html`
@@ -273,8 +251,6 @@ render() {
                         `
                       : ""
                   }
-
-
                   ${item.keys.map(
                     (key) => html`
                       <kbd
@@ -309,20 +285,14 @@ render() {
                       </kbd>
                     `,
                   )}
-
                 </div>
-
               </div>
-
             `,
           )}
+          </div>
 
-        </div>
-
-
-
-        <div
-          class="
+          <div
+            class="
             mt-5
 
             text-center
@@ -331,18 +301,13 @@ render() {
 
             text-slate-500
           "
-        >
-          ${this.t("helpExit")}
+          >
+            ${this.t("helpExit")}
+          </div>
         </div>
-
-
       </div>
-
-    </div>
-
-  `;
-}
-
+    `;
+  }
 }
 
 customElements.define("jk-help-modal", JkHelpModal);
