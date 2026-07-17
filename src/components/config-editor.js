@@ -112,7 +112,6 @@ export class JkConfigEditor extends LitElement {
     });
     /*
     const rows = this.editorRows(editor);
-    console.error("arthur %o", rows);
     addEditorHotkey(editor, "PageUp", () =>
       this.moveDownByLines(editor, -rows),
     );
