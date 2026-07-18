@@ -1,67 +1,160 @@
-import { LitElement, html } from 'lit';
+import { LitElement, html } from "lit";
+import "./icon.js";
 
 export class JkToast extends LitElement {
   createRenderRoot() {
-    return this; // Nutzt dein globales Tailwind CSS
+    return this;
   }
 
   static properties = {
     message: { type: String },
-    type: { type: String }, // 'success', 'error', 'warning'
+    type: { type: String }, // success | error | warning
     duration: { type: Number },
     show: { type: Boolean, reflect: true },
   };
 
   constructor() {
     super();
-    this.message = '';
-    this.type = 'success';
-    this.duration = 2500;
+
+    this.message = "";
+    this.type = "success";
+    this.duration = 3500;
     this.show = false;
+
     this._timer = null;
   }
 
-  updated(changedProperties) {
-    if (changedProperties.has('show') && this.show) {
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    clearTimeout(this._timer);
+  }
+
+  updated(changed) {
+    if (changed.has("show") && this.show) {
       clearTimeout(this._timer);
 
       this._timer = setTimeout(() => {
         this.show = false;
-        this.dispatchEvent(new CustomEvent('toast-closed', { bubbles: true, composed: true }));
+
+        this.dispatchEvent(
+          new CustomEvent("toast-closed", {
+            bubbles: true,
+            composed: true,
+          }),
+        );
       }, this.duration);
     }
   }
 
   render() {
-    console.error('artjhi');
-    // Dynamische Styles je nach Typ für Hintergrund und Text
-    const typeStyles =
-      {
-        success: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-        error: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
-        warning: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
-      }[this.type] || 'bg-slate-800 text-slate-200 border-slate-700';
+    const config = {
+      success: {
+        icon: "circle-check",
+        accent: "bg-emerald-400",
+        border: "border-emerald-500/30",
+        iconColor: "text-emerald-400",
+      },
 
-    const iconMap =
-      {
-        success: 'check',
-        error: 'alert-triangle',
-        warning: 'info',
-      }[this.type] || 'info';
+      error: {
+        icon: "triangle-alert",
+        accent: "bg-rose-400",
+        border: "border-rose-500/30",
+        iconColor: "text-rose-400",
+      },
 
-    // Das Element bleibt immer im DOM, wird aber über opacity-0 / opacity-100 gesteuert.
-    // pointer-events-none sorgt dafür, dass er im unsichtbaren Zustand keine Klicks blockiert.
+      warning: {
+        icon: "triangle-alert",
+        accent: "bg-amber-400",
+        border: "border-amber-500/30",
+        iconColor: "text-amber-400",
+      },
+    }[this.type] ?? {
+      icon: "info",
+      accent: "bg-indigo-400",
+      border: "border-slate-700",
+      iconColor: "text-indigo-400",
+    };
+
     return html`
       <div
-        class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-2 px-4 py-2.5 rounded-xl border font-medium text-sm shadow-xl shadow-slate-950/40 backdrop-blur-md transition-all duration-300 transform
-        ${this.show ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 translate-y-2 pointer-events-none'}
-        ${typeStyles}"
+        class="
+          fixed
+          bottom-6
+          left-4
+          right-4
+
+          sm:left-1/2
+          sm:right-auto
+          sm:-translate-x-1/2
+          sm:w-auto
+          sm:max-w-lg
+
+          z-[9999]
+
+          transition-all
+          duration-300
+          ease-out
+
+          ${
+            this.show
+              ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
+              : "opacity-0 translate-y-4 scale-95 pointer-events-none"
+          }
+        "
       >
-        <jk-icon icon="${iconMap}" class="size-4 shrink-0"></jk-icon>
-        <span class="whitespace-nowrap">${this.message}</span>
+        <div
+          class="
+            flex
+            overflow-hidden
+
+            rounded-2xl
+
+            bg-slate-900/95
+            backdrop-blur-md
+
+            border
+            ${config.border}
+
+            shadow-2xl
+            shadow-black/30
+          "
+        >
+          <!-- Accent Bar -->
+          <div class="w-1 shrink-0 ${config.accent}"></div>
+
+          <!-- Content -->
+          <div
+            class="
+              flex
+              items-center
+              gap-3
+
+              px-5
+              py-3
+
+              min-w-0
+            "
+          >
+            <jk-icon
+              icon="${config.icon}"
+              class="w-5 h-5 shrink-0 ${config.iconColor}"
+            ></jk-icon>
+
+            <span
+              class="
+                text-sm
+                text-slate-100
+                leading-5
+                break-words
+              "
+            >
+              ${this.message}
+            </span>
+          </div>
+        </div>
       </div>
     `;
   }
 }
 
-customElements.define('jk-toast', JkToast);
+customElements.define("jk-toast", JkToast);
