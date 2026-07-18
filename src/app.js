@@ -50,6 +50,7 @@ class DashboardApp extends LitElement {
     showSaveSuccessDialog: { type: Boolean },
     showSaveErrorDialog: { type: Boolean },
     showClearFavoritesDialog: { type: Boolean },
+    notification: { type: Object },
   };
 
   constructor() {
@@ -79,6 +80,7 @@ class DashboardApp extends LitElement {
     this.originalConfigString = '';
     this.hasEditorConfigChanged = false;
     this.showClearFavoritesDialog = false;
+    this.notification = { show: false, type: 'info', title: '', message: '' };
   }
 
   t(key) {
@@ -176,6 +178,21 @@ class DashboardApp extends LitElement {
 
   clearFavorites() {
     this.showClearFavoritesDialog = true;
+  }
+
+  _handleNotification(e) {
+    const { type, message } = e.detail;
+
+    this.notification = {
+      show: true,
+      type: type, // 'success' oder 'error'
+      title: type === 'success' ? this.t('successTitle') : this.t('errorTitle'),
+      message: message,
+    };
+  }
+
+  _closeNotification() {
+    this.notification = { ...this.notification, show: false };
   }
 
   _confirmClearFavorites() {
@@ -446,13 +463,25 @@ class DashboardApp extends LitElement {
   templateConfigModal() {
     return html`
       <jk-config-modal
-        .show=${this.showConfigModal}
-        .categories=${this.categories}
-        .searchEngines=${this.searchEngines}
+        .show="${this.showConfigModal}"
+        .categories="${this.categories}"
+        .searchEngines="${this.searchEngines}"
         .t=${(key) => this.t(key)}
-        @close=${() => (this.showConfigModal = false)}
-        @save=${this.handleSaveConfig}
+        @notify="${this._handleNotification}"
+        @close="${() => (this.showConfigModal = false)}"
       ></jk-config-modal>
+    `;
+  }
+
+  templateDialog() {
+    return html`
+      <jk-dialog
+        .show="${this.notification.show}"
+        .type="${this.notification.type}"
+        .title="${this.notification.title}"
+        .message="${this.notification.message}"
+        @close="${this._closeNotification}"
+      ></jk-dialog>
     `;
   }
 
@@ -580,7 +609,7 @@ class DashboardApp extends LitElement {
       <!-- Global Overlays -->
       ${this.templateKeyBadge()} ${this.templateHelpModal()}
       ${this.templateSearchModal(filteredServices)} ${this.templateConfigModal()}
-      ${this.templateSaveSuccessDialog()} ${this.templateSaveErrorDialog()}
+      ${this.templateDialog()} ${this.templateSaveSuccessDialog()} ${this.templateSaveErrorDialog()}
 
       <!-- Header -->
       <jk-dashboard-header
@@ -615,18 +644,18 @@ class DashboardApp extends LitElement {
                   title="${this.t('categories')}"
                   icon="folder"
                   .services=${this.categories.map((cat) => ({
-                  name: cat.category,
-                  url: `${cat.services?.length ?? 0} Services`,
-                  icon: cat.icon,
-                  key: cat.categoryKey,
-                }))}
+                    name: cat.category,
+                    url: `${cat.services?.length ?? 0} Services`,
+                    icon: cat.icon,
+                    key: cat.categoryKey,
+                  }))}
                   @service-click=${(e) => {
-                  const key = e.detail.service.key;
-                  this.activeCategoryKey = key;
-                  this.currentInput = key.toUpperCase();
+                    const key = e.detail.service.key;
+                    this.activeCategoryKey = key;
+                    this.currentInput = key.toUpperCase();
 
-                  window.history.pushState({ view: 'category', key }, '');
-                }}
+                    window.history.pushState({ view: 'category', key }, '');
+                  }}
                 ></jk-service-group>
               `
             : html`

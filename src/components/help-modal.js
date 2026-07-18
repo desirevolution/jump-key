@@ -10,7 +10,7 @@ const styles = {
   iconBadge: `flex items-center justify-center size-9 rounded-xl bg-indigo-500/10 ring-1 ring-indigo-500/20`,
   icon: `size-5 text-indigo-300`,
   title: `text-base font-semibold text-white`,
-  shortcutsContainer: `space-y-1`,
+  shortcutsContainer: `space-y-1 max-h-[60vh] overflow-y-auto pr-1`, // Scrollbar falls es voll wird
   row: `flex items-center justify-between gap-4 rounded-xl px-3 py-2.5 transition-colors hover:bg-slate-800/60`,
   rowDesc: `text-sm text-slate-400`,
   keysContainer: `flex items-center gap-1 shrink-0`,
@@ -51,18 +51,38 @@ export class JkHelpModal extends LitElement {
         desc: this.t('hkSearch'),
       },
       {
-        keys: ['#'],
-        desc: this.t('hkToggleView'),
+        keys: [':'],
+        desc: this.t('hkSearchEngines'),
+      },
+      {
+        keys: ['?'],
+        desc: this.t('helpTitle'),
+      },
+      {
+        keys: ['Ctrl', ','],
+        desc: this.t('editConfig'),
+      },
+      {
+        keys: ['Ctrl', '1/2'],
+        desc: this.t('hkSwitchTabs'), // Wechselt die Tabs im Config-Modal (z.B. Services / Engines / Raw)
       },
     ];
 
+    // Ansichtsmodus-Wechsel geht laut App-Logik nur, wenn keine Kategorie aktiv ist
+    shortcuts.push({
+      keys: ['#'],
+      desc: this.t('hkToggleView'),
+    });
+
+    // Favoriten-Schnellwahl (nur im Standard-Listenmodus aktiv)
     if (!this.isGridView) {
       shortcuts.push({
-        keys: ['1', '-', '0'],
+        keys: ['0-9'],
         desc: this.t('hkFavs'),
       });
     }
 
+    // Sequenzielle Navigation innerhalb der Strukturen
     shortcuts.push(
       {
         keys: ['A-Z'],
@@ -71,11 +91,7 @@ export class JkHelpModal extends LitElement {
       {
         keys: ['A-Z'],
         desc: this.t('hkService'),
-        context: true,
-      },
-      {
-        keys: [':'],
-        desc: this.t('hkSearchEngines'),
+        context: true, // Zeigt das "In Kategorie"-Badge
       },
       {
         keys: ['↑', '↓'],

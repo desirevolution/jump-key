@@ -17,6 +17,7 @@ export const translations = {
     hkService: 'Service innerhalb einer Kategorie aufrufen',
     hkReset: 'Zurück zur Hauptübersicht / Abbrechen',
     hkToggleView: 'Ansichtsmodus wechseln (Kategorie / Grid)',
+    hkSwitchTabs: 'Konfigurations-Tabs wechseln',
 
     searchEnginesShow: 'Suchmaschinen anzeigen', // <-- Neu
     searchEnginesTitle: 'Unterstützte Suchmaschinen:', // <-- Neu
@@ -78,6 +79,7 @@ export const translations = {
     hkService: 'Launch service inside active category',
     hkReset: 'Back to main overview / Cancel',
     hkToggleView: 'Toggle View Mode (Category / Grid)',
+    hkSwitchTabs: 'Switch config tabs',
 
     // --- Search Engine specific Keys ---
     searchEnginesShow: 'Show search engines', // <-- Neu

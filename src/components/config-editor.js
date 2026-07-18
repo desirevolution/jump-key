@@ -6,16 +6,23 @@ import { matchBrackets } from 'prism-code-editor/match-brackets';
 import { defaultCommands, addEditorHotkey } from 'prism-code-editor/commands';
 import { highlightBracketPairs } from 'prism-code-editor/highlight-brackets';
 import { indentGuides } from 'prism-code-editor/guides';
+import { cursorPosition } from 'prism-code-editor/cursor';
 
 import 'prism-code-editor/layout.css';
 import 'prism-code-editor/guides.css';
 import 'prism-code-editor/prism/languages/json';
 import '../styles/jump-key-dark.css';
-import { cursorPosition } from 'prism-code-editor/cursor';
+
+// 1. Static styling dictionary isolating layouts from the application engine
+const styles = {
+  containerBase: `w-full h-full min-h-[400px] rounded-xl overflow-auto bg-slate-950 border shadow-inner transition-colors`,
+  containerValid: `border-slate-700 focus-within:border-indigo-500`,
+  containerInvalid: `border-rose-500 focus-within:border-rose-500`,
+};
 
 export class JkConfigEditor extends LitElement {
   createRenderRoot() {
-    return this;
+    return this; // Preserves global Tailwind CSS execution space
   }
 
   static properties = {
@@ -34,6 +41,13 @@ export class JkConfigEditor extends LitElement {
 
   firstUpdated() {
     this.initEditor();
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    // Falls Prism-Code-Editor eine Teardown-Methode hat:
+    // this._editorInstance?.destroy();
+    this._editorInstance = null;
   }
 
   editorRows(editor) {
@@ -100,51 +114,12 @@ export class JkConfigEditor extends LitElement {
       indentGuides(),
       cursorPosition(),
     );
-
-    const editor = this._editorInstance;
-
-    /*
-    addEditorHotkey(editor, "PageDown", () => {
-    editor.textarea.dispatchEvent(
-    new KeyboardEvent("keydown", {
-      key: "PageDown",
-      bubbles: true,
-    }),
-  );
-    });*/
-    /*
-    const rows = this.editorRows(editor);
-    addEditorHotkey(editor, "PageUp", () =>
-      this.moveDownByLines(editor, -rows),
-    );
-    addEditorHotkey(editor, "PageDown", () =>
-      this.moveDownByLines(editor, rows),
-    );
-    */
   }
 
   render() {
-    return html`
-      <div
-        id="editorContainer"
-        class="
-          w-full
-          h-full
-          min-h-[400px]  /* Verhindert, dass der Editor auf 0 Pixel zusammengedrückt wird */
-          rounded-xl
-          overflow-auto  /* Erlaubt dem Editor-Container das Scrollen */
-          bg-slate-950
-          border
-          shadow-inner
-          ${
-            this.isValid
-              ? 'border-slate-700 focus-within:border-indigo-500'
-              : 'border-rose-500 focus-within:border-rose-500'
-          }
-          transition-colors
-        "
-      ></div>
-    `;
+    const stateClass = this.isValid ? styles.containerValid : styles.containerInvalid;
+
+    return html` <div id="editorContainer" class="${styles.containerBase} ${stateClass}"></div> `;
   }
 }
 
