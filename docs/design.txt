@@ -553,7 +553,30 @@ Description
 </p>
 
 </div>
-Final Rule
+
+## Mobile Strategy
+
+JumpKey follows a desktop-first administration model.
+
+Mobile is optimized for:
+
+- accessing services
+- searching
+- browsing
+- opening links
+
+Administrative features remain desktop-only:
+
+- configuration editor
+- JSON management
+- import/export
+- backup management
+
+Do not force feature parity.
+Optimize for the primary workflow.
+
+
+##Final Rule
 
 Every new JumpKey component should look like it has always been part of the system.
 
