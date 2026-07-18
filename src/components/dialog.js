@@ -2,6 +2,21 @@ import { LitElement, html } from 'lit';
 import './icon.js';
 import './icon-button.js';
 
+// 1. Static styling dictionary isolating layouts from the rendering engine
+const styles = {
+  overlay: `fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-6`,
+  modal: `relative w-full max-w-lg overflow-hidden rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 shadow-2xl shadow-black/40`,
+  header: `flex items-start gap-4 p-6 pb-5`,
+  iconBadgeBase: `flex items-center justify-center size-12 shrink-0 rounded-xl bg-slate-700/60 ring-1 ring-slate-600/70`,
+  icon: `size-6`,
+  contentCell: `grow min-w-0`,
+  title: `text-xl font-semibold tracking-tight text-white`,
+  message: `mt-2 text-sm leading-6 text-slate-300`,
+  footer: `flex justify-end gap-3 border-t border-slate-700/70 bg-slate-900/30 px-6 py-4`,
+  cancelBtn: `rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 transition-all duration-200 hover:border-indigo-500/50 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30`,
+  confirmBtn: `rounded-xl border border-indigo-500 bg-indigo-500/20 px-4 py-2 text-sm font-medium text-indigo-100 transition-all duration-200 hover:bg-indigo-500/30 hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40`,
+};
+
 export class JkDialog extends LitElement {
   createRenderRoot() {
     return this; // Preserves global Tailwind configuration styles
@@ -82,10 +97,6 @@ export class JkDialog extends LitElement {
       e.stopPropagation();
       this._handleCancel();
     }
-
-    // Note: We don't need a manual "Enter" key handler anymore!
-    // Since our buttons are focused, the browser natively triggers a click
-    // event on the focused button when the user presses Enter.
   }
 
   _handleCancel() {
@@ -106,161 +117,38 @@ export class JkDialog extends LitElement {
     if (!this.show) return html``;
 
     return html`
-      <div
-        @click=${this._handleCancel}
-        class="
-        fixed inset-0 z-[100]
-        flex items-center justify-center
-        bg-slate-950/80
-        backdrop-blur-md
-        p-6
-      "
-      >
-        <div
-          @click=${(e) => e.stopPropagation()}
-          class="
-          relative
-          w-full
-          max-w-lg
-          overflow-hidden
-          rounded-2xl
-          border
-          border-slate-700/70
-          bg-gradient-to-br
-          from-slate-800
-          to-slate-900
-          shadow-2xl
-          shadow-black/40
-        "
-        >
+      <div @click=${this._handleCancel} class="${styles.overlay}">
+        <div @click=${(e) => e.stopPropagation()} class="${styles.modal}">
           <!-- Header -->
-
-          <div
-            class="
-            flex
-            items-start
-            gap-4
-            p-6
-            pb-5
-          "
-          >
-            <!-- Icon -->
-
-            <div
-              class="
-              flex
-              items-center
-              justify-center
-              size-12
-              shrink-0
-              rounded-xl
-              bg-slate-700/60
-              ring-1
-              ring-slate-600/70
-              ${this.iconColor}
-            "
-            >
-              <jk-icon .icon=${this.icon} class="size-6"></jk-icon>
+          <div class="${styles.header}">
+            <!-- Icon (Combines static layout with dynamic color safely) -->
+            <div class="${styles.iconBadgeBase} ${this.iconColor}">
+              <jk-icon .icon=${this.icon} class="${styles.icon}"></jk-icon>
             </div>
 
             <!-- Title + Message -->
-
-            <div class="grow min-w-0">
-              <h2
-                class="
-                text-xl
-                font-semibold
-                tracking-tight
-                text-white
-              "
-              >
-                ${this.title}
-              </h2>
-
-              <p
-                class="
-                mt-2
-                text-sm
-                leading-6
-                text-slate-300
-              "
-              >
-                ${this.message}
-              </p>
+            <div class="${styles.contentCell}">
+              <h2 class="${styles.title}">${this.title}</h2>
+              <p class="${styles.message}">${this.message}</p>
             </div>
 
             <!-- Close -->
-
             <jk-icon-button icon="x" @click=${this._handleCancel}></jk-icon-button>
           </div>
 
           <!-- Footer -->
-
-          <div
-            class="
-            flex
-            justify-end
-            gap-3
-            border-t
-            border-slate-700/70
-            bg-slate-900/30
-            px-6
-            py-4
-          "
-          >
+          <div class="${styles.footer}">
             ${
               this.variant === 'confirm'
                 ? html`
-                    <button
-                      id="cancelBtn"
-                      @click=${this._handleCancel}
-                      class="
-                      rounded-xl
-                      border
-                      border-slate-600
-                      bg-slate-800
-                      px-4
-                      py-2
-                      text-sm
-                      font-medium
-                      text-slate-200
-                      transition-all
-                      duration-200
-                      hover:border-indigo-500/50
-                      hover:bg-slate-700
-                      focus:outline-none
-                      focus:ring-2
-                      focus:ring-indigo-500/30
-                    "
-                    >
+                    <button id="cancelBtn" @click=${this._handleCancel} class="${styles.cancelBtn}">
                       ${this.cancelLabel}
                     </button>
                   `
                 : ''
             }
 
-            <button
-              id="confirmBtn"
-              @click=${this._handleConfirm}
-              class="
-              rounded-xl
-              border
-              border-indigo-500
-              bg-indigo-500/20
-              px-4
-              py-2
-              text-sm
-              font-medium
-              text-indigo-100
-              transition-all
-              duration-200
-              hover:bg-indigo-500/30
-              hover:border-indigo-400
-              focus:outline-none
-              focus:ring-2
-              focus:ring-indigo-500/40
-            "
-            >
+            <button id="confirmBtn" @click=${this._handleConfirm} class="${styles.confirmBtn}">
               ${this.confirmLabel}
             </button>
           </div>

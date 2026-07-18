@@ -2,9 +2,21 @@ import { LitElement, html } from 'lit';
 import './service-card.js';
 import './icon.js';
 
+// 1. Extract static design definitions out of the rendering cycle
+const styles = {
+  section: `rounded-2xl border border-slate-700/50 bg-slate-900/20 p-4 sm:p-5 transition-colors duration-300`,
+  header: `flex items-center gap-3 mb-4`,
+  iconContainer: `flex items-center justify-center size-8 rounded-xl bg-slate-800/70 ring-1 ring-slate-700/70`,
+  icon: `size-4 text-indigo-300`,
+  titleWrapper: `flex items-center gap-2 min-w-0`,
+  title: `text-sm font-semibold tracking-wide text-slate-200 truncate`,
+  badge: `hidden sm:inline-flex items-center rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-2 py-0.5 font-mono text-[11px] font-bold text-indigo-300`,
+  grid: `grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(280px,1fr))]`,
+};
+
 export class JkServiceGroup extends LitElement {
   createRenderRoot() {
-    return this;
+    return this; // Using global Tailwind styles
   }
 
   static properties = {
@@ -14,142 +26,40 @@ export class JkServiceGroup extends LitElement {
     services: { type: Array },
   };
 
+  _handleCardClick(service) {
+    this.dispatchEvent(
+      new CustomEvent('service-click', {
+        detail: { service },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }
+
   render() {
     return html`
-      <section
-        class="
-          rounded-2xl
-
-          border
-          border-slate-700/50
-
-          bg-slate-900/20
-
-          p-4
-          sm:p-5
-
-          transition-colors
-          duration-300
-        "
-      >
+      <section class="${styles.section}">
         <!-- Group Header -->
-
-        <div
-          class="
-            flex
-            items-center
-            gap-3
-
-            mb-4
-          "
-        >
+        <div class="${styles.header}">
           <!-- Icon -->
-
-          <div
-            class="
-              flex
-              items-center
-              justify-center
-
-              size-8
-
-              rounded-xl
-
-              bg-slate-800/70
-
-              ring-1
-              ring-slate-700/70
-            "
-          >
-            <jk-icon
-              .icon=${this.icon || 'folder'}
-              class="
-                size-4
-
-                text-indigo-300
-              "
-            ></jk-icon>
+          <div class="${styles.iconContainer}">
+            <jk-icon .icon=${this.icon || 'folder'} class="${styles.icon}"></jk-icon>
           </div>
 
-          <!-- Title -->
-
-          <div
-            class="
-              flex
-              items-center
-              gap-2
-
-              min-w-0
-            "
-          >
-            <h2
-              class="
-                text-sm
-
-                font-semibold
-
-                tracking-wide
-
-                text-slate-200
-
-                truncate
-              "
-            >
-              ${this.title}
-            </h2>
+          <!-- Title & Optional Badge -->
+          <div class="${styles.titleWrapper}">
+            <h2 class="${styles.title}">${this.title}</h2>
 
             ${
               this.badgeText
-                ? html`
-                    <kbd
-                      class="
-                        hidden
-                        sm:inline-flex
-
-                        items-center
-
-                        rounded-lg
-
-                        border
-                        border-indigo-500/30
-
-                        bg-indigo-500/10
-
-                        px-2
-                        py-0.5
-
-                        font-mono
-
-                        text-[11px]
-
-                        font-bold
-
-                        text-indigo-300
-                      "
-                    >
-                      ${this.badgeText.toUpperCase()}
-                    </kbd>
-                  `
+                ? html` <kbd class="${styles.badge}"> ${this.badgeText.toUpperCase()} </kbd> `
                 : ''
             }
           </div>
         </div>
 
         <!-- Services Grid -->
-
-        <div
-          class="
-            grid
-
-            grid-cols-1
-
-            gap-3
-
-            sm:gap-4
-
-            grid-cols-[repeat(auto-fill,minmax(280px,1fr))]
-          "
-        >
+        <div class="${styles.grid}">
           ${(this.services ?? []).map(
             (service) => html`
               <jk-service-card
@@ -157,15 +67,7 @@ export class JkServiceGroup extends LitElement {
                 .subtitle=${service.url}
                 .icon=${service.icon}
                 .badgeText=${service.key}
-                @card-click=${() => {
-                  this.dispatchEvent(
-                    new CustomEvent('service-click', {
-                      detail: { service },
-                      bubbles: true,
-                      composed: true,
-                    }),
-                  );
-                }}
+                @card-click=${() => this._handleCardClick(service)}
               ></jk-service-card>
             `,
           )}

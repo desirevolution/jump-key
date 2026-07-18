@@ -14,6 +14,17 @@ import './components/service-group.js';
 import './components/favorites-view.js';
 import './components/grid-view.js';
 
+// 1. Static styling dictionary isolating layouts from the application engine
+const styles = {
+  badgeBase: `fixed bottom-6 right-6 z-50 flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900/95 backdrop-blur-sm border shadow-xl font-mono text-lg font-bold transition-all duration-200 animate-fadeIn hidden sm:flex`,
+  badgeInvalid: `border-rose-500/50 text-rose-300 shadow-rose-950/50`,
+  badgeValid: `border-emerald-500/50 text-emerald-300 shadow-emerald-950/50`,
+  badgeDefault: `border-indigo-500/50 text-indigo-300 shadow-indigo-950/50`,
+  kbd: `px-2 py-1 rounded-md bg-slate-800 border border-slate-700 shadow-inner tracking-wider`,
+  iconBadge: `w-4 h-4`,
+  mainContent: `container mx-auto px-4 py-6`,
+};
+
 class DashboardApp extends LitElement {
   createRenderRoot() {
     return this; // Preserves Tailwind utility structures
@@ -303,15 +314,14 @@ class DashboardApp extends LitElement {
       e.preventDefault();
       if (totalItems > 0) {
         this.selectedIndex = (this.selectedIndex + 1) % totalItems;
-        this.scrollToSelected();
       }
       return;
     }
+
     if (e.key === 'ArrowUp') {
       e.preventDefault();
       if (totalItems > 0) {
         this.selectedIndex = (this.selectedIndex - 1 + totalItems) % totalItems;
-        this.scrollToSelected();
       }
       return;
     }
@@ -382,16 +392,16 @@ class DashboardApp extends LitElement {
       }
     }, 10);
   }
+
   // --- Backend Sync (WebDAV) ---
 
   async saveConfiguration(newConfig, oldConfig) {
     try {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-
       const backupResponse = await fetch(`/config/services.backup-${timestamp}.json`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(oldConfig, null, 2),
+        body: oldConfig,
       });
 
       if (!backupResponse.ok) {
@@ -502,6 +512,7 @@ class DashboardApp extends LitElement {
       ></jk-dialog>
     `;
   }
+
   templateSaveSuccessDialog() {
     return html`
       <jk-dialog
@@ -536,109 +547,32 @@ class DashboardApp extends LitElement {
     if (!this.currentInput || this.showSearch || this.showHelp) return '';
 
     const stateClass = this.isInvalidInput
-      ? `
-      border-rose-500/50
-      text-rose-300
-      shadow-rose-950/50
-    `
+      ? styles.badgeInvalid
       : this.isValidInput
-        ? `
-        border-emerald-500/50
-        text-emerald-300
-        shadow-emerald-950/50
-      `
-        : `
-        border-indigo-500/50
-        text-indigo-300
-        shadow-indigo-950/50
-      `;
+        ? styles.badgeValid
+        : styles.badgeDefault;
 
     return html`
-      <div
-        class="
-        fixed
-        bottom-6
-        right-6
-        z-50
-
-        flex
-        items-center
-        gap-2
-
-        px-3
-        py-2
-
-        rounded-xl
-
-        bg-slate-900/95
-        backdrop-blur-sm
-
-        border
-
-        shadow-xl
-
-        font-mono
-        text-lg
-        font-bold
-
-        transition-all
-        duration-200
-
-        animate-fadeIn
-
-        hidden
-        sm:flex
-
-        ${stateClass}
-      "
-      >
-        <kbd
-          class="
-          px-2
-          py-1
-
-          rounded-md
-
-          bg-slate-800
-
-          border
-          border-slate-700
-
-          shadow-inner
-
-          tracking-wider
-        "
-        >
-          ${this.currentInput}
-        </kbd>
+      <div class="${styles.badgeBase} ${stateClass}">
+        <kbd class="${styles.kbd}"> ${this.currentInput} </kbd>
 
         ${
           this.isValidInput
-            ? html` <jk-icon icon="check" class="w-4 h-4 text-emerald-400"></jk-icon> `
+            ? html`<jk-icon icon="check" class="${styles.iconBadge} text-emerald-400"></jk-icon>`
             : ''
         }
         ${
           this.isInvalidInput
-            ? html` <jk-icon icon="x" class="w-4 h-4 text-rose-400"></jk-icon> `
+            ? html`<jk-icon icon="x" class="${styles.iconBadge} text-rose-400"></jk-icon>`
             : ''
         }
       </div>
     `;
   }
 
-  render_() {
-    const favs = getTopFavorites(this.categories, this.favorites);
-    const filteredServices = getFilteredServices(this.categories, this.searchQuery);
-    const showMain = !this.activeCategoryKey && !this.showSearch && !this.showHelp;
-
-    return html` ${this.templateHelpModal()} `;
-  }
-
   render() {
     const favs = getTopFavorites(this.categories, this.favorites);
-
     const filteredServices = getFilteredServices(this.categories, this.searchQuery);
-
     const showMain =
       !this.activeCategoryKey && !this.showSearch && !this.showHelp && !this.showConfigModal;
 
@@ -664,14 +598,7 @@ class DashboardApp extends LitElement {
       ></jk-dashboard-header>
 
       <!-- Main Content -->
-      <main
-        class="
-        container
-        mx-auto
-        px-4
-        py-6
-      "
-      >
+      <main class="${styles.mainContent}">
         ${
           showMain && !this.isGridView
             ? html`
@@ -688,25 +615,18 @@ class DashboardApp extends LitElement {
                   title="${this.t('categories')}"
                   icon="folder"
                   .services=${this.categories.map((cat) => ({
-                    name: cat.category,
-                    url: `${cat.services?.length ?? 0} Services`,
-                    icon: cat.icon,
-                    key: cat.categoryKey,
-                  }))}
+                  name: cat.category,
+                  url: `${cat.services?.length ?? 0} Services`,
+                  icon: cat.icon,
+                  key: cat.categoryKey,
+                }))}
                   @service-click=${(e) => {
-                    const key = e.detail.service.key;
+                  const key = e.detail.service.key;
+                  this.activeCategoryKey = key;
+                  this.currentInput = key.toUpperCase();
 
-                    this.activeCategoryKey = key;
-                    this.currentInput = key.toUpperCase();
-
-                    window.history.pushState(
-                      {
-                        view: 'category',
-                        key,
-                      },
-                      '',
-                    );
-                  }}
+                  window.history.pushState({ view: 'category', key }, '');
+                }}
                 ></jk-service-group>
               `
             : html`

@@ -1,6 +1,24 @@
 import { LitElement, html } from 'lit';
 import './icon.js';
 
+// 1. Static styling dictionary isolating layouts from the rendering engine
+const styles = {
+  overlay: `fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md`,
+  modal: `w-full max-w-md rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 shadow-2xl shadow-black/40 p-5 font-mono`,
+  header: `flex items-center justify-between mb-5`,
+  headerLeft: `flex items-center gap-3`,
+  iconBadge: `flex items-center justify-center size-9 rounded-xl bg-indigo-500/10 ring-1 ring-indigo-500/20`,
+  icon: `size-5 text-indigo-300`,
+  title: `text-base font-semibold text-white`,
+  shortcutsContainer: `space-y-1`,
+  row: `flex items-center justify-between gap-4 rounded-xl px-3 py-2.5 transition-colors hover:bg-slate-800/60`,
+  rowDesc: `text-sm text-slate-400`,
+  keysContainer: `flex items-center gap-1 shrink-0`,
+  contextBadge: `mr-1 rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-bold text-indigo-300`,
+  kbd: `inline-flex items-center justify-center min-w-8 h-7 rounded-lg border border-slate-700 bg-slate-950 px-2 text-xs font-bold text-indigo-300 shadow-inner shadow-black/40`,
+  footer: `mt-5 text-center text-[11px] text-slate-500`,
+};
+
 export class JkHelpModal extends LitElement {
   createRenderRoot() {
     return this; // Preserves global Tailwind styling classes
@@ -70,234 +88,42 @@ export class JkHelpModal extends LitElement {
     );
 
     return html`
-      <div
-        @click=${this._handleClose}
-        class="
-        fixed
-        inset-0
-        z-50
-
-        flex
-        items-center
-        justify-center
-
-        p-4
-
-        bg-slate-950/70
-
-        backdrop-blur-md
-      "
-      >
-        <div
-          @click=${(e) => e.stopPropagation()}
-          class="
-          w-full
-          max-w-md
-
-          rounded-2xl
-
-          border
-          border-slate-700/70
-
-          bg-gradient-to-br
-          from-slate-800
-          to-slate-900
-
-          shadow-2xl
-          shadow-black/40
-
-          p-5
-
-          font-mono
-        "
-        >
+      <div @click=${this._handleClose} class="${styles.overlay}">
+        <div @click=${(e) => e.stopPropagation()} class="${styles.modal}">
           <!-- Header -->
-
-          <div
-            class="
-            flex
-            items-center
-            justify-between
-
-            mb-5
-          "
-          >
-            <div
-              class="
-              flex
-              items-center
-              gap-3
-            "
-            >
-              <div
-                class="
-                flex
-                items-center
-                justify-center
-
-                size-9
-
-                rounded-xl
-
-                bg-indigo-500/10
-
-                ring-1
-                ring-indigo-500/20
-              "
-              >
-                <jk-icon
-                  icon="keyboard"
-                  class="
-                  size-5
-                  text-indigo-300
-                "
-                ></jk-icon>
+          <div class="${styles.header}">
+            <div class="${styles.headerLeft}">
+              <div class="${styles.iconBadge}">
+                <jk-icon icon="keyboard" class="${styles.icon}"></jk-icon>
               </div>
-
-              <h3
-                class="
-                text-base
-
-                font-semibold
-
-                text-white
-              "
-              >
-                ${this.t('helpTitle')}
-              </h3>
+              <h3 class="${styles.title}">${this.t('helpTitle')}</h3>
             </div>
-
             <jk-icon-button icon="x" label="Close" @click=${this._handleClose}></jk-icon-button>
           </div>
 
           <!-- Shortcuts -->
-
-          <div
-            class="
-            space-y-1
-          "
-          >
+          <div class="${styles.shortcutsContainer}">
             ${shortcuts.map(
               (item) => html`
-                <div
-                  class="
-                  flex
-                  items-center
-                  justify-between
+                <div class="${styles.row}">
+                  <span class="${styles.rowDesc}"> ${item.desc} </span>
 
-                  gap-4
-
-                  rounded-xl
-
-                  px-3
-                  py-2.5
-
-                  transition-colors
-
-                  hover:bg-slate-800/60
-                "
-                >
-                  <span
-                    class="
-                    text-sm
-
-                    text-slate-400
-                  "
-                  >
-                    ${item.desc}
-                  </span>
-
-                  <div
-                    class="
-                    flex
-                    items-center
-                    gap-1
-
-                    shrink-0
-                  "
-                  >
+                  <div class="${styles.keysContainer}">
                     ${
                       item.context
                         ? html`
-                            <span
-                              class="
-                              mr-1
-
-                              rounded-lg
-
-                              border
-                              border-indigo-500/20
-
-                              bg-indigo-500/10
-
-                              px-1.5
-                              py-0.5
-
-                              text-[10px]
-
-                              font-bold
-
-                              text-indigo-300
-                            "
-                            >
-                              ${this.t('contextInCat')}
-                            </span>
+                            <span class="${styles.contextBadge}"> ${this.t('contextInCat')} </span>
                           `
                         : ''
                     }
-                    ${item.keys.map(
-                      (key) => html`
-                        <kbd
-                          class="
-                          inline-flex
-                          items-center
-                          justify-center
-
-                          min-w-8
-                          h-7
-
-                          rounded-lg
-
-                          border
-                          border-slate-700
-
-                          bg-slate-950
-
-                          px-2
-
-                          text-xs
-
-                          font-bold
-
-                          text-indigo-300
-
-                          shadow-inner
-                          shadow-black/40
-                        "
-                        >
-                          ${key}
-                        </kbd>
-                      `,
-                    )}
+                    ${item.keys.map((key) => html` <kbd class="${styles.kbd}"> ${key} </kbd> `)}
                   </div>
                 </div>
               `,
             )}
           </div>
 
-          <div
-            class="
-            mt-5
-
-            text-center
-
-            text-[11px]
-
-            text-slate-500
-          "
-          >
-            ${this.t('helpExit')}
-          </div>
+          <div class="${styles.footer}">${this.t('helpExit')}</div>
         </div>
       </div>
     `;

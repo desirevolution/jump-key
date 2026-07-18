@@ -318,7 +318,7 @@ export class JkConfigModal extends LitElement {
                   text-white
                 "
                 >
-                  ${this.t('dashboardSettings') || 'Dashboard Settings'}
+                  JumpKey
                 </h2>
 
                 <p
@@ -381,7 +381,7 @@ export class JkConfigModal extends LitElement {
                           font-medium
                         "
                         >
-                          ${this._isEditorConfigValid ? 'Valid' : 'Invalid'}
+                          ${this._isEditorConfigValid ? this.t('tabEditorValid') : this.t('tabEditorInvalid')}
                         </span>
                       </div>
                     `
@@ -541,7 +541,7 @@ export class JkConfigModal extends LitElement {
 
               min-w-0
 
-              overflow-hidden
+              overflow-y-auto
             "
             >
               ${this._renderActiveTabContent()}

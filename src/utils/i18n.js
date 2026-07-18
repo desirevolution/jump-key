@@ -57,6 +57,8 @@ export const translations = {
       'Du hast ungespeicherte Änderungen vorgenommen. Möchtest du diese wirklich verwerfen?',
     tabEditorDiscardChangesConfirm: 'Änderungen verwerfen',
     tabEditorDiscardChangesCancel: 'Weiter editieren',
+    tabEditorValid: 'Gültig',
+    tabEditorInvalid: 'Ungültig',
   },
   en: {
     helpHint: 'Press [?] for hotkey help',
@@ -116,6 +118,8 @@ export const translations = {
     tabEditorDiscardChangesMsg: 'You have unsaved changes. Do you really want to discard them?',
     tabEditorDiscardChangesConfirm: 'Discard changes',
     tabEditorDiscardChangesCancel: 'Continue editing',
+    tabEditorValid: 'Valid',
+    tabEditorInvalid: 'Invalid',
   },
 };
 

@@ -45,8 +45,6 @@ export class JkConfigEditor extends LitElement {
     // 2. Berechne die Zeilenhöhe (Line-Height) aus dem CSS
     const style = window.getComputedStyle(textarea);
     const lineHeight = parseFloat(style.lineHeight);
-    console.error(clientHeight);
-    console.error(lineHeight);
     const editorWrapper = editor.textarea.closest('.prism-code-editor');
     const korrekteHoehe = editorWrapper.clientHeight;
 
@@ -130,25 +128,21 @@ export class JkConfigEditor extends LitElement {
       <div
         id="editorContainer"
         class="
-w-full
-h-full
-rounded-xl
-overflow-hidden
-
-bg-slate-950
-
-border
-
-shadow-inner
-
-${
-  this.isValid
-    ? 'border-slate-700 focus-within:border-indigo-500'
-    : 'border-rose-500 focus-within:border-rose-500'
-}
-
-transition-colors
-"
+          w-full
+          h-full
+          min-h-[400px]  /* Verhindert, dass der Editor auf 0 Pixel zusammengedrückt wird */
+          rounded-xl
+          overflow-auto  /* Erlaubt dem Editor-Container das Scrollen */
+          bg-slate-950
+          border
+          shadow-inner
+          ${
+            this.isValid
+              ? 'border-slate-700 focus-within:border-indigo-500'
+              : 'border-rose-500 focus-within:border-rose-500'
+          }
+          transition-colors
+        "
       ></div>
     `;
   }

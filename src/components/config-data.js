@@ -23,11 +23,12 @@ export class JkConfigData extends LitElement {
         2,
       );
 
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const blob = new Blob([configData], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = 'dashboard-config.json';
+      link.download = `services.backup-${timestamp}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
