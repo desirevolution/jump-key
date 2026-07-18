@@ -5,7 +5,7 @@ import './search-item.js';
 
 // 1. Static styling dictionary isolating layouts from the rendering engine
 const styles = {
-  overlay: `fixed inset-0 z-50 flex items-start justify-center pt-10 sm:pt-24 p-4 bg-slate-950/70 backdrop-blur-md`,
+  overlay: `fixed inset-0 z-60 flex items-start justify-center pt-10 sm:pt-24 p-4 bg-slate-950/70 backdrop-blur-md`,
   modal: `w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 shadow-2xl shadow-black/40 flex flex-col max-h-[80vh]`,
   header: `flex items-center gap-3 px-5 py-4 border-b border-slate-700/70 bg-slate-900/30 shrink-0`,
   iconBadge: `flex items-center justify-center size-9 rounded-xl bg-slate-700/60 ring-1 ring-slate-600/70 text-indigo-300`,
