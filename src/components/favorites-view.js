@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { html, LitElement } from 'lit';
 import './service-card.js';
 import './icon.js';
 import './icon-button.js';
@@ -49,7 +49,7 @@ export class JkFavoritesView extends LitElement {
                 new CustomEvent('clear-favorites', {
                   bubbles: true,
                   composed: true,
-                }),
+                })
               );
             }}
           ></jk-icon-button>
@@ -71,7 +71,7 @@ export class JkFavoritesView extends LitElement {
                       detail: { service },
                       bubbles: true,
                       composed: true,
-                    }),
+                    })
                   );
                 }}
                 @card-long-press=${() => {
@@ -80,11 +80,11 @@ export class JkFavoritesView extends LitElement {
                       detail: { slot: service.favSlot },
                       bubbles: true,
                       composed: true,
-                    }),
+                    })
                   );
                 }}
               ></jk-service-card>
-            `,
+            `
           )}
         </div>
       </section>

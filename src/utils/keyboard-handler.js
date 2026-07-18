@@ -1,4 +1,4 @@
-import { getFilteredServices, getFavorites } from './shortcuts.js';
+import { getFavorites, getFilteredServices } from './shortcuts.js';
 
 /**
  * Verarbeitet die globalen Tastatureingaben für die Dashboard-App
@@ -93,7 +93,9 @@ function handleFavoriteShortcut(slot, app) {
     app.dialogConfig = {
       show: true,
       title: app.t('confirmDeleteFavTitle') || 'Favorit löschen?',
-      message: `${app.t('confirmDeleteFav') || 'Möchtest du den Favoriten auf Taste'} ${slot} (${app.favorites[slot]}) entfernen?`,
+      message: `${app.t('confirmDeleteFav') || 'Möchtest du den Favoriten auf Taste'} ${slot} (${
+        app.favorites[slot]
+      }) entfernen?`,
       icon: 'trash-2',
       iconColor: 'text-rose-400',
       confirmLabel: app.t('confirmResetConfirm') || 'Löschen',
@@ -188,13 +190,15 @@ function handleSearchKeyDown(e, app) {
     if (firstSpaceIndex !== -1) {
       const prefix = commandString.substring(0, firstSpaceIndex).toLowerCase();
       searchTermsPreview = commandString.substring(firstSpaceIndex + 1);
-      matchedEngine = app.searchEngines.find((eng) => eng.prefix.toLowerCase() === prefix);
+      matchedEngine = app.searchEngines.find(
+        (eng) => eng.prefix.toLowerCase() === prefix
+      );
       if (matchedEngine) showPreviewBlock = true;
     } else {
       isFilteringEngines = true;
       const currentPrefixToken = commandString.toLowerCase();
       candidateEngines = app.searchEngines.filter((eng) =>
-        eng.prefix.toLowerCase().startsWith(currentPrefixToken),
+        eng.prefix.toLowerCase().startsWith(currentPrefixToken)
       );
     }
   }
@@ -220,7 +224,7 @@ function handleSearchKeyDown(e, app) {
       action: () => {
         const finalUrl = matchedEngine.url.replace(
           '%s',
-          encodeURIComponent(searchTermsPreview.trim()),
+          encodeURIComponent(searchTermsPreview.trim())
         );
         window.open(finalUrl, '_blank');
         app.resetInput(true);
@@ -267,7 +271,9 @@ function handleSearchKeyDown(e, app) {
 function handleNavigationKeyDown(key, app) {
   if (!app.activeCategoryKey) {
     if (/^[0-9]$/.test(key)) {
-      const favService = getFavorites(app.categories, app.favorites).find((s) => s.key === key);
+      const favService = getFavorites(app.categories, app.favorites).find(
+        (s) => s.key === key
+      );
       if (favService) {
         app.currentInput = key.toUpperCase();
         app.trackClick(favService, true);
@@ -290,7 +296,9 @@ function handleNavigationKeyDown(key, app) {
   }
 
   app.currentInput += ` → ${key.toUpperCase()}`;
-  const cat = app.categories.find((c) => c.categoryKey === app.activeCategoryKey);
+  const cat = app.categories.find(
+    (c) => c.categoryKey === app.activeCategoryKey
+  );
   const service = cat?.services?.find((s) => s.key === key);
 
   if (service) {

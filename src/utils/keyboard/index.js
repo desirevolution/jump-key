@@ -1,18 +1,12 @@
-/**
- * Keyboard System Entry Point
- */
-
-export { handleGlobalKeyDown } from "./global.js";
+export { handleGlobalKeyDown } from './global.js';
 
 export {
-  handleFavoriteShortcut,
   handleFavoriteRecordingInput,
-} from "./favorites.js";
+  handleFavoriteShortcut,
+} from './favorites.js';
 
-export {
-  handleSearchKeyDown,
-} from "./search.js";
+export { handleSearchKeyDown } from './search.js';
 
-export {
-  handleNavigationKeyDown,
-} from "./navigation.js";
+export { handleNavigationKeyDown } from './navigation.js';
+
+export { clearKeyBadge, showKeyBadge, showToast } from './ui.js';

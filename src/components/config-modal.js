@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { html, LitElement } from 'lit';
 import './icon.js';
 import './icon-button.js';
 import './dialog.js';
@@ -78,7 +78,7 @@ export class JkConfigModal extends LitElement {
             searchEngines: this.searchEngines,
           },
           null,
-          2,
+          2
         );
         this._originalConfigString = this._editorValue;
         this._isEditorConfigValid = true;
@@ -122,7 +122,8 @@ export class JkConfigModal extends LitElement {
     }
 
     if (this._activeTab === 'editor') {
-      const isSaveShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's';
+      const isSaveShortcut =
+        (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's';
       if (isSaveShortcut) {
         e.preventDefault();
         e.stopPropagation();
@@ -134,9 +135,13 @@ export class JkConfigModal extends LitElement {
 
       if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
         const activeElementId = document.activeElement?.id;
-        const isSaveEnabled = this._isEditorConfigValid && this._hasEditorConfigChanged;
+        const isSaveEnabled =
+          this._isEditorConfigValid && this._hasEditorConfigChanged;
 
-        if (activeElementId === 'cancelModalBtn' || activeElementId === 'saveModalBtn') {
+        if (
+          activeElementId === 'cancelModalBtn' ||
+          activeElementId === 'saveModalBtn'
+        ) {
           e.preventDefault();
           e.stopPropagation();
 
@@ -191,7 +196,9 @@ export class JkConfigModal extends LitElement {
   _forceClose() {
     this._showDiscardDialog = false;
     window.removeEventListener('keydown', this._handleKeyDown, true);
-    this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent('close', { bubbles: true, composed: true })
+    );
   }
 
   _handleSave() {
@@ -205,7 +212,7 @@ export class JkConfigModal extends LitElement {
           },
           bubbles: true,
           composed: true,
-        }),
+        })
       );
     } catch (e) {
       console.error('Failed to parse editor JSON on save', e);
@@ -239,11 +246,17 @@ export class JkConfigModal extends LitElement {
   render() {
     if (!this.show) return html``;
 
-    const statusClass = this._isEditorConfigValid ? styles.statusValid : styles.statusInvalid;
+    const statusClass = this._isEditorConfigValid
+      ? styles.statusValid
+      : styles.statusInvalid;
     const tabDataClass =
-      this._activeTab === 'data' ? styles.sidebarBtnActive : styles.sidebarBtnInactive;
+      this._activeTab === 'data'
+        ? styles.sidebarBtnActive
+        : styles.sidebarBtnInactive;
     const tabEditorClass =
-      this._activeTab === 'editor' ? styles.sidebarBtnActive : styles.sidebarBtnInactive;
+      this._activeTab === 'editor'
+        ? styles.sidebarBtnActive
+        : styles.sidebarBtnInactive;
     const saveBtnClass =
       this._isEditorConfigValid && this._hasEditorConfigChanged
         ? styles.btnPrimaryActive
@@ -280,7 +293,11 @@ export class JkConfigModal extends LitElement {
                     `
                   : ''
               }
-              <jk-icon-button icon="x" label="Close" @click="${this._handleClose}"></jk-icon-button>
+              <jk-icon-button
+                icon="x"
+                label="Close"
+                @click="${this._handleClose}"
+              ></jk-icon-button>
             </div>
           </div>
 
@@ -310,7 +327,9 @@ export class JkConfigModal extends LitElement {
             </aside>
 
             <!-- Content Area -->
-            <main class="${styles.contentArea}">${this._renderActiveTabContent()}</main>
+            <main class="${styles.contentArea}">
+              ${this._renderActiveTabContent()}
+            </main>
           </div>
 
           <!-- Footer -->

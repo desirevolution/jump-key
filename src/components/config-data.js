@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { html, LitElement } from 'lit';
 import { validateConfig } from '../utils/config-validator.js';
 
 // 1. Static styling dictionary isolating layouts from the application engine
@@ -48,7 +48,7 @@ export class JkConfigData extends LitElement {
           searchEngines: this.searchEngines,
         },
         null,
-        2,
+        2
       );
 
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
@@ -82,12 +82,15 @@ export class JkConfigData extends LitElement {
               detail: parsed,
               bubbles: true,
               composed: true,
-            }),
+            })
           );
 
           this._sendNotification('success', this.t('tabDataImportSuccess'));
         } else {
-          this._sendNotification('error', this.t('tabDataImportInvalidStructure'));
+          this._sendNotification(
+            'error',
+            this.t('tabDataImportInvalidStructure')
+          );
         }
       } catch (err) {
         // JSON-Parsing-Fehler
@@ -105,7 +108,7 @@ export class JkConfigData extends LitElement {
         detail: { type, message },
         bubbles: true,
         composed: true,
-      }),
+      })
     );
   }
 
@@ -122,7 +125,9 @@ export class JkConfigData extends LitElement {
 
             <!-- Text -->
             <div class="${styles.exportTextContainer}">
-              <h3 class="${styles.exportTitle}">${this.t('tabDataBackupTitle')}</h3>
+              <h3 class="${styles.exportTitle}">
+                ${this.t('tabDataBackupTitle')}
+              </h3>
               <p class="${styles.exportDesc}">${this.t('tabDataBackupDesc')}</p>
             </div>
 
@@ -142,8 +147,12 @@ export class JkConfigData extends LitElement {
             </div>
 
             <div>
-              <h3 class="${styles.importTitle}">${this.t('tabDataRestoreTitle')}</h3>
-              <p class="${styles.importDesc}">${this.t('tabDataRestoreDesc')}</p>
+              <h3 class="${styles.importTitle}">
+                ${this.t('tabDataRestoreTitle')}
+              </h3>
+              <p class="${styles.importDesc}">
+                ${this.t('tabDataRestoreDesc')}
+              </p>
             </div>
           </div>
 
@@ -160,9 +169,13 @@ export class JkConfigData extends LitElement {
               <jk-icon icon="file-json" class="w-7 h-7"></jk-icon>
             </div>
 
-            <span class="${styles.dropZoneLabel}"> ${this.t('tabDataSelectFile')} </span>
+            <span class="${styles.dropZoneLabel}">
+              ${this.t('tabDataSelectFile')}
+            </span>
 
-            <span class="${styles.dropZoneSubLabel}"> ${this.t('tabDataOnlyJsonFiles')} </span>
+            <span class="${styles.dropZoneSubLabel}">
+              ${this.t('tabDataOnlyJsonFiles')}
+            </span>
           </div>
         </section>
       </div>

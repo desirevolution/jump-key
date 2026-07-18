@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { html, LitElement } from 'lit';
 import './icon.js';
 
 // 1. Static styling dictionary isolating layouts from the rendering engine
@@ -39,7 +39,9 @@ export class JkHelpModal extends LitElement {
 
   _handleClose() {
     this.show = false; // Close locally
-    this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent('close', { bubbles: true, composed: true })
+    );
   }
 
   render() {
@@ -100,7 +102,7 @@ export class JkHelpModal extends LitElement {
       {
         keys: ['ESC'],
         desc: this.t('hkReset'),
-      },
+      }
     );
 
     return html`
@@ -114,7 +116,11 @@ export class JkHelpModal extends LitElement {
               </div>
               <h3 class="${styles.title}">${this.t('helpTitle')}</h3>
             </div>
-            <jk-icon-button icon="x" label="Close" @click=${this._handleClose}></jk-icon-button>
+            <jk-icon-button
+              icon="x"
+              label="Close"
+              @click=${this._handleClose}
+            ></jk-icon-button>
           </div>
 
           <!-- Shortcuts -->
@@ -128,14 +134,16 @@ export class JkHelpModal extends LitElement {
                     ${
                       item.context
                         ? html`
-                            <span class="${styles.contextBadge}"> ${this.t('contextInCat')} </span>
+                            <span class="${styles.contextBadge}">
+                              ${this.t('contextInCat')}
+                            </span>
                           `
                         : ''
                     }
                     ${item.keys.map((key) => html` <kbd class="${styles.kbd}"> ${key} </kbd> `)}
                   </div>
                 </div>
-              `,
+              `
             )}
           </div>
 

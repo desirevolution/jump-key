@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { html, LitElement } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import './icon.js';
 
@@ -64,7 +64,10 @@ export class JkDashboardSearchItem extends LitElement {
             this.data.icon
               ? html`
                   <div class="${styles.iconWrapper} ${iconActiveClasses}">
-                    <jk-icon .icon=${this.data.icon} class="${styles.icon}"></jk-icon>
+                    <jk-icon
+                      .icon=${this.data.icon}
+                      class="${styles.icon}"
+                    ></jk-icon>
                   </div>
                 `
               : ''
@@ -92,7 +95,9 @@ export class JkDashboardSearchItem extends LitElement {
         const terms = this.data.searchTerms?.trim() || '...';
         return html`
           <div class="min-w-0">
-            <div class="${styles.previewPrefix}">${this.t('searchEnginePreviewPrefix')}</div>
+            <div class="${styles.previewPrefix}">
+              ${this.t('searchEnginePreviewPrefix')}
+            </div>
             <div class="${styles.previewText}">
               <span class="font-semibold">${this.data.name}</span>
               <span class="${styles.previewTerms}">"${terms}"</span>

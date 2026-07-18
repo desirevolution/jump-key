@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { html, LitElement } from 'lit';
 import './service-card.js';
 import './icon.js';
 
@@ -32,7 +32,7 @@ export class JkServiceGroup extends LitElement {
         detail: { service },
         bubbles: true,
         composed: true,
-      }),
+      })
     );
   }
 
@@ -43,7 +43,7 @@ export class JkServiceGroup extends LitElement {
         detail: { service },
         bubbles: true,
         composed: true,
-      }),
+      })
     );
   }
 
@@ -54,7 +54,10 @@ export class JkServiceGroup extends LitElement {
         <div class="${styles.header}">
           <!-- Icon -->
           <div class="${styles.iconContainer}">
-            <jk-icon .icon=${this.icon || 'folder'} class="${styles.icon}"></jk-icon>
+            <jk-icon
+              .icon=${this.icon || 'folder'}
+              class="${styles.icon}"
+            ></jk-icon>
           </div>
 
           <!-- Title & Optional Badge -->
@@ -63,7 +66,11 @@ export class JkServiceGroup extends LitElement {
 
             ${
               this.badgeText
-                ? html` <kbd class="${styles.badge}"> ${this.badgeText.toUpperCase()} </kbd> `
+                ? html`
+                    <kbd class="${styles.badge}">
+                      ${this.badgeText.toUpperCase()}
+                    </kbd>
+                  `
                 : ''
             }
           </div>
@@ -80,7 +87,7 @@ export class JkServiceGroup extends LitElement {
                 .badgeText=${service.key}
                 @card-click=${() => this._handleCardClick(service)}
               ></jk-service-card>
-            `,
+            `
           )}
         </div>
       </section>

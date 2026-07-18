@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { html, LitElement } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import './icon.js';
 
@@ -67,7 +67,7 @@ export class JkServiceCard extends LitElement {
           detail: { service: serviceData }, // Das füttert e.detail.service in der app.js
           bubbles: true,
           composed: true,
-        }),
+        })
       );
     }, 600);
   }
@@ -102,7 +102,7 @@ export class JkServiceCard extends LitElement {
         detail: { service: serviceData },
         bubbles: true,
         composed: true,
-      }),
+      })
     );
   }
 
@@ -113,7 +113,9 @@ export class JkServiceCard extends LitElement {
   }
 
   render() {
-    const isUrl = this.subtitle && (this.subtitle.includes('.') || this.subtitle.includes('/'));
+    const isUrl =
+      this.subtitle &&
+      (this.subtitle.includes('.') || this.subtitle.includes('/'));
     const displaySubtitle = isUrl
       ? this.subtitle.replace(/^https?:\/\/(www\.)?/, '')
       : this.subtitle || '';
@@ -132,12 +134,20 @@ export class JkServiceCard extends LitElement {
         @pointerdown=${this._handlePointerDown}
         @pointerup=${this._handlePointerUp}
         @pointerleave=${this._handlePointerLeave}
-        class="${styles.card} ${this.isPressing ? 'scale-95 !border-amber-500/80 shadow-2xl shadow-amber-500/20 duration-500' : ''}"
+        class="${styles.card} ${
+          this.isPressing
+            ? 'scale-95 !border-amber-500/80 shadow-2xl shadow-amber-500/20 duration-500'
+            : ''
+        }"
       >
         <!-- Akzentuierter Glow bei aktivem Halten -->
         <div class="${styles.accent}"></div>
         <div
-          class="${styles.glow} ${this.isPressing ? '!opacity-100 from-amber-500/10 via-amber-500/10 to-amber-500/0' : ''}"
+          class="${styles.glow} ${
+            this.isPressing
+              ? '!opacity-100 from-amber-500/10 via-amber-500/10 to-amber-500/0'
+              : ''
+          }"
         ></div>
 
         <!-- Icon -->

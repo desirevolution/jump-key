@@ -10,7 +10,8 @@ export const translations = {
     categories: 'Kategorien',
     services: 'Services',
     back: 'Zurück',
-    confirmReset: 'Möchtest du die Liste der häufig genutzten Services wirklich zurücksetzen?',
+    confirmReset:
+      'Möchtest du die Liste der häufig genutzten Services wirklich zurücksetzen?',
     hkSearch: 'Suche öffnen',
     hkFavs: 'Direkt-Favorit aufrufen',
     hkCat: 'Kategorie-Hotkeys aktivieren',
@@ -38,21 +39,25 @@ export const translations = {
     tabData: 'Import & Export',
     tabDataExport: 'Exportieren',
     tabDataBackupTitle: 'Konfiguration sichern',
-    tabDataBackupDesc: 'Lade deine aktuellen Widgets und Suchmaschinen als .json-Datei herunter.',
+    tabDataBackupDesc:
+      'Lade deine aktuellen Widgets und Suchmaschinen als .json-Datei herunter.',
     tabDataRestoreTitle: 'Konfiguration wiederherstellen',
     tabDataRestoreDesc: 'Lade eine vorhandene JSON-Konfigurationsdatei hoch.',
     tabDataSelectFile: 'Datei auswählen',
     tabDataOnlyJsonFiles: 'Nur valide .json-Dateien',
     tabDataImportSuccess: 'Konfiguration erfolgreich geladen!',
-    tabDataImportInvalidStructure: 'Die hochgeladene Datei hat keine valide Dashboard-Struktur.',
-    tabDataImportJsonError: 'Fehler beim Lesen der JSON-Datei. Ungültige Syntax.',
+    tabDataImportInvalidStructure:
+      'Die hochgeladene Datei hat keine valide Dashboard-Struktur.',
+    tabDataImportJsonError:
+      'Fehler beim Lesen der JSON-Datei. Ungültige Syntax.',
 
     tabEditor: 'JSON-Editor',
     tabEditorOk: 'OK',
     tabEditorSaveDoneTitle: 'Erfolgreich',
     tabEditorSaveDone: 'Konfiguration erfolgreich gespeichert!',
     tabEditorSaveFailedTitle: 'Fehler beim Speichern',
-    tabEditorSaveFailed: 'Die Änderungen konnten nicht in die services.json geschrieben werden.',
+    tabEditorSaveFailed:
+      'Die Änderungen konnten nicht in die services.json geschrieben werden.',
     tabEditorDiscardChangesTitle: 'Ungespeicherte Änderungen',
     tabEditorDiscardChangesMsg:
       'Du hast ungespeicherte Änderungen vorgenommen. Möchtest du diese wirklich verwerfen?',
@@ -101,13 +106,15 @@ export const translations = {
     tabData: 'Import & Export',
     tabDataExport: 'Export',
     tabDataBackupTitle: 'Back up configuration',
-    tabDataBackupDesc: 'Download your current widgets and search engines as a .json file.',
+    tabDataBackupDesc:
+      'Download your current widgets and search engines as a .json file.',
     tabDataRestoreTitle: 'Restore configuration',
     tabDataRestoreDesc: 'Upload an existing JSON configuration file.',
     tabDataSelectFile: 'Select file',
     tabDataOnlyJsonFiles: 'Only valid .json files',
     tabDataImportSuccess: 'Configuration successfully loaded!',
-    tabDataImportInvalidStructure: 'The uploaded file does not have a valid dashboard structure.',
+    tabDataImportInvalidStructure:
+      'The uploaded file does not have a valid dashboard structure.',
     tabDataImportJsonError: 'Error reading the JSON file. Invalid syntax.',
 
     tabEditor: 'JSON-Editor',
@@ -117,7 +124,8 @@ export const translations = {
     tabEditorgSaveFailedTitle: 'Save Failed',
     tabEditorSaveFailed: 'Could not write the changes to services.json.',
     tabEditorDiscardChangesTitle: 'Unsaved Changes',
-    tabEditorDiscardChangesMsg: 'You have unsaved changes. Do you really want to discard them?',
+    tabEditorDiscardChangesMsg:
+      'You have unsaved changes. Do you really want to discard them?',
     tabEditorDiscardChangesConfirm: 'Discard changes',
     tabEditorDiscardChangesCancel: 'Continue editing',
     tabEditorValid: 'Valid',

@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { html, LitElement } from 'lit';
 import './icon.js';
 import './icon-button.js';
 
@@ -77,7 +77,10 @@ export class JkDialog extends LitElement {
     if (!this.show) return;
 
     // 1. Arrow Key Navigation (Only active if we have two buttons)
-    if (this.variant === 'confirm' && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+    if (
+      this.variant === 'confirm' &&
+      (e.key === 'ArrowLeft' || e.key === 'ArrowRight')
+    ) {
       e.preventDefault();
       e.stopPropagation();
 
@@ -100,12 +103,16 @@ export class JkDialog extends LitElement {
   }
 
   _handleCancel() {
-    this.dispatchEvent(new CustomEvent('cancel', { bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent('cancel', { bubbles: true, composed: true })
+    );
     this._close();
   }
 
   _handleConfirm() {
-    this.dispatchEvent(new CustomEvent('confirm', { bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent('confirm', { bubbles: true, composed: true })
+    );
     this._close();
   }
 
@@ -133,7 +140,10 @@ export class JkDialog extends LitElement {
             </div>
 
             <!-- Close -->
-            <jk-icon-button icon="x" @click=${this._handleCancel}></jk-icon-button>
+            <jk-icon-button
+              icon="x"
+              @click=${this._handleCancel}
+            ></jk-icon-button>
           </div>
 
           <!-- Footer -->
@@ -141,14 +151,22 @@ export class JkDialog extends LitElement {
             ${
               this.variant === 'confirm'
                 ? html`
-                    <button id="cancelBtn" @click=${this._handleCancel} class="${styles.cancelBtn}">
+                    <button
+                      id="cancelBtn"
+                      @click=${this._handleCancel}
+                      class="${styles.cancelBtn}"
+                    >
                       ${this.cancelLabel}
                     </button>
                   `
                 : ''
             }
 
-            <button id="confirmBtn" @click=${this._handleConfirm} class="${styles.confirmBtn}">
+            <button
+              id="confirmBtn"
+              @click=${this._handleConfirm}
+              class="${styles.confirmBtn}"
+            >
               ${this.confirmLabel}
             </button>
           </div>

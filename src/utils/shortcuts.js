@@ -1,9 +1,23 @@
 const ALPHABET = 'abcdefghijklmnopqrstuvwxyz'.split('');
-const RESERVED_KEYS = new Set(['space', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '?']);
+const RESERVED_KEYS = new Set([
+  'space',
+  '0',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5',
+  '6',
+  '7',
+  '8',
+  '9',
+  '?',
+]);
 
 function pickKey(preferredChars, usedKeys) {
   return (
-    [...preferredChars].find((c) => !usedKeys.has(c)) ?? ALPHABET.find((c) => !usedKeys.has(c))
+    [...preferredChars].find((c) => !usedKeys.has(c)) ??
+    ALPHABET.find((c) => !usedKeys.has(c))
   );
 }
 
@@ -39,7 +53,7 @@ export function getAllServicesFlat(categories) {
       ...s,
       category: cat.category,
       categoryKey: cat.categoryKey,
-    })),
+    }))
   );
 }
 
@@ -47,7 +61,8 @@ export function getFilteredServices(categories, searchQuery) {
   if (!searchQuery) return [];
   const q = searchQuery.toLowerCase();
   return getAllServicesFlat(categories).filter(
-    (s) => s.name.toLowerCase().includes(q) || s.category.toLowerCase().includes(q),
+    (s) =>
+      s.name.toLowerCase().includes(q) || s.category.toLowerCase().includes(q)
   );
 }
 

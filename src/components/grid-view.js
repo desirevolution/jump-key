@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { html, LitElement } from 'lit';
 import './service-group.js';
 
 // 1. Static styling dictionary isolating layouts from the rendering engine
@@ -39,7 +39,7 @@ export class JkGridView extends LitElement {
     */
     if (this.activeCategoryKey) {
       const activeGroup = this.categories.find(
-        (category) => category.categoryKey === this.activeCategoryKey,
+        (category) => category.categoryKey === this.activeCategoryKey
       );
 
       if (!activeGroup) {
@@ -71,7 +71,7 @@ export class JkGridView extends LitElement {
               .badgeText=${cat.categoryKey}
               .services=${cat.services}
             ></jk-service-group>
-          `,
+          `
         )}
       </div>
     `;

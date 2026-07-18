@@ -20,7 +20,6 @@ export function handleNavigationKeyDown(key, app) {
   handleCategoryNavigation(key, app);
 }
 
-
 /**
  * Navigation auf Root-Ebene
  *
@@ -40,23 +39,17 @@ function handleRootNavigation(key, app) {
     }
   }
 
-
   // Kategorie prüfen
-  const category = app.categories.find(
-    (cat) => cat.categoryKey === key,
-  );
-
+  const category = app.categories.find((cat) => cat.categoryKey === key);
 
   if (category) {
     openCategory(category, app);
     return;
   }
 
-
   // Ungültige Eingabe
   showInvalidInput(key, app);
 }
-
 
 /**
  * Navigation innerhalb einer Kategorie
@@ -64,16 +57,11 @@ function handleRootNavigation(key, app) {
 function handleCategoryNavigation(key, app) {
   app.currentInput += ` → ${key.toUpperCase()}`;
 
-
   const category = app.categories.find(
-    (cat) => cat.categoryKey === app.activeCategoryKey,
+    (cat) => cat.categoryKey === app.activeCategoryKey
   );
 
-
-  const service = category?.services?.find(
-    (service) => service.key === key,
-  );
-
+  const service = category?.services?.find((service) => service.key === key);
 
   if (service) {
     app.isInvalidInput = false;
@@ -81,10 +69,8 @@ function handleCategoryNavigation(key, app) {
     return;
   }
 
-
   showInvalidInput(key, app);
 }
-
 
 /**
  * Kategorie öffnen
@@ -98,27 +84,23 @@ function openCategory(category, app) {
 
   app.startResetTimer();
 
-
   window.history.pushState(
     {
-      view: "category",
+      view: 'category',
       key: category.categoryKey,
     },
-    "",
+    ''
   );
 }
-
 
 /**
  * Favorit anhand Shortcut-Key suchen
  */
 function findFavoriteByKey(key, app) {
-  return Object.entries(app.favorites)
-    .find(([slot]) => slot === key)
+  return Object.entries(app.favorites).find(([slot]) => slot === key)
     ? getFavoriteService(key, app)
     : null;
 }
-
 
 /**
  * Favorit-Service aus Kategorien auflösen
@@ -131,21 +113,16 @@ function getFavoriteService(slot, app) {
 
   if (!favoriteName) return null;
 
-
   for (const category of app.categories) {
-    const service = category.services?.find(
-      (s) => s.name === favoriteName,
-    );
+    const service = category.services?.find((s) => s.name === favoriteName);
 
     if (service) {
       return service;
     }
   }
 
-
   return null;
 }
-
 
 /**
  * Fehlerfeedback
@@ -154,7 +131,6 @@ function showInvalidInput(key, app) {
   app.currentInput = app.currentInput
     ? `${app.currentInput} → ${key.toUpperCase()}`
     : key.toUpperCase();
-
 
   app.isInvalidInput = true;
 

@@ -1,5 +1,5 @@
-import { LitElement, html } from "lit";
-import "./icon.js";
+import { html, LitElement } from 'lit';
+import './icon.js';
 
 export class JkToast extends LitElement {
   createRenderRoot() {
@@ -16,8 +16,8 @@ export class JkToast extends LitElement {
   constructor() {
     super();
 
-    this.message = "";
-    this.type = "success";
+    this.message = '';
+    this.type = 'success';
     this.duration = 3500;
     this.show = false;
 
@@ -30,17 +30,17 @@ export class JkToast extends LitElement {
   }
 
   updated(changed) {
-    if (changed.has("show") && this.show) {
+    if (changed.has('show') && this.show) {
       clearTimeout(this._timer);
 
       this._timer = setTimeout(() => {
         this.show = false;
 
         this.dispatchEvent(
-          new CustomEvent("toast-closed", {
+          new CustomEvent('toast-closed', {
             bubbles: true,
             composed: true,
-          }),
+          })
         );
       }, this.duration);
     }
@@ -49,30 +49,30 @@ export class JkToast extends LitElement {
   render() {
     const config = {
       success: {
-        icon: "circle-check",
-        accent: "bg-emerald-400",
-        border: "border-emerald-500/30",
-        iconColor: "text-emerald-400",
+        icon: 'circle-check',
+        accent: 'bg-emerald-400',
+        border: 'border-emerald-500/30',
+        iconColor: 'text-emerald-400',
       },
 
       error: {
-        icon: "triangle-alert",
-        accent: "bg-rose-400",
-        border: "border-rose-500/30",
-        iconColor: "text-rose-400",
+        icon: 'triangle-alert',
+        accent: 'bg-rose-400',
+        border: 'border-rose-500/30',
+        iconColor: 'text-rose-400',
       },
 
       warning: {
-        icon: "triangle-alert",
-        accent: "bg-amber-400",
-        border: "border-amber-500/30",
-        iconColor: "text-amber-400",
+        icon: 'triangle-alert',
+        accent: 'bg-amber-400',
+        border: 'border-amber-500/30',
+        iconColor: 'text-amber-400',
       },
     }[this.type] ?? {
-      icon: "info",
-      accent: "bg-indigo-400",
-      border: "border-slate-700",
-      iconColor: "text-indigo-400",
+      icon: 'info',
+      accent: 'bg-indigo-400',
+      border: 'border-slate-700',
+      iconColor: 'text-indigo-400',
     };
 
     return html`
@@ -97,8 +97,8 @@ export class JkToast extends LitElement {
 
           ${
             this.show
-              ? "opacity-100 translate-y-0 scale-100 pointer-events-auto"
-              : "opacity-0 translate-y-4 scale-95 pointer-events-none"
+              ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto'
+              : 'opacity-0 translate-y-4 scale-95 pointer-events-none'
           }
         "
       >
@@ -157,4 +157,4 @@ export class JkToast extends LitElement {
   }
 }
 
-customElements.define("jk-toast", JkToast);
+customElements.define('jk-toast', JkToast);

@@ -54,25 +54,18 @@ export function createKeyboardContext(app) {
       app.favoriteRecording = value;
     },
 
-
     // Actions
-    resetInput: (...args) =>
-      app.resetInput(...args),
+    resetInput: (...args) => app.resetInput(...args),
 
-    openSearch: () =>
-      app.openSearch(),
+    openSearch: () => app.openSearch(),
 
-    toggleViewMode: () =>
-      app.toggleViewMode(),
+    toggleViewMode: () => app.toggleViewMode(),
 
-    trackClick: (service) =>
-      app.trackClick(service),
+    trackClick: (service) => app.trackClick(service),
 
-    startResetTimer: (...args) =>
-      app.startResetTimer(...args),
+    startResetTimer: (...args) => app.startResetTimer(...args),
 
-    showToast: (...args) =>
-      app.showToast(...args),
+    showToast: (...args) => app.showToast(...args),
 
     requestUpdate() {
       app.requestUpdate();
@@ -80,6 +73,6 @@ export function createKeyboardContext(app) {
 
     t(key) {
       return app.t(key);
-    }
+    },
   };
 }

@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { html, LitElement } from 'lit';
 import './icon.js';
 import './icon-button.js';
 
@@ -89,7 +89,9 @@ export class JkDashboardHeader extends LitElement {
   }
 
   _dispatchEvent(eventName) {
-    this.dispatchEvent(new CustomEvent(eventName, { bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent(eventName, { bubbles: true, composed: true })
+    );
   }
 
   render() {

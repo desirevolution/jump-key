@@ -4,99 +4,58 @@
  * Verantwortlich für:
  * - globale Tastaturzustände
  * - Delegation an:
- *   - ui.js
  *   - favorites.js
  *   - search.js
  *   - navigation.js
  */
 
 import {
-  handleFavoriteShortcut,
   handleFavoriteRecordingInput,
-} from "./favorites.js";
+  handleFavoriteShortcut,
+} from './favorites.js';
 
-import {
-  handleSearchKeyDown,
-} from "./search.js";
+import { handleSearchKeyDown } from './search.js';
 
-import {
-  handleNavigationKeyDown,
-} from "./navigation.js";
-
-import {
-  openSearch,
-  openHelp,
-  openConfig,
-  toggleViewMode,
-  resetInput,
-} from "./ui.js";
-
+import { handleNavigationKeyDown } from './navigation.js';
 
 export function handleGlobalKeyDown(e, app) {
-
   /*
    * Ctrl + Zahl
    *
    * Favoriten Shortcut
    */
-  if (
-    e.ctrlKey &&
-    /^[0-9]$/.test(e.key)
-  ) {
+  if (e.ctrlKey && /^[0-9]$/.test(e.key)) {
     e.preventDefault();
 
-    handleFavoriteShortcut(
-      e.key,
-      app,
-    );
+    handleFavoriteShortcut(e.key, app);
 
     return;
   }
-
 
   /*
    * Andere Modifier ignorieren
-   *
-   * Ausnahme:
-   * Ctrl + ,
    */
-  if (
-    (e.ctrlKey && e.key !== ",") ||
-    e.altKey ||
-    e.metaKey
-  ) {
+  if ((e.ctrlKey && e.key !== ',') || e.altKey || e.metaKey) {
     return;
   }
-
 
   /*
    * Escape
    */
-  if (e.key === "Escape") {
-
+  if (e.key === 'Escape') {
     if (app.showConfigModal) {
-
       app.showConfigModal = false;
-
       return;
     }
-
 
     if (app.favoriteRecording) {
-
       app.favoriteRecording = null;
-
-      resetInput(app);
-
-      return;
     }
 
-
-    resetInput(app);
+    app.resetInput(true);
 
     return;
   }
-
 
   /*
    * Config Modal blockiert globale Shortcuts
@@ -105,148 +64,92 @@ export function handleGlobalKeyDown(e, app) {
     return;
   }
 
-
   /*
-   * Search besitzt eigene Tastatursteuerung
+   * Search Navigation
    */
   if (app.showSearch) {
-
-    handleSearchKeyDown(
-      e,
-      app,
-    );
-
+    handleSearchKeyDown(e, app);
     return;
   }
-
 
   /*
    * Help schließen
    */
   if (app.showHelp) {
-
     e.preventDefault();
-
     app.showHelp = false;
-
     return;
   }
 
-
   /*
-   * Keine Shortcuts in Eingabefeldern
+   * Keine Shortcuts in Inputs
    */
-  if (
-    e.target.tagName === "INPUT" ||
-    e.target.tagName === "TEXTAREA"
-  ) {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
     return;
   }
 
-
   /*
-   * Favorit-Aufnahme
-   *
-   * Ctrl+1
-   * Kategorie
-   * Service
+   * Favorit Aufnahme
    */
   if (app.favoriteRecording) {
-
-    if (
-      e.key.length === 1 &&
-      /^[a-z]$/i.test(e.key)
-    ) {
-
-      handleFavoriteRecordingInput(
-        e.key.toLowerCase(),
-        app,
-      );
-
+    if (e.key.length === 1 && /^[a-z]$/i.test(e.key)) {
+      handleFavoriteRecordingInput(e.key.toLowerCase(), app);
     } else {
-
       app.favoriteRecording = null;
-
-      resetInput(app);
-
+      app.resetInput(true);
     }
 
     return;
   }
 
-
   /*
    * Hilfe
    */
-  if (e.key === "?") {
-
+  if (e.key === '?') {
     e.preventDefault();
 
-    openHelp(app);
+    app.showHelp = true;
 
     return;
   }
-
 
   /*
    * Config öffnen
    */
-  if (
-    e.ctrlKey &&
-    e.key === ","
-  ) {
-
+  if (e.ctrlKey && e.key === ',') {
     e.preventDefault();
 
-    openConfig(app);
+    app.showConfigModal = true;
 
     return;
   }
-
 
   /*
    * Suche öffnen
    */
-  if (
-    e.key === " " ||
-    e.key === "Spacebar"
-  ) {
-
+  if (e.key === ' ' || e.key === 'Spacebar') {
     e.preventDefault();
 
-    openSearch(app);
+    app.openSearch();
 
     return;
   }
-
 
   /*
    * Grid/List Umschalten
    */
-  if (
-    e.key === "#" &&
-    !app.activeCategoryKey
-  ) {
-
+  if (e.key === '#' && !app.activeCategoryKey) {
     e.preventDefault();
 
-    toggleViewMode(app);
+    app.toggleViewMode();
 
     return;
   }
 
-
   /*
-   * Kategorie / Service Navigation
+   * Navigation
    */
-  if (
-    e.key.length === 1
-  ) {
-
-    handleNavigationKeyDown(
-      e.key.toLowerCase(),
-      app,
-    );
-
+  if (e.key.length === 1) {
+    handleNavigationKeyDown(e.key.toLowerCase(), app);
   }
 }

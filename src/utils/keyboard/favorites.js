@@ -8,13 +8,11 @@
  * - Favoriten speichern
  */
 
-
 /**
  * Ctrl + Zahl Verarbeitung
  */
 export function handleFavoriteShortcut(slot, app) {
   const existing = app.favorites[slot];
-
 
   // Favorit existiert -> löschen anbieten
   if (existing) {
@@ -22,11 +20,9 @@ export function handleFavoriteShortcut(slot, app) {
     return;
   }
 
-
   // Aufnahme starten
   startFavoriteRecording(slot, app);
 }
-
 
 /**
  * Favorit löschen
@@ -35,26 +31,18 @@ function requestFavoriteDelete(slot, app) {
   app.dialogConfig = {
     show: true,
 
-    title:
-      app.t("confirmDeleteFavTitle") ||
-      "Favorit löschen?",
+    title: app.t('confirmDeleteFavTitle') || 'Favorit löschen?',
 
-    message:
-      `${app.t("confirmDeleteFav") ||
-        "Möchtest du den Favoriten entfernen?"} 
+    message: `${app.t('confirmDeleteFav') || 'Möchtest du den Favoriten entfernen?'} 
         ${slot} (${app.favorites[slot]})`,
 
-    icon: "trash-2",
+    icon: 'trash-2',
 
-    iconColor: "text-rose-400",
+    iconColor: 'text-rose-400',
 
-    confirmLabel:
-      app.t("confirmResetConfirm") ||
-      "Löschen",
+    confirmLabel: app.t('confirmResetConfirm') || 'Löschen',
 
-    cancelLabel:
-      app.t("cancel") ||
-      "Abbrechen",
+    cancelLabel: app.t('cancel') || 'Abbrechen',
 
     onConfirm: () => {
       delete app.favorites[slot];
@@ -66,7 +54,6 @@ function requestFavoriteDelete(slot, app) {
   };
 }
 
-
 /**
  * Aufnahme eines neuen Favoriten starten
  */
@@ -74,17 +61,13 @@ function startFavoriteRecording(slot, app) {
   app.favoriteRecording = {
     slot,
     step: 0,
-    categoryKey: "",
+    categoryKey: '',
   };
 
-
-  app.currentInput =
-    `FAV ${slot}: Kategorie wählen`;
-
+  app.currentInput = `FAV ${slot}: Kategorie wählen`;
 
   app.requestUpdate();
 }
-
 
 /**
  * Eingabe während Favoriten-Aufnahme
@@ -100,9 +83,7 @@ function startFavoriteRecording(slot, app) {
 export function handleFavoriteRecordingInput(key, app) {
   const recording = app.favoriteRecording;
 
-
   if (!recording) return;
-
 
   // Schritt 1:
   // Kategorie suchen
@@ -111,85 +92,59 @@ export function handleFavoriteRecordingInput(key, app) {
     return;
   }
 
-
   // Schritt 2:
   // Service suchen
   handleFavoriteService(key, recording, app);
 }
 
-
 /**
  * Kategorie auswählen
  */
 function handleFavoriteCategory(key, recording, app) {
-  const category = app.categories.find(
-    (cat) => cat.categoryKey === key,
-  );
-
+  const category = app.categories.find((cat) => cat.categoryKey === key);
 
   if (!category) {
     cancelRecording(app);
     return;
   }
 
-
   recording.categoryKey = key;
   recording.step = 1;
-
 
   // optional:
   // Kategorie anzeigen während Aufnahme
   app.activeCategoryKey = key;
 
-
-  app.currentInput =
-    `FAV ${recording.slot}: ${key.toUpperCase()} → Service`;
-
+  app.currentInput = `FAV ${recording.slot}: ${key.toUpperCase()} → Service`;
 
   app.requestUpdate();
 }
-
 
 /**
  * Service auswählen
  */
 function handleFavoriteService(key, recording, app) {
   const category = app.categories.find(
-    (cat) =>
-      cat.categoryKey === recording.categoryKey,
+    (cat) => cat.categoryKey === recording.categoryKey
   );
 
-
-  const service = category?.services?.find(
-    (service) => service.key === key,
-  );
-
+  const service = category?.services?.find((service) => service.key === key);
 
   if (!service) {
     cancelRecording(app);
     return;
   }
 
+  saveFavorite(recording.slot, service, app);
 
-  saveFavorite(
-    recording.slot,
-    service,
-    app,
-  );
-
-
-  app.currentInput =
-    `FAV ${recording.slot} gespeichert`;
-
+  app.currentInput = `FAV ${recording.slot} gespeichert`;
 
   app.isValidInput = true;
 
   app.favoriteRecording = null;
 
-
   app.startResetTimer(1500);
 }
-
 
 /**
  * Favorit speichern
@@ -200,17 +155,12 @@ function saveFavorite(slot, service, app) {
   saveFavorites(app);
 }
 
-
 /**
  * LocalStorage schreiben
  */
 function saveFavorites(app) {
-  localStorage.setItem(
-    "dashboard_favs",
-    JSON.stringify(app.favorites),
-  );
+  localStorage.setItem('dashboard_favs', JSON.stringify(app.favorites));
 }
-
 
 /**
  * Aufnahme abbrechen

@@ -1,12 +1,12 @@
-import { LitElement, html } from 'lit';
+import { html, LitElement } from 'lit';
 import { validateConfig } from '../utils/config-validator.js';
 
 import { createEditor } from 'prism-code-editor';
-import { matchBrackets } from 'prism-code-editor/match-brackets';
-import { defaultCommands, addEditorHotkey } from 'prism-code-editor/commands';
-import { highlightBracketPairs } from 'prism-code-editor/highlight-brackets';
-import { indentGuides } from 'prism-code-editor/guides';
+import { addEditorHotkey, defaultCommands } from 'prism-code-editor/commands';
 import { cursorPosition } from 'prism-code-editor/cursor';
+import { indentGuides } from 'prism-code-editor/guides';
+import { highlightBracketPairs } from 'prism-code-editor/highlight-brackets';
+import { matchBrackets } from 'prism-code-editor/match-brackets';
 
 import 'prism-code-editor/layout.css';
 import 'prism-code-editor/guides.css';
@@ -99,7 +99,7 @@ export class JkConfigEditor extends LitElement {
               },
               bubbles: true,
               composed: true,
-            }),
+            })
           );
         },
       },
@@ -112,14 +112,21 @@ export class JkConfigEditor extends LitElement {
       matchBrackets(),
       highlightBracketPairs(),
       indentGuides(),
-      cursorPosition(),
+      cursorPosition()
     );
   }
 
   render() {
-    const stateClass = this.isValid ? styles.containerValid : styles.containerInvalid;
+    const stateClass = this.isValid
+      ? styles.containerValid
+      : styles.containerInvalid;
 
-    return html` <div id="editorContainer" class="${styles.containerBase} ${stateClass}"></div> `;
+    return html`
+      <div
+        id="editorContainer"
+        class="${styles.containerBase} ${stateClass}"
+      ></div>
+    `;
   }
 }
 
