@@ -1,4 +1,4 @@
-import { getFilteredServices, getTopFavorites } from './shortcuts.js';
+import { getFilteredServices, getFavorites } from './shortcuts.js';
 
 /**
  * Verarbeitet die globalen Tastatureingaben für die Dashboard-App
@@ -268,7 +268,7 @@ function handleSearchKeyDown(e, app) {
 function handleNavigationKeyDown(key, app) {
   if (!app.activeCategoryKey) {
     if (/^[0-9]$/.test(key) && !app.isGridView) {
-      const favService = getTopFavorites(app.categories, app.favorites).find((s) => s.key === key);
+      const favService = getFavorites(app.categories, app.favorites).find((s) => s.key === key);
       if (favService) {
         app.currentInput = key.toUpperCase();
         app.trackClick(favService, true);

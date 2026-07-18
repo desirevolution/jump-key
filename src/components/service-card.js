@@ -2,9 +2,9 @@ import { LitElement, html } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
 import './icon.js';
 
-// 1. Extract static design definitions completely out of the class
 const styles = {
-  card: `group relative flex items-center gap-4 w-full overflow-hidden rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 px-5 py-4 cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1 hover:border-indigo-500/60 hover:shadow-xl hover:shadow-indigo-500/10 active:scale-[0.98]`,
+  // select-none verhindert die unschöne Textmarkierung auf Smartphones beim langen Drücken
+  card: `group relative flex items-center gap-4 w-full overflow-hidden rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 px-5 py-4 cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1 hover:border-indigo-500/60 hover:shadow-xl hover:shadow-indigo-500/10 active:scale-[0.98] select-none`,
   accent: `absolute left-0 top-4 bottom-4 w-1 rounded-r-full bg-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300`,
   glow: `pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-indigo-500/0 via-indigo-500/5 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500`,
   iconContainer: `relative z-10 flex items-center justify-center size-14 shrink-0 overflow-hidden rounded-xl bg-slate-700/60 ring-1 ring-slate-600/70 text-indigo-400 transition-all duration-300 ease-out group-hover:bg-indigo-500/15 group-hover:ring-indigo-500/40 group-hover:text-white group-hover:-translate-y-0.5`,
@@ -17,7 +17,7 @@ const styles = {
 
 export class JkServiceCard extends LitElement {
   createRenderRoot() {
-    return this; // Using global Tailwind styles
+    return this;
   }
 
   static properties = {
@@ -26,6 +26,7 @@ export class JkServiceCard extends LitElement {
     icon: { type: String },
     badgeText: { type: String },
     isFavorite: { type: Boolean },
+    isPressing: { type: Boolean }, // Zustand für das visuelle Drück-Feedback
   };
 
   constructor() {
@@ -35,10 +36,47 @@ export class JkServiceCard extends LitElement {
     this.icon = '';
     this.badgeText = '';
     this.isFavorite = false;
+    this.isPressing = false;
+    this._pressTimer = null;
+    this._isLongPressActive = false;
   }
 
-  _handleClick() {
+  _handlePointerDown(e) {
+    // Nur auf primäre Klicks reagieren (Linksklick / normaler Touch)
+    if (e.button !== 0) return;
+
+    this._isLongPressActive = false;
+    this.isPressing = true; // Feedback-Animation starten
+    clearTimeout(this._pressTimer);
+
+    // Nach 600ms gilt es als "gehalten"
+    this._pressTimer = setTimeout(() => {
+      this._isLongPressActive = true;
+      this.isPressing = false; // Ausgelöst, Animation beenden
+      this.dispatchEvent(new CustomEvent('card-long-press', { bubbles: true, composed: true }));
+    }, 600);
+  }
+
+  _handlePointerUp(e) {
+    clearTimeout(this._pressTimer);
+    this.isPressing = false;
+
+    // Wenn es ein Long-Press war, unterbinden wir den darauffolgenden normalen Klick
+    if (this._isLongPressActive) {
+      e.preventDefault();
+      e.stopPropagation();
+      this._isLongPressActive = false;
+      return;
+    }
+
+    // Kurzer Tipp -> Normaler Klick-Event
     this.dispatchEvent(new CustomEvent('card-click', { bubbles: true, composed: true }));
+  }
+
+  _handlePointerLeave() {
+    // Falls der User wegscrollt oder mit der Maus die Kachel verlässt -> Abbruch
+    clearTimeout(this._pressTimer);
+    this.isPressing = false;
   }
 
   render() {
@@ -47,10 +85,9 @@ export class JkServiceCard extends LitElement {
       ? this.subtitle.replace(/^https?:\/\/(www\.)?/, '')
       : this.subtitle || '';
 
-    // 2. Compute dynamic badge classes efficiently using an object layout
-    // FIX: We inject the base classes via dynamic object keys so classMap owns the entire attribute!
-    const badgeClasses = {
-      [styles.badgeBase]: true,
+    // Alle Klassen für den Kbd-Badge gesammelt in einem Objekt für die classMap
+    const dynamicBadgeClasses = {
+      [styles.badgeBase]: true, // Basis-Styling erzwingen
       'border border-indigo-500 bg-indigo-500/20 text-indigo-200 shadow-lg shadow-indigo-500/20 group-hover:bg-indigo-500/30':
         this.isFavorite,
       'border border-slate-600 bg-slate-900/80 text-slate-300 group-hover:border-indigo-500/40 group-hover:text-indigo-300':
@@ -58,9 +95,17 @@ export class JkServiceCard extends LitElement {
     };
 
     return html`
-      <div @click=${this._handleClick} class="${styles.card}">
+      <div
+        @pointerdown=${this._handlePointerDown}
+        @pointerup=${this._handlePointerUp}
+        @pointerleave=${this._handlePointerLeave}
+        class="${styles.card} ${this.isPressing ? 'scale-95 !border-amber-500/80 shadow-2xl shadow-amber-500/20 duration-500' : ''}"
+      >
+        <!-- Akzentuierter Glow bei aktivem Halten -->
         <div class="${styles.accent}"></div>
-        <div class="${styles.glow}"></div>
+        <div
+          class="${styles.glow} ${this.isPressing ? '!opacity-100 from-amber-500/10 via-amber-500/10 to-amber-500/0' : ''}"
+        ></div>
 
         <!-- Icon -->
         <div class="${styles.iconContainer}">
@@ -77,8 +122,9 @@ export class JkServiceCard extends LitElement {
         ${
           this.badgeText
             ? html`
-                <!-- FIX: classMap completely controls the class attribute now -->
-                <kbd class="${classMap(badgeClasses)}"> ${this.badgeText.toUpperCase()} </kbd>
+                <kbd class="${classMap(dynamicBadgeClasses)}">
+                  ${this.badgeText.toUpperCase()}
+                </kbd>
               `
             : ''
         }

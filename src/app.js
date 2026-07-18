@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
 import { t, detectLang } from './utils/i18n.js';
-import { generateShortcuts, getFilteredServices, getTopFavorites } from './utils/shortcuts.js';
+import { generateShortcuts, getFilteredServices, getFavorites } from './utils/shortcuts.js';
 import { handleGlobalKeyDown } from './utils/keyboard-handler.js';
 
 // Import Sub-Components
@@ -205,6 +205,70 @@ class DashboardApp extends LitElement {
     };
   }
 
+  // Automatische Zuweisung für Mobile / Desktop Long-Press im normalen Grid
+  handleServiceLongPress(service) {
+    const slots = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+
+    // 1. Prüfen, ob der Service bereits in den Favoriten existiert
+    const alreadyFavSlot = slots.find((slot) => this.favorites[slot] === service.name);
+    if (alreadyFavSlot) {
+      this.currentInput = `${service.name.toUpperCase()} IST BEREITS AUF TASTE ${alreadyFavSlot}`;
+      this.isInvalidInput = true;
+      this.startResetTimer(1500);
+      this.requestUpdate();
+      return;
+    }
+
+    // 2. Nächsten freien Slot ermitteln
+    const nextFreeSlot = slots.find((slot) => !this.favorites[slot]);
+
+    // 3. Wenn alle Slots voll sind, Dialog anzeigen
+    if (!nextFreeSlot) {
+      this.dialogConfig = {
+        show: true,
+        type: 'error',
+        title: this.t('errorTitle') || 'Favoriten voll',
+        message: 'Alle Favoriten-Slots (1-0) sind bereits belegt! Lösche zuerst einen Favoriten.',
+        confirmLabel: this.t('tabEditorOk') || 'OK',
+      };
+      this.requestUpdate();
+      return;
+    }
+
+    // 4. Favorit automatisch zuweisen und speichern
+    this.favorites[nextFreeSlot] = service.name;
+    localStorage.setItem('dashboard_favs', JSON.stringify(this.favorites));
+
+    // 5. Visuelles Feedback über das KeyBadge geben
+    this.currentInput = `FAV ${nextFreeSlot}: ${service.name.toUpperCase()}`;
+    this.isValidInput = true;
+
+    this.startResetTimer(2000);
+    this.requestUpdate();
+  }
+
+  // Löschen via Long-Press aus der Favoriten-Leiste heraus
+  handleDeleteFavoriteSlot(slot) {
+    const serviceName = this.favorites[slot];
+    if (!serviceName) return;
+
+    this.dialogConfig = {
+      show: true,
+      title: 'Favorit entfernen?',
+      message: `Möchtest du den Favoriten "${serviceName}" von Taste ${slot} löschen?`,
+      icon: 'trash-2',
+      iconColor: 'text-rose-400',
+      confirmLabel: this.t('confirmResetConfirm') || 'Löschen',
+      cancelLabel: this.t('cancel') || 'Abbrechen',
+      onConfirm: () => {
+        delete this.favorites[slot];
+        localStorage.setItem('dashboard_favs', JSON.stringify(this.favorites));
+        this.requestUpdate();
+      },
+    };
+    this.requestUpdate();
+  }
+
   _handleNotification(e) {
     const { type, message } = e.detail;
     this.dialogConfig = {
@@ -391,7 +455,7 @@ class DashboardApp extends LitElement {
   }
 
   render() {
-    const favs = getTopFavorites(this.categories, this.favorites);
+    const favs = getFavorites(this.categories, this.favorites);
     const filteredServices = getFilteredServices(this.categories, this.searchQuery);
     const showMain =
       !this.activeCategoryKey && !this.showSearch && !this.showHelp && !this.showConfigModal;
@@ -427,6 +491,7 @@ class DashboardApp extends LitElement {
                   .t=${this.t}
                   @service-click=${(e) => this.trackClick(e.detail.service)}
                   @clear-favorites=${this.clearFavorites}
+                  @delete-favorite-slot=${(e) => this.handleDeleteFavoriteSlot(e.detail.slot)}
                 ></jk-favorites-view>
 
                 <jk-service-group
@@ -452,6 +517,7 @@ class DashboardApp extends LitElement {
                   .activeCategoryKey=${this.activeCategoryKey}
                   .t=${this.t}
                   @service-click=${(e) => this.trackClick(e.detail.service)}
+                  @card-long-press=${(e) => this.handleServiceLongPress(e.detail.service)}
                 ></jk-grid-view>
               `
         }

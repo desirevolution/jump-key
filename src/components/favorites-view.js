@@ -3,7 +3,6 @@ import './service-card.js';
 import './icon.js';
 import './icon-button.js';
 
-// 1. Static styling dictionary isolating layouts from the rendering engine
 const styles = {
   section: `mb-8 rounded-2xl border border-amber-500/20 bg-slate-900/20 p-4 sm:p-5`,
   header: `flex items-center gap-3 mb-4`,
@@ -34,15 +33,13 @@ export class JkFavoritesView extends LitElement {
       <section class="${styles.section}">
         <!-- Header -->
         <div class="${styles.header}">
-          <!-- Icon -->
           <div class="${styles.iconBadge}">
             <jk-icon icon="star" class="${styles.icon}"></jk-icon>
           </div>
 
-          <!-- Title -->
-          <h2 class="${styles.title}">${this.t('frequent')}</h2>
+          <!-- Titel auf Favoriten geändert -->
+          <h2 class="${styles.title}">${this.t('favorites') || 'Favoriten'}</h2>
 
-          <!-- Reset -->
           <jk-icon-button
             icon="trash-2"
             variant="text"
@@ -73,6 +70,16 @@ export class JkFavoritesView extends LitElement {
                   this.dispatchEvent(
                     new CustomEvent('service-click', {
                       detail: { service },
+                      bubbles: true,
+                      composed: true,
+                    }),
+                  );
+                }}
+                @card-long-press=${() => {
+                  // Wenn ein bestehender Favorit lang gedrückt wird -> Löschen triggern
+                  this.dispatchEvent(
+                    new CustomEvent('delete-favorite-slot', {
+                      detail: { slot: service.key },
                       bubbles: true,
                       composed: true,
                     }),

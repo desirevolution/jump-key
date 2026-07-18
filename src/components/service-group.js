@@ -36,6 +36,17 @@ export class JkServiceGroup extends LitElement {
     );
   }
 
+  // NEU: Reicht den konkreten Service beim Long-Press weiter
+  _handleCardLongPress(service) {
+    this.dispatchEvent(
+      new CustomEvent('card-long-press', {
+        detail: { service },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }
+
   render() {
     return html`
       <section class="${styles.section}">
@@ -68,6 +79,7 @@ export class JkServiceGroup extends LitElement {
                 .icon=${service.icon}
                 .badgeText=${service.key}
                 @card-click=${() => this._handleCardClick(service)}
+                @card-long-press=${() => this._handleCardLongPress(service)}
               ></jk-service-card>
             `,
           )}
