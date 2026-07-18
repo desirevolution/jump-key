@@ -66,23 +66,23 @@ export class JkFavoritesView extends LitElement {
                 .badgeText=${service.favSlot}
                 .isFavorite=${true}
                 @card-click=${() => {
-    this.dispatchEvent(
-      new CustomEvent('service-click', {
-        detail: { service },
-        bubbles: true,
-        composed: true,
-      }),
-    );
-  }}
+                  this.dispatchEvent(
+                    new CustomEvent('service-click', {
+                      detail: { service },
+                      bubbles: true,
+                      composed: true,
+                    }),
+                  );
+                }}
                 @card-long-press=${() => {
-    this.dispatchEvent(
-      new CustomEvent('delete-favorite-slot', {
-        detail: { slot: service.favSlot },
-        bubbles: true,
-        composed: true,
-      }),
-    );
-  }}
+                  this.dispatchEvent(
+                    new CustomEvent('delete-favorite-slot', {
+                      detail: { slot: service.favSlot },
+                      bubbles: true,
+                      composed: true,
+                    }),
+                  );
+                }}
               ></jk-service-card>
             `,
           )}

@@ -14,6 +14,7 @@ import './components/dialog.js';
 import './components/service-group.js';
 import './components/favorites-view.js';
 import './components/grid-view.js';
+import './components/toast.js';
 
 const styles = {
   badgeBase: `fixed bottom-6 right-6 z-50 flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900/95 backdrop-blur-sm border shadow-xl font-mono text-lg font-bold transition-all duration-200 animate-fadeIn hidden sm:flex`,
@@ -46,6 +47,7 @@ class DashboardApp extends LitElement {
     favorites: { type: Object },
     lang: { type: String },
     dialogConfig: { type: Object },
+    toastConfig: { type: Object },
   };
 
   get searchInput() {
@@ -89,9 +91,10 @@ class DashboardApp extends LitElement {
 
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
-    this.t = this.t.bind(this); // Wichtig für die direkte Referenzübergabe (.t=${this.t})
+    this.t = this.t.bind(this);
     this.favorites = JSON.parse(localStorage.getItem('dashboard_favs')) || {};
-    this.favoriteRecording = null; // Neuer Zustand für die Tastatur-Aufnahme
+    this.favoriteRecording = null;
+    this.toastConfig = { show: false, message: '', type: 'success' };
   }
 
   t(key) {
@@ -173,6 +176,15 @@ class DashboardApp extends LitElement {
       this.activeCategoryKey = e.state.key;
       this.showSearch = false;
     }
+  }
+
+  showToast(message, type = 'success') {
+    this.toastConfig = {
+      show: true,
+      message: message,
+      type: type,
+    };
+    this.requestUpdate();
   }
 
   openSearch() {
@@ -461,10 +473,20 @@ class DashboardApp extends LitElement {
       !this.activeCategoryKey && !this.showSearch && !this.showHelp && !this.showConfigModal;
 
     return html`
-      <!-- Global Overlays -->
+      <!-- Global Overlays & Notifications -->
       ${this.templateKeyBadge()} ${this.templateHelpModal()}
       ${this.templateSearchModal(filteredServices)} ${this.templateConfigModal()}
       ${this.templateDialog()}
+
+      <!-- Der neue modulare Toast-Handler -->
+      <jk-toast
+        .show=${this.toastConfig.show}
+        .message=${this.toastConfig.message}
+        .type=${this.toastConfig.type}
+        @toast-closed=${() => {
+          this.toastConfig.show = false;
+        }}
+      ></jk-toast>
 
       <!-- Header -->
       <jk-dashboard-header
