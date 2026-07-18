@@ -72,7 +72,6 @@ class DashboardApp extends LitElement {
     this.showHelp = false;
     this.isGridView = JSON.parse(localStorage.getItem('dashboard_grid_view')) || false;
     this.selectedIndex = 0;
-    this.favorites = JSON.parse(localStorage.getItem('dashboard_favs')) || {};
     this.resetTimeout = null;
     this.lang = detectLang();
 
@@ -91,6 +90,8 @@ class DashboardApp extends LitElement {
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
     this.t = this.t.bind(this); // Wichtig für die direkte Referenzübergabe (.t=${this.t})
+    this.favorites = JSON.parse(localStorage.getItem('dashboard_favs')) || {};
+    this.favoriteRecording = null; // Neuer Zustand für die Tastatur-Aufnahme
   }
 
   t(key) {
@@ -156,19 +157,15 @@ class DashboardApp extends LitElement {
     this.resetTimeout = setTimeout(() => this.resetInput(), duration);
   }
 
-  trackClick(service, isFavClick = false) {
-    if (!isFavClick) {
-      this.favorites[service.name] = (this.favorites[service.name] || 0) + 1;
-      localStorage.setItem('dashboard_favs', JSON.stringify(this.favorites));
-    }
+  trackClick(service) {
     this.isValidInput = true;
     this.requestUpdate();
+
     setTimeout(() => {
       window.open(service.url, '_blank');
       setTimeout(() => this.resetInput(true), 100);
     }, 150);
   }
-
   handlePopState(e) {
     if (!e.state?.view) {
       this.resetInput(false);

@@ -4,6 +4,13 @@ import { getFilteredServices, getTopFavorites } from './shortcuts.js';
  * Verarbeitet die globalen Tastatureingaben für die Dashboard-App
  */
 export function handleGlobalKeyDown(e, app) {
+  if (e.ctrlKey && /^[0-9]$/.test(e.key)) {
+    e.preventDefault();
+    handleFavoriteShortcut(e.key, app);
+    return;
+  }
+
+  // Bestehender Code für sonstige Ctrl/Alt Keys
   if ((e.ctrlKey && e.key !== ',') || e.altKey || e.metaKey) {
     return;
   }
@@ -13,14 +20,36 @@ export function handleGlobalKeyDown(e, app) {
       app.showConfigModal = false;
       return;
     }
+    // Falls wir gerade einen Favoriten aufnehmen, brechen wir ab
+    if (app.favoriteRecording) {
+      app.favoriteRecording = null;
+    }
     app.resetInput(true);
     return;
   }
 
   if (app.showConfigModal) return;
-
   if (app.showSearch) {
     handleSearchKeyDown(e, app);
+    return;
+  }
+  if (app.showHelp) {
+    e.preventDefault();
+    app.showHelp = false;
+    return;
+  }
+
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+  // Wenn wir mitten in der Favoriten-Zuweisung sind (warten auf die 2 Buchstaben)
+  if (app.favoriteRecording) {
+    if (e.key.length === 1 && /^[a-z]$/i.test(e.key)) {
+      handleFavoriteRecordingInput(e.key.toLowerCase(), app);
+    } else {
+      // Wenn mitten drin was falsches getippt wird -> Abbruch
+      app.favoriteRecording = null;
+      app.resetInput(true);
+    }
     return;
   }
 
@@ -56,6 +85,87 @@ export function handleGlobalKeyDown(e, app) {
   if (e.key.length === 1) {
     handleNavigationKeyDown(e.key.toLowerCase(), app);
   }
+}
+
+function handleFavoriteShortcut(slot, app) {
+  // Wenn der Slot bereits belegt ist, und wir erneut Ctrl + dieselbe Zahl drücken -> Löschen triggern
+  if (app.favorites[slot]) {
+    app.dialogConfig = {
+      show: true,
+      title: app.t('confirmDeleteFavTitle') || 'Favorit löschen?',
+      message: `${app.t('confirmDeleteFav') || 'Möchtest du den Favoriten auf Taste'} ${slot} (${app.favorites[slot]}) entfernen?`,
+      icon: 'trash-2',
+      iconColor: 'text-rose-400',
+      confirmLabel: app.t('confirmResetConfirm') || 'Löschen',
+      cancelLabel: app.t('cancel'),
+      onConfirm: () => {
+        delete app.favorites[slot];
+        localStorage.setItem('dashboard_favs', JSON.stringify(app.favorites));
+        app.requestUpdate();
+      },
+    };
+    return;
+  }
+
+  // Ansonsten: Aufnahme-Modus für diesen Slot starten
+  app.favoriteRecording = {
+    slot: slot,
+    step: 0, // 0 = wartet auf Kategorie-Buchstabe, 1 = wartet auf Service-Buchstabe
+    categoryKey: '',
+  };
+
+  // Visuelles Feedback im KeyBadge
+  app.currentInput = `SET FAV ${slot} → ?`;
+  app.requestUpdate();
+}
+
+// In utils/keyboard-handler.js
+
+function handleFavoriteRecordingInput(key, app) {
+  const rec = app.favoriteRecording;
+
+  if (rec.step === 0) {
+    // 1. Buchstabe: Kategorie suchen
+    const catExists = app.categories.some((c) => c.categoryKey === key);
+    if (catExists) {
+      rec.categoryKey = key;
+      rec.step = 1;
+
+      // NEU: Setze die Kategorie aktiv, damit die App die Gruppe/Kacheln einblendet!
+      app.activeCategoryKey = key;
+
+      app.currentInput = `SET FAV ${rec.slot} → ${key.toUpperCase()} → ?`;
+    } else {
+      // Falscher Buchstabe -> Abbruch
+      app.favoriteRecording = null;
+      app.isInvalidInput = true;
+      app.startResetTimer(1000);
+    }
+  } else if (rec.step === 1) {
+    // 2. Buchstabe: Service in der Kategorie suchen
+    const cat = app.categories.find((c) => c.categoryKey === rec.categoryKey);
+    const service = cat?.services?.find((s) => s.key === key);
+
+    if (service) {
+      // Erfolg! Favorit speichern
+      app.favorites[rec.slot] = service.name;
+      localStorage.setItem('dashboard_favs', JSON.stringify(app.favorites));
+
+      app.isValidInput = true;
+      app.currentInput = `FAV ${rec.slot} SAVED!`;
+      app.favoriteRecording = null;
+
+      // Nach dem Speichern gehen wir automatisch zurück zur Hauptübersicht
+      app.startResetTimer(1500);
+    } else {
+      // Ungültiger Service-Key -> Abbruch
+      app.favoriteRecording = null;
+      app.isInvalidInput = true;
+      // Setzt auch die Ansicht zurück
+      app.startResetTimer(1000);
+    }
+  }
+  app.requestUpdate();
 }
 
 /**

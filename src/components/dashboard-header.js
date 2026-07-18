@@ -143,7 +143,7 @@ export class JkDashboardHeader extends LitElement {
             <jk-icon-button
               icon="settings"
               title="${this.t ? this.t('editConfig') : ''}"
-              .hideOnMobile=${true}
+              .desktopOnly=${true}
               @click=${() => this._dispatchEvent('open-config')}
             ></jk-icon-button>
           </div>

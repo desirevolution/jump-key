@@ -52,9 +52,20 @@ export function getFilteredServices(categories, searchQuery) {
 }
 
 export function getTopFavorites(categories, favorites) {
-  return getAllServicesFlat(categories)
-    .filter((s) => favorites[s.name] > 0)
-    .sort((a, b) => favorites[b.name] - favorites[a.name])
-    .slice(0, 10)
-    .map((s, i) => ({ ...s, key: i === 9 ? '0' : String(i + 1) }));
+  const allServices = getAllServicesFlat(categories);
+  const result = [];
+
+  const slots = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+
+  slots.forEach((slot) => {
+    const serviceName = favorites[slot];
+    if (serviceName) {
+      const service = allServices.find((s) => s.name === serviceName);
+      if (service) {
+        result.push({ ...service, key: slot });
+      }
+    }
+  });
+
+  return result;
 }
