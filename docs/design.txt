@@ -1,0 +1,568 @@
+# JumpKey UI Design Recipe
+## A Design System Guide for Building New Components
+
+This document describes the visual and UX principles used throughout the JumpKey dashboard UI.  
+The goal is to keep future components consistent with the existing dark, self-hosted dashboard style.
+
+---
+
+# 1. Core Design Philosophy
+
+JumpKey follows a:
+
+- **Dark-first**
+- **Minimal**
+- **Developer-oriented**
+- **Keyboard-friendly**
+- **Self-hosted dashboard aesthetic**
+
+The interface should feel like:
+
+- a modern terminal
+- a professional admin dashboard
+- a personal command center
+
+Avoid:
+- excessive decoration
+- bright gradients
+- unnecessary animations
+- large rounded "marketing style" cards
+- heavy shadows
+
+Prefer:
+- information density
+- clear hierarchy
+- subtle interaction feedback
+- predictable behavior
+
+---
+
+# 2. Color Palette
+
+The main color system is based on Tailwind Slate + Indigo.
+
+## Backgrounds
+
+Use layered dark backgrounds:
+
+```css
+bg-slate-950
+
+Application background.
+
+Example:
+
+<body class="bg-slate-950 text-slate-200">
+
+Panels and cards:
+
+bg-slate-800
+
+Example:
+
+<div class="bg-slate-800 border border-slate-700 rounded-2xl">
+
+Subtle containers:
+
+bg-slate-900/30
+bg-slate-900/50
+
+Used for:
+
+configuration panels
+secondary information
+grouped content
+3. Border Rules
+
+Borders should separate areas, not decorate.
+
+Primary:
+
+border-slate-700
+
+Secondary:
+
+border-slate-800/40
+
+Examples:
+
+Modal:
+
+border border-slate-700
+
+Section divider:
+
+border-b border-slate-800/40
+
+Avoid:
+
+border-white
+border-gray-400
+
+They are too strong.
+
+4. Accent Colors
+
+The primary action color is Indigo.
+
+Use:
+
+text-indigo-400
+
+for:
+
+icons
+active states
+shortcuts
+highlights
+
+Example:
+
+<jk-icon class="text-indigo-400">
+
+Buttons:
+
+Normal:
+
+bg-indigo-600
+
+Hover:
+
+hover:bg-indigo-500
+
+Example:
+
+<button
+ class="
+ bg-indigo-600
+ hover:bg-indigo-500
+ rounded-xl
+ text-white
+ "
+>
+5. Typography
+Main font
+
+Use:
+
+font-sans
+
+for normal UI.
+
+Examples:
+
+dialogs
+settings
+descriptions
+Technical areas
+
+Use:
+
+font-mono
+
+for:
+
+keyboard shortcuts
+search
+editor areas
+command interfaces
+
+Example:
+
+<div class="font-mono">
+6. Text Hierarchy
+Primary text
+text-white
+
+Used for:
+
+titles
+important labels
+buttons
+
+Example:
+
+<h2 class="text-white font-semibold">
+Secondary text
+text-slate-400
+
+Used for:
+
+descriptions
+metadata
+categories
+Disabled / hints
+text-slate-500
+
+Used for:
+
+placeholders
+explanations
+inactive states
+7. Component Shape Language
+
+The UI uses rounded but not overly soft shapes.
+
+Preferred:
+
+rounded-xl
+rounded-2xl
+
+Examples:
+
+Cards:
+
+rounded-xl
+
+Large containers:
+
+rounded-2xl
+
+Avoid:
+
+rounded-full
+
+except for badges.
+
+8. Spacing Rules
+
+Use consistent spacing:
+
+Small:
+
+gap-2
+
+Normal:
+
+gap-3
+gap-4
+
+Large:
+
+gap-6
+
+Containers:
+
+p-4
+p-5
+p-6
+
+Avoid random spacing values.
+
+9. Icons
+
+Icons should:
+
+never dominate
+support recognition
+use accent colors
+
+Default:
+
+<jk-icon
+ class="w-4 h-4 text-indigo-400"
+>
+
+Large:
+
+class="w-6 h-6"
+
+Avoid:
+
+w-10 h-10
+
+unless it is a hero element.
+
+10. Cards
+
+Standard service card:
+
+Structure:
+
++--------------------------+
+| icon   title             |
+|        subtitle          |
+|                    key   |
++--------------------------+
+
+Rules:
+
+Background:
+
+bg-slate-800
+
+Border:
+
+border-slate-700
+
+Hover:
+
+hover:border-indigo-500/50
+hover:bg-slate-700/50
+
+Transition:
+
+transition-colors
+11. Interactive States
+
+Every clickable element should have:
+
+Normal
+text-slate-300
+Hover
+hover:text-white
+hover:bg-slate-700/50
+Active
+bg-indigo-600/15
+text-indigo-400
+12. Buttons
+
+Primary action:
+
+<button
+class="
+px-4 py-2.5
+bg-indigo-600
+hover:bg-indigo-500
+rounded-xl
+font-semibold
+text-white
+transition-colors
+"
+>
+
+Secondary action:
+
+<button
+class="
+bg-slate-700
+hover:bg-slate-600
+rounded-xl
+"
+>
+
+Danger:
+
+text-rose-400
+border-rose-500
+13. Modals
+
+Standard modal:
+
+Outer:
+
+fixed inset-0
+bg-slate-950/85
+backdrop-blur-sm
+
+Inner:
+
+bg-slate-800
+border border-slate-700
+rounded-2xl
+shadow-2xl
+
+Size:
+
+Small:
+
+max-w-md
+
+Medium:
+
+max-w-3xl
+
+Large:
+
+max-w-7xl
+14. Headers
+
+Header pattern:
+
+[icon/logo] Title              Actions
+                              Time
+
+Rules:
+
+Title:
+
+text-2xl sm:text-3xl
+font-bold
+tracking-tight
+
+Divider:
+
+border-b border-slate-800
+15. Shortcut / Keyboard UI
+
+Keyboard badges:
+
+<kbd
+class="
+px-2
+py-1
+bg-slate-900
+border
+border-slate-700
+rounded
+text-indigo-400
+font-bold
+"
+>
+
+Use:
+
+shortcuts
+command hints
+navigation indicators
+16. Animation Rules
+
+Only subtle animations.
+
+Allowed:
+
+animate-fadeIn
+animate-pulse
+
+For:
+
+opening dialogs
+state changes
+validation
+
+Avoid:
+
+bouncing everywhere
+spinning
+excessive movement
+17. Responsive Design
+
+Mobile first.
+
+Always check:
+
+Small:
+
+sm:
+
+Examples:
+
+text-2xl sm:text-4xl
+
+or:
+
+hidden sm:block
+
+Mobile should:
+
+hide secondary actions
+reduce spacing
+keep functionality
+18. Layout Philosophy
+
+Prefer:
+
+flex
+grid
+gap
+
+Avoid:
+
+absolute positioning
+fixed dimensions
+
+unless necessary.
+
+Good:
+
+grid-cols-[repeat(auto-fill,minmax(320px,1fr))]
+
+This creates flexible dashboards.
+
+19. Empty States
+
+Do not show empty boxes.
+
+Instead:
+
+if (!items.length)
+ return html``
+
+The UI should stay clean.
+
+20. New Component Checklist
+
+Before adding a component:
+
+Colors
+ slate background
+ slate border
+ indigo accent
+Typography
+ correct font family
+ correct hierarchy
+Interaction
+ hover state
+ keyboard support if relevant
+ transition
+Layout
+ mobile compatible
+ consistent spacing
+ no unnecessary decoration
+Icons
+ 16-24px size
+ muted accent color
+Example Component Template
+<div
+ class="
+ bg-slate-800
+ border border-slate-700
+ rounded-2xl
+ p-5
+ transition-colors
+ hover:border-indigo-500/50
+ "
+>
+
+<div class="flex items-center gap-3">
+
+<jk-icon
+ icon="settings"
+ class="w-5 h-5 text-indigo-400"
+></jk-icon>
+
+<h2
+ class="
+ text-white
+ font-semibold
+ "
+>
+Title
+</h2>
+
+</div>
+
+<p
+class="
+mt-2
+text-sm
+text-slate-400
+"
+>
+Description
+</p>
+
+</div>
+Final Rule
+
+Every new JumpKey component should look like it has always been part of the system.
+
+The user should feel:
+
+"This belongs here."
+
+not:
+
+"This is a new feature that was added later."
+
+Consistency is more important than adding visual complexity.
