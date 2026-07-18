@@ -120,7 +120,20 @@ export class JkDashboardHeader extends LitElement {
             rel="noopener noreferrer"
             class="${styles.logoShell} ${this.hasWorkspaces ? 'jk-workspace-logo' : ''}"
           >
-            <img src="/jump-key.png" alt="JumpKey" class="${styles.logoImg}" />
+            <img
+              src="/jump-key/jump-key.png"
+              alt="JumpKey"
+              class="
+              size-9
+              sm:size-11
+              object-contain
+
+              transition-transform
+              duration-300
+
+              group-hover:scale-105
+            "
+            />
           </a>
 
           <div class="${styles.titleContainer} ${this.hasWorkspaces ? 'jk-workspace-title' : ''}">
