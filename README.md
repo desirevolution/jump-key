@@ -31,20 +31,20 @@
 ## Screenshots
 
 <p align="center">
-  <a href="screenshots/screenshot_2.png?v=2">
-    <img src="screenshots/screenshot_1.png" width="300">
+  <a href="screenshots/screenshot_2.png">
+    <img src="screenshots/screenshot_1.png?v=2" width="300">
   </a>
-  <a href="screenshots/screenshot_3.png?v=2">
-    <img src="screenshots/screenshot_3.png" width="300">
+  <a href="screenshots/screenshot_3.png">
+    <img src="screenshots/screenshot_3.png?v=2" width="300">
   </a>
-  <a href="screenshots/screenshot_4.png?v=2">
-    <img src="screenshots/screenshot_4.png" width="300">
+  <a href="screenshots/screenshot_4.png">
+    <img src="screenshots/screenshot_4.png?v=2" width="300">
   </a>
-  <a href="screenshots/screenshot_5.png?v=2">
-    <img src="screenshots/screenshot_5.png" width="300">
+  <a href="screenshots/screenshot_5.png">
+    <img src="screenshots/screenshot_5.png?v=2" width="300">
   </a>
-  <a href="screenshots/screenshot_6.png?v=2">
-    <img src="screenshots/screenshot_6.png" width="300">
+  <a href="screenshots/screenshot_6.png">
+    <img src="screenshots/screenshot_6.png?v=2" width="300">
   </a>
 </p>
 
