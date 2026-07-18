@@ -37,7 +37,6 @@ export class JkFavoritesView extends LitElement {
             <jk-icon icon="star" class="${styles.icon}"></jk-icon>
           </div>
 
-          <!-- Titel auf Favoriten geändert -->
           <h2 class="${styles.title}">${this.t('favorites') || 'Favoriten'}</h2>
 
           <jk-icon-button
@@ -64,27 +63,26 @@ export class JkFavoritesView extends LitElement {
                 .name=${service.name}
                 .subtitle=${service.url}
                 .icon=${service.icon}
-                .badgeText=${service.key}
+                .badgeText=${service.favSlot}
                 .isFavorite=${true}
                 @card-click=${() => {
-                  this.dispatchEvent(
-                    new CustomEvent('service-click', {
-                      detail: { service },
-                      bubbles: true,
-                      composed: true,
-                    }),
-                  );
-                }}
+    this.dispatchEvent(
+      new CustomEvent('service-click', {
+        detail: { service },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }}
                 @card-long-press=${() => {
-                  // Wenn ein bestehender Favorit lang gedrückt wird -> Löschen triggern
-                  this.dispatchEvent(
-                    new CustomEvent('delete-favorite-slot', {
-                      detail: { slot: service.key },
-                      bubbles: true,
-                      composed: true,
-                    }),
-                  );
-                }}
+    this.dispatchEvent(
+      new CustomEvent('delete-favorite-slot', {
+        detail: { slot: service.favSlot },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }}
               ></jk-service-card>
             `,
           )}

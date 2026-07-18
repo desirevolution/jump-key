@@ -40,7 +40,6 @@ export class JkServiceCard extends LitElement {
     this._pressTimer = null;
     this._isLongPressActive = false;
   }
-
   _handlePointerDown(e) {
     // Nur auf primäre Klicks reagieren (Linksklick / normaler Touch)
     if (e.button !== 0) return;
@@ -53,7 +52,23 @@ export class JkServiceCard extends LitElement {
     this._pressTimer = setTimeout(() => {
       this._isLongPressActive = true;
       this.isPressing = false; // Ausgelöst, Animation beenden
-      this.dispatchEvent(new CustomEvent('card-long-press', { bubbles: true, composed: true }));
+
+      // FIX: Wir packen die Daten direkt in das e.detail.service Objekt!
+      // Falls die Karte ein ganzes .service Objekt hat, nutzen wir das, ansonsten bauen wir es aus den Props.
+      const serviceData = this.service || {
+        name: this.name,
+        url: this.subtitle,
+        icon: this.icon,
+        key: this.badgeText,
+      };
+
+      this.dispatchEvent(
+        new CustomEvent('card-long-press', {
+          detail: { service: serviceData }, // Das füttert e.detail.service in der app.js
+          bubbles: true,
+          composed: true,
+        }),
+      );
     }, 600);
   }
 
@@ -65,12 +80,30 @@ export class JkServiceCard extends LitElement {
     if (this._isLongPressActive) {
       e.preventDefault();
       e.stopPropagation();
-      this._isLongPressActive = false;
+      // WICHTIG: Das Zurücksetzen auf false verzögern wir ganz leicht (per setTimeout 0),
+      // damit ein eventuell verzögert feuerndes natives '@click' im Template ebenfalls blockiert wird!
+      setTimeout(() => {
+        this._isLongPressActive = false;
+      }, 0);
       return;
     }
 
     // Kurzer Tipp -> Normaler Klick-Event
-    this.dispatchEvent(new CustomEvent('card-click', { bubbles: true, composed: true }));
+    // FIX: Auch hier packen wir zur Sicherheit die Service-Daten rein, falls eine Komponente danach sucht
+    const serviceData = this.service || {
+      name: this.name,
+      url: this.subtitle,
+      icon: this.icon,
+      key: this.badgeText,
+    };
+
+    this.dispatchEvent(
+      new CustomEvent('card-click', {
+        detail: { service: serviceData },
+        bubbles: true,
+        composed: true,
+      }),
+    );
   }
 
   _handlePointerLeave() {

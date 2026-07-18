@@ -125,7 +125,6 @@ function handleFavoriteRecordingInput(key, app) {
   const rec = app.favoriteRecording;
 
   if (rec.step === 0) {
-    // 1. Buchstabe: Kategorie suchen
     const catExists = app.categories.some((c) => c.categoryKey === key);
     if (catExists) {
       rec.categoryKey = key;
@@ -267,7 +266,7 @@ function handleSearchKeyDown(e, app) {
  */
 function handleNavigationKeyDown(key, app) {
   if (!app.activeCategoryKey) {
-    if (/^[0-9]$/.test(key) && !app.isGridView) {
+    if (/^[0-9]$/.test(key)) {
       const favService = getFavorites(app.categories, app.favorites).find((s) => s.key === key);
       if (favService) {
         app.currentInput = key.toUpperCase();

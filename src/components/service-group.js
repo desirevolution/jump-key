@@ -79,7 +79,6 @@ export class JkServiceGroup extends LitElement {
                 .icon=${service.icon}
                 .badgeText=${service.key}
                 @card-click=${() => this._handleCardClick(service)}
-                @card-long-press=${() => this._handleCardLongPress(service)}
               ></jk-service-card>
             `,
           )}

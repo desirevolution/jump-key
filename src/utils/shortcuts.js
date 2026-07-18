@@ -54,17 +54,17 @@ export function getFilteredServices(categories, searchQuery) {
 export function getFavorites(categories, favorites) {
   const allServices = getAllServicesFlat(categories);
   const result = [];
-
-  // Die feste Reihenfolge der Slots: 1 bis 9, und die 0 am Ende
   const slots = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 
   slots.forEach((slot) => {
     const serviceName = favorites[slot];
     if (serviceName) {
-      const service = allServices.find((s) => s.name === serviceName);
-      if (service) {
-        // Wir übergeben den Slot ('1'-'0') als Key für den Kachel-Badge
-        result.push({ ...service, key: slot });
+      const originalService = allServices.find((s) => s.name === serviceName);
+      if (originalService) {
+        result.push({
+          ...originalService,
+          favSlot: slot,
+        });
       }
     }
   });
