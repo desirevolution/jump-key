@@ -4,6 +4,12 @@ import { createIcons, icons } from 'lucide';
 
 createIcons({ icons });
 
+// 1. Externalize default styling parameters
+const styles = {
+  image: `block object-contain`,
+  defaultIconSize: `size-6`,
+};
+
 export class JkIcon extends LitElement {
   static properties = {
     icon: { type: String },
@@ -12,13 +18,20 @@ export class JkIcon extends LitElement {
 
   constructor() {
     super();
-
     this.icon = '';
     this.alt = '';
   }
 
   createRenderRoot() {
-    return this;
+    return this; // Interacts with global Tailwind configuration styles
+  }
+
+  /**
+   * Helper to fetch classes explicitly set on the host element.
+   * Defaults to 'size-6' if no explicit sizes or styles are supplied by the parent.
+   */
+  get hostClasses() {
+    return this.getAttribute('class') || styles.defaultIconSize;
   }
 
   render() {
@@ -27,32 +40,20 @@ export class JkIcon extends LitElement {
     }
 
     const isUrl = /^https?:\/\/|^\//i.test(this.icon);
-
     const isImageFile = /\.(png|jpe?g|svg|webp|gif)$/i.test(this.icon);
 
     if (isUrl || isImageFile) {
       const src = isUrl ? this.icon : `./icons/${this.icon}`;
 
-      return html`
-        <img
-          src=${src}
-          alt=${this.alt}
-          class="
-            block
-            object-contain
-            ${this.className}
-          "
-        />
-      `;
+      return html` <img src=${src} alt=${this.alt} class="${styles.image} ${this.hostClasses}" /> `;
     }
 
     const iconNode = icons[this.toPascalCase(this.icon)];
-
     if (!iconNode) {
       return html``;
     }
 
-    return html` ${unsafeSVG(this.renderIcon(iconNode))} `;
+    return html`${unsafeSVG(this.renderIcon(iconNode))}`;
   }
 
   renderIcon(node) {
@@ -75,15 +76,11 @@ export class JkIcon extends LitElement {
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
-        class="${this.className}"
+        class="${this.hostClasses}"
       >
         ${children}
       </svg>
     `;
-  }
-
-  get className() {
-    return this.getAttribute('class') || 'size-6';
   }
 
   toPascalCase(name) {

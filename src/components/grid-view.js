@@ -1,6 +1,15 @@
 import { LitElement, html } from 'lit';
 import './service-group.js';
 
+// 1. Static styling dictionary isolating layouts from the rendering engine
+const styles = {
+  emptyState: `flex flex-col items-center justify-center py-16 text-slate-500`,
+  emptyIcon: `size-10 mb-3 opacity-40`,
+  emptyText: `text-sm`,
+  singleCategoryWrapper: `animate-fadeIn transition-all duration-300`,
+  fullDashboardWrapper: `space-y-5 sm:space-y-6 animate-fadeIn`,
+};
+
 export class JkGridView extends LitElement {
   createRenderRoot() {
     return this;
@@ -16,21 +25,11 @@ export class JkGridView extends LitElement {
   render() {
     if (!this.categories || this.categories.length === 0) {
       return html`
-        <div
-          class="
-            flex
-            flex-col
-            items-center
-            justify-center
-
-            py-16
-
-            text-slate-500
-          "
-        >
-          <jk-icon icon="folder-open" class="size-10 mb-3 opacity-40"></jk-icon>
-
-          <span class="text-sm"> ${this.t ? this.t('noServices') : 'No services'} </span>
+        <div class="${styles.emptyState}">
+          <jk-icon icon="folder-open" class="${styles.emptyIcon}"></jk-icon>
+          <span class="${styles.emptyText}">
+            ${this.t ? this.t('noServices') : 'No services'}
+          </span>
         </div>
       `;
     }
@@ -38,7 +37,6 @@ export class JkGridView extends LitElement {
     /*
       Single Category Mode
     */
-
     if (this.activeCategoryKey) {
       const activeGroup = this.categories.find(
         (category) => category.categoryKey === this.activeCategoryKey,
@@ -49,14 +47,7 @@ export class JkGridView extends LitElement {
       }
 
       return html`
-        <div
-          class="
-            animate-fadeIn
-
-            transition-all
-            duration-300
-          "
-        >
+        <div class="${styles.singleCategoryWrapper}">
           <jk-service-group
             .title=${activeGroup.category}
             .icon=${activeGroup.icon}
@@ -70,16 +61,8 @@ export class JkGridView extends LitElement {
     /*
       Full Dashboard Mode
     */
-
     return html`
-      <div
-        class="
-          space-y-5
-          sm:space-y-6
-
-          animate-fadeIn
-        "
-      >
+      <div class="${styles.fullDashboardWrapper}">
         ${this.categories.map(
           (cat) => html`
             <jk-service-group

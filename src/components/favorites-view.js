@@ -3,6 +3,17 @@ import './service-card.js';
 import './icon.js';
 import './icon-button.js';
 
+// 1. Static styling dictionary isolating layouts from the rendering engine
+const styles = {
+  section: `mb-8 rounded-2xl border border-amber-500/20 bg-slate-900/20 p-4 sm:p-5`,
+  header: `flex items-center gap-3 mb-4`,
+  iconBadge: `flex items-center justify-center size-8 rounded-xl bg-amber-500/10 ring-1 ring-amber-500/20`,
+  icon: `size-4 text-amber-400`,
+  title: `text-sm font-semibold tracking-wide text-slate-200`,
+  resetButton: `ml-auto`,
+  grid: `grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(280px,1fr))]`,
+};
+
 export class JkFavoritesView extends LitElement {
   createRenderRoot() {
     return this;
@@ -20,84 +31,23 @@ export class JkFavoritesView extends LitElement {
     }
 
     return html`
-      <section
-        class="
-          mb-8
-
-          rounded-2xl
-
-          border
-          border-amber-500/20
-
-          bg-slate-900/20
-
-          p-4
-          sm:p-5
-        "
-      >
+      <section class="${styles.section}">
         <!-- Header -->
-
-        <div
-          class="
-            flex
-            items-center
-            gap-3
-
-            mb-4
-          "
-        >
+        <div class="${styles.header}">
           <!-- Icon -->
-
-          <div
-            class="
-              flex
-              items-center
-              justify-center
-
-              size-8
-
-              rounded-xl
-
-              bg-amber-500/10
-
-              ring-1
-              ring-amber-500/20
-            "
-          >
-            <jk-icon
-              icon="star"
-              class="
-                size-4
-
-                text-amber-400
-
-              "
-            ></jk-icon>
+          <div class="${styles.iconBadge}">
+            <jk-icon icon="star" class="${styles.icon}"></jk-icon>
           </div>
 
           <!-- Title -->
-
-          <h2
-            class="
-              text-sm
-
-              font-semibold
-
-              tracking-wide
-
-              text-slate-200
-            "
-          >
-            ${this.t('frequent')}
-          </h2>
+          <h2 class="${styles.title}">${this.t('frequent')}</h2>
 
           <!-- Reset -->
-
           <jk-icon-button
             icon="trash-2"
             variant="text"
             .text=${this.t('resetFavs')}
-            class="ml-auto"
+            class="${styles.resetButton}"
             @click=${() => {
               this.dispatchEvent(
                 new CustomEvent('clear-favorites', {
@@ -110,20 +60,7 @@ export class JkFavoritesView extends LitElement {
         </div>
 
         <!-- Cards -->
-
-        <div
-          class="
-            grid
-
-            grid-cols-1
-
-            gap-3
-
-            sm:gap-4
-
-            grid-cols-[repeat(auto-fill,minmax(280px,1fr))]
-          "
-        >
+        <div class="${styles.grid}">
           ${this.favorites.map(
             (service) => html`
               <jk-service-card
@@ -135,12 +72,8 @@ export class JkFavoritesView extends LitElement {
                 @card-click=${() => {
                   this.dispatchEvent(
                     new CustomEvent('service-click', {
-                      detail: {
-                        service,
-                      },
-
+                      detail: { service },
                       bubbles: true,
-
                       composed: true,
                     }),
                   );

@@ -3,6 +3,22 @@ import './icon.js';
 import './icon-button.js';
 import './search-item.js';
 
+// 1. Static styling dictionary isolating layouts from the rendering engine
+const styles = {
+  overlay: `fixed inset-0 z-50 flex items-start justify-center pt-10 sm:pt-24 p-4 bg-slate-950/70 backdrop-blur-md`,
+  modal: `w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 shadow-2xl shadow-black/40 flex flex-col max-h-[80vh]`,
+  header: `flex items-center gap-3 px-5 py-4 border-b border-slate-700/70 bg-slate-900/30 shrink-0`,
+  iconBadge: `flex items-center justify-center size-9 rounded-xl bg-slate-700/60 ring-1 ring-slate-600/70 text-indigo-300`,
+  form: `grow`,
+  input: `w-full bg-transparent text-lg sm:text-xl font-medium tracking-tight text-white placeholder-slate-500 focus:outline-none`,
+  // FIX: Nur reine Tailwind-Klassen hier rein. Der Selektor-Name bleibt getrennt.
+  resultsContainer: `overflow-y-auto p-2 space-y-1 grow scroll-py-2`,
+  engineHeader: `px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500`,
+  emptyState: `flex flex-col items-center justify-center py-10 text-slate-500`,
+  emptyIcon: `size-8 mb-3 opacity-50`,
+  emptyText: `text-sm`,
+};
+
 export class JkSearchModal extends LitElement {
   createRenderRoot() {
     return this; // Preserves global Tailwind configuration styles
@@ -30,40 +46,35 @@ export class JkSearchModal extends LitElement {
   updated(changedProperties) {
     if (changedProperties.has('selectedIndex')) {
       requestAnimationFrame(() => {
-        const container = this.querySelector('.search-results');
+        // FIX: Sicherstellen, dass wir das Element über die dedizierte ID/Klasse finden
+        const container = this.querySelector('#searchResults');
         if (!container) return;
 
         const items = container.querySelectorAll('jk-dashboard-search-item');
         const active = items[this.selectedIndex];
 
         if (active) {
-          // 1. Wenn wir ganz oben sind (Index 0 oder 1), erzwinge den absoluten Anfang
           if (this.selectedIndex <= 1) {
             container.scrollTop = 0;
             return;
           }
 
-          // 2. Wenn wir beim allerletzten Element sind, scrolle komplett nach unten
           if (this.selectedIndex === items.length - 1) {
             container.scrollTop = container.scrollHeight;
             return;
           }
 
-          // 3. Für alle Elemente dazwischen: Präzise manuelle Berechnung mit Puffer
           const activeTop = active.offsetTop;
           const activeBottom = activeTop + active.offsetHeight;
           const visibleTop = container.scrollTop;
           const visibleBottom = visibleTop + container.clientHeight;
 
-          // Puffer-Zone, damit Elemente oben/unten nicht an die Kante gequetscht werden
-          const padding = 12;
+          const topOffset = 160;
 
-          if (activeTop < visibleTop + padding) {
-            // Scrollt nach oben, wenn das Element die obere Puffer-Zone berührt
-            container.scrollTop = activeTop - padding;
-          } else if (activeBottom > visibleBottom - padding) {
-            // Scrollt nach unten, wenn das Element die untere Puffer-Zone berührt
-            container.scrollTop = activeBottom - container.clientHeight + padding;
+          if (activeTop < visibleTop + topOffset) {
+            container.scrollTop = Math.max(0, activeTop - topOffset);
+          } else if (activeBottom > visibleBottom) {
+            container.scrollTop += activeBottom - visibleBottom;
           }
         }
       });
@@ -217,97 +228,18 @@ export class JkSearchModal extends LitElement {
 
     const queryTrimmed = this.searchQuery.trim();
     const showQuickTrigger = queryTrimmed === '';
-
     const { items, showAllEngines, isFilteringEngines } = this._buildItems();
 
     return html`
-      <div
-        @click=${this._handleClose}
-        class="
-        fixed
-        inset-0
-        z-50
-
-        flex
-        items-start
-        justify-center
-
-        pt-10
-        sm:pt-24
-
-        p-4
-
-        bg-slate-950/70
-        backdrop-blur-md
-      "
-      >
-        <div
-          @click=${(e) => e.stopPropagation()}
-          class="
-          w-full
-          max-w-3xl
-
-          overflow-hidden
-
-          rounded-2xl
-
-          border
-          border-slate-700/70
-
-          bg-gradient-to-br
-          from-slate-800
-          to-slate-900
-
-          shadow-2xl
-          shadow-black/40
-
-          flex
-          flex-col
-
-          max-h-[80vh]
-        "
-        >
+      <div @click=${this._handleClose} class="${styles.overlay}">
+        <div @click=${(e) => e.stopPropagation()} class="${styles.modal}">
           <!-- Search Header -->
-
-          <div
-            class="
-            flex
-            items-center
-            gap-3
-
-            px-5
-            py-4
-
-            border-b
-            border-slate-700/70
-
-            bg-slate-900/30
-
-            shrink-0
-          "
-          >
-            <div
-              class="
-              flex
-              items-center
-              justify-center
-
-              size-9
-
-              rounded-xl
-
-              bg-slate-700/60
-
-              ring-1
-              ring-slate-600/70
-
-              text-indigo-300
-            "
-            >
+          <div class="${styles.header}">
+            <div class="${styles.iconBadge}">
               <jk-icon icon="search" class="size-5"></jk-icon>
             </div>
 
-            <form @submit=${this._handleSubmit} class="grow">
+            <form @submit=${this._handleSubmit} class="${styles.form}">
               <input
                 id="searchInput"
                 type="text"
@@ -316,22 +248,7 @@ export class JkSearchModal extends LitElement {
                 placeholder="${this.t('searchPlaceholder')}"
                 .value=${this.searchQuery}
                 @input=${this._handleInput}
-                class="
-                w-full
-                bg-transparent
-
-                text-lg
-                sm:text-xl
-
-                font-medium
-                tracking-tight
-
-                text-white
-
-                placeholder-slate-500
-
-                focus:outline-none
-              "
+                class="${styles.input}"
               />
             </form>
 
@@ -351,61 +268,20 @@ export class JkSearchModal extends LitElement {
           </div>
 
           <!-- Results -->
-
-          <div
-            class="
-    search-results
-    overflow-y-auto
-    p-2
-    space-y-1
-    grow
-scroll-py-2    
-          "
-          >
+          <!-- FIX: Eindeutige ID vergeben und die dynamischen Styles sauber getrennt übergeben -->
+          <div id="searchResults" class="${styles.resultsContainer}">
             ${
               (showAllEngines || isFilteringEngines) && items.length > 0
-                ? html`
-                    <div
-                      class="
-                      px-3
-                      pt-2
-                      pb-1
-
-                      text-[10px]
-
-                      font-semibold
-
-                      uppercase
-
-                      tracking-[0.18em]
-
-                      text-slate-500
-                    "
-                    >
-                      ${this.t('searchEnginesTitle')}
-                    </div>
-                  `
+                ? html`<div class="${styles.engineHeader}">${this.t('searchEnginesTitle')}</div>`
                 : ''
             }
             ${items.map((item, i) => item.render(i === this.selectedIndex))}
             ${
               this.searchQuery && items.length === 0
                 ? html`
-                    <div
-                      class="
-                      flex
-                      flex-col
-                      items-center
-                      justify-center
-
-                      py-10
-
-                      text-slate-500
-                    "
-                    >
-                      <jk-icon icon="search-x" class="size-8 mb-3 opacity-50"></jk-icon>
-
-                      <span class="text-sm"> ${this.t('noServices')} </span>
+                    <div class="${styles.emptyState}">
+                      <jk-icon icon="search-x" class="${styles.emptyIcon}"></jk-icon>
+                      <span class="${styles.emptyText}">${this.t('noServices')}</span>
                     </div>
                   `
                 : ''

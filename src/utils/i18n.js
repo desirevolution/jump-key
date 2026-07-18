@@ -17,6 +17,7 @@ export const translations = {
     hkService: 'Service innerhalb einer Kategorie aufrufen',
     hkReset: 'Zurück zur Hauptübersicht / Abbrechen',
     hkToggleView: 'Ansichtsmodus wechseln (Kategorie / Grid)',
+    hkSwitchTabs: 'Konfigurations-Tabs wechseln',
 
     searchEnginesShow: 'Suchmaschinen anzeigen', // <-- Neu
     searchEnginesTitle: 'Unterstützte Suchmaschinen:', // <-- Neu
@@ -57,6 +58,8 @@ export const translations = {
       'Du hast ungespeicherte Änderungen vorgenommen. Möchtest du diese wirklich verwerfen?',
     tabEditorDiscardChangesConfirm: 'Änderungen verwerfen',
     tabEditorDiscardChangesCancel: 'Weiter editieren',
+    tabEditorValid: 'Gültig',
+    tabEditorInvalid: 'Ungültig',
   },
   en: {
     helpHint: 'Press [?] for hotkey help',
@@ -76,6 +79,7 @@ export const translations = {
     hkService: 'Launch service inside active category',
     hkReset: 'Back to main overview / Cancel',
     hkToggleView: 'Toggle View Mode (Category / Grid)',
+    hkSwitchTabs: 'Switch config tabs',
 
     // --- Search Engine specific Keys ---
     searchEnginesShow: 'Show search engines', // <-- Neu
@@ -116,6 +120,8 @@ export const translations = {
     tabEditorDiscardChangesMsg: 'You have unsaved changes. Do you really want to discard them?',
     tabEditorDiscardChangesConfirm: 'Discard changes',
     tabEditorDiscardChangesCancel: 'Continue editing',
+    tabEditorValid: 'Valid',
+    tabEditorInvalid: 'Invalid',
   },
 };
 
