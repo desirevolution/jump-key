@@ -1,9 +1,8 @@
-import { LitElement, html } from 'lit';
+import { html, LitElement } from 'lit';
 import './service-card.js';
 import './icon.js';
 import './icon-button.js';
 
-// 1. Static styling dictionary isolating layouts from the rendering engine
 const styles = {
   section: `mb-8 rounded-2xl border border-amber-500/20 bg-slate-900/20 p-4 sm:p-5`,
   header: `flex items-center gap-3 mb-4`,
@@ -34,15 +33,12 @@ export class JkFavoritesView extends LitElement {
       <section class="${styles.section}">
         <!-- Header -->
         <div class="${styles.header}">
-          <!-- Icon -->
           <div class="${styles.iconBadge}">
             <jk-icon icon="star" class="${styles.icon}"></jk-icon>
           </div>
 
-          <!-- Title -->
-          <h2 class="${styles.title}">${this.t('frequent')}</h2>
+          <h2 class="${styles.title}">${this.t('favorites') || 'Favoriten'}</h2>
 
-          <!-- Reset -->
           <jk-icon-button
             icon="trash-2"
             variant="text"
@@ -53,7 +49,7 @@ export class JkFavoritesView extends LitElement {
                 new CustomEvent('clear-favorites', {
                   bubbles: true,
                   composed: true,
-                }),
+                })
               );
             }}
           ></jk-icon-button>
@@ -67,7 +63,7 @@ export class JkFavoritesView extends LitElement {
                 .name=${service.name}
                 .subtitle=${service.url}
                 .icon=${service.icon}
-                .badgeText=${service.key}
+                .badgeText=${service.favSlot}
                 .isFavorite=${true}
                 @card-click=${() => {
                   this.dispatchEvent(
@@ -75,11 +71,20 @@ export class JkFavoritesView extends LitElement {
                       detail: { service },
                       bubbles: true,
                       composed: true,
-                    }),
+                    })
+                  );
+                }}
+                @card-long-press=${() => {
+                  this.dispatchEvent(
+                    new CustomEvent('delete-favorite-slot', {
+                      detail: { slot: service.favSlot },
+                      bubbles: true,
+                      composed: true,
+                    })
                   );
                 }}
               ></jk-service-card>
-            `,
+            `
           )}
         </div>
       </section>

@@ -1,8 +1,7 @@
-import { LitElement, html } from 'lit';
+import { html, LitElement } from 'lit';
 import './service-card.js';
 import './icon.js';
 
-// 1. Extract static design definitions out of the rendering cycle
 const styles = {
   section: `rounded-2xl border border-slate-700/50 bg-slate-900/20 p-4 sm:p-5 transition-colors duration-300`,
   header: `flex items-center gap-3 mb-4`,
@@ -16,7 +15,7 @@ const styles = {
 
 export class JkServiceGroup extends LitElement {
   createRenderRoot() {
-    return this; // Using global Tailwind styles
+    return this;
   }
 
   static properties = {
@@ -32,7 +31,21 @@ export class JkServiceGroup extends LitElement {
         detail: { service },
         bubbles: true,
         composed: true,
-      }),
+      })
+    );
+  }
+
+  _handleCardLongPress(e, service) {
+    // Verhindert, dass das originale Event der Service-Card
+    // weiter nach oben zur app.js wandert
+    e.stopPropagation();
+
+    this.dispatchEvent(
+      new CustomEvent('card-long-press', {
+        detail: { service },
+        bubbles: true,
+        composed: true,
+      })
     );
   }
 
@@ -41,18 +54,22 @@ export class JkServiceGroup extends LitElement {
       <section class="${styles.section}">
         <!-- Group Header -->
         <div class="${styles.header}">
-          <!-- Icon -->
           <div class="${styles.iconContainer}">
-            <jk-icon .icon=${this.icon || 'folder'} class="${styles.icon}"></jk-icon>
+            <jk-icon
+              .icon=${this.icon || 'folder'}
+              class="${styles.icon}"
+            ></jk-icon>
           </div>
 
-          <!-- Title & Optional Badge -->
           <div class="${styles.titleWrapper}">
             <h2 class="${styles.title}">${this.title}</h2>
-
             ${
               this.badgeText
-                ? html` <kbd class="${styles.badge}"> ${this.badgeText.toUpperCase()} </kbd> `
+                ? html`
+                    <kbd class="${styles.badge}">
+                      ${this.badgeText.toUpperCase()}
+                    </kbd>
+                  `
                 : ''
             }
           </div>
@@ -68,8 +85,9 @@ export class JkServiceGroup extends LitElement {
                 .icon=${service.icon}
                 .badgeText=${service.key}
                 @card-click=${() => this._handleCardClick(service)}
+                @card-long-press=${(e) => this._handleCardLongPress(e, service)} <!-- 'e' hinzugefügt -->
               ></jk-service-card>
-            `,
+            `
           )}
         </div>
       </section>

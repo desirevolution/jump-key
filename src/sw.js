@@ -26,7 +26,9 @@ precacheAndRoute(self.__WB_MANIFEST);
 //
 // SPA-Navigation immer aus dem Precache
 //
-const navigationHandler = createHandlerBoundToURL(import.meta.env.BASE_URL + 'index.html');
+const navigationHandler = createHandlerBoundToURL(
+  import.meta.env.BASE_URL + 'index.html'
+);
 
 registerRoute(new NavigationRoute(navigationHandler));
 
@@ -35,7 +37,6 @@ registerRoute(new NavigationRoute(navigationHandler));
 //
 registerRoute(
   ({ request }) => request.destination === 'image',
-
   new CacheFirst({
     cacheName: 'images',
 
@@ -45,7 +46,7 @@ registerRoute(
         maxAgeSeconds: 60 * 60 * 24 * 365,
       }),
     ],
-  }),
+  })
 );
 
 //
@@ -53,10 +54,9 @@ registerRoute(
 //
 registerRoute(
   ({ request }) => request.destination === 'font',
-
   new CacheFirst({
     cacheName: 'fonts',
-  }),
+  })
 );
 
 //
@@ -69,7 +69,6 @@ registerRoute(
 //
 registerRoute(
   ({ url }) => url.pathname.endsWith('/config/services.json'),
-
   new NetworkFirst({
     cacheName: 'services',
 
@@ -101,5 +100,5 @@ registerRoute(
         },
       },
     ],
-  }),
+  })
 );

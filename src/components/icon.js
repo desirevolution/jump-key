@@ -1,4 +1,4 @@
-import { LitElement, html } from 'lit';
+import { html, LitElement } from 'lit';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
 import { createIcons, icons } from 'lucide';
 
@@ -45,7 +45,13 @@ export class JkIcon extends LitElement {
     if (isUrl || isImageFile) {
       const src = isUrl ? this.icon : `./icons/${this.icon}`;
 
-      return html` <img src=${src} alt=${this.alt} class="${styles.image} ${this.hostClasses}" /> `;
+      return html`
+        <img
+          src=${src}
+          alt=${this.alt}
+          class="${styles.image} ${this.hostClasses}"
+        />
+      `;
     }
 
     const iconNode = icons[this.toPascalCase(this.icon)];

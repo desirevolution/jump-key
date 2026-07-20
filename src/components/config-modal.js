@@ -1,11 +1,10 @@
-import { LitElement, html } from 'lit';
+import { html, LitElement } from 'lit';
 import './icon.js';
 import './icon-button.js';
 import './dialog.js';
 import './config-data.js';
 import './config-editor.js';
 
-// 1. Static styling dictionary isolating layouts from the application engine
 const styles = {
   overlay: `fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn`,
   container: `w-full max-w-7xl h-[88vh] max-h-[900px] flex flex-col rounded-3xl border border-slate-700/70 bg-slate-900/95 shadow-2xl shadow-black/50 p-5 sm:p-6`,
@@ -36,7 +35,7 @@ const styles = {
 
 export class JkConfigModal extends LitElement {
   createRenderRoot() {
-    return this; // Preserves global Tailwind layout system
+    return this;
   }
 
   static properties = {
@@ -57,7 +56,6 @@ export class JkConfigModal extends LitElement {
     this.show = false;
     this.categories = [];
     this.searchEngines = [];
-
     this._activeTab = 'data';
     this._isEditorConfigValid = true;
     this._hasEditorConfigChanged = false;
@@ -65,7 +63,6 @@ export class JkConfigModal extends LitElement {
     this._originalConfigString = '';
     this._showDiscardDialog = false;
     this.t = (key) => key;
-
     this._handleKeyDown = this._handleKeyDown.bind(this);
   }
 
@@ -73,19 +70,15 @@ export class JkConfigModal extends LitElement {
     if (changed.has('show')) {
       if (this.show) {
         this._editorValue = JSON.stringify(
-          {
-            categories: this.categories,
-            searchEngines: this.searchEngines,
-          },
+          { categories: this.categories, searchEngines: this.searchEngines },
           null,
-          2,
+          2
         );
         this._originalConfigString = this._editorValue;
         this._isEditorConfigValid = true;
         this._hasEditorConfigChanged = false;
         this._showDiscardDialog = false;
         this._activeTab = 'data';
-
         window.addEventListener('keydown', this._handleKeyDown, true);
       } else {
         window.removeEventListener('keydown', this._handleKeyDown, true);
@@ -96,12 +89,6 @@ export class JkConfigModal extends LitElement {
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener('keydown', this._handleKeyDown, true);
-  }
-
-  async _focusButton(id) {
-    await this.updateComplete;
-    const btn = this.querySelector(`#${id}`);
-    if (btn) btn.focus();
   }
 
   _handleKeyDown(e) {
@@ -122,7 +109,8 @@ export class JkConfigModal extends LitElement {
     }
 
     if (this._activeTab === 'editor') {
-      const isSaveShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's';
+      const isSaveShortcut =
+        (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's';
       if (isSaveShortcut) {
         e.preventDefault();
         e.stopPropagation();
@@ -130,27 +118,6 @@ export class JkConfigModal extends LitElement {
           this._handleSave();
         }
         return;
-      }
-
-      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-        const activeElementId = document.activeElement?.id;
-        const isSaveEnabled = this._isEditorConfigValid && this._hasEditorConfigChanged;
-
-        if (activeElementId === 'cancelModalBtn' || activeElementId === 'saveModalBtn') {
-          e.preventDefault();
-          e.stopPropagation();
-
-          if (e.key === 'ArrowLeft' && activeElementId === 'saveModalBtn') {
-            this._focusButton('cancelModalBtn');
-          } else if (
-            e.key === 'ArrowRight' &&
-            activeElementId === 'cancelModalBtn' &&
-            isSaveEnabled
-          ) {
-            this._focusButton('saveModalBtn');
-          }
-          return;
-        }
       }
     }
 
@@ -190,25 +157,53 @@ export class JkConfigModal extends LitElement {
 
   _forceClose() {
     this._showDiscardDialog = false;
-    window.removeEventListener('keydown', this._handleKeyDown, true);
-    this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
+    this.dispatchEvent(
+      new CustomEvent('close', { bubbles: true, composed: true })
+    );
   }
 
   _handleSave() {
     try {
       const parsedJson = JSON.parse(this._editorValue);
+
+      localStorage.setItem('services-cache', JSON.stringify(parsedJson));
+
       this.dispatchEvent(
         new CustomEvent('save', {
+          detail: { newConfig: parsedJson },
+          bubbles: true,
+          composed: true,
+        })
+      );
+
+      this.dispatchEvent(
+        new CustomEvent('notify', {
           detail: {
-            newConfig: parsedJson,
-            oldConfig: this._originalConfigString,
+            type: 'success',
+            message:
+              this.t('tabEditorSaveSuccess') ||
+              'Configuration successfully saved!',
           },
           bubbles: true,
           composed: true,
-        }),
+        })
       );
+
+      this._originalConfigString = this._editorValue;
+      this._hasEditorConfigChanged = false;
+      this._forceClose();
     } catch (e) {
-      console.error('Failed to parse editor JSON on save', e);
+      this.dispatchEvent(
+        new CustomEvent('notify', {
+          detail: {
+            type: 'error',
+            message:
+              this.t('tabEditorSaveFailed') || 'Error saving configuration.',
+          },
+          bubbles: true,
+          composed: true,
+        })
+      );
     }
   }
 
@@ -239,11 +234,17 @@ export class JkConfigModal extends LitElement {
   render() {
     if (!this.show) return html``;
 
-    const statusClass = this._isEditorConfigValid ? styles.statusValid : styles.statusInvalid;
+    const statusClass = this._isEditorConfigValid
+      ? styles.statusValid
+      : styles.statusInvalid;
     const tabDataClass =
-      this._activeTab === 'data' ? styles.sidebarBtnActive : styles.sidebarBtnInactive;
+      this._activeTab === 'data'
+        ? styles.sidebarBtnActive
+        : styles.sidebarBtnInactive;
     const tabEditorClass =
-      this._activeTab === 'editor' ? styles.sidebarBtnActive : styles.sidebarBtnInactive;
+      this._activeTab === 'editor'
+        ? styles.sidebarBtnActive
+        : styles.sidebarBtnInactive;
     const saveBtnClass =
       this._isEditorConfigValid && this._hasEditorConfigChanged
         ? styles.btnPrimaryActive
@@ -260,7 +261,9 @@ export class JkConfigModal extends LitElement {
               </div>
               <div>
                 <h2 class="${styles.title}">JumpKey</h2>
-                <p class="${styles.subtitle}">Configuration & Backup</p>
+                <p class="${styles.subtitle}">
+                  ${this.t('configSubtitle') || 'Configuration & Backup'}
+                </p>
               </div>
             </div>
 
@@ -273,44 +276,45 @@ export class JkConfigModal extends LitElement {
                           .icon="${this._isEditorConfigValid ? 'circle-check' : 'triangle-alert'}"
                           class="size-4"
                         ></jk-icon>
-                        <span>
-                          ${this._isEditorConfigValid ? this.t('tabEditorValid') : this.t('tabEditorInvalid')}
-                        </span>
+                        <span
+                          >${this._isEditorConfigValid ? this.t('tabEditorValid') : this.t('tabEditorInvalid')}</span
+                        >
                       </div>
                     `
                   : ''
               }
-              <jk-icon-button icon="x" label="Close" @click="${this._handleClose}"></jk-icon-button>
+              <jk-icon-button
+                icon="x"
+                label="${this.t('close') || 'Close'}"
+                @click="${this._handleClose}"
+              ></jk-icon-button>
             </div>
           </div>
 
           <!-- Main Area -->
           <div class="${styles.mainArea}">
-            <!-- Navigation -->
             <aside class="${styles.sidebar}">
               <button
                 @click="${() => this._setActiveTab('data')}"
-                title="Ctrl + 1"
                 class="${styles.sidebarBtn} ${tabDataClass}"
               >
                 <jk-icon icon="database" class="size-4"></jk-icon>
                 ${this.t('tabData')}
                 <kbd class="${styles.kbd}">1</kbd>
               </button>
-
               <button
                 @click="${() => this._setActiveTab('editor')}"
-                title="Ctrl + 2"
                 class="${styles.sidebarBtn} ${tabEditorClass}"
               >
                 <jk-icon icon="code-2" class="size-4"></jk-icon>
-                ${this.t('tabEditor') || 'JSON Editor'}
+                ${this.t('tabEditor')}
                 <kbd class="${styles.kbd}">2</kbd>
               </button>
             </aside>
 
-            <!-- Content Area -->
-            <main class="${styles.contentArea}">${this._renderActiveTabContent()}</main>
+            <main class="${styles.contentArea}">
+              ${this._renderActiveTabContent()}
+            </main>
           </div>
 
           <!-- Footer -->
@@ -320,16 +324,13 @@ export class JkConfigModal extends LitElement {
                 ? html`
                     <button
                       type="button"
-                      id="cancelModalBtn"
                       @click="${this._handleClose}"
                       class="${styles.btnSecondary}"
                     >
                       ${this.t('editConfigCancel') || 'Cancel'}
                     </button>
-
                     <button
                       type="button"
-                      id="saveModalBtn"
                       @click="${this._handleSave}"
                       ?disabled="${!this._isEditorConfigValid || !this._hasEditorConfigChanged}"
                       class="${styles.btnPrimary} ${saveBtnClass}"
@@ -350,6 +351,31 @@ export class JkConfigModal extends LitElement {
           </div>
         </div>
       </div>
+
+      <!-- Entscheidungs-Dialog -->
+      ${
+        this._showDiscardDialog
+          ? html`
+              <jk-dialog
+                .show=${this._showDiscardDialog}
+                type="warning"
+                .title=${this.t('discardChangesTitle')}
+                .message=${this.t('discardChangesMessage')}
+                icon="triangle-alert"
+                iconColor="text-amber-400"
+                .confirmLabel=${this.t('discardConfirm')}
+                .cancelLabel=${this.t('cancel')}
+                @confirm=${this._forceClose}
+                @close=${() => {
+                  this._showDiscardDialog = false;
+                }}
+                @cancel=${() => {
+                  this._showDiscardDialog = false;
+                }}
+              ></jk-dialog>
+            `
+          : ''
+      }
     `;
   }
 }
