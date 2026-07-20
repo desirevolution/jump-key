@@ -347,6 +347,9 @@ class DashboardApp extends LitElement {
     const serviceName = this.favorites[slot];
     if (!serviceName) return;
 
+    // Aktiviert eine temporäre Klicksperre auf App-Ebene
+    this._blockClickEvents = true;
+
     this.lastDeletedFavorite = { slot, name: serviceName };
 
     delete this.favorites[slot];
@@ -358,18 +361,14 @@ class DashboardApp extends LitElement {
       true
     );
 
-    // Bereinigt sofort jeglichen Input-Zustand und blendet die Shortcuts aus
     this.resetInput(false);
     this.requestUpdate();
+
+    // Hebt die Klicksperre auf, sobald das "Finger-Abheben"-Event vorbei ist
+    setTimeout(() => {
+      this._blockClickEvents = false;
+    }, 300);
   }
-
-  // --------------------------------------------------
-  // External Notifications
-  // --------------------------------------------------
-
-  // --------------------------------------------------
-  // External Notifications
-  // --------------------------------------------------
 
   handleNotification(e) {
     const { type, message } = e.detail;
@@ -575,25 +574,28 @@ class DashboardApp extends LitElement {
                   }}
                 ></jk-favorites-view>
 
-<jk-service-group
-  title="${this.t('categories')}"
-  icon="folder"
-  .services=${this.categories.map((cat) => ({
-    name: cat.category,
-    url: `${cat.services?.length ?? 0} ${this.t('serviceCount') || 'Services'}`,
-    icon: cat.icon,
-    key: cat.categoryKey,
-    isCategory: true, // <-- NEU: Erkenntlich machen als Kategorie
-  }))}
-  @service-click=${(e) => {
-    const key = e.detail.service.key;
-    this.activeCategoryKey = key;
-    this.currentInput = key.toUpperCase();
-    window.history.pushState({ view: 'category', key }, '');
-  }}
-  @card-long-press=${this.handleCardLongPress} // <-- NEU: Event abfangen
-></jk-service-group>
-                `
+                <jk-service-group
+                  title="${this.t('categories')}"
+                  icon="folder"
+                  .services=${this.categories.map((cat) => ({
+      name: cat.category,
+      url: `${cat.services?.length ?? 0} ${this.t('serviceCount') || 'Services'}`,
+      icon: cat.icon,
+      key: cat.categoryKey,
+      isCategory: true,
+    }))}
+                  @service-click=${(e) => {
+      // WICHTIG: Klick blockieren, wenn gerade ein Favorit gelöscht wurde
+      if (this._blockClickEvents) return;
+
+      const key = e.detail.service.key;
+      this.activeCategoryKey = key;
+      this.currentInput = key.toUpperCase();
+      window.history.pushState({ view: 'category', key }, '');
+    }}
+                  @card-long-press=${this.handleCardLongPress}
+                ></jk-service-group>
+              `
             : html`
                 <jk-grid-view
                   .categories=${this.categories}

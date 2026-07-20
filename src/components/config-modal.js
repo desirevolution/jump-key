@@ -367,11 +367,11 @@ export class JkConfigModal extends LitElement {
                 .cancelLabel=${this.t('cancel')}
                 @confirm=${this._forceClose}
                 @close=${() => {
-            this._showDiscardDialog = false;
-          }}
+                  this._showDiscardDialog = false;
+                }}
                 @cancel=${() => {
-            this._showDiscardDialog = false;
-          }}
+                  this._showDiscardDialog = false;
+                }}
               ></jk-dialog>
             `
           : ''
