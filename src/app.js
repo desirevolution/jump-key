@@ -207,6 +207,9 @@ class DashboardApp extends LitElement {
 
   trackClick(service) {
     this.isValidInput = true;
+
+    // Sofort die Shortcuts ausblenden, wenn geklickt wurde
+    this.currentInput = '';
     this.requestUpdate();
 
     setTimeout(() => {
@@ -308,9 +311,16 @@ class DashboardApp extends LitElement {
     this.favorites[freeSlot] = service.name;
     localStorage.setItem('dashboard_favs', JSON.stringify(this.favorites));
 
-    this.currentInput = `FAV ${freeSlot}: ${service.name.toUpperCase()}`;
-    this.isValidInput = true;
-    this.startResetTimer(2000);
+    // NEU: Setzt die Kategorieauswahl und Inputs zurück.
+    // Dadurch wird showMain wieder true, die App springt zurück zur
+    // Hauptübersicht und zeigt die aktualisierten Favoriten an.
+    this.resetInput(true);
+
+    this.showToast(
+      `"${service.name}" als Favorit auf Taste ${freeSlot} gespeichert`,
+      'success',
+      true
+    );
     this.requestUpdate();
   }
 
@@ -318,20 +328,20 @@ class DashboardApp extends LitElement {
     const serviceName = this.favorites[slot];
     if (!serviceName) return;
 
-    this.dialogConfig = {
-      show: true,
-      title: 'Favorit entfernen?',
-      message: `Möchtest du "${serviceName}" von Taste ${slot} löschen?`,
-      icon: 'trash-2',
-      iconColor: 'text-rose-400',
-      confirmLabel: this.t('confirmResetConfirm'),
-      cancelLabel: this.t('cancel'),
-      onConfirm: () => {
-        delete this.favorites[slot];
-        localStorage.setItem('dashboard_favs', JSON.stringify(this.favorites));
-        this.requestUpdate();
-      },
-    };
+    this.lastDeletedFavorite = { slot, name: serviceName };
+
+    delete this.favorites[slot];
+    localStorage.setItem('dashboard_favs', JSON.stringify(this.favorites));
+
+    this.showToast(
+      `"${serviceName}" von Taste ${slot} entfernt`,
+      'success',
+      true
+    );
+
+    // Bereinigt sofort jeglichen Input-Zustand und blendet die Shortcuts aus
+    this.resetInput(false);
+    this.requestUpdate();
   }
 
   // --------------------------------------------------
@@ -544,29 +554,29 @@ class DashboardApp extends LitElement {
                   .favorites=${favs}
                   .t=${this.t}
                   @service-click=${(e) => {
-                  this.trackClick(e.detail.service);
-                }}
+                    this.trackClick(e.detail.service);
+                  }}
                   @clear-favorites=${this.clearFavorites}
                   @delete-favorite-slot=${(e) => {
-                  this.handleDeleteFavoriteSlot(e.detail.slot);
-                }}
+                    this.handleDeleteFavoriteSlot(e.detail.slot);
+                  }}
                 ></jk-favorites-view>
 
                 <jk-service-group
                   title="${this.t('categories')}"
                   icon="folder"
                   .services=${this.categories.map((cat) => ({
-                  name: cat.category,
-                  url: `${cat.services?.length ?? 0} Services`,
-                  icon: cat.icon,
-                  key: cat.categoryKey,
-                }))}
+                    name: cat.category,
+                    url: `${cat.services?.length ?? 0} Services`,
+                    icon: cat.icon,
+                    key: cat.categoryKey,
+                  }))}
                   @service-click=${(e) => {
-                  const key = e.detail.service.key;
-                  this.activeCategoryKey = key;
-                  this.currentInput = key.toUpperCase();
-                  window.history.pushState({ view: 'category', key }, '');
-                }}
+                    const key = e.detail.service.key;
+                    this.activeCategoryKey = key;
+                    this.currentInput = key.toUpperCase();
+                    window.history.pushState({ view: 'category', key }, '');
+                  }}
                 ></jk-service-group>
               `
             : html`
@@ -575,11 +585,11 @@ class DashboardApp extends LitElement {
                   .activeCategoryKey=${this.activeCategoryKey}
                   .t=${this.t}
                   @service-click=${(e) => {
-                  this.trackClick(e.detail.service);
-                }}
+                    this.trackClick(e.detail.service);
+                  }}
                   @card-long-press=${(e) => {
-                  this.handleServiceLongPress(e.detail.service);
-                }}
+                    this.handleServiceLongPress(e.detail.service);
+                  }}
                 ></jk-grid-view>
               `
         }
