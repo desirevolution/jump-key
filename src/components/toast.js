@@ -119,10 +119,8 @@ export class JkToast extends LitElement {
             shadow-black/30
           "
         >
-          <!-- Accent Bar -->
           <div class="w-1 shrink-0 ${config.accent}"></div>
 
-          <!-- Content -->
           <div
             class="
               flex

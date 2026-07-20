@@ -294,10 +294,7 @@ class DashboardApp extends LitElement {
     );
 
     if (existingSlot) {
-      this.showToast(
-        `${service.name} ist bereits Favorit (${existingSlot})`,
-        'warning'
-      );
+      this.handleDeleteFavoriteSlot(existingSlot);
       return;
     }
 
@@ -310,9 +307,6 @@ class DashboardApp extends LitElement {
     this.favorites[freeSlot] = service.name;
     localStorage.setItem('dashboard_favs', JSON.stringify(this.favorites));
 
-    // NEU: Setzt die Kategorieauswahl und Inputs zurück.
-    // Dadurch wird showMain wieder true, die App springt zurück zur
-    // Hauptübersicht und zeigt die aktualisierten Favoriten an.
     this.resetInput(true);
 
     this.showToast(
@@ -326,29 +320,21 @@ class DashboardApp extends LitElement {
   handleCardLongPress(e) {
     const service = e.detail.service;
 
-    // Debug-Hilfe: Schau in die Browser-Konsole (F12), ob hier "isCategory: true" ankommt
-    console.log('Long pressed item:', service);
-
-    // Extrem sichere Prüfung, falls "isCategory" ein String oder Boolean ist
+    // Prüfen, ob es sich um eine Kategorie handelt
     if (service && (service.isCategory === true || service.key)) {
-      // Da Kategorien ein 'key' besitzen (Services haben eine 'url'),
-      // nutzen wir 'key' bzw. 'isCategory' als eindeutigen Identifikator
       if (service.isCategory || !service.url || service.key) {
         this.showToast(this.t('cannotFavoriteCategory'), 'info');
         return;
       }
     }
 
-    // Wenn es ein echter Service ist, ab zur normalen Favoriten-Logik
+    // Wenn es ein echter Service ist, ab zur Favoriten-Logik
     this.handleServiceLongPress(service);
   }
 
   handleDeleteFavoriteSlot(slot) {
     const serviceName = this.favorites[slot];
     if (!serviceName) return;
-
-    // Aktiviert eine temporäre Klicksperre auf App-Ebene
-    this._blockClickEvents = true;
 
     this.lastDeletedFavorite = { slot, name: serviceName };
 
@@ -363,17 +349,10 @@ class DashboardApp extends LitElement {
 
     this.resetInput(false);
     this.requestUpdate();
-
-    // Hebt die Klicksperre auf, sobald das "Finger-Abheben"-Event vorbei ist
-    setTimeout(() => {
-      this._blockClickEvents = false;
-    }, 300);
   }
 
   handleNotification(e) {
     const { type, message } = e.detail;
-
-    // Nutzt jetzt auch hier direkt das Toast-System für Benachrichtigungen
     this.showToast(message, type);
   }
 
@@ -527,12 +506,10 @@ class DashboardApp extends LitElement {
       !this.showConfigModal;
 
     return html`
-      <!-- Global UI -->
       ${this.templateKeyBadge()} ${this.templateHelpModal()}
       ${this.templateSearchModal(filteredServices)}
       ${this.templateConfigModal()} ${this.templateDialog()}
 
-      <!-- Toast Notification -->
       <jk-toast
         .show=${this.toastConfig.show}
         .message=${this.toastConfig.message}
@@ -542,7 +519,6 @@ class DashboardApp extends LitElement {
         }}
       ></jk-toast>
 
-      <!-- Header -->
       <jk-dashboard-header
         .isGridView=${this.isGridView}
         .lang=${this.lang}
@@ -557,7 +533,6 @@ class DashboardApp extends LitElement {
         @toggle-view=${this.toggleViewMode}
       ></jk-dashboard-header>
 
-      <!-- Main Content -->
       <main class="${styles.mainContent}">
         ${
           showMain && !this.isGridView
@@ -578,21 +553,18 @@ class DashboardApp extends LitElement {
                   title="${this.t('categories')}"
                   icon="folder"
                   .services=${this.categories.map((cat) => ({
-      name: cat.category,
-      url: `${cat.services?.length ?? 0} ${this.t('serviceCount') || 'Services'}`,
-      icon: cat.icon,
-      key: cat.categoryKey,
-      isCategory: true,
-    }))}
+                    name: cat.category,
+                    url: `${cat.services?.length ?? 0} ${this.t('serviceCount') || 'Services'}`,
+                    icon: cat.icon,
+                    key: cat.categoryKey,
+                    isCategory: true,
+                  }))}
                   @service-click=${(e) => {
-      // WICHTIG: Klick blockieren, wenn gerade ein Favorit gelöscht wurde
-      if (this._blockClickEvents) return;
-
-      const key = e.detail.service.key;
-      this.activeCategoryKey = key;
-      this.currentInput = key.toUpperCase();
-      window.history.pushState({ view: 'category', key }, '');
-    }}
+                    const key = e.detail.service.key;
+                    this.activeCategoryKey = key;
+                    this.currentInput = key.toUpperCase();
+                    window.history.pushState({ view: 'category', key }, '');
+                  }}
                   @card-long-press=${this.handleCardLongPress}
                 ></jk-service-group>
               `

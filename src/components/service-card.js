@@ -3,7 +3,6 @@ import { classMap } from 'lit/directives/class-map.js';
 import './icon.js';
 
 const styles = {
-  // select-none verhindert die unschöne Textmarkierung auf Smartphones beim langen Drücken
   card: `group relative flex items-center gap-4 w-full overflow-hidden rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 px-5 py-4 cursor-pointer transition-all duration-300 ease-out hover:-translate-y-1 hover:border-indigo-500/60 hover:shadow-xl hover:shadow-indigo-500/10 active:scale-[0.98] select-none`,
   accent: `absolute left-0 top-4 bottom-4 w-1 rounded-r-full bg-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300`,
   glow: `pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-indigo-500/0 via-indigo-500/5 to-indigo-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500`,
@@ -26,7 +25,8 @@ export class JkServiceCard extends LitElement {
     icon: { type: String },
     badgeText: { type: String },
     isFavorite: { type: Boolean },
-    isPressing: { type: Boolean }, // Zustand für das visuelle Drück-Feedback
+    isPressing: { type: Boolean },
+    isReady: { type: Boolean }, // NEU: Zustand für "Bereit zum Loslassen"
   };
 
   constructor() {
@@ -37,38 +37,25 @@ export class JkServiceCard extends LitElement {
     this.badgeText = '';
     this.isFavorite = false;
     this.isPressing = false;
+    this.isReady = false;
     this._pressTimer = null;
     this._isLongPressActive = false;
   }
+
   _handlePointerDown(e) {
-    // Nur auf primäre Klicks reagieren (Linksklick / normaler Touch)
     if (e.button !== 0) return;
 
     this._isLongPressActive = false;
-    this.isPressing = true; // Feedback-Animation starten
+    this.isReady = false;
+    this.isPressing = true;
     clearTimeout(this._pressTimer);
 
-    // Nach 600ms gilt es als "gehalten"
+    // Nach 600ms signalisieren wir dem User: "Jetzt loslassen!"
     this._pressTimer = setTimeout(() => {
       this._isLongPressActive = true;
-      this.isPressing = false; // Ausgelöst, Animation beenden
-
-      // FIX: Wir packen die Daten direkt in das e.detail.service Objekt!
-      // Falls die Karte ein ganzes .service Objekt hat, nutzen wir das, ansonsten bauen wir es aus den Props.
-      const serviceData = this.service || {
-        name: this.name,
-        url: this.subtitle,
-        icon: this.icon,
-        key: this.badgeText,
-      };
-
-      this.dispatchEvent(
-        new CustomEvent('card-long-press', {
-          detail: { service: serviceData }, // Das füttert e.detail.service in der app.js
-          bubbles: true,
-          composed: true,
-        })
-      );
+      this.isReady = true; // Visueller Trigger wird aktiv
+      this.isPressing = false;
+      this.requestUpdate();
     }, 600);
   }
 
@@ -76,27 +63,32 @@ export class JkServiceCard extends LitElement {
     clearTimeout(this._pressTimer);
     this.isPressing = false;
 
-    // Wenn es ein Long-Press war, unterbinden wir den darauffolgenden normalen Klick
-    if (this._isLongPressActive) {
-      e.preventDefault();
-      e.stopPropagation();
-      // WICHTIG: Das Zurücksetzen auf false verzögern wir ganz leicht (per setTimeout 0),
-      // damit ein eventuell verzögert feuerndes natives '@click' im Template ebenfalls blockiert wird!
-      setTimeout(() => {
-        this._isLongPressActive = false;
-      }, 0);
-      return;
-    }
-
-    // Kurzer Tipp -> Normaler Klick-Event
-    // FIX: Auch hier packen wir zur Sicherheit die Service-Daten rein, falls eine Komponente danach sucht
-    const serviceData = this.service || {
+    const serviceData = {
       name: this.name,
       url: this.subtitle,
       icon: this.icon,
       key: this.badgeText,
     };
 
+    // WICHTIG: Die Action wird erst JETZT beim Loslassen ausgeführt
+    if (this._isLongPressActive) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      this.isReady = false;
+      this._isLongPressActive = false;
+
+      this.dispatchEvent(
+        new CustomEvent('card-long-press', {
+          detail: { service: serviceData },
+          bubbles: true,
+          composed: true,
+        })
+      );
+      return;
+    }
+
+    // Normaler kurzer Klick
     this.dispatchEvent(
       new CustomEvent('card-click', {
         detail: { service: serviceData },
@@ -107,9 +99,17 @@ export class JkServiceCard extends LitElement {
   }
 
   _handlePointerLeave() {
-    // Falls der User wegscrollt oder mit der Maus die Kachel verlässt -> Abbruch
     clearTimeout(this._pressTimer);
     this.isPressing = false;
+    this.isReady = false;
+  }
+
+  _handleNativeClick(e) {
+    // Wenn es ein Long-Press war, fangen wir das darauffolgende native Click-Event ab
+    if (this.isReady || this._isLongPressActive) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
   }
 
   render() {
@@ -120,13 +120,15 @@ export class JkServiceCard extends LitElement {
       ? this.subtitle.replace(/^https?:\/\/(www\.)?/, '')
       : this.subtitle || '';
 
-    // Alle Klassen für den Kbd-Badge gesammelt in einem Objekt für die classMap
     const dynamicBadgeClasses = {
-      [styles.badgeBase]: true, // Basis-Styling erzwingen
-      'border border-indigo-500 bg-indigo-500/20 text-indigo-200 shadow-lg shadow-indigo-500/20 group-hover:bg-indigo-500/30':
-        this.isFavorite,
-      'border border-slate-600 bg-slate-900/80 text-slate-300 group-hover:border-indigo-500/40 group-hover:text-indigo-300':
-        !this.isFavorite,
+      [styles.badgeBase]: true,
+      'border border-indigo-500 bg-indigo-500/20 text-indigo-200 shadow-lg shadow-indigo-500/20':
+        this.isFavorite && !this.isReady,
+      'border border-slate-600 bg-slate-900/80 text-slate-300':
+        !this.isFavorite && !this.isReady,
+      // Optimiert: Ein ruhiges, klares Indigo statt Warn-Gelb/Orange
+      '!border-indigo-400 !bg-indigo-500/30 !text-white shadow-indigo-500/30':
+        this.isReady,
     };
 
     return html`
@@ -134,37 +136,43 @@ export class JkServiceCard extends LitElement {
         @pointerdown=${this._handlePointerDown}
         @pointerup=${this._handlePointerUp}
         @pointerleave=${this._handlePointerLeave}
+        @click=${this._handleNativeClick}
         class="${styles.card} ${
-          this.isPressing
-            ? 'scale-95 !border-amber-500/80 shadow-2xl shadow-amber-500/20 duration-500'
-            : ''
+          this.isPressing ? 'scale-95 !border-indigo-500/50 duration-500' : ''
+        } ${
+          this.isReady
+            ? 'scale-[0.98] !border-indigo-400 bg-slate-800/90 shadow-2xl shadow-indigo-500/20 ring-2 ring-indigo-500/50'
+            : '' // Kein unruhiges animate-pulse, sondern ein eleganter Ring & Glow
         }"
       >
-        <!-- Akzentuierter Glow bei aktivem Halten -->
-        <div class="${styles.accent}"></div>
+        <div
+          class="${styles.accent} ${this.isReady ? '!bg-amber-500 !opacity-100' : ''}"
+        ></div>
         <div
           class="${styles.glow} ${
-            this.isPressing
-              ? '!opacity-100 from-amber-500/10 via-amber-500/10 to-amber-500/0'
+            this.isReady
+              ? '!opacity-100 from-amber-500/10 via-amber-500/5 to-amber-500/0'
               : ''
           }"
         ></div>
 
-        <!-- Icon -->
-        <div class="${styles.iconContainer}">
+        <div
+          class="${styles.iconContainer} ${this.isReady ? 'text-amber-400 !ring-amber-500/50 bg-amber-500/10' : ''}"
+        >
           <jk-icon .icon=${this.icon} class="${styles.icon}"></jk-icon>
         </div>
 
-        <!-- Content -->
         <div class="${styles.content}">
-          <span class="${styles.name}">${this.name}</span>
+          <span class="${styles.name} ${this.isReady ? '!text-amber-200' : ''}"
+            >${this.name}</span
+          >
           <span class="${styles.subtitle}">${displaySubtitle}</span>
         </div>
 
-        <!-- Dynamic Badge -->
         ${
           this.badgeText
             ? html`
+                <!-- classMap steht hier jetzt VÖLLIG ALLEIN im class-Attribut -->
                 <kbd class="${classMap(dynamicBadgeClasses)}">
                   ${this.badgeText.toUpperCase()}
                 </kbd>

@@ -253,7 +253,6 @@ export class JkConfigModal extends LitElement {
     return html`
       <div @click="${this._handleClose}" class="${styles.overlay}">
         <div @click="${(e) => e.stopPropagation()}" class="${styles.container}">
-          <!-- Header -->
           <div class="${styles.header}">
             <div class="${styles.headerLeft}">
               <div class="${styles.iconBadge}">
@@ -291,7 +290,6 @@ export class JkConfigModal extends LitElement {
             </div>
           </div>
 
-          <!-- Main Area -->
           <div class="${styles.mainArea}">
             <aside class="${styles.sidebar}">
               <button
@@ -317,7 +315,6 @@ export class JkConfigModal extends LitElement {
             </main>
           </div>
 
-          <!-- Footer -->
           <div class="${styles.footer}">
             ${
               this._activeTab === 'editor'
@@ -352,7 +349,6 @@ export class JkConfigModal extends LitElement {
         </div>
       </div>
 
-      <!-- Entscheidungs-Dialog -->
       ${
         this._showDiscardDialog
           ? html`

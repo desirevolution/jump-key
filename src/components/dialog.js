@@ -126,27 +126,22 @@ export class JkDialog extends LitElement {
     return html`
       <div @click=${this._handleCancel} class="${styles.overlay}">
         <div @click=${(e) => e.stopPropagation()} class="${styles.modal}">
-          <!-- Header -->
           <div class="${styles.header}">
-            <!-- Icon (Combines static layout with dynamic color safely) -->
             <div class="${styles.iconBadgeBase} ${this.iconColor}">
               <jk-icon .icon=${this.icon} class="${styles.icon}"></jk-icon>
             </div>
 
-            <!-- Title + Message -->
             <div class="${styles.contentCell}">
               <h2 class="${styles.title}">${this.title}</h2>
               <p class="${styles.message}">${this.message}</p>
             </div>
 
-            <!-- Close -->
             <jk-icon-button
               icon="x"
               @click=${this._handleCancel}
             ></jk-icon-button>
           </div>
 
-          <!-- Footer -->
           <div class="${styles.footer}">
             ${
               this.variant === 'confirm'

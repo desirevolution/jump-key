@@ -242,7 +242,6 @@ export class JkSearchModal extends LitElement {
     return html`
       <div @click=${this._handleClose} class="${styles.overlay}">
         <div @click=${(e) => e.stopPropagation()} class="${styles.modal}">
-          <!-- Search Header -->
           <div class="${styles.header}">
             <div class="${styles.iconBadge}">
               <jk-icon icon="search" class="size-5"></jk-icon>
@@ -280,8 +279,6 @@ export class JkSearchModal extends LitElement {
             ></jk-icon-button>
           </div>
 
-          <!-- Results -->
-          <!-- FIX: Eindeutige ID vergeben und die dynamischen Styles sauber getrennt übergeben -->
           <div id="searchResults" class="${styles.resultsContainer}">
             ${
               (showAllEngines || isFilteringEngines) && items.length > 0

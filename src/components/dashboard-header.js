@@ -97,9 +97,7 @@ export class JkDashboardHeader extends LitElement {
   render() {
     return html`
       <div class="${styles.container}">
-        <!-- Left: Branding -->
         <div class="${styles.leftSection}">
-          <!-- Logo Shell -->
           <a
             href="https://github.com/desirevolution/jump-key"
             target="_blank"
@@ -109,7 +107,6 @@ export class JkDashboardHeader extends LitElement {
             <img src="/jump-key.png" alt="JumpKey" class="${styles.logoImg}" />
           </a>
 
-          <!-- Title -->
           <div class="${styles.titleContainer}">
             <div class="${styles.brandTextWrapper}">
               <span class="${styles.brandJump}">Jump</span>
@@ -126,9 +123,7 @@ export class JkDashboardHeader extends LitElement {
           </div>
         </div>
 
-        <!-- Right -->
         <div class="${styles.rightSection}">
-          <!-- Action Group -->
           <div class="${styles.actionGroup}">
             <jk-icon-button
               icon="${this.isGridView ? 'rows-2' : 'layout-grid'}"
@@ -150,7 +145,6 @@ export class JkDashboardHeader extends LitElement {
             ></jk-icon-button>
           </div>
 
-          <!-- Clock -->
           <div class="${styles.clockWrapper}">
             <div class="${styles.clockTime}">
               <span>${this._hours}</span>

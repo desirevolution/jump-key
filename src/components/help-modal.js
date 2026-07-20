@@ -108,7 +108,6 @@ export class JkHelpModal extends LitElement {
     return html`
       <div @click=${this._handleClose} class="${styles.overlay}">
         <div @click=${(e) => e.stopPropagation()} class="${styles.modal}">
-          <!-- Header -->
           <div class="${styles.header}">
             <div class="${styles.headerLeft}">
               <div class="${styles.iconBadge}">
@@ -123,7 +122,6 @@ export class JkHelpModal extends LitElement {
             ></jk-icon-button>
           </div>
 
-          <!-- Shortcuts -->
           <div class="${styles.shortcutsContainer}">
             ${shortcuts.map(
               (item) => html`

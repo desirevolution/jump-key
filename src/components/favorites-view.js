@@ -31,7 +31,6 @@ export class JkFavoritesView extends LitElement {
 
     return html`
       <section class="${styles.section}">
-        <!-- Header -->
         <div class="${styles.header}">
           <div class="${styles.iconBadge}">
             <jk-icon icon="star" class="${styles.icon}"></jk-icon>
@@ -55,7 +54,6 @@ export class JkFavoritesView extends LitElement {
           ></jk-icon-button>
         </div>
 
-        <!-- Cards -->
         <div class="${styles.grid}">
           ${this.favorites.map(
             (service) => html`

@@ -55,7 +55,6 @@ export class JkDashboardSearchItem extends LitElement {
       : 'ring-slate-600/70 text-indigo-400 group-hover:text-white group-hover:bg-indigo-500/15';
 
     return html`
-      <!-- Wir nutzen wieder normalen Text – Lit fügt den String sicher als Attribut ein -->
       <button class="${styles.itemBase} ${buttonActiveClasses}">
         ${this.active ? html`<div class="${styles.accentBar}"></div>` : ''}
 
@@ -126,7 +125,6 @@ export class JkDashboardSearchItem extends LitElement {
         'border-slate-600 bg-slate-900/80 text-slate-300': !this.active,
       };
       return html`
-        <!-- FIX: classMap ist nun alleiniger Herrscher über das class-Attribut -->
         <kbd class="${classMap(kbdClasses)}"> :${this.data.prefix} </kbd>
       `;
     }

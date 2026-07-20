@@ -52,7 +52,6 @@ export class JkServiceGroup extends LitElement {
   render() {
     return html`
       <section class="${styles.section}">
-        <!-- Group Header -->
         <div class="${styles.header}">
           <div class="${styles.iconContainer}">
             <jk-icon
@@ -75,7 +74,6 @@ export class JkServiceGroup extends LitElement {
           </div>
         </div>
 
-        <!-- Services Grid -->
         <div class="${styles.grid}">
           ${(this.services ?? []).map(
             (service) => html`
@@ -85,7 +83,7 @@ export class JkServiceGroup extends LitElement {
                 .icon=${service.icon}
                 .badgeText=${service.key}
                 @card-click=${() => this._handleCardClick(service)}
-                @card-long-press=${(e) => this._handleCardLongPress(e, service)} <!-- 'e' hinzugefügt -->
+                @card-long-press=${(e) => this._handleCardLongPress(e, service)}
               ></jk-service-card>
             `
           )}
