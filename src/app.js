@@ -76,7 +76,6 @@ class DashboardApp extends LitElement {
 
   constructor() {
     super();
-    console.log('arthur');
 
     // Data & Navigation State
     this.categories = [];
@@ -324,6 +323,26 @@ class DashboardApp extends LitElement {
     this.requestUpdate();
   }
 
+  handleCardLongPress(e) {
+    const service = e.detail.service;
+
+    // Debug-Hilfe: Schau in die Browser-Konsole (F12), ob hier "isCategory: true" ankommt
+    console.log('Long pressed item:', service);
+
+    // Extrem sichere Prüfung, falls "isCategory" ein String oder Boolean ist
+    if (service && (service.isCategory === true || service.key)) {
+      // Da Kategorien ein 'key' besitzen (Services haben eine 'url'),
+      // nutzen wir 'key' bzw. 'isCategory' als eindeutigen Identifikator
+      if (service.isCategory || !service.url || service.key) {
+        this.showToast(this.t('cannotFavoriteCategory'), 'info');
+        return;
+      }
+    }
+
+    // Wenn es ein echter Service ist, ab zur normalen Favoriten-Logik
+    this.handleServiceLongPress(service);
+  }
+
   handleDeleteFavoriteSlot(slot) {
     const serviceName = this.favorites[slot];
     if (!serviceName) return;
@@ -348,16 +367,15 @@ class DashboardApp extends LitElement {
   // External Notifications
   // --------------------------------------------------
 
+  // --------------------------------------------------
+  // External Notifications
+  // --------------------------------------------------
+
   handleNotification(e) {
     const { type, message } = e.detail;
 
-    this.dialogConfig = {
-      show: true,
-      type,
-      title: type === 'success' ? this.t('successTitle') : this.t('errorTitle'),
-      message,
-      confirmLabel: this.t('tabEditorOk'),
-    };
+    // Nutzt jetzt auch hier direkt das Toast-System für Benachrichtigungen
+    this.showToast(message, type);
   }
 
   // --------------------------------------------------
@@ -498,11 +516,6 @@ class DashboardApp extends LitElement {
   }
 
   render() {
-    console.log('Dashboard render', {
-      categories: this.categories.length,
-      showSearch: this.showSearch,
-    });
-
     const favs = getFavorites(this.categories, this.favorites);
     const filteredServices = getFilteredServices(
       this.categories,
@@ -562,23 +575,25 @@ class DashboardApp extends LitElement {
                   }}
                 ></jk-favorites-view>
 
-                <jk-service-group
-                  title="${this.t('categories')}"
-                  icon="folder"
-                  .services=${this.categories.map((cat) => ({
-                    name: cat.category,
-                    url: `${cat.services?.length ?? 0} Services`,
-                    icon: cat.icon,
-                    key: cat.categoryKey,
-                  }))}
-                  @service-click=${(e) => {
-                    const key = e.detail.service.key;
-                    this.activeCategoryKey = key;
-                    this.currentInput = key.toUpperCase();
-                    window.history.pushState({ view: 'category', key }, '');
-                  }}
-                ></jk-service-group>
-              `
+<jk-service-group
+  title="${this.t('categories')}"
+  icon="folder"
+  .services=${this.categories.map((cat) => ({
+    name: cat.category,
+    url: `${cat.services?.length ?? 0} ${this.t('serviceCount') || 'Services'}`,
+    icon: cat.icon,
+    key: cat.categoryKey,
+    isCategory: true, // <-- NEU: Erkenntlich machen als Kategorie
+  }))}
+  @service-click=${(e) => {
+    const key = e.detail.service.key;
+    this.activeCategoryKey = key;
+    this.currentInput = key.toUpperCase();
+    window.history.pushState({ view: 'category', key }, '');
+  }}
+  @card-long-press=${this.handleCardLongPress} // <-- NEU: Event abfangen
+></jk-service-group>
+                `
             : html`
                 <jk-grid-view
                   .categories=${this.categories}
