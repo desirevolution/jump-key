@@ -102,8 +102,7 @@ function handleFavoriteShortcut(slot, app) {
     // Toast als Bestätigung (auf Desktop ohne Undo-Button)
     app.showToast(
       `"${serviceName}" von Taste ${slot} entfernt`,
-      'success',
-      false
+      'success'
     );
     app.requestUpdate();
     return;
