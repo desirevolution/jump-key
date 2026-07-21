@@ -19,6 +19,7 @@ import './components/service-group.js';
 import './components/favorites-view.js';
 import './components/grid-view.js';
 import './components/toast.js';
+import './components/keystroke-badge.js';
 
 const styles = {
   badgeBase:
@@ -205,16 +206,22 @@ class DashboardApp extends LitElement {
   }
 
   trackClick(service) {
+    // Klick-Logik mit automatischer Keystroke-Ermittlung
+    if (this.activeCategoryKey && service.key) {
+      this.currentInput = `${this.activeCategoryKey.toUpperCase()} → ${service.key.toUpperCase()}`;
+    } else if (service.key || service.favSlot) {
+      this.currentInput = (service.favSlot || service.key).toUpperCase();
+    }
+
     this.isValidInput = true;
+    this.isInvalidInput = false;
 
-    // Sofort die Shortcuts ausblenden, wenn geklickt wurde
-    this.currentInput = '';
-    this.requestUpdate();
-
+    // 300ms Bestätigungspause
     setTimeout(() => {
       window.open(service.url, '_blank');
+
       setTimeout(() => this.resetInput(true), 100);
-    }, 150);
+    }, 300);
   }
 
   handlePopState(e) {
@@ -462,34 +469,13 @@ class DashboardApp extends LitElement {
   }
 
   templateKeyBadge() {
-    if (!this.currentInput || this.showSearch || this.showHelp) return '';
-
-    const stateClass = this.isInvalidInput
-      ? styles.badgeInvalid
-      : this.isValidInput
-        ? styles.badgeValid
-        : styles.badgeDefault;
-
     return html`
-      <div class="${styles.badgeBase} ${stateClass}">
-        <kbd class="${styles.kbd}"> ${this.currentInput} </kbd>
-        ${
-          this.isValidInput
-            ? html`<jk-icon
-                icon="check"
-                class="${styles.iconBadge} text-emerald-400"
-              ></jk-icon>`
-            : ''
-        }
-        ${
-          this.isInvalidInput
-            ? html`<jk-icon
-                icon="x"
-                class="${styles.iconBadge} text-rose-400"
-              ></jk-icon>`
-            : ''
-        }
-      </div>
+      <jk-keystroke-badge
+        .input=${this.currentInput}
+        .isValid=${this.isValidInput}
+        .isInvalid=${this.isInvalidInput}
+        .hidden=${this.showSearch || this.showHelp}
+      ></jk-keystroke-badge>
     `;
   }
 
@@ -563,6 +549,10 @@ class DashboardApp extends LitElement {
                     const key = e.detail.service.key;
                     this.activeCategoryKey = key;
                     this.currentInput = key.toUpperCase();
+
+                    // NEU: Reset-Timer auch beim Mausklick starten!
+                    this.startResetTimer();
+
                     window.history.pushState({ view: 'category', key }, '');
                   }}
                   @card-long-press=${this.handleCardLongPress}
