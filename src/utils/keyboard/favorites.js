@@ -28,30 +28,14 @@ export function handleFavoriteShortcut(slot, app) {
  * Favorit löschen
  */
 function requestFavoriteDelete(slot, app) {
-  app.dialogConfig = {
-    show: true,
+  app.showToast(
+    `"${app.favorites[slot]}" ${app.t('favRemoved', { slot })}`,
+    'info'
+  );
 
-    title: app.t('confirmDeleteFavTitle') || 'Favorit löschen?',
-
-    message: `${app.t('confirmDeleteFav') || 'Möchtest du den Favoriten entfernen?'} 
-        ${slot} (${app.favorites[slot]})`,
-
-    icon: 'trash-2',
-
-    iconColor: 'text-rose-400',
-
-    confirmLabel: app.t('confirmResetConfirm') || 'Löschen',
-
-    cancelLabel: app.t('cancel') || 'Abbrechen',
-
-    onConfirm: () => {
-      delete app.favorites[slot];
-
-      saveFavorites(app);
-
-      app.requestUpdate();
-    },
-  };
+  delete app.favorites[slot];
+  saveFavorites(app);
+  app.requestUpdate();
 }
 
 /**
@@ -64,7 +48,10 @@ function startFavoriteRecording(slot, app) {
     categoryKey: '',
   };
 
-  app.currentInput = `FAV ${slot}: Kategorie wählen`;
+  const favLabel = app.t('favLabel') || 'FAV';
+  const selectCategoryText = app.t('selectCategory') || 'Kategorie wählen';
+
+  app.currentInput = `${favLabel} ${slot}: ${selectCategoryText}`;
 
   app.requestUpdate();
 }
@@ -115,7 +102,10 @@ function handleFavoriteCategory(key, recording, app) {
   // Kategorie anzeigen während Aufnahme
   app.activeCategoryKey = key;
 
-  app.currentInput = `FAV ${recording.slot}: ${key.toUpperCase()} → Service`;
+  const favLabel = app.t('favLabel') || 'FAV';
+  const serviceLabel = app.t('serviceLabel') || 'Service';
+
+  app.currentInput = `${favLabel} ${recording.slot}: ${key.toUpperCase()} → ${serviceLabel}`;
 
   app.requestUpdate();
 }
@@ -137,7 +127,10 @@ function handleFavoriteService(key, recording, app) {
 
   saveFavorite(recording.slot, service, app);
 
-  app.currentInput = `FAV ${recording.slot} gespeichert`;
+  const favLabel = app.t('favLabel') || 'FAV';
+  const savedText = app.t('saved') || 'gespeichert';
+
+  app.currentInput = `${favLabel} ${recording.slot} ${savedText}`;
 
   app.isValidInput = true;
 

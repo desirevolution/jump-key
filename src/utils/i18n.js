@@ -15,18 +15,22 @@ export const translations = {
     cancel: 'Abbrechen',
     configSubtitle: 'Konfiguration & Backup',
 
-    // Favoriten & Aktionen (inkl. Variablen-Platzhalter für zukünftige Nutzung / manuelle Replacements in app.js)
+    // Favoriten & Aktionen
     confirmResetTitle: 'Favoriten zurücksetzen',
     confirmReset:
       'Möchtest du die Liste der häufig genutzten Services wirklich zurücksetzen?',
     confirmResetConfirm: 'Ja, zurücksetzen',
     favAlreadyExists: 'ist bereits ein Favorit auf Slot',
-    favFull: 'Alle Favoritenplätze sind belegt.',
-    favSaved: 'als Favorit gespeichert.',
-    favRemoved: 'wurde entfernt.',
+    favFull: 'Alle Favoritenplätze sind belegt',
+    favSaved: 'als Favorit auf Taste {slot} gespeichert',
+    favRemoved: 'von Taste {slot} entfernt',
     serviceCount: 'Services',
     cannotFavoriteCategory:
       'Kategorien können nicht als Favorit gespeichert werden. Öffne die Kategorie, um ihre Services hinzuzufügen.',
+    favLabel: 'FAV',
+    selectCategory: 'Kategorie wählen',
+    serviceLabel: 'Service',
+    saved: 'gespeichert',
 
     // Hotkeys & Search Engines
     hkSearch: 'Suche öffnen',
@@ -81,13 +85,13 @@ export const translations = {
     tabEditorSaveFailed:
       'Die Änderungen konnten nicht in die services.json geschrieben werden.',
 
-    // Editor Discard Dialog (jetzt passend benannt)
+    // Editor Discard Dialog
     discardChangesTitle: 'Änderungen verwerfen?',
     discardChangesMessage:
       'Es gibt ungespeicherte Änderungen im JSON-Editor. Möchtest du das Fenster wirklich schließen?',
     discardConfirm: 'Ja, verwerfen',
 
-    // Fallback/Legacy Editor keys (falls woanders genutzt)
+    // Fallback/Legacy Editor keys
     tabEditorDiscardChangesTitle: 'Ungespeicherte Änderungen',
     tabEditorDiscardChangesMsg:
       'Du hast ungespeicherte Änderungen vorgenommen. Möchtest du diese wirklich verwerfen?',
@@ -103,7 +107,7 @@ export const translations = {
     helpExit: 'Click anywhere or press a key to close it.',
     searchPlaceholder: 'Search services...',
     noServices: 'No services found.',
-    favorites: 'Favorites', // Bugfix: war 'Favoriten'
+    favorites: 'Favorites',
     resetFavs: 'Reset',
     categories: 'Categories',
     services: 'Services',
@@ -117,12 +121,16 @@ export const translations = {
     confirmReset: 'Do you really want to reset your frequently used services?',
     confirmResetConfirm: 'Yes, reset',
     favAlreadyExists: 'is already a favorite on slot',
-    favFull: 'All favorite slots are taken.',
-    favSaved: 'saved as a favorite.',
-    favRemoved: 'was removed.',
+    favFull: 'All favorite slots are taken',
+    favSaved: 'saved as favorite on key {slot}',
+    favRemoved: 'removed from key {slot}',
     serviceCount: 'Services',
     cannotFavoriteCategory:
       'Categories cannot be favorited. Open the category to add its services.',
+    favLabel: 'FAV',
+    selectCategory: 'Select category',
+    serviceLabel: 'Service',
+    saved: 'saved',
 
     // Hotkeys & Search Engines
     hkSearch: 'Open search',
@@ -143,7 +151,7 @@ export const translations = {
 
     // Config Modal
     editConfig: 'Edit configuration',
-    editConfigValid: 'Configuration is valid', // Typo fix
+    editConfigValid: 'Configuration is valid',
     editConfigInvalid: 'Configuration is invalid',
     editConfigSave: 'Save',
     editConfigCancel: 'Cancel',
@@ -192,8 +200,12 @@ export const translations = {
   },
 };
 
-export function t(lang, key) {
-  return translations[lang]?.[key] ?? translations['en'][key] ?? key;
+export function t(lang, key, params = {}) {
+  let str = translations[lang]?.[key] ?? translations['en'][key] ?? key;
+  Object.keys(params).forEach((paramKey) => {
+    str = str.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), params[paramKey]);
+  });
+  return str;
 }
 
 export function detectLang() {

@@ -55,7 +55,8 @@ function handleRootNavigation(key, app) {
  * Navigation innerhalb einer Kategorie
  */
 function handleCategoryNavigation(key, app) {
-  app.currentInput += ` → ${key.toUpperCase()}`;
+  // Baut den String sauber als "KAT → SERVICE" auf (ohne doppelte Pfeile)
+  app.currentInput = `${app.activeCategoryKey.toUpperCase()} → ${key.toUpperCase()}`;
 
   const category = app.categories.find(
     (cat) => cat.categoryKey === app.activeCategoryKey
@@ -128,11 +129,13 @@ function getFavoriteService(slot, app) {
  * Fehlerfeedback
  */
 function showInvalidInput(key, app) {
-  app.currentInput = app.currentInput
-    ? `${app.currentInput} → ${key.toUpperCase()}`
-    : key.toUpperCase();
+  // Falls bereits eine Kategorie aktiv ist, behalten wir die Struktur "KAT → FALSCH" bei
+  if (app.activeCategoryKey) {
+    app.currentInput = `${app.activeCategoryKey.toUpperCase()} → ${key.toUpperCase()}`;
+  } else {
+    app.currentInput = key.toUpperCase();
+  }
 
   app.isInvalidInput = true;
-
   app.startResetTimer(1500);
 }

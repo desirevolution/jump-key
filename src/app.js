@@ -19,6 +19,7 @@ import './components/service-group.js';
 import './components/favorites-view.js';
 import './components/grid-view.js';
 import './components/toast.js';
+import './components/keystroke-badge.js';
 
 const styles = {
   badgeBase:
@@ -128,12 +129,63 @@ class DashboardApp extends LitElement {
     this.t = this.t.bind(this);
   }
 
-  t(key) {
-    return t(this.lang, key);
+  t(key, params) {
+    return t(this.lang, key, params);
   }
 
   handleKeyDown(e) {
     handleGlobalKeyDown(e, this);
+  }
+
+  async saveConfiguration(updatedConfig) {
+    try {
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+
+      const backupResponse = await fetch(
+        `/config/services.backup-${timestamp}.json`,
+        {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedConfig),
+        }
+      );
+
+      if (!backupResponse.ok) {
+        throw new Error('Failed to create configuration backup.');
+      }
+
+      const response = await fetch('/config/services.json', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedConfig),
+      });
+
+      if (response.ok) {
+        if (updatedConfig.categories) {
+          this.categories = generateShortcuts(updatedConfig.categories);
+        } else {
+          this.categories = generateShortcuts(updatedConfig);
+        }
+
+        if (updatedConfig.searchEngines) {
+          this.searchEngines = updatedConfig.searchEngines;
+        }
+
+        this.showConfigModal = false;
+
+        this.showToast(this.t('editConfigSaveDone'), 'success');
+      } else {
+        this.showToast(this.t('editConfigSaveFailed'), 'error');
+      }
+    } catch (error) {
+      console.error('WebDAV Error:', error);
+      this.showToast(this.t('editConfigSaveFailed'), 'error');
+    }
+  }
+
+  async handleSaveConfig(e) {
+    const updatedConfig = e.detail.config;
+    await this.saveConfiguration(updatedConfig);
   }
 
   // --------------------------------------------------
@@ -205,16 +257,22 @@ class DashboardApp extends LitElement {
   }
 
   trackClick(service) {
+    // Klick-Logik mit automatischer Keystroke-Ermittlung
+    if (this.activeCategoryKey && service.key) {
+      this.currentInput = `${this.activeCategoryKey.toUpperCase()} → ${service.key.toUpperCase()}`;
+    } else if (service.key || service.favSlot) {
+      this.currentInput = (service.favSlot || service.key).toUpperCase();
+    }
+
     this.isValidInput = true;
+    this.isInvalidInput = false;
 
-    // Sofort die Shortcuts ausblenden, wenn geklickt wurde
-    this.currentInput = '';
-    this.requestUpdate();
-
+    // 300ms Bestätigungspause
     setTimeout(() => {
       window.open(service.url, '_blank');
+
       setTimeout(() => this.resetInput(true), 100);
-    }, 150);
+    }, 300);
   }
 
   handlePopState(e) {
@@ -300,7 +358,7 @@ class DashboardApp extends LitElement {
 
     const freeSlot = slots.find((slot) => !this.favorites[slot]);
     if (!freeSlot) {
-      this.showToast('Alle Favoritenplätze sind belegt', 'error');
+      this.showToast(this.t('favFull'), 'warn');
       return;
     }
 
@@ -310,9 +368,8 @@ class DashboardApp extends LitElement {
     this.resetInput(true);
 
     this.showToast(
-      `"${service.name}" als Favorit auf Taste ${freeSlot} gespeichert`,
-      'success',
-      true
+      `"${service.name}" ${this.t('favSaved', { slot: freeSlot })}`,
+      'success'
     );
     this.requestUpdate();
   }
@@ -342,9 +399,8 @@ class DashboardApp extends LitElement {
     localStorage.setItem('dashboard_favs', JSON.stringify(this.favorites));
 
     this.showToast(
-      `"${serviceName}" von Taste ${slot} entfernt`,
-      'success',
-      true
+      `"${serviceName}" ${this.t('favRemoved', { slot })}`,
+      'success'
     );
 
     this.resetInput(false);
@@ -392,6 +448,7 @@ class DashboardApp extends LitElement {
         .searchEngines=${this.searchEngines}
         .t=${this.t}
         @notify=${this.handleNotification}
+        @save=${this.handleSaveConfig}
         @close=${() => (this.showConfigModal = false)}
       ></jk-config-modal>
     `;
@@ -462,34 +519,13 @@ class DashboardApp extends LitElement {
   }
 
   templateKeyBadge() {
-    if (!this.currentInput || this.showSearch || this.showHelp) return '';
-
-    const stateClass = this.isInvalidInput
-      ? styles.badgeInvalid
-      : this.isValidInput
-        ? styles.badgeValid
-        : styles.badgeDefault;
-
     return html`
-      <div class="${styles.badgeBase} ${stateClass}">
-        <kbd class="${styles.kbd}"> ${this.currentInput} </kbd>
-        ${
-          this.isValidInput
-            ? html`<jk-icon
-                icon="check"
-                class="${styles.iconBadge} text-emerald-400"
-              ></jk-icon>`
-            : ''
-        }
-        ${
-          this.isInvalidInput
-            ? html`<jk-icon
-                icon="x"
-                class="${styles.iconBadge} text-rose-400"
-              ></jk-icon>`
-            : ''
-        }
-      </div>
+      <jk-keystroke-badge
+        .input=${this.currentInput}
+        .isValid=${this.isValidInput}
+        .isInvalid=${this.isInvalidInput}
+        .hidden=${this.showSearch || this.showHelp}
+      ></jk-keystroke-badge>
     `;
   }
 
@@ -554,7 +590,7 @@ class DashboardApp extends LitElement {
                   icon="folder"
                   .services=${this.categories.map((cat) => ({
                     name: cat.category,
-                    url: `${cat.services?.length ?? 0} ${this.t('serviceCount') || 'Services'}`,
+                    url: `${cat.services?.length ?? 0} ${this.t('serviceCount')}`,
                     icon: cat.icon,
                     key: cat.categoryKey,
                     isCategory: true,
@@ -563,6 +599,9 @@ class DashboardApp extends LitElement {
                     const key = e.detail.service.key;
                     this.activeCategoryKey = key;
                     this.currentInput = key.toUpperCase();
+
+                    this.startResetTimer();
+
                     window.history.pushState({ view: 'category', key }, '');
                   }}
                   @card-long-press=${this.handleCardLongPress}
