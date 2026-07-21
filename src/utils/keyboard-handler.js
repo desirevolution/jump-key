@@ -99,9 +99,9 @@ function handleFavoriteShortcut(slot, app) {
     app.isInvalidInput = true;
     app.startResetTimer(1000);
 
-    // Toast als Bestätigung (auf Desktop ohne Undo-Button)
+    // Toast als Bestätigung
     app.showToast(
-      `"${serviceName}" von Taste ${slot} entfernt`,
+      `"${serviceName}" ${app.t('favRemoved', { slot })}`,
       'success'
     );
     app.requestUpdate();
@@ -145,18 +145,16 @@ function handleFavoriteRecordingInput(key, app) {
       app.favorites[rec.slot] = service.name;
       localStorage.setItem('dashboard_favs', JSON.stringify(app.favorites));
 
-      // Kein kryptisches "FAV SAVED!" im Badge mehr nötig.
-      // Wir setzen isValidInput für das grüne Häkchen im Badge und überlassen das Text-Feedback dem Toast.
       app.isValidInput = true;
       app.currentInput = `${rec.slot} → ${rec.categoryKey.toUpperCase()} → ${key.toUpperCase()}`;
 
       app.showToast(
-        `"${service.name}" als Favorit auf Taste ${rec.slot} gespeichert`,
+        `"${service.name}" ${app.t('favSaved', { slot: rec.slot })}`,
         'success'
       );
 
       app.favoriteRecording = null;
-      app.startResetTimer(1000); // Schneller ausblenden, da der Toast jetzt informiert
+      app.startResetTimer(1000);
     } else {
       app.favoriteRecording = null;
       app.isInvalidInput = true;
@@ -272,7 +270,6 @@ function handleNavigationKeyDown(key, app) {
         (s) => s.key === key
       );
       if (favService) {
-        // Cleaneres Feedback beim direkten Aufrufen eines Favoriten
         app.currentInput = `${key} → ${favService.name.toUpperCase()}`;
         app.trackClick(favService, true);
         return;

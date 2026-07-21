@@ -129,8 +129,8 @@ class DashboardApp extends LitElement {
     this.t = this.t.bind(this);
   }
 
-  t(key) {
-    return t(this.lang, key);
+  t(key, params) {
+    return t(this.lang, key, params);
   }
 
   handleKeyDown(e) {
@@ -139,24 +139,24 @@ class DashboardApp extends LitElement {
 
   async saveConfiguration(updatedConfig) {
     try {
-      const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
 
       const backupResponse = await fetch(
         `/config/services.backup-${timestamp}.json`,
         {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(updatedConfig),
-        },
+        }
       );
 
       if (!backupResponse.ok) {
-        throw new Error("Failed to create configuration backup.");
+        throw new Error('Failed to create configuration backup.');
       }
 
-      const response = await fetch("/config/services.json", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/config/services.json', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updatedConfig),
       });
 
@@ -173,26 +173,13 @@ class DashboardApp extends LitElement {
 
         this.showConfigModal = false;
 
-        this.showToast(
-          this.t("editConfigSaveDone"),
-          'success'
-        );
-
-
+        this.showToast(this.t('editConfigSaveDone'), 'success');
       } else {
-        this.showToast(
-          this.t("editConfigSaveFailed"),
-          'error'
-        );
-
-
+        this.showToast(this.t('editConfigSaveFailed'), 'error');
       }
     } catch (error) {
-      console.error("WebDAV Error:", error);
-        this.showToast(
-          this.t("editConfigSaveFailed"),
-          'error'
-        );
+      console.error('WebDAV Error:', error);
+      this.showToast(this.t('editConfigSaveFailed'), 'error');
     }
   }
 
@@ -200,7 +187,6 @@ class DashboardApp extends LitElement {
     const updatedConfig = e.detail.config;
     await this.saveConfiguration(updatedConfig);
   }
-
 
   // --------------------------------------------------
   // Lifecycle
@@ -372,7 +358,7 @@ class DashboardApp extends LitElement {
 
     const freeSlot = slots.find((slot) => !this.favorites[slot]);
     if (!freeSlot) {
-      this.showToast('Alle Favoritenplätze sind belegt', 'warn');
+      this.showToast(this.t('favFull'), 'warn');
       return;
     }
 
@@ -382,7 +368,7 @@ class DashboardApp extends LitElement {
     this.resetInput(true);
 
     this.showToast(
-      `"${service.name}" als Favorit auf Taste ${freeSlot} gespeichert`,
+      `"${service.name}" ${this.t('favSaved', { slot: freeSlot })}`,
       'success'
     );
     this.requestUpdate();
@@ -413,7 +399,7 @@ class DashboardApp extends LitElement {
     localStorage.setItem('dashboard_favs', JSON.stringify(this.favorites));
 
     this.showToast(
-      `"${serviceName}" von Taste ${slot} entfernt`,
+      `"${serviceName}" ${this.t('favRemoved', { slot })}`,
       'success'
     );
 
@@ -482,11 +468,11 @@ class DashboardApp extends LitElement {
         .confirmLabel=${this.dialogConfig.confirmLabel || this.t('tabEditorOk')}
         .cancelLabel=${this.dialogConfig.cancelLabel || ''}
         @confirm=${() => {
-        if (this.dialogConfig.onConfirm) {
-          this.dialogConfig.onConfirm();
-        }
-        this.closeDialog();
-      }}
+          if (this.dialogConfig.onConfirm) {
+            this.dialogConfig.onConfirm();
+          }
+          this.closeDialog();
+        }}
         @close=${this.closeDialog}
         @cancel=${this.closeDialog}
       ></jk-dialog>
@@ -515,19 +501,19 @@ class DashboardApp extends LitElement {
         .t=${this.t}
         @close=${() => this.resetInput(true)}
         @search-change=${(e) => {
-        this.searchQuery = e.detail.value;
-        this.selectedIndex = 0;
-      }}
+          this.searchQuery = e.detail.value;
+          this.selectedIndex = 0;
+        }}
         @service-click=${(e) => {
-        this.trackClick(e.detail.service);
-      }}
+          this.trackClick(e.detail.service);
+        }}
         @execute-submit=${() => {
-        this.handleKeyDown({
-          key: 'Enter',
-          preventDefault: () => { },
-          target: { tagName: 'BUTTON' },
-        });
-      }}
+          this.handleKeyDown({
+            key: 'Enter',
+            preventDefault: () => {},
+            target: { tagName: 'BUTTON' },
+          });
+        }}
       ></jk-search-modal>
     `;
   }
@@ -565,8 +551,8 @@ class DashboardApp extends LitElement {
         .message=${this.toastConfig.message}
         .type=${this.toastConfig.type}
         @toast-closed=${() => {
-        this.toastConfig = { ...this.toastConfig, show: false };
-      }}
+          this.toastConfig = { ...this.toastConfig, show: false };
+        }}
       ></jk-toast>
 
       <jk-dashboard-header
@@ -574,67 +560,67 @@ class DashboardApp extends LitElement {
         .lang=${this.lang}
         .t=${this.t}
         @open-help=${() => {
-        this.showHelp = true;
-      }}
+          this.showHelp = true;
+        }}
         @open-search=${this.openSearch}
         @open-config=${() => {
-        this.showConfigModal = true;
-      }}
+          this.showConfigModal = true;
+        }}
         @toggle-view=${this.toggleViewMode}
       ></jk-dashboard-header>
 
       <main class="${styles.mainContent}">
-        ${showMain && !this.isGridView
-        ? html`
+        ${
+          showMain && !this.isGridView
+            ? html`
                 <jk-favorites-view
                   .favorites=${favs}
                   .t=${this.t}
                   @service-click=${(e) => {
-            this.trackClick(e.detail.service);
-          }}
+                    this.trackClick(e.detail.service);
+                  }}
                   @clear-favorites=${this.clearFavorites}
                   @delete-favorite-slot=${(e) => {
-            this.handleDeleteFavoriteSlot(e.detail.slot);
-          }}
+                    this.handleDeleteFavoriteSlot(e.detail.slot);
+                  }}
                 ></jk-favorites-view>
 
                 <jk-service-group
                   title="${this.t('categories')}"
                   icon="folder"
                   .services=${this.categories.map((cat) => ({
-            name: cat.category,
-            url: `${cat.services?.length ?? 0} ${this.t('serviceCount') || 'Services'}`,
-            icon: cat.icon,
-            key: cat.categoryKey,
-            isCategory: true,
-          }))}
+                    name: cat.category,
+                    url: `${cat.services?.length ?? 0} ${this.t('serviceCount')}`,
+                    icon: cat.icon,
+                    key: cat.categoryKey,
+                    isCategory: true,
+                  }))}
                   @service-click=${(e) => {
-            const key = e.detail.service.key;
-            this.activeCategoryKey = key;
-            this.currentInput = key.toUpperCase();
+                    const key = e.detail.service.key;
+                    this.activeCategoryKey = key;
+                    this.currentInput = key.toUpperCase();
 
-            // NEU: Reset-Timer auch beim Mausklick starten!
-            this.startResetTimer();
+                    this.startResetTimer();
 
-            window.history.pushState({ view: 'category', key }, '');
-          }}
+                    window.history.pushState({ view: 'category', key }, '');
+                  }}
                   @card-long-press=${this.handleCardLongPress}
                 ></jk-service-group>
               `
-        : html`
+            : html`
                 <jk-grid-view
                   .categories=${this.categories}
                   .activeCategoryKey=${this.activeCategoryKey}
                   .t=${this.t}
                   @service-click=${(e) => {
-            this.trackClick(e.detail.service);
-          }}
+                    this.trackClick(e.detail.service);
+                  }}
                   @card-long-press=${(e) => {
-            this.handleServiceLongPress(e.detail.service);
-          }}
+                    this.handleServiceLongPress(e.detail.service);
+                  }}
                 ></jk-grid-view>
               `
-      }
+        }
       </main>
     `;
   }
