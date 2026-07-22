@@ -15,10 +15,13 @@ const styles = {
   iconPressing: `scale-95 bg-indigo-500/10 text-indigo-300 ring-indigo-500/30`,
   iconReady: `scale-105 bg-indigo-500/20 text-indigo-200 ring-indigo-400/50`,
   icon: `size-8 transition-transform duration-200 group-hover:scale-105`,
-  content: `relative z-10 flex min-w-0 grow flex-col justify-center pr-10`,
+  content: `relative z-10 flex min-w-0 grow flex-col justify-center pr-10 sm:pr-24`,
   name: `truncate text-lg font-semibold leading-tight tracking-tight transition-colors duration-200`,
   subtitle: `mt-1 truncate text-sm leading-snug text-slate-400 transition-colors duration-200 group-hover:text-slate-300`,
-  badge: `absolute right-4 top-4 z-20 hidden h-7 min-w-7 items-center justify-center rounded-lg border px-2 text-xs font-semibold uppercase tracking-widest transition-all duration-200 sm:flex`,
+  badges: `absolute right-4 top-4 z-20 flex items-center gap-1.5`,
+  badge: `hidden h-7 min-w-7 items-center justify-center rounded-lg border px-2 text-xs font-semibold uppercase tracking-widest transition-all duration-200 sm:inline-flex`,
+  favoriteBadge: `hidden h-7 min-w-7 items-center justify-center gap-1 rounded-lg border border-amber-400/40 bg-amber-500/15 px-2 text-xs font-semibold text-amber-300 shadow-md shadow-amber-400/20 sm:inline-flex`,
+  favoriteMobile: `inline-flex size-7 items-center justify-center rounded-lg border border-amber-400/35 bg-amber-500/15 text-amber-300 shadow-md shadow-amber-400/20 sm:hidden`,
 };
 
 export class JkServiceCard extends LitElement {
@@ -32,6 +35,7 @@ export class JkServiceCard extends LitElement {
     icon: { type: String },
     badgeText: { type: String },
     isFavorite: { type: Boolean },
+    favoriteSlot: { type: String },
 
     isPressing: { type: Boolean, state: true },
     isReady: { type: Boolean, state: true },
@@ -45,6 +49,7 @@ export class JkServiceCard extends LitElement {
     this.icon = '';
     this.badgeText = '';
     this.isFavorite = false;
+    this.favoriteSlot = '';
 
     this.isPressing = false;
     this.isReady = false;
@@ -215,7 +220,11 @@ export class JkServiceCard extends LitElement {
   _getCardClasses() {
     if (this.isReady) return styles.cardReady;
     if (this.isPressing) return styles.cardPressing;
-    return styles.cardDefault;
+    return `${styles.cardDefault} ${
+      this.isFavorite
+        ? 'shadow-lg shadow-amber-400/20 hover:shadow-amber-400/25'
+        : ''
+    }`;
   }
 
   _getIconClasses() {
@@ -297,11 +306,39 @@ export class JkServiceCard extends LitElement {
         </div>
 
         ${
-          this.badgeText
+          this.favoriteSlot || this.badgeText
             ? html`
-                <kbd class="${styles.badge} ${this._getBadgeClasses()}">
-                  ${this.badgeText.toUpperCase()}
-                </kbd>
+                <div class=${styles.badges}>
+                  ${
+                    this.favoriteSlot
+                      ? html`
+                          <span
+                            class=${styles.favoriteMobile}
+                            aria-label="Favorit"
+                            title="Favorit"
+                          >
+                            <jk-icon icon="star" class="size-4"></jk-icon>
+                          </span>
+                          <kbd
+                            class=${styles.favoriteBadge}
+                            title="Favoriten-Shortcut ${this.favoriteSlot}"
+                          >
+                            <jk-icon icon="star" class="size-3.5"></jk-icon>
+                            ${this.favoriteSlot}
+                          </kbd>
+                        `
+                      : ''
+                  }
+                  ${
+                    this.badgeText
+                      ? html`
+                          <kbd class="${styles.badge} ${this._getBadgeClasses()}">
+                            ${this.badgeText.toUpperCase()}
+                          </kbd>
+                        `
+                      : ''
+                  }
+                </div>
               `
             : ''
         }
