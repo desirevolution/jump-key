@@ -1,3 +1,5 @@
+import { getFavoriteService } from '../shortcuts.js';
+
 /**
  * Navigation innerhalb des Dashboards
  *
@@ -30,7 +32,7 @@ export function handleNavigationKeyDown(key, app) {
 function handleRootNavigation(key, app) {
   // Favoriten prüfen
   if (/^[0-9]$/.test(key)) {
-    const favService = findFavoriteByKey(key, app);
+    const favService = getFavoriteService(app.categories, app.favorites, key);
 
     if (favService) {
       app.currentInput = key.toUpperCase();
@@ -92,37 +94,6 @@ function openCategory(category, app) {
     },
     ''
   );
-}
-
-/**
- * Favorit anhand Shortcut-Key suchen
- */
-function findFavoriteByKey(key, app) {
-  return Object.entries(app.favorites).find(([slot]) => slot === key)
-    ? getFavoriteService(key, app)
-    : null;
-}
-
-/**
- * Favorit-Service aus Kategorien auflösen
- *
- * favorites speichert aktuell nur Namen,
- * daher muss die Kategorie-Struktur durchsucht werden.
- */
-function getFavoriteService(slot, app) {
-  const favoriteName = app.favorites[slot];
-
-  if (!favoriteName) return null;
-
-  for (const category of app.categories) {
-    const service = category.services?.find((s) => s.name === favoriteName);
-
-    if (service) {
-      return service;
-    }
-  }
-
-  return null;
 }
 
 /**

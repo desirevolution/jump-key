@@ -61,7 +61,7 @@ export class JkFavoritesView extends LitElement {
                 .name=${service.name}
                 .subtitle=${service.url}
                 .icon=${service.icon}
-                .badgeText=${service.favSlot}
+                .favoriteSlot=${service.favSlot}
                 .isFavorite=${true}
                 @card-click=${() => {
                   this.dispatchEvent(

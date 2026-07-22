@@ -3,8 +3,11 @@ import { detectLang, t } from './utils/i18n.js';
 import {
   generateShortcuts,
   getFavorites,
+  addFavoriteSlots,
   getFilteredServices,
+  FAVORITE_SLOTS,
 } from './utils/shortcuts.js';
+import { readJsonStorage, writeJsonStorage } from './utils/storage.js';
 import { handleGlobalKeyDown } from './utils/keyboard/index.js';
 
 // Import Sub-Components
@@ -22,14 +25,13 @@ import './components/toast.js';
 import './components/keystroke-badge.js';
 
 const styles = {
-  badgeBase:
-    'fixed bottom-6 right-6 z-50 flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-900/95 backdrop-blur-sm border shadow-xl font-mono text-lg font-bold transition-all duration-200 animate-fadeIn hidden sm:flex',
-  badgeInvalid: 'border-rose-500/50 text-rose-300 shadow-rose-950/50',
-  badgeValid: 'border-emerald-500/50 text-emerald-300 shadow-emerald-950/50',
-  badgeDefault: 'border-indigo-500/50 text-indigo-300 shadow-indigo-950/50',
-  kbd: 'px-2 py-1 rounded-md bg-slate-800 border border-slate-700 shadow-inner tracking-wider',
-  iconBadge: 'w-4 h-4',
   mainContent: 'container mx-auto px-4 pt-8 pb-6',
+};
+
+const STORAGE_KEYS = {
+  configCache: 'services-cache',
+  favorites: 'dashboard_favs',
+  gridView: 'dashboard_grid_view',
 };
 
 class DashboardApp extends LitElement {
@@ -67,14 +69,6 @@ class DashboardApp extends LitElement {
     return this.querySelector('#searchInput');
   }
 
-  get searchResultsContainer() {
-    return this.querySelector('.search-results');
-  }
-
-  get activeSearchItem() {
-    return this.querySelector('.search-item-active');
-  }
-
   constructor() {
     super();
 
@@ -91,11 +85,10 @@ class DashboardApp extends LitElement {
     this.showHelp = false;
     this.isInvalidInput = false;
     this.isValidInput = false;
-    this.isGridView =
-      JSON.parse(localStorage.getItem('dashboard_grid_view')) || false;
+    this.isGridView = readJsonStorage(STORAGE_KEYS.gridView, false);
 
     // User Data & Search
-    this.favorites = JSON.parse(localStorage.getItem('dashboard_favs')) || {};
+    this.favorites = readJsonStorage(STORAGE_KEYS.favorites, {});
     this.searchQuery = '';
     this.lang = detectLang();
 
@@ -197,14 +190,14 @@ class DashboardApp extends LitElement {
 
     try {
       const res = await fetch('./config/services.json');
+      if (!res.ok) throw new Error(`Configuration request failed: ${res.status}`);
       const data = await res.json();
-      localStorage.setItem('services-cache', JSON.stringify(data));
+      writeJsonStorage(STORAGE_KEYS.configCache, data);
       this.categories = generateShortcuts(data.categories || data);
       this.searchEngines = data.searchEngines || [];
     } catch {
-      const cached = localStorage.getItem('services-cache');
-      if (cached) {
-        const data = JSON.parse(cached);
+      const data = readJsonStorage(STORAGE_KEYS.configCache, null);
+      if (data) {
         this.categories = generateShortcuts(data.categories || data);
         this.searchEngines = data.searchEngines || [];
       }
@@ -218,6 +211,7 @@ class DashboardApp extends LitElement {
     super.disconnectedCallback();
     window.removeEventListener('keydown', this.handleKeyDown);
     window.removeEventListener('popstate', this.handlePopState);
+    clearTimeout(this.resetTimeout);
   }
 
   // --------------------------------------------------
@@ -244,10 +238,7 @@ class DashboardApp extends LitElement {
 
   toggleViewMode() {
     this.isGridView = !this.isGridView;
-    localStorage.setItem(
-      'dashboard_grid_view',
-      JSON.stringify(this.isGridView)
-    );
+    writeJsonStorage(STORAGE_KEYS.gridView, this.isGridView);
     this.resetInput(true);
   }
 
@@ -309,7 +300,9 @@ class DashboardApp extends LitElement {
     this.showSearch = true;
     this.selectedIndex = 0;
 
-    window.history.pushState({ view: 'search' }, '');
+    if (window.history.state?.view !== 'search') {
+      window.history.pushState({ view: 'search' }, '');
+    }
     setTimeout(() => this.searchInput?.focus(), 100);
   }
 
@@ -339,15 +332,14 @@ class DashboardApp extends LitElement {
       cancelLabel: this.t('cancel'),
       onConfirm: () => {
         this.favorites = {};
-        localStorage.removeItem('dashboard_favs');
+        localStorage.removeItem(STORAGE_KEYS.favorites);
         this.requestUpdate();
       },
     };
   }
 
   handleServiceLongPress(service) {
-    const slots = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
-    const existingSlot = slots.find(
+    const existingSlot = FAVORITE_SLOTS.find(
       (slot) => this.favorites[slot] === service.name
     );
 
@@ -356,14 +348,14 @@ class DashboardApp extends LitElement {
       return;
     }
 
-    const freeSlot = slots.find((slot) => !this.favorites[slot]);
+    const freeSlot = FAVORITE_SLOTS.find((slot) => !this.favorites[slot]);
     if (!freeSlot) {
       this.showToast(this.t('favFull'), 'warn');
       return;
     }
 
-    this.favorites[freeSlot] = service.name;
-    localStorage.setItem('dashboard_favs', JSON.stringify(this.favorites));
+    this.favorites = { ...this.favorites, [freeSlot]: service.name };
+    writeJsonStorage(STORAGE_KEYS.favorites, this.favorites);
 
     this.resetInput(true);
 
@@ -377,15 +369,11 @@ class DashboardApp extends LitElement {
   handleCardLongPress(e) {
     const service = e.detail.service;
 
-    // Prüfen, ob es sich um eine Kategorie handelt
-    if (service && (service.isCategory === true || service.key)) {
-      if (service.isCategory || !service.url || service.key) {
-        this.showToast(this.t('cannotFavoriteCategory'), 'info');
-        return;
-      }
+    if (!service?.url || service.isCategory) {
+      this.showToast(this.t('cannotFavoriteCategory'), 'info');
+      return;
     }
 
-    // Wenn es ein echter Service ist, ab zur Favoriten-Logik
     this.handleServiceLongPress(service);
   }
 
@@ -395,8 +383,9 @@ class DashboardApp extends LitElement {
 
     this.lastDeletedFavorite = { slot, name: serviceName };
 
-    delete this.favorites[slot];
-    localStorage.setItem('dashboard_favs', JSON.stringify(this.favorites));
+    const { [slot]: _removed, ...remainingFavorites } = this.favorites;
+    this.favorites = remainingFavorites;
+    writeJsonStorage(STORAGE_KEYS.favorites, this.favorites);
 
     this.showToast(
       `"${serviceName}" ${this.t('favRemoved', { slot })}`,
@@ -410,30 +399,6 @@ class DashboardApp extends LitElement {
   handleNotification(e) {
     const { type, message } = e.detail;
     this.showToast(message, type);
-  }
-
-  // --------------------------------------------------
-  // Search Scrolling
-  // --------------------------------------------------
-
-  scrollToSelected() {
-    setTimeout(() => {
-      const active = this.activeSearchItem;
-      const container = this.searchResultsContainer;
-
-      if (!active || !container) return;
-
-      const activeTop = active.offsetTop;
-      const activeBottom = activeTop + active.offsetHeight;
-      const visibleTop = container.scrollTop;
-      const visibleBottom = visibleTop + container.clientHeight;
-
-      if (activeTop < visibleTop) {
-        container.scrollTop = activeTop;
-      } else if (activeBottom > visibleBottom) {
-        container.scrollTop = activeBottom - container.clientHeight;
-      }
-    }, 10);
   }
 
   // --------------------------------------------------
@@ -531,6 +496,10 @@ class DashboardApp extends LitElement {
 
   render() {
     const favs = getFavorites(this.categories, this.favorites);
+    const categoriesWithFavorites = addFavoriteSlots(
+      this.categories,
+      this.favorites
+    );
     const filteredServices = getFilteredServices(
       this.categories,
       this.searchQuery
@@ -609,7 +578,7 @@ class DashboardApp extends LitElement {
               `
             : html`
                 <jk-grid-view
-                  .categories=${this.categories}
+                  .categories=${categoriesWithFavorites}
                   .activeCategoryKey=${this.activeCategoryKey}
                   .t=${this.t}
                   @service-click=${(e) => {

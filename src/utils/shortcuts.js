@@ -1,4 +1,6 @@
-const ALPHABET = 'abcdefghijklmnopqrstuvwxyz'.split('');
+const ALPHABET = [...'abcdefghijklmnopqrstuvwxyz'];
+
+export const FAVORITE_SLOTS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 const RESERVED_KEYS = new Set([
   'space',
   '0',
@@ -69,9 +71,7 @@ export function getFilteredServices(categories, searchQuery) {
 export function getFavorites(categories, favorites) {
   const allServices = getAllServicesFlat(categories);
   const result = [];
-  const slots = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
-
-  slots.forEach((slot) => {
+  FAVORITE_SLOTS.forEach((slot) => {
     const serviceName = favorites[slot];
     if (serviceName) {
       const originalService = allServices.find((s) => s.name === serviceName);
@@ -85,4 +85,22 @@ export function getFavorites(categories, favorites) {
   });
 
   return result;
+}
+
+export function addFavoriteSlots(categories, favorites) {
+  const slotsByName = new Map(
+    Object.entries(favorites ?? {}).map(([slot, serviceName]) => [serviceName, slot])
+  );
+
+  return categories.map((category) => ({
+    ...category,
+    services: (category.services ?? []).map((service) => ({
+      ...service,
+      favSlot: slotsByName.get(service.name) ?? '',
+    })),
+  }));
+}
+
+export function getFavoriteService(categories, favorites, slot) {
+  return getFavorites(categories, favorites).find((service) => service.favSlot === slot) ?? null;
 }

@@ -1,3 +1,7 @@
+import { writeJsonStorage } from '../storage.js';
+
+const FAVORITES_STORAGE_KEY = 'dashboard_favs';
+
 /**
  * Favoriten Keyboard Handling
  *
@@ -33,9 +37,9 @@ function requestFavoriteDelete(slot, app) {
     'info'
   );
 
-  delete app.favorites[slot];
+  const { [slot]: _removed, ...remainingFavorites } = app.favorites;
+  app.favorites = remainingFavorites;
   saveFavorites(app);
-  app.requestUpdate();
 }
 
 /**
@@ -143,8 +147,7 @@ function handleFavoriteService(key, recording, app) {
  * Favorit speichern
  */
 function saveFavorite(slot, service, app) {
-  app.favorites[slot] = service.name;
-
+  app.favorites = { ...app.favorites, [slot]: service.name };
   saveFavorites(app);
 }
 
@@ -152,7 +155,7 @@ function saveFavorite(slot, service, app) {
  * LocalStorage schreiben
  */
 function saveFavorites(app) {
-  localStorage.setItem('dashboard_favs', JSON.stringify(app.favorites));
+  writeJsonStorage(FAVORITES_STORAGE_KEY, app.favorites);
 }
 
 /**
