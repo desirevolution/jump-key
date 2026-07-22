@@ -9,6 +9,7 @@ import {
 } from './utils/shortcuts.js';
 import { readJsonStorage, writeJsonStorage } from './utils/storage.js';
 import { handleGlobalKeyDown } from './utils/keyboard/index.js';
+import { loadTheme, saveTheme } from './utils/theme.js';
 
 // Import Sub-Components
 import './components/dashboard-header.js';
@@ -60,6 +61,7 @@ class DashboardApp extends LitElement {
     // Data
     favorites: { type: Object },
     lang: { type: String },
+    theme: { type: String },
     // Feedback UI
     dialogConfig: { type: Object },
     toastConfig: { type: Object },
@@ -91,6 +93,7 @@ class DashboardApp extends LitElement {
     this.favorites = readJsonStorage(STORAGE_KEYS.favorites, {});
     this.searchQuery = '';
     this.lang = detectLang();
+    this.theme = loadTheme();
 
     // Timers & Modes
     this.resetTimeout = null;
@@ -129,6 +132,10 @@ class DashboardApp extends LitElement {
   handleKeyDown(e) {
     handleGlobalKeyDown(e, this);
   }
+  handleThemeChange(e) {
+    this.theme = saveTheme(e.detail.theme);
+  }
+
 
   async saveConfiguration(updatedConfig) {
     try {
@@ -177,7 +184,7 @@ class DashboardApp extends LitElement {
   }
 
   async handleSaveConfig(e) {
-    const updatedConfig = e.detail.config;
+    const updatedConfig = e.detail.newConfig ?? e.detail.config;
     await this.saveConfiguration(updatedConfig);
   }
 
@@ -187,6 +194,7 @@ class DashboardApp extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
+    this.theme = saveTheme(this.theme);
 
     try {
       const res = await fetch('./config/services.json');
@@ -411,8 +419,10 @@ class DashboardApp extends LitElement {
         .show=${this.showConfigModal}
         .categories=${this.categories}
         .searchEngines=${this.searchEngines}
+        .theme=${this.theme}
         .t=${this.t}
         @notify=${this.handleNotification}
+        @theme-change=${this.handleThemeChange}
         @save=${this.handleSaveConfig}
         @close=${() => (this.showConfigModal = false)}
       ></jk-config-modal>

@@ -97,15 +97,35 @@ export class JkSearchModal extends LitElement {
     );
   }
 
+  _focusInputAtEnd(value) {
+    const moveCursor = () => {
+      const input = this.querySelector('#searchInput');
+      if (!input) return;
+
+      // Keep the DOM value in sync immediately. On mobile, Lit's following
+      // render may otherwise restore focus while preserving the old cursor.
+      if (input.value !== value) input.value = value;
+
+      input.focus({ preventScroll: true });
+      input.setSelectionRange(value.length, value.length);
+    };
+
+    moveCursor();
+    requestAnimationFrame(moveCursor);
+  }
+
   _selectEngine(prefix) {
+    const value = `:${prefix} `;
+
     this.dispatchEvent(
       new CustomEvent('search-change', {
-        detail: { value: `:${prefix} ` },
+        detail: { value },
         bubbles: true,
         composed: true,
       })
     );
-    setTimeout(() => this.querySelector('#searchInput')?.focus(), 10);
+
+    this._focusInputAtEnd(value);
   }
 
   _triggerServiceClick(service) {

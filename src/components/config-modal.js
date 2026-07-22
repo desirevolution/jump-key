@@ -2,6 +2,7 @@ import { html, LitElement } from 'lit';
 import './icon.js';
 import './icon-button.js';
 import './dialog.js';
+import './config-appearance.js';
 import './config-data.js';
 import './config-editor.js';
 
@@ -42,6 +43,7 @@ export class JkConfigModal extends LitElement {
     show: { type: Boolean },
     categories: { type: Array },
     searchEngines: { type: Array },
+    theme: { type: String },
     t: { type: Function },
     _activeTab: { type: String },
     _isEditorConfigValid: { type: Boolean },
@@ -56,7 +58,8 @@ export class JkConfigModal extends LitElement {
     this.show = false;
     this.categories = [];
     this.searchEngines = [];
-    this._activeTab = 'data';
+    this.theme = 'midnight';
+    this._activeTab = 'appearance';
     this._isEditorConfigValid = true;
     this._hasEditorConfigChanged = false;
     this._editorValue = '';
@@ -78,7 +81,7 @@ export class JkConfigModal extends LitElement {
         this._isEditorConfigValid = true;
         this._hasEditorConfigChanged = false;
         this._showDiscardDialog = false;
-        this._activeTab = 'data';
+        this._activeTab = 'appearance';
         window.addEventListener('keydown', this._handleKeyDown, true);
       } else {
         window.removeEventListener('keydown', this._handleKeyDown, true);
@@ -98,9 +101,14 @@ export class JkConfigModal extends LitElement {
       if (e.key === '1') {
         e.preventDefault();
         e.stopPropagation();
-        this._setActiveTab('data');
+        this._setActiveTab('appearance');
         return;
       } else if (e.key === '2') {
+        e.preventDefault();
+        e.stopPropagation();
+        this._setActiveTab('data');
+        return;
+      } else if (e.key === '3') {
         e.preventDefault();
         e.stopPropagation();
         this._setActiveTab('editor');
@@ -209,6 +217,13 @@ export class JkConfigModal extends LitElement {
 
   _renderActiveTabContent() {
     switch (this._activeTab) {
+      case 'appearance':
+        return html`
+          <jk-config-appearance
+            .selectedTheme="${this.theme}"
+            .t="${this.t}"
+          ></jk-config-appearance>
+        `;
       case 'data':
         return html`
           <jk-config-data
@@ -237,6 +252,10 @@ export class JkConfigModal extends LitElement {
     const statusClass = this._isEditorConfigValid
       ? styles.statusValid
       : styles.statusInvalid;
+    const tabAppearanceClass =
+      this._activeTab === 'appearance'
+        ? styles.sidebarBtnActive
+        : styles.sidebarBtnInactive;
     const tabDataClass =
       this._activeTab === 'data'
         ? styles.sidebarBtnActive
@@ -293,12 +312,20 @@ export class JkConfigModal extends LitElement {
           <div class="${styles.mainArea}">
             <aside class="${styles.sidebar}">
               <button
+                @click="${() => this._setActiveTab('appearance')}"
+                class="${styles.sidebarBtn} ${tabAppearanceClass}"
+              >
+                <jk-icon icon="palette" class="size-4"></jk-icon>
+                ${this.t('tabAppearance')}
+                <kbd class="${styles.kbd}">1</kbd>
+              </button>
+              <button
                 @click="${() => this._setActiveTab('data')}"
                 class="${styles.sidebarBtn} ${tabDataClass}"
               >
                 <jk-icon icon="database" class="size-4"></jk-icon>
                 ${this.t('tabData')}
-                <kbd class="${styles.kbd}">1</kbd>
+                <kbd class="${styles.kbd}">2</kbd>
               </button>
               <button
                 @click="${() => this._setActiveTab('editor')}"
@@ -306,7 +333,7 @@ export class JkConfigModal extends LitElement {
               >
                 <jk-icon icon="code-2" class="size-4"></jk-icon>
                 ${this.t('tabEditor')}
-                <kbd class="${styles.kbd}">2</kbd>
+                <kbd class="${styles.kbd}">3</kbd>
               </button>
             </aside>
 
