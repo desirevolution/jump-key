@@ -335,7 +335,7 @@ class DashboardApp extends LitElement {
       title: this.t('confirmResetTitle'),
       message: this.t('confirmReset'),
       icon: 'trash-2',
-      iconColor: 'text-rose-400',
+      iconColor: 'jk-status-danger',
       confirmLabel: this.t('confirmResetConfirm'),
       cancelLabel: this.t('cancel'),
       onConfirm: () => {

@@ -18,6 +18,7 @@ export function loadTheme() {
 export function applyTheme(themeId) {
   const theme = getTheme(themeId);
   document.documentElement.dataset.theme = theme.id;
+  document.documentElement.dataset.colorScheme = theme.scheme;
   document
     .querySelector('meta[name="theme-color"]')
     ?.setAttribute('content', theme.metaColor);

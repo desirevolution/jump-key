@@ -7,11 +7,11 @@ const MOVE_CANCEL_DISTANCE = 12;
 const styles = {
   card: `group relative flex w-full cursor-pointer select-none items-center gap-4 overflow-hidden rounded-2xl border px-5 py-4 transition-all duration-200 ease-out touch-manipulation`,
   cardDefault: `border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 hover:-translate-y-1 hover:border-indigo-500/60 hover:shadow-xl hover:shadow-indigo-500/10 active:scale-[0.98]`,
-  cardPressing: `scale-[0.985] border-indigo-500/40 bg-gradient-to-br from-slate-800 to-slate-900 shadow-inner shadow-black/20`,
+  cardPressing: `scale-[0.985] border-indigo-500/40 bg-gradient-to-br from-slate-800 to-slate-900 jk-shadow-inset`,
   cardReady: `scale-[0.99] border-indigo-400/70 bg-gradient-to-br from-slate-800 to-indigo-950/25 ring-2 ring-indigo-400/20 shadow-xl shadow-indigo-500/10`,
   glow: `pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-indigo-500/0 via-indigo-500/5 to-indigo-500/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100`,
   iconContainer: `relative z-10 flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl ring-1 transition-all duration-200 ease-out`,
-  iconDefault: `bg-slate-700/60 text-indigo-400 ring-slate-600/70 group-hover:-translate-y-0.5 group-hover:bg-indigo-500/15 group-hover:text-white group-hover:ring-indigo-500/40`,
+  iconDefault: `bg-slate-700/60 text-indigo-400 ring-slate-600/70 group-hover:-translate-y-0.5 group-hover:bg-indigo-500/15 group-hover:text-slate-50 group-hover:ring-indigo-500/40`,
   iconPressing: `scale-95 bg-indigo-500/10 text-indigo-300 ring-indigo-500/30`,
   iconReady: `scale-105 bg-indigo-500/20 text-indigo-200 ring-indigo-400/50`,
   icon: `size-8 transition-transform duration-200 group-hover:scale-105`,
@@ -235,7 +235,7 @@ export class JkServiceCard extends LitElement {
 
   _getBadgeClasses() {
     if (this.isReady) {
-      return 'border-indigo-400/60 bg-indigo-500/30 text-white shadow-md shadow-indigo-500/20';
+      return 'border-indigo-400/60 bg-indigo-500/30 text-slate-50 shadow-md shadow-indigo-500/20';
     }
 
     if (this.isFavorite) {
@@ -257,7 +257,7 @@ export class JkServiceCard extends LitElement {
         class="pointer-events-none absolute bottom-4 left-0 top-4 z-20 w-1 overflow-hidden rounded-r-full bg-slate-700/50 transition-opacity duration-200 ${this.isPressing || this.isReady ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}"
       >
         <div
-          class="absolute inset-x-0 bottom-0 origin-bottom rounded-r-full bg-indigo-400 shadow-[0_0_10px_rgba(129,140,248,0.65)] ${fillClasses}"
+          class="absolute inset-x-0 bottom-0 origin-bottom rounded-r-full bg-indigo-400 jk-long-press-fill ${fillClasses}"
         ></div>
       </div>
     `;
@@ -297,7 +297,7 @@ export class JkServiceCard extends LitElement {
 
         <div class=${styles.content}>
           <span
-            class="${styles.name} ${this.isReady ? 'text-indigo-200' : 'text-white group-hover:text-indigo-200'}"
+            class="${styles.name} ${this.isReady ? 'text-indigo-200' : 'text-slate-50 group-hover:text-indigo-200'}"
           >
             ${this.name}
           </span>

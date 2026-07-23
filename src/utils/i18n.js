@@ -63,6 +63,8 @@ export const translations = {
     appearanceTitle: 'Theme auswählen',
     appearanceDescription:
       'Das Theme wird sofort angewendet und für dieses Gerät gespeichert.',
+    themeGroupDark: 'Dunkel',
+    themeGroupLight: 'Hell',
     themeMidnight: 'Midnight',
     themeMidnightDesc: 'Das klassische Slate-Design mit Indigo-Akzent.',
     themeOcean: 'Ocean',
@@ -87,6 +89,12 @@ export const translations = {
     themeSolarizedDesc: 'Augenschonendes Petrol mit ausgewogenen Kontrasten.',
     themeGruvbox: 'Gruvbox Dark',
     themeGruvboxDesc: 'Warme Retro-Töne mit goldigem Akzent.',
+    themeDaylight: 'Daylight',
+    themeDaylightDesc: 'Klares, neutrales Hell-Theme mit Indigo-Akzent.',
+    themeNordLight: 'Nord Light',
+    themeNordLightDesc: 'Kühle, weiche Flächen für ruhiges Arbeiten bei Tageslicht.',
+    themeSolarizedLight: 'Solarized Light',
+    themeSolarizedLightDesc: 'Warm und augenschonend mit ausgewogenen Blau-Tönen.',
 
     // Config: Tab Import/Export
     tabData: 'Import & Export',
@@ -193,6 +201,8 @@ export const translations = {
     appearanceTitle: 'Choose a theme',
     appearanceDescription:
       'The theme is applied immediately and saved on this device.',
+    themeGroupDark: 'Dark',
+    themeGroupLight: 'Light',
     themeMidnight: 'Midnight',
     themeMidnightDesc: 'The classic slate design with an indigo accent.',
     themeOcean: 'Ocean',
@@ -217,6 +227,12 @@ export const translations = {
     themeSolarizedDesc: 'Eye-friendly petrol tones with balanced contrast.',
     themeGruvbox: 'Gruvbox Dark',
     themeGruvboxDesc: 'Warm retro tones with a golden accent.',
+    themeDaylight: 'Daylight',
+    themeDaylightDesc: 'A clear, neutral light theme with an indigo accent.',
+    themeNordLight: 'Nord Light',
+    themeNordLightDesc: 'Cool, soft surfaces for calm daytime work.',
+    themeSolarizedLight: 'Solarized Light',
+    themeSolarizedLightDesc: 'Warm and eye-friendly with balanced blue tones.',
 
     // Config: Tab Import/Export
     tabData: 'Import & Export',

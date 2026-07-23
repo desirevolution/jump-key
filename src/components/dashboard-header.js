@@ -4,12 +4,12 @@ import './icon-button.js';
 
 // 1. Static styling dictionary isolating layouts from the rendering engine
 const styles = {
-  container: `sticky top-0 z-50 flex flex-nowrap items-center justify-between gap-4 rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-900/95 to-slate-800/90 px-4 py-4 sm:px-6 sm:py-5 shadow-xl shadow-black/20 backdrop-blur-md`,
+  container: `sticky top-0 z-50 flex flex-nowrap items-center justify-between gap-4 rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-900/95 to-slate-800/90 px-4 py-4 sm:px-6 sm:py-5 jk-shadow-card backdrop-blur-md`,
   logoShell: `group flex items-center justify-center size-12 sm:size-14 shrink-0 rounded-xl bg-slate-700/60 ring-1 ring-slate-600/70 transition-all duration-300 hover:bg-indigo-500/15 hover:ring-indigo-500/40 hover:-translate-y-0.5`,
   logoImg: `size-9 sm:size-11 object-contain transition-transform duration-300 group-hover:scale-105`,
   titleContainer: `flex items-center gap-2 min-w-0`,
   brandTextWrapper: `flex items-center gap-1 font-mono font-bold text-2xl sm:text-3xl`,
-  brandJump: `text-white`,
+  brandJump: `text-slate-50`,
   brandKey: `text-indigo-400`,
   helpButton: `hidden md:flex items-center justify-center size-7 rounded-lg text-slate-500 transition-all duration-200 hover:bg-slate-700/60 hover:text-indigo-300 focus:outline-none focus:ring-2 focus:ring-indigo-500/40`,
   rightSection: `flex items-center gap-3 sm:gap-5 shrink-0`,

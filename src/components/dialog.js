@@ -5,12 +5,12 @@ import './icon-button.js';
 // 1. Static styling dictionary isolating layouts from the rendering engine
 const styles = {
   overlay: `fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80 backdrop-blur-md p-6`,
-  modal: `relative w-full max-w-lg overflow-hidden rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 shadow-2xl shadow-black/40`,
+  modal: `relative w-full max-w-lg overflow-hidden rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 jk-shadow-elevated`,
   header: `flex items-start gap-4 p-6 pb-5`,
   iconBadgeBase: `flex items-center justify-center size-12 shrink-0 rounded-xl bg-slate-700/60 ring-1 ring-slate-600/70`,
   icon: `size-6`,
   contentCell: `grow min-w-0`,
-  title: `text-xl font-semibold tracking-tight text-white`,
+  title: `text-xl font-semibold tracking-tight text-slate-50`,
   message: `mt-2 text-sm leading-6 text-slate-300`,
   footer: `flex justify-end gap-3 border-t border-slate-700/70 bg-slate-900/30 px-6 py-4`,
   cancelBtn: `rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 transition-all duration-200 hover:border-indigo-500/50 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30`,

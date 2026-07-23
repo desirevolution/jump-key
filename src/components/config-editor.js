@@ -17,7 +17,7 @@ import '../styles/jump-key-dark.css';
 const styles = {
   containerBase: `w-full h-full min-h-[400px] rounded-xl overflow-auto bg-slate-950 border shadow-inner transition-colors`,
   containerValid: `border-slate-700 focus-within:border-indigo-500`,
-  containerInvalid: `border-rose-500 focus-within:border-rose-500`,
+  containerInvalid: `jk-invalid-container`,
 };
 
 export class JkConfigEditor extends LitElement {
