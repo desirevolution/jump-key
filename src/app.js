@@ -10,6 +10,7 @@ import {
 import { readJsonStorage, writeJsonStorage } from './utils/storage.js';
 import { handleGlobalKeyDown } from './utils/keyboard/index.js';
 import { loadTheme, saveTheme } from './utils/theme.js';
+import { getTheme } from './themes/themes.js';
 
 // Import Sub-Components
 import './components/dashboard-header.js';
@@ -24,6 +25,7 @@ import './components/favorites-view.js';
 import './components/grid-view.js';
 import './components/toast.js';
 import './components/keystroke-badge.js';
+import './components/mobile-menu.js';
 
 const styles = {
   mainContent: 'container mx-auto px-4 pt-8 pb-6',
@@ -54,6 +56,8 @@ class DashboardApp extends LitElement {
     showSearch: { type: Boolean },
     // Modals
     showHelp: { type: Boolean },
+    showMobileMenu: { type: Boolean },
+    mobileMenuMode: { type: String },
     // Layout
     isGridView: { type: Boolean },
     // Keyboard navigation
@@ -85,6 +89,8 @@ class DashboardApp extends LitElement {
     this.showConfigModal = false;
     this.showSearch = false;
     this.showHelp = false;
+    this.showMobileMenu = false;
+    this.mobileMenuMode = 'menu';
     this.isInvalidInput = false;
     this.isValidInput = false;
     this.isGridView = readJsonStorage(STORAGE_KEYS.gridView, false);
@@ -134,6 +140,12 @@ class DashboardApp extends LitElement {
   }
   handleThemeChange(e) {
     this.theme = saveTheme(e.detail.theme);
+  }
+
+  handleMobileThemeChange(e) {
+    this.theme = saveTheme(e.detail.theme);
+    const selectedTheme = getTheme(this.theme);
+    this.showToast(this.t('themeChanged', { theme: this.t(selectedTheme.nameKey) }), 'info');
   }
 
 
@@ -428,6 +440,30 @@ class DashboardApp extends LitElement {
     `;
   }
 
+
+  templateMobileMenu() {
+    return html`
+      <jk-mobile-menu
+        .show=${this.showMobileMenu}
+        .mode=${this.mobileMenuMode}
+        .theme=${this.theme}
+        .t=${this.t}
+        @close=${() => {
+          this.showMobileMenu = false;
+          this.mobileMenuMode = 'menu';
+        }}
+        @back=${() => (this.mobileMenuMode = 'menu')}
+        @open-help=${() => {
+          this.showMobileMenu = false;
+          this.mobileMenuMode = 'menu';
+          this.showHelp = true;
+        }}
+        @open-themes=${() => (this.mobileMenuMode = 'themes')}
+        @theme-change=${this.handleMobileThemeChange}
+      ></jk-mobile-menu>
+    `;
+  }
+
   templateDialog() {
     if (!this.dialogConfig.show) return '';
 
@@ -522,7 +558,7 @@ class DashboardApp extends LitElement {
     return html`
       ${this.templateKeyBadge()} ${this.templateHelpModal()}
       ${this.templateSearchModal(filteredServices)}
-      ${this.templateConfigModal()} ${this.templateDialog()}
+      ${this.templateConfigModal()} ${this.templateMobileMenu()} ${this.templateDialog()}
 
       <jk-toast
         .show=${this.toastConfig.show}
@@ -543,6 +579,10 @@ class DashboardApp extends LitElement {
         @open-search=${this.openSearch}
         @open-config=${() => {
           this.showConfigModal = true;
+        }}
+        @open-mobile-menu=${() => {
+          this.mobileMenuMode = 'menu';
+          this.showMobileMenu = true;
         }}
         @toggle-view=${this.toggleViewMode}
       ></jk-dashboard-header>

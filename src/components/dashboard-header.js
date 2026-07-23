@@ -143,6 +143,14 @@ export class JkDashboardHeader extends LitElement {
               .desktopOnly=${true}
               @click=${() => this._dispatchEvent('open-config')}
             ></jk-icon-button>
+
+            <span class="md:hidden">
+              <jk-icon-button
+                icon="ellipsis"
+                label="${this.t ? this.t('mobileMenuTitle') : 'More'}"
+                @click=${() => this._dispatchEvent('open-mobile-menu')}
+              ></jk-icon-button>
+            </span>
           </div>
 
           <div class="${styles.clockWrapper}">
