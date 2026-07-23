@@ -4,7 +4,7 @@
 
 <h1 align="center">JumpKey</h1>
 
-#### JumpKey — A minimalist, keyboard-driven local first PWA homepage for your services.
+#### JumpKey — A minimalist, keyboard-driven local first PWA startpage for your services.
 
 <p align="center">
   <img src="screenshots/screenshot_1.png?v=3" alt="Grid dashboard">
