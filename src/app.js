@@ -9,6 +9,7 @@ import {
 } from './utils/shortcuts.js';
 import { readJsonStorage, writeJsonStorage } from './utils/storage.js';
 import { handleGlobalKeyDown } from './utils/keyboard/index.js';
+import { loadTheme, saveTheme } from './utils/theme.js';
 
 // Import Sub-Components
 import './components/dashboard-header.js';
@@ -60,6 +61,7 @@ class DashboardApp extends LitElement {
     // Data
     favorites: { type: Object },
     lang: { type: String },
+    theme: { type: String },
     // Feedback UI
     dialogConfig: { type: Object },
     toastConfig: { type: Object },
@@ -91,6 +93,7 @@ class DashboardApp extends LitElement {
     this.favorites = readJsonStorage(STORAGE_KEYS.favorites, {});
     this.searchQuery = '';
     this.lang = detectLang();
+    this.theme = loadTheme();
 
     // Timers & Modes
     this.resetTimeout = null;
@@ -129,11 +132,16 @@ class DashboardApp extends LitElement {
   handleKeyDown(e) {
     handleGlobalKeyDown(e, this);
   }
+  handleThemeChange(e) {
+    this.theme = saveTheme(e.detail.theme);
+  }
+
 
   async saveConfiguration(updatedConfig) {
     try {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-
+      const tmp = JSON.stringify(updatedConfig);
+      console.error("arthur %o", tmp);
       const backupResponse = await fetch(
         `/config/services.backup-${timestamp}.json`,
         {
@@ -177,7 +185,7 @@ class DashboardApp extends LitElement {
   }
 
   async handleSaveConfig(e) {
-    const updatedConfig = e.detail.config;
+    const updatedConfig = e.detail.newConfig ?? e.detail.config;
     await this.saveConfiguration(updatedConfig);
   }
 
@@ -187,6 +195,7 @@ class DashboardApp extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
+    this.theme = saveTheme(this.theme);
 
     try {
       const res = await fetch('./config/services.json');
@@ -327,7 +336,7 @@ class DashboardApp extends LitElement {
       title: this.t('confirmResetTitle'),
       message: this.t('confirmReset'),
       icon: 'trash-2',
-      iconColor: 'text-rose-400',
+      iconColor: 'jk-status-danger',
       confirmLabel: this.t('confirmResetConfirm'),
       cancelLabel: this.t('cancel'),
       onConfirm: () => {
@@ -411,8 +420,10 @@ class DashboardApp extends LitElement {
         .show=${this.showConfigModal}
         .categories=${this.categories}
         .searchEngines=${this.searchEngines}
+        .theme=${this.theme}
         .t=${this.t}
         @notify=${this.handleNotification}
+        @theme-change=${this.handleThemeChange}
         @save=${this.handleSaveConfig}
         @close=${() => (this.showConfigModal = false)}
       ></jk-config-modal>

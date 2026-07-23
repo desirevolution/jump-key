@@ -15,12 +15,12 @@ const styles = {
   enterKbd: `hidden sm:flex items-center justify-center h-7 px-3 rounded-lg border border-indigo-500 bg-indigo-500/20 text-xs font-semibold tracking-widest uppercase text-indigo-200`,
 
   // Specific internal sub-content layouts
-  engineTitle: `truncate text-base font-semibold tracking-tight text-white`,
+  engineTitle: `truncate text-base font-semibold tracking-tight text-slate-50`,
   engineUrl: `mt-0.5 truncate text-sm text-slate-400`,
   previewPrefix: `text-sm text-slate-400`,
-  previewText: `truncate mt-0.5 text-white`,
+  previewText: `truncate mt-0.5 text-slate-50`,
   previewTerms: `italic text-indigo-300 ml-2`,
-  serviceTitle: `truncate text-base font-semibold tracking-tight text-white`,
+  serviceTitle: `truncate text-base font-semibold tracking-tight text-slate-50`,
   serviceCategory: `mt-0.5 truncate text-xs uppercase tracking-widest text-slate-500`,
 };
 
@@ -51,8 +51,8 @@ export class JkDashboardSearchItem extends LitElement {
       : 'border-transparent hover:border-slate-700 hover:bg-slate-800/70';
 
     const iconActiveClasses = this.active
-      ? 'ring-indigo-500/40 bg-indigo-500/20 text-white'
-      : 'ring-slate-600/70 text-indigo-400 group-hover:text-white group-hover:bg-indigo-500/15';
+      ? 'ring-indigo-500/40 bg-indigo-500/20 text-slate-50'
+      : 'ring-slate-600/70 text-indigo-400 group-hover:text-slate-50 group-hover:bg-indigo-500/15';
 
     return html`
       <button class="${styles.itemBase} ${buttonActiveClasses}">

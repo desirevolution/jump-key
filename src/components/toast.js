@@ -50,29 +50,29 @@ export class JkToast extends LitElement {
     const config = {
       success: {
         icon: 'circle-check',
-        accent: 'bg-emerald-400',
-        border: 'border-emerald-500/30',
-        iconColor: 'text-emerald-400',
+        accent: 'jk-status-success-accent',
+        border: 'jk-status-success-border',
+        iconColor: 'jk-status-success',
       },
 
       error: {
         icon: 'triangle-alert',
-        accent: 'bg-rose-400',
-        border: 'border-rose-500/30',
-        iconColor: 'text-rose-400',
+        accent: 'jk-status-danger-accent',
+        border: 'jk-status-danger-border',
+        iconColor: 'jk-status-danger',
       },
 
       warning: {
         icon: 'triangle-alert',
-        accent: 'bg-amber-400',
-        border: 'border-amber-500/30',
-        iconColor: 'text-amber-400',
+        accent: 'jk-status-warning-accent',
+        border: 'jk-status-warning-border',
+        iconColor: 'jk-status-warning',
       },
     }[this.type] ?? {
       icon: 'info',
-      accent: 'bg-indigo-400',
-      border: 'border-slate-700',
-      iconColor: 'text-indigo-400',
+      accent: 'jk-status-info-accent',
+      border: 'jk-status-info-border',
+      iconColor: 'jk-status-info',
     };
 
     return html`
@@ -116,7 +116,7 @@ export class JkToast extends LitElement {
             ${config.border}
 
             shadow-2xl
-            shadow-black/30
+            jk-shadow-card
           "
         >
           <div class="w-1 shrink-0 ${config.accent}"></div>

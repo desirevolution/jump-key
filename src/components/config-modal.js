@@ -2,33 +2,34 @@ import { html, LitElement } from 'lit';
 import './icon.js';
 import './icon-button.js';
 import './dialog.js';
+import './config-appearance.js';
 import './config-data.js';
 import './config-editor.js';
 
 const styles = {
   overlay: `fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn`,
-  container: `w-full max-w-7xl h-[88vh] max-h-[900px] flex flex-col rounded-3xl border border-slate-700/70 bg-slate-900/95 shadow-2xl shadow-black/50 p-5 sm:p-6`,
+  container: `w-full max-w-7xl h-[88vh] max-h-[900px] flex flex-col rounded-3xl border border-slate-700/70 bg-slate-900/95 jk-shadow-elevated p-5 sm:p-6`,
   header: `flex items-center justify-between mb-5 pb-4 border-b border-slate-700/50`,
   headerLeft: `flex items-center gap-3`,
   iconBadge: `flex items-center justify-center size-10 rounded-xl bg-indigo-500/10 ring-1 ring-indigo-500/20`,
   icon: `size-5 text-indigo-300`,
-  title: `text-base font-semibold text-white`,
+  title: `text-base font-semibold text-slate-50`,
   subtitle: `text-xs text-slate-500`,
   headerRight: `flex items-center gap-2`,
   statusBadge: `flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-medium`,
-  statusValid: `bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20`,
-  statusInvalid: `bg-rose-500/10 text-rose-400 ring-1 ring-rose-500/20`,
+  statusValid: `jk-status-success-surface ring-1`,
+  statusInvalid: `jk-status-danger-surface ring-1`,
   mainArea: `flex flex-1 gap-5 min-h-0`,
   sidebar: `w-52 shrink-0 flex flex-col gap-2`,
   sidebarBtn: `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all`,
   sidebarBtnActive: `bg-indigo-500/10 border border-indigo-500/20 text-indigo-300`,
-  sidebarBtnInactive: `border border-transparent text-slate-400 hover:text-white hover:bg-slate-800/70`,
+  sidebarBtnInactive: `border border-transparent text-slate-400 hover:text-slate-50 hover:bg-slate-800/70`,
   kbd: `ml-auto hidden sm:inline-flex text-[10px] text-slate-500`,
   contentArea: `flex-1 min-w-0 overflow-y-auto`,
   footer: `flex justify-end gap-3 mt-5 pt-4 border-t border-slate-700/50`,
   btnSecondary: `px-5 py-2.5 rounded-xl text-sm font-medium text-slate-300 bg-slate-800 border border-slate-700 hover:bg-slate-700 transition-all`,
-  btnSecondaryWhite: `px-5 py-2.5 rounded-xl text-sm font-medium text-white bg-slate-800 border border-slate-700 hover:bg-slate-700`,
-  btnPrimary: `px-5 py-2.5 rounded-xl text-sm font-medium text-white transition-all`,
+  btnSecondaryWhite: `px-5 py-2.5 rounded-xl text-sm font-medium text-slate-50 bg-slate-800 border border-slate-700 hover:bg-slate-700`,
+  btnPrimary: `px-5 py-2.5 rounded-xl text-sm font-medium jk-on-accent transition-all`,
   btnPrimaryActive: `bg-indigo-600 hover:bg-indigo-500 cursor-pointer`,
   btnPrimaryDisabled: `bg-slate-700 text-slate-500 cursor-not-allowed opacity-50`,
 };
@@ -42,6 +43,7 @@ export class JkConfigModal extends LitElement {
     show: { type: Boolean },
     categories: { type: Array },
     searchEngines: { type: Array },
+    theme: { type: String },
     t: { type: Function },
     _activeTab: { type: String },
     _isEditorConfigValid: { type: Boolean },
@@ -56,7 +58,8 @@ export class JkConfigModal extends LitElement {
     this.show = false;
     this.categories = [];
     this.searchEngines = [];
-    this._activeTab = 'data';
+    this.theme = 'midnight';
+    this._activeTab = 'appearance';
     this._isEditorConfigValid = true;
     this._hasEditorConfigChanged = false;
     this._editorValue = '';
@@ -78,7 +81,7 @@ export class JkConfigModal extends LitElement {
         this._isEditorConfigValid = true;
         this._hasEditorConfigChanged = false;
         this._showDiscardDialog = false;
-        this._activeTab = 'data';
+        this._activeTab = 'appearance';
         window.addEventListener('keydown', this._handleKeyDown, true);
       } else {
         window.removeEventListener('keydown', this._handleKeyDown, true);
@@ -98,9 +101,14 @@ export class JkConfigModal extends LitElement {
       if (e.key === '1') {
         e.preventDefault();
         e.stopPropagation();
-        this._setActiveTab('data');
+        this._setActiveTab('appearance');
         return;
       } else if (e.key === '2') {
+        e.preventDefault();
+        e.stopPropagation();
+        this._setActiveTab('data');
+        return;
+      } else if (e.key === '3') {
         e.preventDefault();
         e.stopPropagation();
         this._setActiveTab('editor');
@@ -209,6 +217,13 @@ export class JkConfigModal extends LitElement {
 
   _renderActiveTabContent() {
     switch (this._activeTab) {
+      case 'appearance':
+        return html`
+          <jk-config-appearance
+            .selectedTheme="${this.theme}"
+            .t="${this.t}"
+          ></jk-config-appearance>
+        `;
       case 'data':
         return html`
           <jk-config-data
@@ -237,6 +252,10 @@ export class JkConfigModal extends LitElement {
     const statusClass = this._isEditorConfigValid
       ? styles.statusValid
       : styles.statusInvalid;
+    const tabAppearanceClass =
+      this._activeTab === 'appearance'
+        ? styles.sidebarBtnActive
+        : styles.sidebarBtnInactive;
     const tabDataClass =
       this._activeTab === 'data'
         ? styles.sidebarBtnActive
@@ -293,12 +312,20 @@ export class JkConfigModal extends LitElement {
           <div class="${styles.mainArea}">
             <aside class="${styles.sidebar}">
               <button
+                @click="${() => this._setActiveTab('appearance')}"
+                class="${styles.sidebarBtn} ${tabAppearanceClass}"
+              >
+                <jk-icon icon="palette" class="size-4"></jk-icon>
+                ${this.t('tabAppearance')}
+                <kbd class="${styles.kbd}">1</kbd>
+              </button>
+              <button
                 @click="${() => this._setActiveTab('data')}"
                 class="${styles.sidebarBtn} ${tabDataClass}"
               >
                 <jk-icon icon="database" class="size-4"></jk-icon>
                 ${this.t('tabData')}
-                <kbd class="${styles.kbd}">1</kbd>
+                <kbd class="${styles.kbd}">2</kbd>
               </button>
               <button
                 @click="${() => this._setActiveTab('editor')}"
@@ -306,7 +333,7 @@ export class JkConfigModal extends LitElement {
               >
                 <jk-icon icon="code-2" class="size-4"></jk-icon>
                 ${this.t('tabEditor')}
-                <kbd class="${styles.kbd}">2</kbd>
+                <kbd class="${styles.kbd}">3</kbd>
               </button>
             </aside>
 
@@ -358,7 +385,7 @@ export class JkConfigModal extends LitElement {
                 .title=${this.t('discardChangesTitle')}
                 .message=${this.t('discardChangesMessage')}
                 icon="triangle-alert"
-                iconColor="text-amber-400"
+                iconColor="jk-status-warning"
                 .confirmLabel=${this.t('discardConfirm')}
                 .cancelLabel=${this.t('cancel')}
                 @confirm=${this._forceClose}

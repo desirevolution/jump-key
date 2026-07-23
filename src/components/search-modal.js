@@ -6,11 +6,11 @@ import './search-item.js';
 // 1. Static styling dictionary isolating layouts from the rendering engine
 const styles = {
   overlay: `fixed inset-0 z-60 flex items-start justify-center pt-10 sm:pt-24 p-4 bg-slate-950/70 backdrop-blur-md`,
-  modal: `w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 shadow-2xl shadow-black/40 flex flex-col max-h-[80vh]`,
+  modal: `w-full max-w-3xl overflow-hidden rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 jk-shadow-elevated flex flex-col max-h-[80vh]`,
   header: `flex items-center gap-3 px-5 py-4 border-b border-slate-700/70 bg-slate-900/30 shrink-0`,
   iconBadge: `flex items-center justify-center size-9 rounded-xl bg-slate-700/60 ring-1 ring-slate-600/70 text-indigo-300`,
   form: `grow`,
-  input: `w-full bg-transparent text-lg sm:text-xl font-medium tracking-tight text-white placeholder-slate-500 focus:outline-none`,
+  input: `w-full bg-transparent text-lg sm:text-xl font-medium tracking-tight text-slate-50 placeholder-slate-500 focus:outline-none`,
   // FIX: Nur reine Tailwind-Klassen hier rein. Der Selektor-Name bleibt getrennt.
   resultsContainer: `overflow-y-auto p-2 space-y-1 grow scroll-py-2`,
   engineHeader: `px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500`,

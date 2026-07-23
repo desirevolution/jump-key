@@ -14,3 +14,479 @@
     transform: translateY(0);
   }
 }
+
+/*
+ * Theme palettes
+ * Existing Tailwind color utilities consume these CSS variables, so the
+ * component markup stays focused on layout while the palette is centralized.
+ */
+ :root,
+[data-theme='midnight'] {
+  color-scheme: dark;
+  --jk-bg-page: #020617;
+  --jk-bg-surface: #0f172a;
+  --jk-bg-surface-elevated: #1e293b;
+  --jk-bg-surface-hover: #334155;
+  --jk-border-strong: #596678;
+  --jk-text-muted: #8390a2;
+  --jk-text-secondary: #9facbf;
+  --jk-text-secondary-strong: #cbd5e1;
+  --jk-text-primary: #e2e8f0;
+  --jk-text-primary-strong: #f1f5f9;
+  --jk-text-high-contrast: #f8fafc;
+  --jk-accent-deep: #1e1b4b;
+  --jk-accent-deep-hover: #312e81;
+  --jk-accent-strong: #4338ca;
+  --jk-accent: #4f46e5;
+  --jk-accent-hover: #5f62e7;
+  --jk-accent-bright: #818cf8;
+  --jk-accent-text: #a5b4fc;
+  --jk-accent-text-strong: #c7d2fe;
+  --jk-on-accent: #f8fafc;
+}
+
+[data-theme='ocean'] {
+  color-scheme: dark;
+  --jk-bg-page: #04141b;
+  --jk-bg-surface: #08232e;
+  --jk-bg-surface-elevated: #0d3442;
+  --jk-bg-surface-hover: #1c5060;
+  --jk-border-strong: #387383;
+  --jk-text-muted: #719eab;
+  --jk-text-secondary: #9abfc8;
+  --jk-text-secondary-strong: #b9d5da;
+  --jk-text-primary: #d9e9ec;
+  --jk-text-primary-strong: #eef7f8;
+  --jk-text-high-contrast: #f7fcfc;
+  --jk-accent-deep: #083344;
+  --jk-accent-deep-hover: #164e63;
+  --jk-accent-strong: #0e7490;
+  --jk-accent: #0891b2;
+  --jk-accent-hover: #06b6d4;
+  --jk-accent-bright: #22d3ee;
+  --jk-accent-text: #67e8f9;
+  --jk-accent-text-strong: #a5f3fc;
+  --jk-on-accent: #071018;
+}
+
+[data-theme='graphite'] {
+  color-scheme: dark;
+  --jk-bg-page: #09090b;
+  --jk-bg-surface: #18181b;
+  --jk-bg-surface-elevated: #27272a;
+  --jk-bg-surface-hover: #3f3f46;
+  --jk-border-strong: #65656d;
+  --jk-text-muted: #8d8d95;
+  --jk-text-secondary: #aaaab2;
+  --jk-text-secondary-strong: #d4d4d8;
+  --jk-text-primary: #e4e4e7;
+  --jk-text-primary-strong: #f4f4f5;
+  --jk-text-high-contrast: #fafafa;
+  --jk-accent-deep: #2e1065;
+  --jk-accent-deep-hover: #4c1d95;
+  --jk-accent-strong: #6d28d9;
+  --jk-accent: #7c3aed;
+  --jk-accent-hover: #8356e7;
+  --jk-accent-bright: #a78bfa;
+  --jk-accent-text: #c4b5fd;
+  --jk-accent-text-strong: #ddd6fe;
+  --jk-on-accent: #f8fafc;
+}
+
+[data-theme='emerald'] {
+  color-scheme: dark;
+  --jk-bg-page: #06130d;
+  --jk-bg-surface: #0d2118;
+  --jk-bg-surface-elevated: #143425;
+  --jk-bg-surface-hover: #20513a;
+  --jk-border-strong: #387357;
+  --jk-text-muted: #6f9f86;
+  --jk-text-secondary: #99bfab;
+  --jk-text-secondary-strong: #b8d4c5;
+  --jk-text-primary: #d8e8df;
+  --jk-text-primary-strong: #eef7f2;
+  --jk-text-high-contrast: #f7fcf9;
+  --jk-accent-deep: #022c22;
+  --jk-accent-deep-hover: #064e3b;
+  --jk-accent-strong: #047857;
+  --jk-accent: #059669;
+  --jk-accent-hover: #10b981;
+  --jk-accent-bright: #34d399;
+  --jk-accent-text: #6ee7b7;
+  --jk-accent-text-strong: #a7f3d0;
+  --jk-on-accent: #071018;
+}
+
+[data-theme='tokyo-night'] {
+  color-scheme: dark;
+  --jk-bg-page: #13141c;
+  --jk-bg-surface: #1a1b26;
+  --jk-bg-surface-elevated: #24283b;
+  --jk-bg-surface-hover: #343b58;
+  --jk-border-strong: #616782;
+  --jk-text-muted: #898fac;
+  --jk-text-secondary: #a2a5b9;
+  --jk-text-secondary-strong: #a9b1d6;
+  --jk-text-primary: #c0caf5;
+  --jk-text-primary-strong: #d9e0ff;
+  --jk-text-high-contrast: #f1f3ff;
+  --jk-accent-deep: #1f2d5a;
+  --jk-accent-deep-hover: #2d3f76;
+  --jk-accent-strong: #3d59a1;
+  --jk-accent: #5d7bd9;
+  --jk-accent-hover: #7aa2f7;
+  --jk-accent-bright: #89b4fa;
+  --jk-accent-text: #a5c7ff;
+  --jk-accent-text-strong: #c5dcff;
+  --jk-on-accent: #071018;
+}
+
+[data-theme='catppuccin-mocha'] {
+  color-scheme: dark;
+  --jk-bg-page: #181825;
+  --jk-bg-surface: #1e1e2e;
+  --jk-bg-surface-elevated: #313244;
+  --jk-bg-surface-hover: #45475a;
+  --jk-border-strong: #676a7d;
+  --jk-text-muted: #989baa;
+  --jk-text-secondary: #b1b6c8;
+  --jk-text-secondary-strong: #bac2de;
+  --jk-text-primary: #cdd6f4;
+  --jk-text-primary-strong: #dce3f7;
+  --jk-text-high-contrast: #f3f5fb;
+  --jk-accent-deep: #26345d;
+  --jk-accent-deep-hover: #35466f;
+  --jk-accent-strong: #5f7fbd;
+  --jk-accent: #74a0e8;
+  --jk-accent-hover: #89b4fa;
+  --jk-accent-bright: #a6c8ff;
+  --jk-accent-text: #bfd8ff;
+  --jk-accent-text-strong: #d7e7ff;
+  --jk-on-accent: #071018;
+}
+
+[data-theme='gruvbox-dark'] {
+  color-scheme: dark;
+  --jk-bg-page: #1d2021;
+  --jk-bg-surface: #282828;
+  --jk-bg-surface-elevated: #3c3836;
+  --jk-bg-surface-hover: #504945;
+  --jk-border-strong: #787069;
+  --jk-text-muted: #a9a099;
+  --jk-text-secondary: #c2b8a9;
+  --jk-text-secondary-strong: #d5c4a1;
+  --jk-text-primary: #ebdbb2;
+  --jk-text-primary-strong: #f2e5bc;
+  --jk-text-high-contrast: #fbf1c7;
+  --jk-accent-deep: #3c2f0d;
+  --jk-accent-deep-hover: #5a4714;
+  --jk-accent-strong: #b57614;
+  --jk-accent: #d79921;
+  --jk-accent-hover: #fabd2f;
+  --jk-accent-bright: #f6c94d;
+  --jk-accent-text: #f7d877;
+  --jk-accent-text-strong: #f8e5a7;
+  --jk-on-accent: #071018;
+}
+
+[data-theme='daylight'] {
+  color-scheme: light;
+  --jk-bg-page: #e8edf4;
+  --jk-bg-surface: #ffffff;
+  --jk-bg-surface-elevated: #f6f8fb;
+  --jk-bg-surface-hover: #eef2f7;
+  --jk-border-strong: #94a3b8;
+  --jk-text-muted: #64748b;
+  --jk-text-secondary: #475569;
+  --jk-text-secondary-strong: #334155;
+  --jk-text-primary: #1e293b;
+  --jk-text-primary-strong: #0f172a;
+  --jk-text-high-contrast: #020617;
+  --jk-accent-deep: #e0e7ff;
+  --jk-accent-deep-hover: #c7d2fe;
+  --jk-accent-strong: #4338ca;
+  --jk-accent: #4f46e5;
+  --jk-accent-hover: #4338ca;
+  --jk-accent-bright: #6366f1;
+  --jk-accent-text: #4338ca;
+  --jk-accent-text-strong: #3730a3;
+  --jk-on-accent: #ffffff;
+  --jk-favorite: #b45309;
+  --jk-success: #15803d;
+  --jk-warning: #a16207;
+  --jk-danger: #b91c1c;
+  --jk-info: #0369a1;
+}
+
+[data-theme='nord-light'] {
+  color-scheme: light;
+  --jk-bg-page: #dde3eb;
+  --jk-bg-surface: #f8fafc;
+  --jk-bg-surface-elevated: #ffffff;
+  --jk-bg-surface-hover: #e9edf3;
+  --jk-border-strong: #9aa5b5;
+  --jk-text-muted: #5e6b7f;
+  --jk-text-secondary: #4c566a;
+  --jk-text-secondary-strong: #3b4252;
+  --jk-text-primary: #343b49;
+  --jk-text-primary-strong: #2e3440;
+  --jk-text-high-contrast: #20242c;
+  --jk-accent-deep: #dbe5ef;
+  --jk-accent-deep-hover: #c8d6e5;
+  --jk-accent-strong: #4c6f96;
+  --jk-accent: #5e81ac;
+  --jk-accent-hover: #4c6f96;
+  --jk-accent-bright: #6d8fb7;
+  --jk-accent-text: #496c91;
+  --jk-accent-text-strong: #3b5f87;
+  --jk-on-accent: #ffffff;
+  --jk-favorite: #9a6700;
+  --jk-success: #2f7d52;
+  --jk-warning: #946200;
+  --jk-danger: #b43a45;
+  --jk-info: #3f6f99;
+}
+
+[data-theme='solarized-light'] {
+  color-scheme: light;
+  --jk-bg-page: #e9e1ca;
+  --jk-bg-surface: #fdf6e3;
+  --jk-bg-surface-elevated: #fffaf0;
+  --jk-bg-surface-hover: #eee6d2;
+  --jk-border-strong: #a9a28e;
+  --jk-text-muted: #657b83;
+  --jk-text-secondary: #586e75;
+  --jk-text-secondary-strong: #3d5961;
+  --jk-text-primary: #17424d;
+  --jk-text-primary-strong: #073642;
+  --jk-text-high-contrast: #002b36;
+  --jk-accent-deep: #d7edf6;
+  --jk-accent-deep-hover: #bddfec;
+  --jk-accent-strong: #1675b5;
+  --jk-accent: #268bd2;
+  --jk-accent-hover: #1675b5;
+  --jk-accent-bright: #2aa198;
+  --jk-accent-text: #176d9e;
+  --jk-accent-text-strong: #0f5c87;
+  --jk-on-accent: #ffffff;
+  --jk-favorite: #8a6500;
+  --jk-success: #587f00;
+  --jk-warning: #8a6500;
+  --jk-danger: #c23b35;
+  --jk-info: #1675b5;
+}
+
+/*
+ * Semantic theme contract.
+ * Components may continue using the existing Tailwind palette utilities while
+ * they are migrated gradually. Those utilities now resolve through semantic
+ * roles instead of directly owning the theme colors.
+ */
+:root {
+  --jk-border: color-mix(in srgb, var(--jk-bg-surface-hover) 78%, var(--jk-text-secondary));
+
+  --jk-overlay: color-mix(in srgb, var(--jk-bg-page) 80%, transparent);
+  --jk-surface-translucent: color-mix(in srgb, var(--jk-bg-surface) 95%, transparent);
+  --jk-surface-subtle: color-mix(in srgb, var(--jk-bg-surface) 32%, transparent);
+  --jk-shadow-card: 0 10px 28px rgb(0 0 0 / 0.16);
+  --jk-shadow-elevated: 0 24px 70px rgb(0 0 0 / 0.28);
+  --jk-shadow-inset: inset 0 1px 4px rgb(0 0 0 / 0.18);
+
+  --jk-accent-soft: color-mix(in srgb, var(--jk-accent-hover) 18%, transparent);
+  --jk-accent-border: color-mix(in srgb, var(--jk-accent-hover) 38%, transparent);
+  --jk-accent-selection: color-mix(in srgb, var(--jk-accent) 38%, transparent);
+  --jk-accent-highlight: color-mix(in srgb, var(--jk-accent-bright) 20%, transparent);
+  --jk-accent-glow: color-mix(in srgb, var(--jk-accent-bright) 65%, transparent);
+  --jk-accent-glow-soft: color-mix(in srgb, var(--jk-accent-hover) 34%, transparent);
+
+  --jk-favorite: #fbbf24;
+  --jk-favorite-text: var(--jk-favorite);
+  --jk-favorite-soft: color-mix(in srgb, var(--jk-favorite) 20%, transparent);
+  --jk-favorite-border: color-mix(in srgb, var(--jk-favorite) 42%, transparent);
+  --jk-favorite-glow: color-mix(in srgb, var(--jk-favorite) 20%, transparent);
+  --jk-favorite-glow-hover: color-mix(in srgb, var(--jk-favorite) 30%, transparent);
+  --jk-favorite-edge: var(--jk-favorite);
+
+  /* Status colors are intentionally independent from favorites. */
+  --jk-success: #34d399;
+  --jk-warning: #fbbf24;
+  --jk-danger: #fb7185;
+  --jk-info: var(--jk-accent-bright);
+
+  --jk-success-soft: color-mix(in srgb, var(--jk-success) 12%, transparent);
+  --jk-success-border: color-mix(in srgb, var(--jk-success) 34%, transparent);
+  --jk-warning-soft: color-mix(in srgb, var(--jk-warning) 12%, transparent);
+  --jk-warning-border: color-mix(in srgb, var(--jk-warning) 34%, transparent);
+  --jk-danger-soft: color-mix(in srgb, var(--jk-danger) 12%, transparent);
+  --jk-danger-border: color-mix(in srgb, var(--jk-danger) 34%, transparent);
+  --jk-info-soft: color-mix(in srgb, var(--jk-info) 12%, transparent);
+  --jk-info-border: color-mix(in srgb, var(--jk-info) 34%, transparent);
+
+  /* Compatibility bridge for the current Tailwind-based component markup. */
+  --color-slate-950: var(--jk-bg-page);
+  --color-slate-900: var(--jk-bg-surface);
+  --color-slate-800: var(--jk-bg-surface-elevated);
+  --color-slate-700: var(--jk-bg-surface-hover);
+  --color-slate-600: var(--jk-border-strong);
+  --color-slate-500: var(--jk-text-muted);
+  --color-slate-400: var(--jk-text-secondary);
+  --color-slate-300: var(--jk-text-secondary-strong);
+  --color-slate-200: var(--jk-text-primary);
+  --color-slate-100: var(--jk-text-primary-strong);
+  --color-slate-50: var(--jk-text-high-contrast);
+
+  --color-indigo-950: var(--jk-accent-deep);
+  --color-indigo-900: var(--jk-accent-deep-hover);
+  --color-indigo-700: var(--jk-accent-strong);
+  --color-indigo-600: var(--jk-accent);
+  --color-indigo-500: var(--jk-accent-hover);
+  --color-indigo-400: var(--jk-accent-bright);
+  --color-indigo-300: var(--jk-accent-text);
+  --color-indigo-200: var(--jk-accent-text-strong);
+}
+
+.jk-long-press-fill {
+  box-shadow: 0 0 10px var(--jk-accent-glow);
+}
+
+/* Accessible foreground for solid accent surfaces. */
+.jk-on-accent {
+  color: var(--jk-on-accent);
+}
+
+
+/* Semantic status utilities. Keep status meaning separate from favorite styling. */
+.jk-status-success { color: var(--jk-success); }
+.jk-status-warning { color: var(--jk-warning); }
+.jk-status-danger { color: var(--jk-danger); }
+.jk-status-info { color: var(--jk-info); }
+
+.jk-status-success-surface {
+  color: var(--jk-success);
+  background: var(--jk-success-soft);
+  border-color: var(--jk-success-border);
+  --tw-ring-color: var(--jk-success-border);
+}
+
+.jk-status-warning-surface {
+  color: var(--jk-warning);
+  background: var(--jk-warning-soft);
+  border-color: var(--jk-warning-border);
+  --tw-ring-color: var(--jk-warning-border);
+}
+
+.jk-status-danger-surface {
+  color: var(--jk-danger);
+  background: var(--jk-danger-soft);
+  border-color: var(--jk-danger-border);
+  --tw-ring-color: var(--jk-danger-border);
+}
+
+.jk-status-info-surface {
+  color: var(--jk-info);
+  background: var(--jk-info-soft);
+  border-color: var(--jk-info-border);
+  --tw-ring-color: var(--jk-info-border);
+}
+
+.jk-status-success-border { border-color: var(--jk-success); }
+.jk-status-danger-border { border-color: var(--jk-danger); }
+.jk-status-warning-border { border-color: var(--jk-warning); }
+.jk-status-info-border { border-color: var(--jk-info); }
+
+.jk-status-success-accent { background: var(--jk-success); }
+.jk-status-warning-accent { background: var(--jk-warning); }
+.jk-status-danger-accent { background: var(--jk-danger); }
+.jk-status-info-accent { background: var(--jk-info); }
+
+.jk-favorite-color { color: var(--jk-favorite); }
+
+.jk-favorite-badge {
+  color: var(--jk-favorite-text);
+  background: var(--jk-favorite-soft);
+  border-color: var(--jk-favorite-border);
+  box-shadow: 0 4px 12px var(--jk-favorite-glow);
+}
+
+.jk-favorite-card {
+  box-shadow:
+    var(--jk-shadow-card),
+    0 0 18px var(--jk-favorite-glow);
+}
+
+.jk-favorite-card:hover {
+  box-shadow:
+    var(--jk-shadow-card),
+    0 0 24px var(--jk-favorite-glow-hover);
+}
+
+.jk-danger-action:hover {
+  color: var(--jk-danger);
+  background: var(--jk-danger-soft);
+}
+
+.jk-danger-action:focus-visible {
+  --tw-ring-color: var(--jk-danger-border);
+}
+
+.jk-invalid-container,
+.jk-invalid-container:focus-within {
+  border-color: var(--jk-danger);
+}
+
+.jk-shadow-card { box-shadow: var(--jk-shadow-card); }
+.jk-shadow-elevated { box-shadow: var(--jk-shadow-elevated); }
+.jk-shadow-inset { box-shadow: var(--jk-shadow-inset); }
+
+[data-color-scheme='light'] {
+  --jk-favorite-text: color-mix(in srgb, var(--jk-favorite) 82%, black);
+  --jk-favorite-soft: color-mix(in srgb, var(--jk-favorite) 13%, white);
+  --jk-favorite-border: color-mix(in srgb, var(--jk-favorite) 45%, white);
+  --jk-favorite-glow: color-mix(in srgb, var(--jk-favorite) 11%, transparent);
+  --jk-favorite-glow-hover: color-mix(in srgb, var(--jk-favorite) 16%, transparent);
+  --jk-shadow-card: 0 10px 28px rgb(15 23 42 / 0.12);
+  --jk-shadow-elevated: 0 24px 70px rgb(15 23 42 / 0.18);
+  --jk-shadow-inset: inset 0 1px 4px rgb(15 23 42 / 0.12);
+}
+
+[data-color-scheme='light'] .jk-favorite-card {
+  box-shadow:
+    var(--jk-shadow-card),
+    inset 3px 0 0 var(--jk-favorite-edge),
+    0 0 0 1px var(--jk-favorite-border);
+}
+
+[data-color-scheme='light'] .jk-favorite-card:hover {
+  box-shadow:
+    var(--jk-shadow-card),
+    inset 3px 0 0 var(--jk-favorite-edge),
+    0 0 0 1px var(--jk-favorite-border),
+    0 8px 24px var(--jk-favorite-glow-hover);
+}
+
+[data-theme='daylight'] {
+  --jk-favorite: #b45309;
+  --jk-favorite-edge: #c56516;
+  --jk-success: #15803d;
+  --jk-warning: #a16207;
+  --jk-danger: #b91c1c;
+  --jk-info: #0369a1;
+}
+
+[data-theme='nord-light'] {
+  --jk-favorite: #9a6700;
+  --jk-favorite-edge: #b07a17;
+  --jk-success: #2f7d52;
+  --jk-warning: #946200;
+  --jk-danger: #b43a45;
+  --jk-info: #3f6f99;
+}
+
+[data-theme='solarized-light'] {
+  --jk-favorite: #8a6500;
+  --jk-favorite-edge: #b58900;
+  --jk-success: #587f00;
+  --jk-warning: #8a6500;
+  --jk-danger: #c23b35;
+  --jk-info: #1675b5;
+}

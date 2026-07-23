@@ -1,9 +1,36 @@
 <!doctype html>
-<html lang="de" class="bg-slate-900 text-slate-100">
+<html lang="de" data-theme="midnight" class="bg-slate-900 text-slate-100">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JumpKey dashboard</title>
+    <meta name="theme-color" content="#020617" />
+    <meta name="color-scheme" content="dark light" />
+    <script>
+      try {
+        const supportedThemes = [
+          'midnight',
+          'ocean',
+          'graphite',
+          'emerald',
+          'tokyo-night',
+          'catppuccin-mocha',
+          'gruvbox-dark',
+          'daylight',
+          'nord-light',
+          'solarized-light',
+        ];
+        const lightThemes = new Set(['daylight', 'nord-light', 'solarized-light']);
+        const storedTheme = localStorage.getItem('jump-key-theme');
+        const theme = supportedThemes.includes(storedTheme) ? storedTheme : 'midnight';
+
+        document.documentElement.dataset.theme = theme;
+        document.documentElement.dataset.colorScheme = lightThemes.has(theme) ? 'light' : 'dark';
+      } catch {
+        document.documentElement.dataset.theme = 'midnight';
+        document.documentElement.dataset.colorScheme = 'dark';
+      }
+    </script>
     <link rel="icon" type="image/x-icon" href="/jump-key.ico" />
   </head>
   <body

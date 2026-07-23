@@ -4,18 +4,18 @@ import './icon.js';
 // 1. Static styling dictionary isolating layouts from the rendering engine
 const styles = {
   overlay: `fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md`,
-  modal: `w-full max-w-md rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 shadow-2xl shadow-black/40 p-5 font-mono`,
+  modal: `w-full max-w-md rounded-2xl border border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 jk-shadow-elevated p-5 font-mono`,
   header: `flex items-center justify-between mb-5`,
   headerLeft: `flex items-center gap-3`,
   iconBadge: `flex items-center justify-center size-9 rounded-xl bg-indigo-500/10 ring-1 ring-indigo-500/20`,
   icon: `size-5 text-indigo-300`,
-  title: `text-base font-semibold text-white`,
+  title: `text-base font-semibold text-slate-50`,
   shortcutsContainer: `space-y-1 max-h-[60vh] overflow-y-auto pr-1`, // Scrollbar falls es voll wird
   row: `flex items-center justify-between gap-4 rounded-xl px-3 py-2.5 transition-colors hover:bg-slate-800/60`,
   rowDesc: `text-sm text-slate-400`,
   keysContainer: `flex items-center gap-1 shrink-0`,
   contextBadge: `mr-1 rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-bold text-indigo-300`,
-  kbd: `inline-flex items-center justify-center min-w-8 h-7 rounded-lg border border-slate-700 bg-slate-950 px-2 text-xs font-bold text-indigo-300 shadow-inner shadow-black/40`,
+  kbd: `inline-flex items-center justify-center min-w-8 h-7 rounded-lg border border-slate-700 bg-slate-950 px-2 text-xs font-bold text-indigo-300 jk-shadow-inset`,
   footer: `mt-5 text-center text-[11px] text-slate-500`,
 };
 
