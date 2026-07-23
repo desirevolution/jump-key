@@ -192,6 +192,10 @@ function scrollSelected(app) {
  */
 function focusSearch(app) {
   setTimeout(() => {
-    app.querySelector('#searchInput')?.focus();
+    const input = app.querySelector('#searchInput');
+    if (!input) return;
+
+    input.focus({ preventScroll: true });
+    input.setSelectionRange(input.value.length, input.value.length);
   }, 0);
 }
