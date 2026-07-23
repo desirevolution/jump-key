@@ -191,10 +191,10 @@
 
 [data-theme='daylight'] {
   color-scheme: light;
-  --jk-bg-page: #f1f5f9;
+  --jk-bg-page: #e8edf4;
   --jk-bg-surface: #ffffff;
-  --jk-bg-surface-elevated: #f8fafc;
-  --jk-bg-surface-hover: #e2e8f0;
+  --jk-bg-surface-elevated: #f6f8fb;
+  --jk-bg-surface-hover: #eef2f7;
   --jk-border-strong: #94a3b8;
   --jk-text-muted: #64748b;
   --jk-text-secondary: #475569;
@@ -220,10 +220,10 @@
 
 [data-theme='nord-light'] {
   color-scheme: light;
-  --jk-bg-page: #eceff4;
-  --jk-bg-surface: #ffffff;
-  --jk-bg-surface-elevated: #f7f9fc;
-  --jk-bg-surface-hover: #e5e9f0;
+  --jk-bg-page: #dde3eb;
+  --jk-bg-surface: #f8fafc;
+  --jk-bg-surface-elevated: #ffffff;
+  --jk-bg-surface-hover: #e9edf3;
   --jk-border-strong: #9aa5b5;
   --jk-text-muted: #5e6b7f;
   --jk-text-secondary: #4c566a;
@@ -249,10 +249,10 @@
 
 [data-theme='solarized-light'] {
   color-scheme: light;
-  --jk-bg-page: #fdf6e3;
-  --jk-bg-surface: #fffdf5;
-  --jk-bg-surface-elevated: #eee8d5;
-  --jk-bg-surface-hover: #e4ddc8;
+  --jk-bg-page: #e9e1ca;
+  --jk-bg-surface: #fdf6e3;
+  --jk-bg-surface-elevated: #fffaf0;
+  --jk-bg-surface-hover: #eee6d2;
   --jk-border-strong: #a9a28e;
   --jk-text-muted: #657b83;
   --jk-text-secondary: #586e75;
@@ -300,8 +300,12 @@
   --jk-accent-glow-soft: color-mix(in srgb, var(--jk-accent-hover) 34%, transparent);
 
   --jk-favorite: #fbbf24;
+  --jk-favorite-text: var(--jk-favorite);
   --jk-favorite-soft: color-mix(in srgb, var(--jk-favorite) 20%, transparent);
   --jk-favorite-border: color-mix(in srgb, var(--jk-favorite) 42%, transparent);
+  --jk-favorite-glow: color-mix(in srgb, var(--jk-favorite) 20%, transparent);
+  --jk-favorite-glow-hover: color-mix(in srgb, var(--jk-favorite) 30%, transparent);
+  --jk-favorite-edge: var(--jk-favorite);
 
   /* Status colors are intentionally independent from favorites. */
   --jk-success: #34d399;
@@ -397,6 +401,25 @@
 
 .jk-favorite-color { color: var(--jk-favorite); }
 
+.jk-favorite-badge {
+  color: var(--jk-favorite-text);
+  background: var(--jk-favorite-soft);
+  border-color: var(--jk-favorite-border);
+  box-shadow: 0 4px 12px var(--jk-favorite-glow);
+}
+
+.jk-favorite-card {
+  box-shadow:
+    var(--jk-shadow-card),
+    0 0 18px var(--jk-favorite-glow);
+}
+
+.jk-favorite-card:hover {
+  box-shadow:
+    var(--jk-shadow-card),
+    0 0 24px var(--jk-favorite-glow-hover);
+}
+
 .jk-danger-action:hover {
   color: var(--jk-danger);
   background: var(--jk-danger-soft);
@@ -416,13 +439,34 @@
 .jk-shadow-inset { box-shadow: var(--jk-shadow-inset); }
 
 [data-color-scheme='light'] {
-  --jk-shadow-card: 0 10px 28px rgb(15 23 42 / 0.10);
+  --jk-favorite-text: color-mix(in srgb, var(--jk-favorite) 82%, black);
+  --jk-favorite-soft: color-mix(in srgb, var(--jk-favorite) 13%, white);
+  --jk-favorite-border: color-mix(in srgb, var(--jk-favorite) 45%, white);
+  --jk-favorite-glow: color-mix(in srgb, var(--jk-favorite) 11%, transparent);
+  --jk-favorite-glow-hover: color-mix(in srgb, var(--jk-favorite) 16%, transparent);
+  --jk-shadow-card: 0 10px 28px rgb(15 23 42 / 0.12);
   --jk-shadow-elevated: 0 24px 70px rgb(15 23 42 / 0.18);
   --jk-shadow-inset: inset 0 1px 4px rgb(15 23 42 / 0.12);
 }
 
+[data-color-scheme='light'] .jk-favorite-card {
+  box-shadow:
+    var(--jk-shadow-card),
+    inset 3px 0 0 var(--jk-favorite-edge),
+    0 0 0 1px var(--jk-favorite-border);
+}
+
+[data-color-scheme='light'] .jk-favorite-card:hover {
+  box-shadow:
+    var(--jk-shadow-card),
+    inset 3px 0 0 var(--jk-favorite-edge),
+    0 0 0 1px var(--jk-favorite-border),
+    0 8px 24px var(--jk-favorite-glow-hover);
+}
+
 [data-theme='daylight'] {
   --jk-favorite: #b45309;
+  --jk-favorite-edge: #c56516;
   --jk-success: #15803d;
   --jk-warning: #a16207;
   --jk-danger: #b91c1c;
@@ -431,6 +475,7 @@
 
 [data-theme='nord-light'] {
   --jk-favorite: #9a6700;
+  --jk-favorite-edge: #b07a17;
   --jk-success: #2f7d52;
   --jk-warning: #946200;
   --jk-danger: #b43a45;
@@ -439,6 +484,7 @@
 
 [data-theme='solarized-light'] {
   --jk-favorite: #8a6500;
+  --jk-favorite-edge: #b58900;
   --jk-success: #587f00;
   --jk-warning: #8a6500;
   --jk-danger: #c23b35;

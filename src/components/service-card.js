@@ -6,7 +6,7 @@ const MOVE_CANCEL_DISTANCE = 12;
 
 const styles = {
   card: `group relative flex w-full cursor-pointer select-none items-center gap-4 overflow-hidden rounded-2xl border px-5 py-4 transition-all duration-200 ease-out touch-manipulation`,
-  cardDefault: `border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 hover:-translate-y-1 hover:border-indigo-500/60 hover:shadow-xl hover:shadow-indigo-500/10 active:scale-[0.98]`,
+  cardDefault: `jk-shadow-card border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 hover:-translate-y-1 hover:border-indigo-500/60 hover:shadow-xl hover:shadow-indigo-500/10 active:scale-[0.98]`,
   cardPressing: `scale-[0.985] border-indigo-500/40 bg-gradient-to-br from-slate-800 to-slate-900 jk-shadow-inset`,
   cardReady: `scale-[0.99] border-indigo-400/70 bg-gradient-to-br from-slate-800 to-indigo-950/25 ring-2 ring-indigo-400/20 shadow-xl shadow-indigo-500/10`,
   glow: `pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-r from-indigo-500/0 via-indigo-500/5 to-indigo-500/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100`,
@@ -20,8 +20,8 @@ const styles = {
   subtitle: `mt-1 truncate text-sm leading-snug text-slate-400 transition-colors duration-200 group-hover:text-slate-300`,
   badges: `absolute right-4 top-4 z-20 flex items-center gap-1.5`,
   badge: `hidden h-7 min-w-7 items-center justify-center rounded-lg border px-2 text-xs font-semibold uppercase tracking-widest transition-all duration-200 sm:inline-flex`,
-  favoriteBadge: `hidden h-7 min-w-7 items-center justify-center gap-1 rounded-lg border border-amber-400/40 bg-amber-500/15 px-2 text-xs font-semibold text-amber-300 shadow-md shadow-amber-400/20 sm:inline-flex`,
-  favoriteMobile: `inline-flex size-7 items-center justify-center rounded-lg border border-amber-400/35 bg-amber-500/15 text-amber-300 shadow-md shadow-amber-400/20 sm:hidden`,
+  favoriteBadge: `jk-favorite-badge hidden h-7 min-w-7 items-center justify-center gap-1 rounded-lg border px-2 text-xs font-semibold sm:inline-flex`,
+  favoriteMobile: `jk-favorite-badge inline-flex size-7 items-center justify-center rounded-lg border sm:hidden`,
 };
 
 export class JkServiceCard extends LitElement {
@@ -221,9 +221,7 @@ export class JkServiceCard extends LitElement {
     if (this.isReady) return styles.cardReady;
     if (this.isPressing) return styles.cardPressing;
     return `${styles.cardDefault} ${
-      this.isFavorite
-        ? 'shadow-lg shadow-amber-400/20 hover:shadow-amber-400/25'
-        : ''
+      this.isFavorite ? 'jk-favorite-card' : ''
     }`;
   }
 
@@ -359,13 +357,13 @@ export class JkServiceCard extends LitElement {
             0%,
             100% {
               opacity: 0.75;
-              box-shadow: 0 0 8px rgb(129 140 248 / 0.45);
+              box-shadow: 0 0 8px var(--jk-accent-glow-soft);
             }
             50% {
               opacity: 1;
               box-shadow:
-                0 0 14px rgb(129 140 248 / 0.8),
-                0 0 24px rgb(99 102 241 / 0.35);
+                0 0 14px var(--jk-accent-glow),
+                0 0 24px var(--jk-accent-glow-soft);
             }
           }
 

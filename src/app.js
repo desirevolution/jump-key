@@ -140,7 +140,8 @@ class DashboardApp extends LitElement {
   async saveConfiguration(updatedConfig) {
     try {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-
+      const tmp = JSON.stringify(updatedConfig);
+      console.error("arthur %o", tmp);
       const backupResponse = await fetch(
         `/config/services.backup-${timestamp}.json`,
         {
