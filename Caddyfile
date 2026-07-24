@@ -6,55 +6,53 @@
     log {
         output stdout
         format json
+        level DEBUG
     }
 }
 
 :80 {
-    root * /app
-
-    # =========================================================================
-    # DEBUG-ENDPOINT: Rufe im Browser /config/debug auf, um sofort zu sehen,
-    # was Caddy aus deinem Remote-User Header macht!
-    # =========================================================================
-    handle /config/debug {
-        respond "User-Header: '{http.request.header.Remote-User}' | Ziel-Datei: '/app/config/services.{http.request.header.Remote-User}.json'" 200
+    # Aktiviert HTTP-Access-Logs
+    log {
+        output stdout
+        format json
+        level DEBUG
     }
+
+    # Zusätzliche, deutlich sichtbare Access-Log-Felder
+    log_append <remote_user "{http.request.header.Remote-User}"
+    log_append <requested_uri "{http.request.uri}"
+    log_append <request_method "{http.request.method}"
+
+    root * /app
 
     route /config/* {
         header Cache-Control "no-store, no-cache, must-revalidate" defer
 
-        # 1. Das Rewrite auf den User-Dateinamen
         @user_config {
             path /config/services.json
             header Remote-User ?*
         }
         rewrite @user_config /config/services.{http.request.header.Remote-User}.json
 
-        # Backup Rewrite
         @user_backup {
             path_regexp backup ^/config/services\.backup-(.+)\.json$
             header Remote-User ?*
         }
         rewrite @user_backup /config/services.{http.request.header.Remote-User}.backup-{re.backup.1}.json
 
-        # 2. WebDAV Steuerung (Nur PUT)
         @forbidden_methods {
             method DELETE PROPFIND PROPPATCH MKCOL COPY MOVE LOCK UNLOCK
         }
         respond @forbidden_methods "Method Not Allowed" 405
 
-        @is_put {
-            method PUT
-        }
+        @is_put method PUT
         webdav @is_put {
             root /app
         }
 
-        # 3. Falls die umgeschriebene Datei existiert -> ausliefern, sonst 404
         file_server
     }
 
-    # SPA Fallback
     route {
         try_files {path} {path}/ /index.html
         file_server
