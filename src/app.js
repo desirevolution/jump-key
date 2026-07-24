@@ -157,7 +157,7 @@ class DashboardApp extends LitElement {
         {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updatedConfig),
+          body: JSON.stringify(updatedConfig, null, 2),
         }
       );
 
@@ -168,7 +168,7 @@ class DashboardApp extends LitElement {
       const response = await fetch('/config/services.json', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedConfig),
+        body: JSON.stringify(updatedConfig, null, 2),
       });
 
       if (response.ok) {
