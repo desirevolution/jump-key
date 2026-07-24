@@ -11,17 +11,14 @@
 }
 
 :80 {
-    # Aktiviert HTTP-Access-Logs
     log {
         output stdout
         format json
-        level DEBUG
     }
 
-    # Zusätzliche, deutlich sichtbare Access-Log-Felder
-    log_append <remote_user "{http.request.header.Remote-User}"
-    log_append <requested_uri "{http.request.uri}"
-    log_append <request_method "{http.request.method}"
+    log_append remote_user "{http.request.header.Remote-User}"
+    log_append requested_uri "{http.request.uri}"
+    log_append request_method "{http.request.method}"
 
     root * /app
 
@@ -30,13 +27,13 @@
 
         @user_config {
             path /config/services.json
-            header Remote-User ?*
+            header Remote-User *
         }
         rewrite @user_config /config/services.{http.request.header.Remote-User}.json
 
         @user_backup {
             path_regexp backup ^/config/services\.backup-(.+)\.json$
-            header Remote-User ?*
+            header Remote-User *
         }
         rewrite @user_backup /config/services.{http.request.header.Remote-User}.backup-{re.backup.1}.json
 
@@ -45,7 +42,9 @@
         }
         respond @forbidden_methods "Method Not Allowed" 405
 
-        @is_put method PUT
+        @is_put {
+            method PUT
+        }
         webdav @is_put {
             root /app
         }
