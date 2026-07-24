@@ -1,4 +1,5 @@
 {
+    debug
     auto_https off
     order webdav before file_server
 }
