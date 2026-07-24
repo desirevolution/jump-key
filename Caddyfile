@@ -2,50 +2,36 @@
     debug
     auto_https off
     order webdav before file_server
+
+    log {
+        output stdout
+        format json
+        level INFO
+    }
 }
 
 :80 {
     root * /app
 
-    # =========================================================================
-    # Zwingt Caddy dazu, ALLE eingehenden Request-Header im JSON-Log auszugeben!
-    # =========================================================================
-    log {
-        output stdout
-        format json
-        level DEBUG
-    }
-
     route /config/* {
         header Cache-Control "no-store, no-cache, must-revalidate" defer
 
-        # 1. Rewrites für Remote-User & X-Remote-User
+        # 1. Matcher: Prüft, ob der Header "Remote-User" gesetzt ist
         @user_config {
             path /config/services.json
             header Remote-User ?*
         }
+        # Liest exakt den Header aus deinem Log "arthur" -> /config/services.arthur.json
         rewrite @user_config /config/services.{http.request.header.Remote-User}.json
 
-        @x_user_config {
-            path /config/services.json
-            header X-Remote-User ?*
-        }
-        rewrite @x_user_config /config/services.{http.request.header.X-Remote-User}.json
-
-        # 2. Backup-Rewrites
+        # 2. Backup-Matcher
         @user_backup {
             path_regexp backup ^/config/services\.backup-(.+)\.json$
             header Remote-User ?*
         }
         rewrite @user_backup /config/services.{http.request.header.Remote-User}.backup-{re.backup.1}.json
 
-        @x_user_backup {
-            path_regexp backup ^/config/services\.backup-(.+)\.json$
-            header X-Remote-User ?*
-        }
-        rewrite @x_user_backup /config/services.{http.request.header.X-Remote-User}.backup-{re.backup.1}.json
-
-        # 3. WebDAV (Nur PUT)
+        # 3. WebDAV: Nur PUT erlauben, alles andere an WebDAV blockieren
         @forbidden_methods {
             method DELETE PROPFIND PROPPATCH MKCOL COPY MOVE LOCK UNLOCK
         }
@@ -58,6 +44,7 @@
             root /app
         }
 
+        # 4. Lese-Zugriff für GET
         file_server
     }
 
