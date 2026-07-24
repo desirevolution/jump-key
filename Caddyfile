@@ -1,16 +1,22 @@
 {
     debug
     auto_https off
+    
     order webdav before file_server
+
+    log {
+        output stdout
+        format json
+    }
 }
 
 :80 {
     root * /app
 
-    @config path /config/*
+    header Remote-User-Debug "{http.request.header.Remote-User}"
 
-    route @config {
-        header Cache-Control "no-store"
+    route /config/* {
+        header Cache-Control "no-store, no-cache, must-revalidate"
 
         @user_config {
             path /config/services.json
@@ -24,17 +30,23 @@
         }
         rewrite @user_backup /config/services.{http.request.header.Remote-User}.backup-{re.backup.1}.json
 
-        webdav {
+        @forbidden_methods {
+            method DELETE PROPFIND PROPPATCH MKCOL COPY MOVE LOCK UNLOCK
+        }
+        respond @forbidden_methods "Method Not Allowed" 405
+
+        @is_put {
+            method PUT
+        }
+        webdav @is_put {
             root /app
         }
+
+        file_server
     }
 
-    @spa {
-        not path /config/*
-    }
-
-    route @spa {
-        try_files {path} /index.html
+    route {
+        try_files {path} {path}/ /index.html
         file_server
     }
 }
