@@ -6,32 +6,38 @@
     log {
         output stdout
         format json
-        level INFO
     }
 }
 
 :80 {
     root * /app
 
+    # =========================================================================
+    # DEBUG-ENDPOINT: Rufe im Browser /config/debug auf, um sofort zu sehen,
+    # was Caddy aus deinem Remote-User Header macht!
+    # =========================================================================
+    handle /config/debug {
+        respond "User-Header: '{http.request.header.Remote-User}' | Ziel-Datei: '/app/config/services.{http.request.header.Remote-User}.json'" 200
+    }
+
     route /config/* {
         header Cache-Control "no-store, no-cache, must-revalidate" defer
 
-        # 1. Matcher: Prüft, ob der Header "Remote-User" gesetzt ist
+        # 1. Das Rewrite auf den User-Dateinamen
         @user_config {
             path /config/services.json
             header Remote-User ?*
         }
-        # Liest exakt den Header aus deinem Log "arthur" -> /config/services.arthur.json
         rewrite @user_config /config/services.{http.request.header.Remote-User}.json
 
-        # 2. Backup-Matcher
+        # Backup Rewrite
         @user_backup {
             path_regexp backup ^/config/services\.backup-(.+)\.json$
             header Remote-User ?*
         }
         rewrite @user_backup /config/services.{http.request.header.Remote-User}.backup-{re.backup.1}.json
 
-        # 3. WebDAV: Nur PUT erlauben, alles andere an WebDAV blockieren
+        # 2. WebDAV Steuerung (Nur PUT)
         @forbidden_methods {
             method DELETE PROPFIND PROPPATCH MKCOL COPY MOVE LOCK UNLOCK
         }
@@ -44,7 +50,7 @@
             root /app
         }
 
-        # 4. Lese-Zugriff für GET
+        # 3. Falls die umgeschriebene Datei existiert -> ausliefern, sonst 404
         file_server
     }
 
