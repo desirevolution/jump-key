@@ -1,42 +1,42 @@
 {
-    debug
     auto_https off
+
     order webdav before file_server
 
     log {
         output stdout
         format json
-        level DEBUG
+        level INFO
     }
 }
 
 :80 {
-    log {
-        output stdout
-        format json
-    }
-
-    log_append remote_user "{http.request.header.Remote-User}"
-    log_append requested_uri "{http.request.uri}"
-    log_append request_method "{http.request.method}"
-
     root * /app
 
     route /config/* {
         header Cache-Control "no-store, no-cache, must-revalidate" defer
 
+        #
+        # user config
+        #
         @user_config {
             path /config/services.json
             header Remote-User *
         }
         rewrite @user_config /config/services.{http.request.header.Remote-User}.json
 
+        #
+        # backups
+        #
         @user_backup {
             path_regexp backup ^/config/services\.backup-(.+)\.json$
             header Remote-User *
         }
         rewrite @user_backup /config/services.{http.request.header.Remote-User}.backup-{re.backup.1}.json
 
+        #
+        # limit webdav to PUT only
+        #
         @forbidden_methods {
             method DELETE PROPFIND PROPPATCH MKCOL COPY MOVE LOCK UNLOCK
         }
@@ -52,6 +52,9 @@
         file_server
     }
 
+    #
+    # static files + SPA Fallback
+    #
     route {
         try_files {path} {path}/ /index.html
         file_server
