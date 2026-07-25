@@ -27,6 +27,7 @@
 - **Docker Ready**: Deploy using the included Docker Compose configuration.
 - **Lightweight Architecture**: Built with Lit for fast rendering and minimal resource usage.
 - **Static Deployment**: No backend or database required. (Caddy + WebDav plugin)
+- **Simple Multi-User Support**: Map Remote-User header as part of the saved config file.
 
 ## Screenshots
 
