@@ -140,6 +140,16 @@ The application is configured through the `config/services.json` file.
 }
 ```
 
+## Multi-user support (Authelia etc.)
+
+Remote-User header if detected is used as a part of the expected local config name:
+
+"Remote-User" header | expected config file | (automatic) backup file 
+---|---|---
+not set | services.json | services.backup-2026-07-25T06-54-03-332Z.json
+arthur | services.arthur.json | services.arthur.backup-2026-07-25T06-54-03-332Z.json
+
+
 ## Disclaimer
 
 #### Project was build with AI support. I am a lazy dev...
