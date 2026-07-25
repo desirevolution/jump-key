@@ -17,13 +17,14 @@
 - **Keyboard-Centric Navigation**: Navigate categories and launch services using sequential keyboard shortcuts.
 - **Category Organization**: Group services into configurable categories.
 - **Favorites**: Mark frequently used services as favorites for quick access.
+- **Last Used**: Mark last used services for quick access.
 - **Instant Search**: Filter services in real time while typing.
 - **Search Engine Integration**: Configure multiple search engines for quick web searches.
 - **Built-in Configuration Editor**: Edit the configuration directly from the web interface.
 - **Configuration Import/Export**: Create/restore local configuration backup.
 - **Configuration Validation**: Validate JSON before applying changes.
 - **Responsive User Interface**: Optimized for desktop and mobile devices.
-- **Localization Support**: Automatic language detection with internationalization support.
+- **Localization Support**: Automatic language detection with internationalization support. Currently DE, EN, FR, ES included.
 - **Themes**: 6 dark and 3 light themes included.
 - **Docker Ready**: Deploy using the included Docker Compose configuration.
 - **Lightweight Architecture**: Built with Lit for fast rendering and minimal resource usage.
