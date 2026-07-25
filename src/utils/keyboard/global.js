@@ -18,7 +18,13 @@ import { handleSearchKeyDown } from './search.js';
 
 import { handleNavigationKeyDown } from './navigation.js';
 
+function getDigitFromEvent(e) {
+  const match = /^Digit([0-9])$/.exec(e.code ?? '');
+  return match?.[1] ?? (/^[0-9]$/.test(e.key) ? e.key : null);
+}
+
 export function handleGlobalKeyDown(e, app) {
+
   /*
    * Ctrl + Zahl
    *
@@ -89,6 +95,20 @@ export function handleGlobalKeyDown(e, app) {
   }
 
   /*
+   * Shift + Zahl
+   *
+   * Continue Shortcut (ändert die LRU-Reihenfolge nicht)
+   */
+  const shiftedDigit = e.shiftKey ? getDigitFromEvent(e) : null;
+  if (shiftedDigit) {
+    e.preventDefault();
+
+    app.launchContinueSlot(shiftedDigit);
+
+    return;
+  }
+
+  /*
    * Favorit Aufnahme
    */
   if (app.favoriteRecording) {
@@ -99,6 +119,15 @@ export function handleGlobalKeyDown(e, app) {
       app.resetInput(true);
     }
 
+    return;
+  }
+
+  /*
+   * Zwischen den beiden letzten Services wechseln
+   */
+  if (e.key === '-') {
+    e.preventDefault();
+    app.toggleLastService();
     return;
   }
 

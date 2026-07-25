@@ -25,10 +25,10 @@ export class JkServiceGroup extends LitElement {
     services: { type: Array },
   };
 
-  _handleCardClick(service) {
+  _handleCardClick(event, service) {
     this.dispatchEvent(
       new CustomEvent('service-click', {
-        detail: { service },
+        detail: { service, shiftKey: event.detail.shiftKey },
         bubbles: true,
         composed: true,
       })
@@ -84,7 +84,7 @@ export class JkServiceGroup extends LitElement {
                 .badgeText=${service.key}
                 .favoriteSlot=${service.favSlot || ''}
                 .isFavorite=${Boolean(service.favSlot)}
-                @card-click=${() => this._handleCardClick(service)}
+                @card-click=${(e) => this._handleCardClick(e, service)}
                 @card-long-press=${(e) => this._handleCardLongPress(e, service)}
               ></jk-service-card>
             `

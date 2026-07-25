@@ -35,7 +35,9 @@ export const translations = {
     searchPlaceholder: 'Service suchen...',
     noServices: 'Keine Services gefunden.',
     favorites: 'Favoriten',
+    continue: 'Zuletzt verwendet',
     resetFavs: 'Zurücksetzen',
+    resetContinue: 'Zurücksetzen',
     categories: 'Kategorien',
     services: 'Services',
     back: 'Zurück',
@@ -48,6 +50,9 @@ export const translations = {
     confirmReset:
       'Möchtest du die Liste der häufig genutzten Services wirklich zurücksetzen?',
     confirmResetConfirm: 'Ja, zurücksetzen',
+    confirmContinueResetTitle: 'Zuletzt verwendet zurücksetzen',
+    confirmContinueReset:
+      'Möchtest du die Liste der zuletzt verwendeten Services wirklich zurücksetzen?',
     favAlreadyExists: 'ist bereits ein Favorit auf Slot',
     favFull: 'Alle Favoritenplätze sind belegt',
     favSaved: 'als Favorit auf Taste {slot} gespeichert',
@@ -63,6 +68,8 @@ export const translations = {
     // Hotkeys & Search Engines
     hkSearch: 'Suche öffnen',
     hkFavs: 'Direkt-Favorit aufrufen',
+    hkContinue: 'Zuletzt verwendeten Service aufrufen',
+    hkToggleLast: 'Zwischen den letzten beiden Services wechseln',
     hkCat: 'Kategorie-Hotkeys aktivieren',
     hkService: 'Service innerhalb einer Kategorie aufrufen',
     hkReset: 'Zurück zur Hauptübersicht / Abbrechen',
@@ -203,7 +210,9 @@ export const translations = {
     searchPlaceholder: 'Search services...',
     noServices: 'No services found.',
     favorites: 'Favorites',
+    continue: 'Continue',
     resetFavs: 'Reset',
+    resetContinue: 'Reset',
     categories: 'Categories',
     services: 'Services',
     back: 'Back',
@@ -215,6 +224,9 @@ export const translations = {
     confirmResetTitle: 'Reset Favorites',
     confirmReset: 'Do you really want to reset your frequently used services?',
     confirmResetConfirm: 'Yes, reset',
+    confirmContinueResetTitle: 'Reset recently used',
+    confirmContinueReset:
+      'Do you really want to reset the list of recently used services?',
     favAlreadyExists: 'is already a favorite on slot',
     favFull: 'All favorite slots are taken',
     favSaved: 'saved as favorite on key {slot}',
@@ -230,6 +242,8 @@ export const translations = {
     // Hotkeys & Search Engines
     hkSearch: 'Open search',
     hkFavs: 'Launch direct favorite',
+    hkContinue: 'Launch recently used service',
+    hkToggleLast: 'Switch between the last two services',
     hkCat: 'Activate category hotkeys',
     hkService: 'Launch service inside active category',
     hkReset: 'Back to main overview / Cancel',
