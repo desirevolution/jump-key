@@ -6,6 +6,8 @@ import {
   addFavoriteSlots,
   getFilteredServices,
   FAVORITE_SLOTS,
+  getContinueServices,
+  getContinueService,
 } from './utils/shortcuts.js';
 import { readJsonStorage, writeJsonStorage } from './utils/storage.js';
 import { handleGlobalKeyDown } from './utils/keyboard/index.js';
@@ -34,6 +36,7 @@ const styles = {
 const STORAGE_KEYS = {
   configCache: 'services-cache',
   favorites: 'dashboard_favs',
+  continueHistory: 'dashboard_continue',
   gridView: 'dashboard_grid_view',
 };
 
@@ -64,6 +67,7 @@ class DashboardApp extends LitElement {
     selectedIndex: { type: Number },
     // Data
     favorites: { type: Object },
+    continueHistory: { type: Array },
     lang: { type: String },
     theme: { type: String },
     // Feedback UI
@@ -97,6 +101,8 @@ class DashboardApp extends LitElement {
 
     // User Data & Search
     this.favorites = readJsonStorage(STORAGE_KEYS.favorites, {});
+    this.continueHistory = readJsonStorage(STORAGE_KEYS.continueHistory, []);
+    this.continueToggleIndex = 1;
     this.searchQuery = '';
     this.lang = detectLang();
     this.theme = loadTheme();
@@ -266,9 +272,16 @@ class DashboardApp extends LitElement {
     this.resetTimeout = setTimeout(() => this.resetInput(), duration);
   }
 
-  trackClick(service) {
-    // Klick-Logik mit automatischer Keystroke-Ermittlung
-    if (this.activeCategoryKey && service.key) {
+  trackClick(service, options = {}) {
+    const {
+      updateContinue = true,
+      shortcutLabel = '',
+      openInSameTab = false,
+    } = options;
+
+    if (shortcutLabel) {
+      this.currentInput = shortcutLabel;
+    } else if (this.activeCategoryKey && service.key) {
       this.currentInput = `${this.activeCategoryKey.toUpperCase()} → ${service.key.toUpperCase()}`;
     } else if (service.key || service.favSlot) {
       this.currentInput = (service.favSlot || service.key).toUpperCase();
@@ -277,12 +290,54 @@ class DashboardApp extends LitElement {
     this.isValidInput = true;
     this.isInvalidInput = false;
 
-    // 300ms Bestätigungspause
-    setTimeout(() => {
-      window.open(service.url, '_blank');
+    if (updateContinue) {
+      this.rememberContinueService(service);
+    }
 
+    setTimeout(() => {
+      if (openInSameTab) {
+        window.location.assign(service.url);
+        return;
+      }
+
+      window.open(service.url, '_blank');
       setTimeout(() => this.resetInput(true), 100);
     }, 300);
+  }
+
+  rememberContinueService(service) {
+    if (!service?.name || !service?.url) return;
+
+    this.continueHistory = [
+      service.name,
+      ...this.continueHistory.filter((name) => name !== service.name),
+    ].slice(0, 10);
+
+    this.continueToggleIndex = 1;
+    writeJsonStorage(STORAGE_KEYS.continueHistory, this.continueHistory);
+  }
+
+  launchContinueSlot(slot) {
+    const service = getContinueService(this.categories, this.continueHistory, slot);
+    if (!service) return;
+
+    this.trackClick(service, {
+      updateContinue: false,
+      shortcutLabel: `⇧${slot}`,
+    });
+  }
+
+  toggleLastService() {
+    const services = getContinueServices(this.categories, this.continueHistory).slice(0, 2);
+    if (services.length < 2) return;
+
+    const service = services[this.continueToggleIndex];
+    this.continueToggleIndex = this.continueToggleIndex === 0 ? 1 : 0;
+
+    this.trackClick(service, {
+      updateContinue: false,
+      shortcutLabel: '-',
+    });
   }
 
   handlePopState(e) {
@@ -352,6 +407,25 @@ class DashboardApp extends LitElement {
       onConfirm: () => {
         this.favorites = {};
         localStorage.removeItem(STORAGE_KEYS.favorites);
+        this.requestUpdate();
+      },
+    };
+  }
+
+
+  clearContinue() {
+    this.dialogConfig = {
+      show: true,
+      title: this.t('confirmContinueResetTitle'),
+      message: this.t('confirmContinueReset'),
+      icon: 'trash-2',
+      iconColor: 'jk-status-danger',
+      confirmLabel: this.t('confirmResetConfirm'),
+      cancelLabel: this.t('cancel'),
+      onConfirm: () => {
+        this.continueHistory = [];
+        this.continueToggleIndex = 1;
+        localStorage.removeItem(STORAGE_KEYS.continueHistory);
         this.requestUpdate();
       },
     };
@@ -515,7 +589,9 @@ class DashboardApp extends LitElement {
           this.selectedIndex = 0;
         }}
         @service-click=${(e) => {
-          this.trackClick(e.detail.service);
+          this.trackClick(e.detail.service, {
+            openInSameTab: e.detail.shiftKey,
+          });
         }}
         @execute-submit=${() => {
           this.handleKeyDown({
@@ -541,6 +617,7 @@ class DashboardApp extends LitElement {
 
   render() {
     const favs = getFavorites(this.categories, this.favorites);
+    const continueServices = getContinueServices(this.categories, this.continueHistory);
     const categoriesWithFavorites = addFavoriteSlots(
       this.categories,
       this.favorites
@@ -593,11 +670,22 @@ class DashboardApp extends LitElement {
             ? html`
                 <jk-favorites-view
                   .favorites=${favs}
+                  .continueServices=${continueServices}
                   .t=${this.t}
                   @service-click=${(e) => {
-                    this.trackClick(e.detail.service);
+                    this.trackClick(e.detail.service, {
+                      openInSameTab: e.detail.shiftKey,
+                    });
+                  }}
+                  @continue-click=${(e) => {
+                    this.trackClick(e.detail.service, {
+                      updateContinue: false,
+                      shortcutLabel: `⇧${e.detail.service.continueSlot}`,
+                      openInSameTab: e.detail.shiftKey,
+                    });
                   }}
                   @clear-favorites=${this.clearFavorites}
+                  @clear-continue=${this.clearContinue}
                   @delete-favorite-slot=${(e) => {
                     this.handleDeleteFavoriteSlot(e.detail.slot);
                   }}
@@ -631,7 +719,9 @@ class DashboardApp extends LitElement {
                   .activeCategoryKey=${this.activeCategoryKey}
                   .t=${this.t}
                   @service-click=${(e) => {
-                    this.trackClick(e.detail.service);
+                    this.trackClick(e.detail.service, {
+                      openInSameTab: e.detail.shiftKey,
+                    });
                   }}
                   @card-long-press=${(e) => {
                     this.handleServiceLongPress(e.detail.service);

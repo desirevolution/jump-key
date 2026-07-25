@@ -151,6 +151,7 @@ export class JkServiceCard extends LitElement {
       new CustomEvent('card-click', {
         detail: {
           service: this._getServiceData(),
+          shiftKey: event.shiftKey,
         },
         bubbles: true,
         composed: true,

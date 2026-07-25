@@ -44,7 +44,7 @@ export function handleSearchKeyDown(e, app) {
     const item = items[app.selectedIndex];
 
     if (item) {
-      item.action();
+      item.action({ openInSameTab: e.shiftKey });
     }
   }
 }
@@ -86,15 +86,18 @@ function buildSearchItems(app) {
     items.push({
       type: 'engine-execute',
 
-      action() {
+      action({ openInSameTab = false } = {}) {
         const url = previewEngine.url.replace(
           '%s',
           encodeURIComponent(previewEngine.searchTerms)
         );
 
-        window.open(url, '_blank');
-
-        app.resetInput(true);
+        if (openInSameTab) {
+          window.location.assign(url);
+        } else {
+          window.open(url, '_blank');
+          app.resetInput(true);
+        }
       },
     });
   }
@@ -107,8 +110,8 @@ function buildSearchItems(app) {
       items.push({
         type: 'service',
 
-        action() {
-          app.trackClick(service);
+        action({ openInSameTab = false } = {}) {
+          app.trackClick(service, { openInSameTab });
         },
       });
     });

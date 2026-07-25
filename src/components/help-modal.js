@@ -52,7 +52,12 @@ export class JkHelpModal extends LitElement {
       { keys: ['#'], desc: this.t('hkToggleView') },
     ];
 
-    if (!this.isGridView) shortcuts.push({ keys: ['0-9'], desc: this.t('hkFavs') });
+    if (!this.isGridView) {
+      shortcuts.push({ keys: ['0-9'], desc: this.t('hkFavs') });
+      shortcuts.push({ keys: ['Shift', '0-9'], desc: this.t('hkContinue') });
+    }
+
+    shortcuts.push({ keys: ['-'], desc: this.t('hkToggleLast') });
 
     shortcuts.push(
       { keys: ['A-Z'], desc: this.t('hkCat') },

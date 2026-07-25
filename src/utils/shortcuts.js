@@ -1,6 +1,7 @@
 const ALPHABET = [...'abcdefghijklmnopqrstuvwxyz'];
 
 export const FAVORITE_SLOTS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+export const CONTINUE_SLOTS = FAVORITE_SLOTS;
 const RESERVED_KEYS = new Set([
   'space',
   '0',
@@ -103,4 +104,29 @@ export function addFavoriteSlots(categories, favorites) {
 
 export function getFavoriteService(categories, favorites, slot) {
   return getFavorites(categories, favorites).find((service) => service.favSlot === slot) ?? null;
+}
+
+
+export function getContinueServices(categories, continueHistory) {
+  const allServices = getAllServicesFlat(categories);
+
+  return (continueHistory ?? [])
+    .map((serviceName, index) => {
+      const originalService = allServices.find((service) => service.name === serviceName);
+      if (!originalService) return null;
+
+      return {
+        ...originalService,
+        continueSlot: CONTINUE_SLOTS[index],
+      };
+    })
+    .filter(Boolean);
+}
+
+export function getContinueService(categories, continueHistory, slot) {
+  return (
+    getContinueServices(categories, continueHistory).find(
+      (service) => service.continueSlot === slot
+    ) ?? null
+  );
 }

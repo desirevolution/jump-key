@@ -128,10 +128,10 @@ export class JkSearchModal extends LitElement {
     this._focusInputAtEnd(value);
   }
 
-  _triggerServiceClick(service) {
+  _triggerServiceClick(service, shiftKey = false) {
     this.dispatchEvent(
       new CustomEvent('service-click', {
-        detail: { service },
+        detail: { service, shiftKey },
         bubbles: true,
         composed: true,
       })
@@ -165,13 +165,17 @@ export class JkSearchModal extends LitElement {
         .active=${active}
         .data=${previewData}
         .t=${this.t}
-        @click="${() => {
+        @click="${(e) => {
           const finalUrl = matchedEngine.url.replace(
             '%s',
             encodeURIComponent(searchTermsPreview.trim())
           );
-          window.open(finalUrl, '_blank');
-          this._handleClose();
+          if (e.shiftKey) {
+            window.location.assign(finalUrl);
+          } else {
+            window.open(finalUrl, '_blank');
+            this._handleClose();
+          }
         }}"
       ></jk-dashboard-search-item>
     `;
@@ -183,7 +187,7 @@ export class JkSearchModal extends LitElement {
         type="service"
         .active=${active}
         .data=${s}
-        @click=${() => this._triggerServiceClick(s)}
+        @click=${(e) => this._triggerServiceClick(s, e.shiftKey)}
       ></jk-dashboard-search-item>
     `;
   }
