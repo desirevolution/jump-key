@@ -91,6 +91,7 @@ export class JkFavoritesView extends LitElement {
               .icon=${service.icon}
               .badgeText=${`⇧${service.continueSlot}`}
               @card-click=${(e) => this.dispatchEvent(new CustomEvent('continue-click', { detail: { service, shiftKey: e.detail.shiftKey }, bubbles: true, composed: true }))}
+              @card-long-press=${() => this.dispatchEvent(new CustomEvent('delete-continue-entry', { detail: { service }, bubbles: true, composed: true }))}
             ></jk-service-card>
           `)}
         </div>

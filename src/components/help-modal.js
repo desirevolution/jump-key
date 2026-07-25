@@ -64,6 +64,7 @@ export class JkHelpModal extends LitElement {
       { keys: ['A-Z'], desc: this.t('hkService'), context: true },
       { keys: ['↑', '↓'], desc: this.t('hkNavigate') },
       { keys: ['Enter'], desc: this.t('hkOpenSelection') },
+      { keys: ['Shift', 'Enter'], desc: this.t('hkOpenSelectionSameTab') },
       { keys: ['ESC'], desc: this.t('hkReset') }
     );
 
@@ -117,6 +118,7 @@ export class JkHelpModal extends LitElement {
               </div>
               ${this._renderActionRow('mouse-pointer-click', this.t('helpClick'), this.t('helpClickAction'))}
               <div class="hidden md:block">
+                ${this._renderActionRow('mouse-pointer-click', this.t('helpShiftClick'), this.t('helpShiftClickAction'))}
                 ${this._renderActionRow('hand', this.t('helpLongPress'), this.t('helpLongPressFavorite'))}
                 ${this._renderActionRow('hand', this.t('helpLongPress'), this.t('helpLongPressRemoveFavorite'))}
               </div>

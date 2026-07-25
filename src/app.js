@@ -431,6 +431,20 @@ class DashboardApp extends LitElement {
     };
   }
 
+
+  removeContinueService(service) {
+    if (!service?.name) return;
+
+    const nextHistory = this.continueHistory.filter((name) => name !== service.name);
+    if (nextHistory.length === this.continueHistory.length) return;
+
+    this.continueHistory = nextHistory;
+    this.continueToggleIndex = 1;
+    writeJsonStorage(STORAGE_KEYS.continueHistory, this.continueHistory);
+    this.showToast(`"${service.name}" ${this.t('continueRemoved')}`, 'success');
+    this.requestUpdate();
+  }
+
   handleServiceLongPress(service) {
     const existingSlot = FAVORITE_SLOTS.find(
       (slot) => this.favorites[slot] === service.name
@@ -686,6 +700,9 @@ class DashboardApp extends LitElement {
                   }}
                   @clear-favorites=${this.clearFavorites}
                   @clear-continue=${this.clearContinue}
+                  @delete-continue-entry=${(e) => {
+                    this.removeContinueService(e.detail.service);
+                  }}
                   @delete-favorite-slot=${(e) => {
                     this.handleDeleteFavoriteSlot(e.detail.slot);
                   }}
