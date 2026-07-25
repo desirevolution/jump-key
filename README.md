@@ -24,6 +24,7 @@
 - **Configuration Validation**: Validate JSON before applying changes.
 - **Responsive User Interface**: Optimized for desktop and mobile devices.
 - **Localization Support**: Automatic language detection with internationalization support.
+- **Themes**: 6 dark and 3 light themes included.
 - **Docker Ready**: Deploy using the included Docker Compose configuration.
 - **Lightweight Architecture**: Built with Lit for fast rendering and minimal resource usage.
 - **Static Deployment**: No backend or database required. (Caddy + WebDav plugin)
