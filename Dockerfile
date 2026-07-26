@@ -20,7 +20,7 @@ RUN addgroup -S -g 1000 caddy && \
 
 COPY --from=caddy-builder /usr/bin/caddy /usr/bin/caddy
 
-COPY --from=node-builder --chown=caddy:caddy /app/dist/ /app/dist/
+COPY --from=node-builder --chown=caddy:caddy /app/dist/ /app/
 
 COPY --chown=caddy:caddy Caddyfile /etc/caddy/Caddyfile
 
