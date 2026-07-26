@@ -27,6 +27,7 @@ import './components/favorites-view.js';
 import './components/grid-view.js';
 import './components/toast.js';
 import './components/keystroke-badge.js';
+import './components/action-feedback.js';
 import './components/mobile-menu.js';
 
 const styles = {
@@ -73,6 +74,7 @@ class DashboardApp extends LitElement {
     // Feedback UI
     dialogConfig: { type: Object },
     toastConfig: { type: Object },
+    actionFeedbackVisible: { type: Boolean },
   };
 
   get searchInput() {
@@ -131,6 +133,8 @@ class DashboardApp extends LitElement {
       type: 'success',
     };
 
+    this.actionFeedbackVisible = false;
+
     // Bindings
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
@@ -142,6 +146,14 @@ class DashboardApp extends LitElement {
   }
 
   handleKeyDown(e) {
+    if (e.key === 'Escape' && this.actionFeedbackVisible) {
+      e.preventDefault();
+      e.stopPropagation?.();
+      this.querySelector('jk-action-feedback')?.cancel();
+      this.resetInput(true);
+      return;
+    }
+
     handleGlobalKeyDown(e, this);
   }
   handleThemeChange(e) {
@@ -272,37 +284,61 @@ class DashboardApp extends LitElement {
     this.resetTimeout = setTimeout(() => this.resetInput(), duration);
   }
 
-  trackClick(service, options = {}) {
+  async trackClick(service, options = {}) {
     const {
       updateContinue = true,
       shortcutLabel = '',
       openInSameTab = false,
+      keyboardFeedback = !this.showSearch,
     } = options;
 
-    if (shortcutLabel) {
-      this.currentInput = shortcutLabel;
-    } else if (this.activeCategoryKey && service.key) {
-      this.currentInput = `${this.activeCategoryKey.toUpperCase()} → ${service.key.toUpperCase()}`;
-    } else if (service.key || service.favSlot) {
-      this.currentInput = (service.favSlot || service.key).toUpperCase();
-    }
+    if (keyboardFeedback) {
+      if (shortcutLabel) {
+        this.currentInput = shortcutLabel;
+      } else if (this.activeCategoryKey && service.key) {
+        this.currentInput = `${this.activeCategoryKey.toUpperCase()} → ${service.key.toUpperCase()}`;
+      } else if (service.key || service.favSlot) {
+        this.currentInput = (service.favSlot || service.key).toUpperCase();
+      }
 
-    this.isValidInput = true;
-    this.isInvalidInput = false;
+      this.isValidInput = true;
+      this.isInvalidInput = false;
+
+      const shouldLaunch = await this.showActionFeedback(service);
+      if (!shouldLaunch) return;
+    }
 
     if (updateContinue) {
       this.rememberContinueService(service);
     }
 
-    setTimeout(() => {
-      if (openInSameTab) {
-        window.location.assign(service.url);
-        return;
-      }
+    if (openInSameTab) {
+      window.location.assign(service.url);
+      return;
+    }
 
-      window.open(service.url, '_blank');
+    window.open(service.url, '_blank');
+
+    if (keyboardFeedback) {
       setTimeout(() => this.resetInput(true), 100);
-    }, 300);
+    }
+  }
+
+  showActionFeedback(service) {
+    const category = this.categories.find((item) =>
+      item.services?.some(
+        (candidate) => candidate.name === service.name && candidate.url === service.url
+      )
+    );
+
+    return (
+      this.querySelector('jk-action-feedback')?.show({
+        service: {
+          ...service,
+          category: service.category || category?.category || '',
+        },
+      }) ?? Promise.resolve(true)
+    );
   }
 
   rememberContinueService(service) {
@@ -605,6 +641,7 @@ class DashboardApp extends LitElement {
         @service-click=${(e) => {
           this.trackClick(e.detail.service, {
             openInSameTab: e.detail.shiftKey,
+            keyboardFeedback: false,
           });
         }}
         @execute-submit=${() => {
@@ -629,6 +666,16 @@ class DashboardApp extends LitElement {
     `;
   }
 
+  templateActionFeedback() {
+    return html`
+      <jk-action-feedback
+        @feedback-visibility-change=${(e) => {
+          this.actionFeedbackVisible = e.detail.visible;
+        }}
+      ></jk-action-feedback>
+    `;
+  }
+
   render() {
     const favs = getFavorites(this.categories, this.favorites);
     const continueServices = getContinueServices(this.categories, this.continueHistory);
@@ -647,7 +694,7 @@ class DashboardApp extends LitElement {
       !this.showConfigModal;
 
     return html`
-      ${this.templateKeyBadge()} ${this.templateHelpModal()}
+      ${this.templateKeyBadge()} ${this.templateActionFeedback()} ${this.templateHelpModal()}
       ${this.templateSearchModal(filteredServices)}
       ${this.templateConfigModal()} ${this.templateMobileMenu()} ${this.templateDialog()}
 
@@ -689,13 +736,14 @@ class DashboardApp extends LitElement {
                   @service-click=${(e) => {
                     this.trackClick(e.detail.service, {
                       openInSameTab: e.detail.shiftKey,
+                      keyboardFeedback: false,
                     });
                   }}
                   @continue-click=${(e) => {
                     this.trackClick(e.detail.service, {
                       updateContinue: false,
-                      shortcutLabel: `⇧${e.detail.service.continueSlot}`,
                       openInSameTab: e.detail.shiftKey,
+                      keyboardFeedback: false,
                     });
                   }}
                   @clear-favorites=${this.clearFavorites}
@@ -738,6 +786,7 @@ class DashboardApp extends LitElement {
                   @service-click=${(e) => {
                     this.trackClick(e.detail.service, {
                       openInSameTab: e.detail.shiftKey,
+                      keyboardFeedback: false,
                     });
                   }}
                   @card-long-press=${(e) => {
