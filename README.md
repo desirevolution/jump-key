@@ -158,6 +158,11 @@ Remote-User header if detected is used as a part of the expected local config na
 not set | services.json | services.backup-2026-07-25T06-54-03-332Z.json
 arthur | services.arthur.json | services.arthur.backup-2026-07-25T06-54-03-332Z.json
 
+## Ideas/Todos
+
+- **Workspaces**: Work/private separation. (functional)
+- **Standalone server**: golang wrapper server, replaces the caddy setup. (technical)
+
 
 ## Disclaimer
 
