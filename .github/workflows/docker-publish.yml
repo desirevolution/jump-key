@@ -113,17 +113,17 @@ jobs:
       - name: Create manifest list and push
         working-directory: /tmp/digests
         run: |
-          # 1. Convert tags string into -t arguments array
+          # 1. Build an array of -t <tag> flags
           TAG_ARGS=()
-          for tag in ${{ steps.meta.outputs.tags }}; do
-            TAG_ARGS+=("-t" "$tag")
-          done
+          while IFS= read -r tag; do
+            [ -n "$tag" ] && TAG_ARGS+=("-t" "$tag")
+          done <<< "${{ steps.meta.outputs.tags }}"
 
-          # 2. Convert downloaded artifact digest files into target image reference strings
+          # 2. Build an array of image digests
           DIGEST_ARGS=()
           for digest in *; do
-            DIGEST_ARGS+=("${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:${digest}")
+            [ -f "$digest" ] && DIGEST_ARGS+=("${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:${digest}")
           done
 
-          # 3. Create and push the multi-architecture manifest
+          # 3. Create and push the multi-arch manifest
           docker buildx imagetools create "${TAG_ARGS[@]}" "${DIGEST_ARGS[@]}"
