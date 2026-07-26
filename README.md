@@ -27,7 +27,7 @@
 - **Localization Support**: Automatic language detection with internationalization support. Currently DE, EN, FR, ES included.
 - **Icons**: Lucide icon name, local hosted images and urls.
 - **Themes**: 6 dark and 3 light themes included.
-- **Docker Ready**: Deploy using the included Docker Compose configuration.
+- **Docker Ready**: Deploy using the included Docker Compose configuration. (amd64/arm64 ~60 mb image)
 - **Lightweight Architecture**: Built with Lit for fast rendering and minimal resource usage.
 - **Static Deployment**: No backend or database required. (Caddy + WebDav plugin)
 - **Simple Multi-User Support**: Map Remote-User header as part of the saved config file.
