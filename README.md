@@ -1,3 +1,6 @@
+
+
+
 <p align="center">
   <img src="./public/jump-key.png" alt="logo" width="80" height="80" />
 </p>
@@ -6,9 +9,12 @@
 
 #### JumpKey — A minimalist, keyboard-driven local first PWA startpage for your services.
 
+
 <p align="center">
   <img src="screenshots/screenshot_1.png?v=3" alt="Grid dashboard">
 </p>
+
+https://github.com/user-attachments/assets/b2c4290e-f371-44eb-b47c-44d5a73de379
 
 ## [Live Demo](https://desirevolution.github.io/jump-key/)
 
