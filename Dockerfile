@@ -13,7 +13,7 @@ FROM alpine:3.24
 
 WORKDIR /app
 
-RUN apk add --no-libc-dev --no-cache ca-certificates tzdata
+RUN apk add --no-cache ca-certificates tzdata
 
 RUN addgroup -S -g 1000 caddy && \
     adduser -S -u 1000 -G caddy caddy
