@@ -289,21 +289,24 @@ class DashboardApp extends LitElement {
       updateContinue = true,
       shortcutLabel = '',
       openInSameTab = false,
+      keyboardFeedback = !this.showSearch,
     } = options;
 
-    if (shortcutLabel) {
-      this.currentInput = shortcutLabel;
-    } else if (this.activeCategoryKey && service.key) {
-      this.currentInput = `${this.activeCategoryKey.toUpperCase()} → ${service.key.toUpperCase()}`;
-    } else if (service.key || service.favSlot) {
-      this.currentInput = (service.favSlot || service.key).toUpperCase();
+    if (keyboardFeedback) {
+      if (shortcutLabel) {
+        this.currentInput = shortcutLabel;
+      } else if (this.activeCategoryKey && service.key) {
+        this.currentInput = `${this.activeCategoryKey.toUpperCase()} → ${service.key.toUpperCase()}`;
+      } else if (service.key || service.favSlot) {
+        this.currentInput = (service.favSlot || service.key).toUpperCase();
+      }
+
+      this.isValidInput = true;
+      this.isInvalidInput = false;
+
+      const shouldLaunch = await this.showActionFeedback(service);
+      if (!shouldLaunch) return;
     }
-
-    this.isValidInput = true;
-    this.isInvalidInput = false;
-
-    const shouldLaunch = await this.showActionFeedback(service);
-    if (!shouldLaunch) return;
 
     if (updateContinue) {
       this.rememberContinueService(service);
@@ -315,7 +318,10 @@ class DashboardApp extends LitElement {
     }
 
     window.open(service.url, '_blank');
-    setTimeout(() => this.resetInput(true), 100);
+
+    if (keyboardFeedback) {
+      setTimeout(() => this.resetInput(true), 100);
+    }
   }
 
   showActionFeedback(service) {
@@ -635,6 +641,7 @@ class DashboardApp extends LitElement {
         @service-click=${(e) => {
           this.trackClick(e.detail.service, {
             openInSameTab: e.detail.shiftKey,
+            keyboardFeedback: false,
           });
         }}
         @execute-submit=${() => {
@@ -729,13 +736,14 @@ class DashboardApp extends LitElement {
                   @service-click=${(e) => {
                     this.trackClick(e.detail.service, {
                       openInSameTab: e.detail.shiftKey,
+                      keyboardFeedback: false,
                     });
                   }}
                   @continue-click=${(e) => {
                     this.trackClick(e.detail.service, {
                       updateContinue: false,
-                      shortcutLabel: `⇧${e.detail.service.continueSlot}`,
                       openInSameTab: e.detail.shiftKey,
+                      keyboardFeedback: false,
                     });
                   }}
                   @clear-favorites=${this.clearFavorites}
@@ -778,6 +786,7 @@ class DashboardApp extends LitElement {
                   @service-click=${(e) => {
                     this.trackClick(e.detail.service, {
                       openInSameTab: e.detail.shiftKey,
+                      keyboardFeedback: false,
                     });
                   }}
                   @card-long-press=${(e) => {
