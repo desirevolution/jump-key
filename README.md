@@ -58,6 +58,22 @@ https://github.com/user-attachments/assets/b2c4290e-f371-44eb-b47c-44d5a73de379
   </a>
 </p>
 
+## Keyboard Shortcuts
+| Shortcut | Action |
+|----------|--------|
+| `A-Z` | Select a category |
+| `A-Z` → `A-Z` | Launch a service from the selected category |
+| `1-0` | Open a favorite |
+| `Shift + 1-0` | Open a recent service |
+| `-` | Cycle through recently used services (press `-` again before launch to select the next one) |
+| `Space` | Open search |
+| `#` | Toggle between grouped and grid view |
+| `Esc` | Cancel the current input or pending launch |
+| `Shift + Click` / `Shift + Enter` | Open in the current tab |
+| `Ctrl + 1-0` | Assign a favorite to a slot |
+| `Ctrl + ,` | Open configuration |
+| `?` | Show keyboard help |
+
 ## Quick Start
 
 Copy/adjust [compose.yml](compose.yml) and /config/[services.json](services.example.json) and put all your custome icon images in /icon.
