@@ -270,7 +270,8 @@ function handleNavigationKeyDown(key, app) {
         (s) => s.key === key
       );
       if (favService) {
-        app.currentInput = `${key} → ${favService.name.toUpperCase()}`;
+        const safeName = favService.name.replace(/[<>&"'→]/g, '');
+        app.currentInput = `${key} → ${safeName.toUpperCase()}`;
         app.trackClick(favService, true);
         return;
       }
