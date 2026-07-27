@@ -164,7 +164,7 @@ The application is configured through the `config/services.json` file.
   ]
 }
 ```
-## Security
+## Security Notice
 
 JumpKey is intended for trusted environments only. It is designed to run on a local network or behind an authentication proxy such as Authelia, Authentik, or a similar SSO solution.
 Therefore I do not plan to invest additional effort into hardening it gainst Internet-facing deployments. If you expose it publicly, you are responsible for providing appropriate authentication and security.
