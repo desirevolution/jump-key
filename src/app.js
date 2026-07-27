@@ -13,6 +13,7 @@ import { readJsonStorage, writeJsonStorage } from './utils/storage.js';
 import { handleGlobalKeyDown } from './utils/keyboard/index.js';
 import { loadTheme, saveTheme } from './utils/theme.js';
 import { getTheme } from './themes/themes.js';
+import { ActionManager } from './utils/action-manager.js';
 
 // Import Sub-Components
 import './components/dashboard-header.js';
@@ -105,12 +106,14 @@ class DashboardApp extends LitElement {
     this.favorites = readJsonStorage(STORAGE_KEYS.favorites, {});
     this.continueHistory = readJsonStorage(STORAGE_KEYS.continueHistory, []);
     this.lastUsedCycleIndex = 0;
+    this.continueLastUsedCycle = false;
     this.searchQuery = '';
     this.lang = detectLang();
     this.theme = loadTheme();
 
     // Timers & Modes
     this.resetTimeout = null;
+    this.actionManager = new ActionManager();
     this.favoriteRecording = null;
 
     // Dialog state
@@ -146,16 +149,21 @@ class DashboardApp extends LitElement {
   }
 
   handleKeyDown(e) {
-    if (e.key === 'Escape' && this.actionFeedbackVisible) {
-      e.preventDefault();
-      e.stopPropagation?.();
-      this.querySelector('jk-action-feedback')?.cancel();
+    const continuesLastUsedCycle =
+      e.key === '-' && this.actionManager.activeType === 'launch';
+
+    this.cancelPendingAction();
+
+    if (!continuesLastUsedCycle) {
       this.lastUsedCycleIndex = 0;
-      this.resetInput(true);
-      return;
     }
 
-    handleGlobalKeyDown(e, this);
+    this.continueLastUsedCycle = continuesLastUsedCycle;
+    try {
+      handleGlobalKeyDown(e, this);
+    } finally {
+      this.continueLastUsedCycle = false;
+    }
   }
   handleThemeChange(e) {
     this.theme = saveTheme(e.detail.theme);
@@ -250,27 +258,66 @@ class DashboardApp extends LitElement {
     window.removeEventListener('keydown', this.handleKeyDown);
     window.removeEventListener('popstate', this.handlePopState);
     clearTimeout(this.resetTimeout);
+    this.cancelPendingAction();
   }
 
   // --------------------------------------------------
   // Core Actions & State
   // --------------------------------------------------
 
-  resetInput(updateHistory = true) {
-    this.activeCategoryKey = '';
+  cancelInputResetTimer() {
+    clearTimeout(this.resetTimeout);
+    this.resetTimeout = null;
+  }
+
+  cancelPendingAction() {
+    return this.actionManager.cancel();
+  }
+
+  enterUiMode() {
+    this.cancelInputResetTimer();
+    this.cancelPendingAction();
+    this.resetKeyboardInput();
+  }
+
+  resetKeyboardInput() {
     this.currentInput = '';
     this.isInvalidInput = false;
     this.isValidInput = false;
+  }
+
+  resetNavigationInput(updateHistory = true) {
+    this.cancelInputResetTimer();
+    this.activeCategoryKey = '';
+    this.resetKeyboardInput();
+
+    if (updateHistory && window.history.state?.view === 'category') {
+      window.history.back();
+    }
+  }
+
+  closeSearch(updateHistory = true) {
     this.showSearch = false;
-    this.showHelp = false;
     this.searchQuery = '';
     this.selectedIndex = 0;
 
-    if (updateHistory) {
-      const state = window.history.state;
-      if (state?.view === 'category' || state?.view === 'search') {
-        window.history.back();
-      }
+    if (updateHistory && window.history.state?.view === 'search') {
+      window.history.back();
+    }
+  }
+
+  resetInput(updateHistory = true) {
+    const state = window.history.state;
+
+    this.cancelPendingAction();
+    this.cancelInputResetTimer();
+    this.activeCategoryKey = '';
+    this.resetKeyboardInput();
+    this.closeSearch(false);
+    this.showHelp = false;
+
+    if (updateHistory && (state?.view === 'category' || state?.view === 'search')) {
+      window.history.back();
     }
   }
 
@@ -281,8 +328,19 @@ class DashboardApp extends LitElement {
   }
 
   startResetTimer(duration = 3000) {
-    clearTimeout(this.resetTimeout);
-    this.resetTimeout = setTimeout(() => this.resetInput(), duration);
+    this.cancelInputResetTimer();
+    this.resetTimeout = setTimeout(() => {
+      this.resetTimeout = null;
+      this.resetNavigationInput(true);
+    }, duration);
+  }
+
+  startPendingLaunch() {
+    const feedback = this.querySelector('jk-action-feedback');
+    return this.actionManager.start({
+      type: 'launch',
+      cancel: () => feedback?.cancel(),
+    });
   }
 
   async trackClick(service, options = {}) {
@@ -292,6 +350,10 @@ class DashboardApp extends LitElement {
       openInSameTab = false,
       keyboardFeedback = !this.showSearch,
     } = options;
+
+    this.cancelInputResetTimer();
+
+    const action = keyboardFeedback ? this.startPendingLaunch() : null;
 
     if (keyboardFeedback) {
       if (shortcutLabel) {
@@ -306,11 +368,23 @@ class DashboardApp extends LitElement {
       this.isInvalidInput = false;
 
       const shouldLaunch = await this.showActionFeedback(service);
+
+      if (!this.actionManager.isActive(action)) return;
+
+      this.actionManager.complete(action);
       if (!shouldLaunch) return;
     }
 
     if (updateContinue) {
       this.rememberContinueService(service);
+    }
+
+    // Complete the active interaction synchronously before navigation.
+    // No pending input timer may change an unrelated UI state afterwards.
+    if (this.showSearch) {
+      this.closeSearch(true);
+    } else if (keyboardFeedback) {
+      this.resetNavigationInput(true);
     }
 
     if (openInSameTab) {
@@ -319,10 +393,6 @@ class DashboardApp extends LitElement {
     }
 
     window.open(service.url, '_blank');
-
-    if (keyboardFeedback) {
-      setTimeout(() => this.resetInput(true), 100);
-    }
   }
 
   showActionFeedback(service) {
@@ -368,22 +438,17 @@ class DashboardApp extends LitElement {
     const services = getContinueServices(this.categories, this.continueHistory);
     if (!services.length) return;
 
-    if (this.actionFeedbackVisible) {
+    if (this.continueLastUsedCycle) {
       this.lastUsedCycleIndex = (this.lastUsedCycleIndex + 1) % services.length;
     } else {
       this.lastUsedCycleIndex = 0;
     }
+    this.continueLastUsedCycle = false;
 
-    const service = services[this.lastUsedCycleIndex];
-
-    await this.trackClick(service, {
+    await this.trackClick(services[this.lastUsedCycleIndex], {
       updateContinue: false,
       shortcutLabel: '-',
     });
-
-    if (!this.actionFeedbackVisible) {
-      this.lastUsedCycleIndex = 0;
-    }
   }
 
   handlePopState(e) {
@@ -416,6 +481,8 @@ class DashboardApp extends LitElement {
   // --------------------------------------------------
 
   openSearch() {
+    this.enterUiMode();
+
     this.showHelp = false;
     this.showSearch = true;
     this.selectedIndex = 0;
@@ -424,6 +491,25 @@ class DashboardApp extends LitElement {
       window.history.pushState({ view: 'search' }, '');
     }
     setTimeout(() => this.searchInput?.focus(), 100);
+  }
+
+  openHelp() {
+    this.enterUiMode();
+    this.showSearch = false;
+    this.showHelp = true;
+  }
+
+  openConfig() {
+    this.enterUiMode();
+    this.showSearch = false;
+    this.showHelp = false;
+    this.showConfigModal = true;
+  }
+
+  openMobileMenu() {
+    this.enterUiMode();
+    this.mobileMenuMode = 'menu';
+    this.showMobileMenu = true;
   }
 
   // --------------------------------------------------
@@ -590,7 +676,7 @@ class DashboardApp extends LitElement {
         @open-help=${() => {
           this.showMobileMenu = false;
           this.mobileMenuMode = 'menu';
-          this.showHelp = true;
+          this.openHelp();
         }}
         @open-themes=${() => (this.mobileMenuMode = 'themes')}
         @theme-change=${this.handleMobileThemeChange}
@@ -722,15 +808,14 @@ class DashboardApp extends LitElement {
         .lang=${this.lang}
         .t=${this.t}
         @open-help=${() => {
-          this.showHelp = true;
+          this.openHelp();
         }}
         @open-search=${this.openSearch}
         @open-config=${() => {
-          this.showConfigModal = true;
+          this.openConfig();
         }}
         @open-mobile-menu=${() => {
-          this.mobileMenuMode = 'menu';
-          this.showMobileMenu = true;
+          this.openMobileMenu();
         }}
         @toggle-view=${this.toggleViewMode}
       ></jk-dashboard-header>
