@@ -104,7 +104,7 @@ class DashboardApp extends LitElement {
     // User Data & Search
     this.favorites = readJsonStorage(STORAGE_KEYS.favorites, {});
     this.continueHistory = readJsonStorage(STORAGE_KEYS.continueHistory, []);
-    this.continueToggleIndex = 1;
+    this.lastUsedCycleIndex = 0;
     this.searchQuery = '';
     this.lang = detectLang();
     this.theme = loadTheme();
@@ -150,6 +150,7 @@ class DashboardApp extends LitElement {
       e.preventDefault();
       e.stopPropagation?.();
       this.querySelector('jk-action-feedback')?.cancel();
+      this.lastUsedCycleIndex = 0;
       this.resetInput(true);
       return;
     }
@@ -349,7 +350,7 @@ class DashboardApp extends LitElement {
       ...this.continueHistory.filter((name) => name !== service.name),
     ].slice(0, 10);
 
-    this.continueToggleIndex = 1;
+    this.lastUsedCycleIndex = 0;
     writeJsonStorage(STORAGE_KEYS.continueHistory, this.continueHistory);
   }
 
@@ -363,17 +364,26 @@ class DashboardApp extends LitElement {
     });
   }
 
-  toggleLastService() {
-    const services = getContinueServices(this.categories, this.continueHistory).slice(0, 2);
-    if (services.length < 2) return;
+  async toggleLastService() {
+    const services = getContinueServices(this.categories, this.continueHistory);
+    if (!services.length) return;
 
-    const service = services[this.continueToggleIndex];
-    this.continueToggleIndex = this.continueToggleIndex === 0 ? 1 : 0;
+    if (this.actionFeedbackVisible) {
+      this.lastUsedCycleIndex = (this.lastUsedCycleIndex + 1) % services.length;
+    } else {
+      this.lastUsedCycleIndex = 0;
+    }
 
-    this.trackClick(service, {
+    const service = services[this.lastUsedCycleIndex];
+
+    await this.trackClick(service, {
       updateContinue: false,
       shortcutLabel: '-',
     });
+
+    if (!this.actionFeedbackVisible) {
+      this.lastUsedCycleIndex = 0;
+    }
   }
 
   handlePopState(e) {
@@ -460,7 +470,7 @@ class DashboardApp extends LitElement {
       cancelLabel: this.t('cancel'),
       onConfirm: () => {
         this.continueHistory = [];
-        this.continueToggleIndex = 1;
+        this.lastUsedCycleIndex = 0;
         localStorage.removeItem(STORAGE_KEYS.continueHistory);
         this.requestUpdate();
       },
@@ -475,7 +485,7 @@ class DashboardApp extends LitElement {
     if (nextHistory.length === this.continueHistory.length) return;
 
     this.continueHistory = nextHistory;
-    this.continueToggleIndex = 1;
+    this.lastUsedCycleIndex = 0;
     writeJsonStorage(STORAGE_KEYS.continueHistory, this.continueHistory);
     this.showToast(`"${service.name}" ${this.t('continueRemoved')}`, 'success');
     this.requestUpdate();
