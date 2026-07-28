@@ -60,13 +60,39 @@ export function getAllServicesFlat(categories) {
   );
 }
 
+function getSearchRank(value, query) {
+  if (value === query) return 0;
+  if (value.startsWith(query)) return 1;
+  if (value.split(/[^a-z0-9]+/).some((word) => word.startsWith(query))) return 2;
+  if (value.includes(query)) return 3;
+  return null;
+}
+
 export function getFilteredServices(categories, searchQuery) {
-  if (!searchQuery) return [];
-  const q = searchQuery.toLowerCase();
-  return getAllServicesFlat(categories).filter(
-    (s) =>
-      s.name.toLowerCase().includes(q) || s.category.toLowerCase().includes(q)
-  );
+  const query = searchQuery.trim().toLowerCase();
+  if (!query) return [];
+
+  return getAllServicesFlat(categories)
+    .map((service, index) => {
+      const nameRank = getSearchRank(service.name.toLowerCase(), query);
+      const categoryRank = getSearchRank(service.category.toLowerCase(), query);
+
+      if (nameRank === null && categoryRank === null) return null;
+
+      return {
+        service,
+        index,
+        rank: nameRank ?? categoryRank + 4,
+      };
+    })
+    .filter(Boolean)
+    .sort(
+      (a, b) =>
+        a.rank - b.rank ||
+        a.service.name.length - b.service.name.length ||
+        a.index - b.index
+    )
+    .map(({ service }) => service);
 }
 
 export function getFavorites(categories, favorites) {
