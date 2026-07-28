@@ -29,8 +29,6 @@ COPY --from=builder /etc/passwd /etc/passwd
 
 COPY --from=builder /jump-key-server /jump-key-server
 
-USER 10001
-
 EXPOSE 8080
 
 ENTRYPOINT ["/jump-key-server"]

@@ -169,13 +169,14 @@ export class JkConfigModal extends LitElement {
 
   _handleSave() {
     try {
-      const parsedJson = JSON.parse(this._editorValue);
+      const newConfig = JSON.parse(this._editorValue);
+      const previousConfig = JSON.parse(this._originalConfigString);
 
-      localStorage.setItem('services-cache', JSON.stringify(parsedJson));
+      localStorage.setItem('services-cache', JSON.stringify(newConfig));
 
       this.dispatchEvent(
         new CustomEvent('save', {
-          detail: { newConfig: parsedJson },
+          detail: { newConfig, previousConfig },
           bubbles: true,
           composed: true,
         })
