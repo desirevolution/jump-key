@@ -1,7 +1,6 @@
 services:
   jump-key:
-    #image: ghcr.io/desirevolution/jump-key:latest
-    image: test:latest
+    image: ghcr.io/desirevolution/jump-key:latest
     volumes:
       - ./config:/app/config
       - ./icons:/app/icons
