@@ -7,6 +7,8 @@ RUN npm run build
 
 FROM golang:1.26-alpine AS builder
 
+RUN apk add --no-cache ca-certificates tzdata
+
 WORKDIR /app
 
 COPY go.mod ./
@@ -19,15 +21,16 @@ RUN CGO_ENABLED=0 go build \
     -o /jump-key-server \
     .
 
-FROM alpine:3.24
+FROM scratch
 
-RUN addgroup -S jumpkey \
-    && adduser -S -G jumpkey jumpkey
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=builder /etc/passwd /etc/passwd
 
-COPY --from=builder /jump-key-server /usr/local/bin/jump-key-server
+COPY --from=builder /jump-key-server /jump-key-server
 
-USER jumpkey
+USER 10001
 
 EXPOSE 8080
 
-ENTRYPOINT ["/usr/local/bin/jump-key-server"]
+ENTRYPOINT ["/jump-key-server"]
