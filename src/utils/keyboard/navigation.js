@@ -60,9 +60,7 @@ function handleCategoryNavigation(key, app) {
   // Baut den String sauber als "KAT → SERVICE" auf (ohne doppelte Pfeile)
   app.currentInput = `${app.activeCategoryKey.toUpperCase()} → ${key.toUpperCase()}`;
 
-  const category = app.categories.find(
-    (cat) => cat.categoryKey === app.activeCategoryKey
-  );
+  const category = app.categories.find((cat) => cat.categoryKey === app.activeCategoryKey);
 
   const service = category?.services?.find((service) => service.key === key);
 

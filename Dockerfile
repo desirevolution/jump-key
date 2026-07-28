@@ -5,26 +5,32 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM caddy:2-builder AS caddy-builder
-RUN xcaddy build \
-    --with github.com/mholt/caddy-webdav
-
-FROM alpine:3.24
-
-WORKDIR /app
+FROM golang:1.26-alpine AS builder
 
 RUN apk add --no-cache ca-certificates tzdata
 
-RUN addgroup -S -g 1000 caddy && \
-    adduser -S -u 1000 -G caddy caddy
+WORKDIR /app
 
-COPY --from=caddy-builder /usr/bin/caddy /usr/bin/caddy
+COPY go.mod ./
+COPY main.go ./
+COPY --from=node-builder /app/dist/ ./dist/
 
-COPY --from=node-builder --chown=caddy:caddy /app/dist/ /app/
+RUN CGO_ENABLED=0 go build \
+    -trimpath \
+    -ldflags="-s -w" \
+    -o /jump-key-server \
+    .
 
-COPY --chown=caddy:caddy Caddyfile /etc/caddy/Caddyfile
+FROM scratch
 
-USER caddy
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=builder /etc/passwd /etc/passwd
+
+COPY --from=builder /jump-key-server /jump-key-server
+
 EXPOSE 8080
 
-CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
+ENTRYPOINT ["/jump-key-server"]
+
+CMD [ "--host=0.0.0.0",  "--port=8080", "--config-dir=/app/config", "--icons-dir=/app/icons" ]

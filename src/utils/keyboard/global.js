@@ -9,10 +9,7 @@
  *   - navigation.js
  */
 
-import {
-  handleFavoriteRecordingInput,
-  handleFavoriteShortcut,
-} from './favorites.js';
+import { handleFavoriteRecordingInput, handleFavoriteShortcut } from './favorites.js';
 
 import { handleSearchKeyDown } from './search.js';
 
@@ -24,7 +21,6 @@ function getDigitFromEvent(e) {
 }
 
 export function handleGlobalKeyDown(e, app) {
-
   /*
    * Ctrl + Zahl
    *

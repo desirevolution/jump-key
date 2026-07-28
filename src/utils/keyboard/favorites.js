@@ -32,10 +32,7 @@ export function handleFavoriteShortcut(slot, app) {
  * Favorit löschen
  */
 function requestFavoriteDelete(slot, app) {
-  app.showToast(
-    `"${app.favorites[slot]}" ${app.t('favRemoved', { slot })}`,
-    'info'
-  );
+  app.showToast(`"${app.favorites[slot]}" ${app.t('favRemoved', { slot })}`, 'info');
 
   const { [slot]: _removed, ...remainingFavorites } = app.favorites;
   app.favorites = remainingFavorites;
@@ -118,9 +115,7 @@ function handleFavoriteCategory(key, recording, app) {
  * Service auswählen
  */
 function handleFavoriteService(key, recording, app) {
-  const category = app.categories.find(
-    (cat) => cat.categoryKey === recording.categoryKey
-  );
+  const category = app.categories.find((cat) => cat.categoryKey === recording.categoryKey);
 
   const service = category?.services?.find((service) => service.key === key);
 

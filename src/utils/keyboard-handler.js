@@ -100,10 +100,7 @@ function handleFavoriteShortcut(slot, app) {
     app.startResetTimer(1000);
 
     // Toast als Bestätigung
-    app.showToast(
-      `"${serviceName}" ${app.t('favRemoved', { slot })}`,
-      'success'
-    );
+    app.showToast(`"${serviceName}" ${app.t('favRemoved', { slot })}`, 'success');
     app.requestUpdate();
     return;
   }
@@ -148,10 +145,7 @@ function handleFavoriteRecordingInput(key, app) {
       app.isValidInput = true;
       app.currentInput = `${rec.slot} → ${rec.categoryKey.toUpperCase()} → ${key.toUpperCase()}`;
 
-      app.showToast(
-        `"${service.name}" ${app.t('favSaved', { slot: rec.slot })}`,
-        'success'
-      );
+      app.showToast(`"${service.name}" ${app.t('favSaved', { slot: rec.slot })}`, 'success');
 
       app.favoriteRecording = null;
       app.startResetTimer(1000);
@@ -185,9 +179,7 @@ function handleSearchKeyDown(e, app) {
     if (firstSpaceIndex !== -1) {
       const prefix = commandString.substring(0, firstSpaceIndex).toLowerCase();
       searchTermsPreview = commandString.substring(firstSpaceIndex + 1);
-      matchedEngine = app.searchEngines.find(
-        (eng) => eng.prefix.toLowerCase() === prefix
-      );
+      matchedEngine = app.searchEngines.find((eng) => eng.prefix.toLowerCase() === prefix);
       if (matchedEngine) showPreviewBlock = true;
     } else {
       isFilteringEngines = true;
@@ -266,9 +258,7 @@ function handleSearchKeyDown(e, app) {
 function handleNavigationKeyDown(key, app) {
   if (!app.activeCategoryKey) {
     if (/^[0-9]$/.test(key)) {
-      const favService = getFavorites(app.categories, app.favorites).find(
-        (s) => s.key === key
-      );
+      const favService = getFavorites(app.categories, app.favorites).find((s) => s.key === key);
       if (favService) {
         app.currentInput = `${key} → ${favService.name.toUpperCase()}`;
         app.trackClick(favService, true);
@@ -291,9 +281,7 @@ function handleNavigationKeyDown(key, app) {
   }
 
   app.currentInput += ` → ${key.toUpperCase()}`;
-  const cat = app.categories.find(
-    (c) => c.categoryKey === app.activeCategoryKey
-  );
+  const cat = app.categories.find((c) => c.categoryKey === app.activeCategoryKey);
   const service = cat?.services?.find((s) => s.key === key);
 
   if (service) {

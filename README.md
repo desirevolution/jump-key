@@ -1,6 +1,3 @@
-
-
-
 <p align="center">
   <img src="./public/jump-key.png" alt="logo" width="80" height="80" />
 </p>
@@ -8,7 +5,6 @@
 <h1 align="center">JumpKey</h1>
 
 #### JumpKey — A minimalist, keyboard-driven local first PWA startpage for your services.
-
 
 <p align="center">
   <img src="screenshots/screenshot_1.png?v=3" alt="Grid dashboard">
@@ -59,20 +55,21 @@ https://github.com/user-attachments/assets/b2c4290e-f371-44eb-b47c-44d5a73de379
 </p>
 
 ## Keyboard Shortcuts
-| Shortcut | Action |
-|----------|--------|
-| `A-Z` | Select a category |
-| `A-Z` → `A-Z` | Launch a service from the selected category |
-| `1-0` | Open a favorite |
-| `Shift + 1-0` | Open a recent service |
-| `-` | Cycle through recently used services (press `-` again before launch to select the next one) |
-| `Space` | Open search |
-| `#` | Toggle between grouped and grid view |
-| `Esc` | Cancel the current input or pending launch |
-| `Shift + Click` / `Shift + Enter` | Open in the current tab |
-| `Ctrl + 1-0` | Assign a favorite to a slot |
-| `Ctrl + ,` | Open configuration |
-| `?` | Show keyboard help |
+
+| Shortcut                          | Action                                                                                      |
+| --------------------------------- | ------------------------------------------------------------------------------------------- |
+| `A-Z`                             | Select a category                                                                           |
+| `A-Z` → `A-Z`                     | Launch a service from the selected category                                                 |
+| `1-0`                             | Open a favorite                                                                             |
+| `Shift + 1-0`                     | Open a recent service                                                                       |
+| `-`                               | Cycle through recently used services (press `-` again before launch to select the next one) |
+| `Space`                           | Open search                                                                                 |
+| `#`                               | Toggle between grouped and grid view                                                        |
+| `Esc`                             | Cancel the current input or pending launch                                                  |
+| `Shift + Click` / `Shift + Enter` | Open in the current tab                                                                     |
+| `Ctrl + 1-0`                      | Assign a favorite to a slot                                                                 |
+| `Ctrl + ,`                        | Open configuration                                                                          |
+| `?`                               | Show keyboard help                                                                          |
 
 ## Quick Start
 
@@ -164,6 +161,7 @@ The application is configured through the `config/services.json` file.
   ]
 }
 ```
+
 ## Security Notice
 
 JumpKey is intended for trusted environments only. It is designed to run on a local network or behind an authentication proxy such as Authelia, Authentik, or a similar SSO solution.
@@ -173,16 +171,15 @@ Therefore, I don't plan to spend extra effort hardening it for Internet-facing d
 
 Remote-User header if detected is used as a part of the expected local config name:
 
-"Remote-User" header | expected config file | (automatic) backup file 
----|---|---
-not set | services.json | services.backup-2026-07-25T06-54-03-332Z.json
-arthur | services.arthur.json | services.arthur.backup-2026-07-25T06-54-03-332Z.json
+| "Remote-User" header | expected config file | (automatic) backup file                              |
+| -------------------- | -------------------- | ---------------------------------------------------- |
+| not set              | services.json        | services.backup-2026-07-25T06-54-03-332Z.json        |
+| arthur               | services.arthur.json | services.arthur.backup-2026-07-25T06-54-03-332Z.json |
 
 ## Ideas/Todos
 
 - **Workspaces**: Work/private separation. (functional)
 - **Standalone server**: golang wrapper server, replaces the caddy setup. (technical)
-
 
 ## Disclaimer
 

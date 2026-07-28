@@ -149,8 +149,7 @@ class DashboardApp extends LitElement {
   }
 
   handleKeyDown(e) {
-    const continuesLastUsedCycle =
-      e.key === '-' && this.actionManager.activeType === 'launch';
+    const continuesLastUsedCycle = e.key === '-' && this.actionManager.activeType === 'launch';
 
     this.cancelPendingAction();
 
@@ -175,18 +174,14 @@ class DashboardApp extends LitElement {
     this.showToast(this.t('themeChanged', { theme: this.t(selectedTheme.nameKey) }), 'info');
   }
 
-
   async saveConfiguration(updatedConfig) {
     try {
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const backupResponse = await fetch(
-        `/config/services.backup-${timestamp}.json`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(updatedConfig, null, 2),
-        }
-      );
+      const backupResponse = await fetch(`/config/services.backup-${timestamp}.json`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updatedConfig, null, 2),
+      });
 
       if (!backupResponse.ok) {
         throw new Error('Failed to create configuration backup.');
@@ -544,7 +539,6 @@ class DashboardApp extends LitElement {
     };
   }
 
-
   clearContinue() {
     this.dialogConfig = {
       show: true,
@@ -563,7 +557,6 @@ class DashboardApp extends LitElement {
     };
   }
 
-
   removeContinueService(service) {
     if (!service?.name) return;
 
@@ -578,9 +571,7 @@ class DashboardApp extends LitElement {
   }
 
   handleServiceLongPress(service) {
-    const existingSlot = FAVORITE_SLOTS.find(
-      (slot) => this.favorites[slot] === service.name
-    );
+    const existingSlot = FAVORITE_SLOTS.find((slot) => this.favorites[slot] === service.name);
 
     if (existingSlot) {
       this.handleDeleteFavoriteSlot(existingSlot);
@@ -598,10 +589,7 @@ class DashboardApp extends LitElement {
 
     this.resetInput(true);
 
-    this.showToast(
-      `"${service.name}" ${this.t('favSaved', { slot: freeSlot })}`,
-      'success'
-    );
+    this.showToast(`"${service.name}" ${this.t('favSaved', { slot: freeSlot })}`, 'success');
     this.requestUpdate();
   }
 
@@ -626,10 +614,7 @@ class DashboardApp extends LitElement {
     this.favorites = remainingFavorites;
     writeJsonStorage(STORAGE_KEYS.favorites, this.favorites);
 
-    this.showToast(
-      `"${serviceName}" ${this.t('favRemoved', { slot })}`,
-      'success'
-    );
+    this.showToast(`"${serviceName}" ${this.t('favRemoved', { slot })}`, 'success');
 
     this.resetInput(false);
     this.requestUpdate();
@@ -659,7 +644,6 @@ class DashboardApp extends LitElement {
       ></jk-config-modal>
     `;
   }
-
 
   templateMobileMenu() {
     return html`
@@ -775,24 +759,15 @@ class DashboardApp extends LitElement {
   render() {
     const favs = getFavorites(this.categories, this.favorites);
     const continueServices = getContinueServices(this.categories, this.continueHistory);
-    const categoriesWithFavorites = addFavoriteSlots(
-      this.categories,
-      this.favorites
-    );
-    const filteredServices = getFilteredServices(
-      this.categories,
-      this.searchQuery
-    );
+    const categoriesWithFavorites = addFavoriteSlots(this.categories, this.favorites);
+    const filteredServices = getFilteredServices(this.categories, this.searchQuery);
     const showMain =
-      !this.activeCategoryKey &&
-      !this.showSearch &&
-      !this.showHelp &&
-      !this.showConfigModal;
+      !this.activeCategoryKey && !this.showSearch && !this.showHelp && !this.showConfigModal;
 
     return html`
       ${this.templateKeyBadge()} ${this.templateActionFeedback()} ${this.templateHelpModal()}
-      ${this.templateSearchModal(filteredServices)}
-      ${this.templateConfigModal()} ${this.templateMobileMenu()} ${this.templateDialog()}
+      ${this.templateSearchModal(filteredServices)} ${this.templateConfigModal()}
+      ${this.templateMobileMenu()} ${this.templateDialog()}
 
       <jk-toast
         .show=${this.toastConfig.show}

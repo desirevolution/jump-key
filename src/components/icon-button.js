@@ -31,9 +31,7 @@ export class JkIconButton extends LitElement {
     const isTextVariant = this.variant === 'text';
 
     // Sichtbarkeit Mobile/Desktop
-    const visibilityClasses = this.desktopOnly
-      ? 'hidden md:inline-flex'
-      : 'inline-flex';
+    const visibilityClasses = this.desktopOnly ? 'hidden md:inline-flex' : 'inline-flex';
 
     // Varianten-Klassen
     // Wichtig: Kein inline-flex hier, damit visibilityClasses die Kontrolle behält

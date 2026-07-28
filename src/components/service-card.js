@@ -98,11 +98,7 @@ export class JkServiceCard extends LitElement {
   }
 
   _handlePointerMove(event) {
-    if (
-      event.pointerId !== this._pointerId ||
-      !this._pointerStart ||
-      this.isReady
-    ) {
+    if (event.pointerId !== this._pointerId || !this._pointerStart || this.isReady) {
       return;
     }
 
@@ -221,9 +217,7 @@ export class JkServiceCard extends LitElement {
   _getCardClasses() {
     if (this.isReady) return styles.cardReady;
     if (this.isPressing) return styles.cardPressing;
-    return `${styles.cardDefault} ${
-      this.isFavorite ? 'jk-favorite-card' : ''
-    }`;
+    return `${styles.cardDefault} ${this.isFavorite ? 'jk-favorite-card' : ''}`;
   }
 
   _getIconClasses() {
@@ -263,9 +257,7 @@ export class JkServiceCard extends LitElement {
   }
 
   render() {
-    const isUrl =
-      this.subtitle &&
-      (this.subtitle.includes('.') || this.subtitle.includes('/'));
+    const isUrl = this.subtitle && (this.subtitle.includes('.') || this.subtitle.includes('/'));
 
     const displaySubtitle = isUrl
       ? this.subtitle.replace(/^https?:\/\/(www\.)?/, '')
@@ -286,9 +278,7 @@ export class JkServiceCard extends LitElement {
       >
         ${this._renderAccent()}
 
-        <div
-          class="${styles.glow} ${this.isPressing || this.isReady ? 'opacity-100' : ''}"
-        ></div>
+        <div class="${styles.glow} ${this.isPressing || this.isReady ? 'opacity-100' : ''}"></div>
 
         <div class="${styles.iconContainer} ${this._getIconClasses()}">
           <jk-icon .icon=${this.icon} class=${styles.icon}></jk-icon>
@@ -311,11 +301,7 @@ export class JkServiceCard extends LitElement {
                   ${
                     this.favoriteSlot
                       ? html`
-                          <span
-                            class=${styles.favoriteMobile}
-                            aria-label="Favorit"
-                            title="Favorit"
-                          >
+                          <span class=${styles.favoriteMobile} aria-label="Favorit" title="Favorit">
                             <jk-icon icon="star" class="size-4"></jk-icon>
                           </span>
                           <kbd

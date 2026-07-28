@@ -54,21 +54,14 @@ export class JkServiceGroup extends LitElement {
       <section class="${styles.section}">
         <div class="${styles.header}">
           <div class="${styles.iconContainer}">
-            <jk-icon
-              .icon=${this.icon || 'folder'}
-              class="${styles.icon}"
-            ></jk-icon>
+            <jk-icon .icon=${this.icon || 'folder'} class="${styles.icon}"></jk-icon>
           </div>
 
           <div class="${styles.titleWrapper}">
             <h2 class="${styles.title}">${this.title}</h2>
             ${
               this.badgeText
-                ? html`
-                    <kbd class="${styles.badge}">
-                      ${this.badgeText.toUpperCase()}
-                    </kbd>
-                  `
+                ? html` <kbd class="${styles.badge}"> ${this.badgeText.toUpperCase()} </kbd> `
                 : ''
             }
           </div>

@@ -1,10 +1,8 @@
 export function validateConfig(jsonObj) {
   if (!jsonObj || typeof jsonObj !== 'object') return false;
 
-  const hasCategories =
-    Array.isArray(jsonObj.categories) && jsonObj.categories.length > 0;
-  const hasSearchEngines =
-    Array.isArray(jsonObj.searchEngines) && jsonObj.searchEngines.length > 0;
+  const hasCategories = Array.isArray(jsonObj.categories) && jsonObj.categories.length > 0;
+  const hasSearchEngines = Array.isArray(jsonObj.searchEngines) && jsonObj.searchEngines.length > 0;
 
   if (!hasCategories || !hasSearchEngines) return false;
 

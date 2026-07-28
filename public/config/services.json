@@ -1,13 +1,25 @@
-[
-  {
-    "category": "Web",
-    "icon": "message-square",
-    "services": [
-      {
-        "name": "JumpKey",
-        "url": "https://github.com/desirevolution/jump-key",
-        "icon": "house"
-      }
-    ]
-  }
-]
+{
+  "categories": [
+    {
+      "category": "web",
+      "categoryKey": "w",
+      "icon": "message-square",
+      "services": [
+        {
+          "name": "JumpKey",
+          "url": "https://github.com/desirevolution/jump-key",
+          "icon": "house",
+          "key": "j"
+        }
+      ]
+    }
+  ],
+  "searchEngines": [
+    {
+      "prefix": "g",
+      "name": "Google",
+      "url": "https://www.google.com/search?q=%s",
+      "icon": "https://cdn.simpleicons.org/google"
+    }
+  ]
+}

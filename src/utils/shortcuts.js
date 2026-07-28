@@ -2,25 +2,11 @@ const ALPHABET = [...'abcdefghijklmnopqrstuvwxyz'];
 
 export const FAVORITE_SLOTS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 export const CONTINUE_SLOTS = FAVORITE_SLOTS;
-const RESERVED_KEYS = new Set([
-  'space',
-  '0',
-  '1',
-  '2',
-  '3',
-  '4',
-  '5',
-  '6',
-  '7',
-  '8',
-  '9',
-  '?',
-]);
+const RESERVED_KEYS = new Set(['space', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '?']);
 
 function pickKey(preferredChars, usedKeys) {
   return (
-    [...preferredChars].find((c) => !usedKeys.has(c)) ??
-    ALPHABET.find((c) => !usedKeys.has(c))
+    [...preferredChars].find((c) => !usedKeys.has(c)) ?? ALPHABET.find((c) => !usedKeys.has(c))
   );
 }
 
@@ -88,9 +74,7 @@ export function getFilteredServices(categories, searchQuery) {
     .filter(Boolean)
     .sort(
       (a, b) =>
-        a.rank - b.rank ||
-        a.service.name.length - b.service.name.length ||
-        a.index - b.index
+        a.rank - b.rank || a.service.name.length - b.service.name.length || a.index - b.index
     )
     .map(({ service }) => service);
 }
@@ -131,7 +115,6 @@ export function addFavoriteSlots(categories, favorites) {
 export function getFavoriteService(categories, favorites, slot) {
   return getFavorites(categories, favorites).find((service) => service.favSlot === slot) ?? null;
 }
-
 
 export function getContinueServices(categories, continueHistory) {
   const allServices = getAllServicesFlat(categories);
