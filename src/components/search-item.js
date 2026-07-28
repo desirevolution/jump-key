@@ -63,10 +63,7 @@ export class JkDashboardSearchItem extends LitElement {
             this.data.icon
               ? html`
                   <div class="${styles.iconWrapper} ${iconActiveClasses}">
-                    <jk-icon
-                      .icon=${this.data.icon}
-                      class="${styles.icon}"
-                    ></jk-icon>
+                    <jk-icon .icon=${this.data.icon} class="${styles.icon}"></jk-icon>
                   </div>
                 `
               : ''
@@ -94,9 +91,7 @@ export class JkDashboardSearchItem extends LitElement {
         const terms = this.data.searchTerms?.trim() || '...';
         return html`
           <div class="min-w-0">
-            <div class="${styles.previewPrefix}">
-              ${this.t('searchEnginePreviewPrefix')}
-            </div>
+            <div class="${styles.previewPrefix}">${this.t('searchEnginePreviewPrefix')}</div>
             <div class="${styles.previewText}">
               <span class="font-semibold">${this.data.name}</span>
               <span class="${styles.previewTerms}">"${terms}"</span>
@@ -124,9 +119,7 @@ export class JkDashboardSearchItem extends LitElement {
         'border-indigo-500 bg-indigo-500/20 text-indigo-200': this.active,
         'border-slate-600 bg-slate-900/80 text-slate-300': !this.active,
       };
-      return html`
-        <kbd class="${classMap(kbdClasses)}"> :${this.data.prefix} </kbd>
-      `;
+      return html` <kbd class="${classMap(kbdClasses)}"> :${this.data.prefix} </kbd> `;
     }
 
     // Default "Enter" badge path for service/preview when focused

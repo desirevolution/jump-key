@@ -23,7 +23,9 @@ const styles = {
 };
 
 export class JkHelpModal extends LitElement {
-  createRenderRoot() { return this; }
+  createRenderRoot() {
+    return this;
+  }
 
   static properties = {
     show: { type: Boolean },
@@ -68,22 +70,26 @@ export class JkHelpModal extends LitElement {
       { keys: ['ESC'], desc: this.t('hkReset') }
     );
 
-    return shortcuts.map((item) => html`
-      <div class="${styles.row}">
-        <span class="${styles.rowDesc}">${item.desc}</span>
-        <div class="${styles.keysContainer}">
-          ${item.context ? html`<span class="${styles.contextBadge}">${this.t('contextInCat')}</span>` : ''}
-          ${item.keys.map((key) => html`<kbd class="${styles.kbd}">${key}</kbd>`)}
+    return shortcuts.map(
+      (item) => html`
+        <div class="${styles.row}">
+          <span class="${styles.rowDesc}">${item.desc}</span>
+          <div class="${styles.keysContainer}">
+            ${item.context ? html`<span class="${styles.contextBadge}">${this.t('contextInCat')}</span>` : ''}
+            ${item.keys.map((key) => html`<kbd class="${styles.kbd}">${key}</kbd>`)}
+          </div>
         </div>
-      </div>
-    `);
+      `
+    );
   }
 
   _renderActionRow(icon, label, desc) {
     return html`
       <div class="${styles.row}">
         <span class="${styles.rowDesc}">${desc}</span>
-        <span class="${styles.actionBadge}"><jk-icon icon="${icon}" class="${styles.actionIcon}"></jk-icon>${label}</span>
+        <span class="${styles.actionBadge}"
+          ><jk-icon icon="${icon}" class="${styles.actionIcon}"></jk-icon>${label}</span
+        >
       </div>
     `;
   }
@@ -93,16 +99,27 @@ export class JkHelpModal extends LitElement {
 
     return html`
       <div @click=${this._handleClose} class="${styles.overlay}">
-        <div @click=${(e) => e.stopPropagation()} class="${styles.modal}" role="dialog" aria-modal="true">
+        <div
+          @click=${(e) => e.stopPropagation()}
+          class="${styles.modal}"
+          role="dialog"
+          aria-modal="true"
+        >
           <div class="${styles.header}">
             <div class="${styles.headerLeft}">
-              <div class="${styles.iconBadge}"><jk-icon icon="circle-help" class="${styles.icon}"></jk-icon></div>
+              <div class="${styles.iconBadge}">
+                <jk-icon icon="circle-help" class="${styles.icon}"></jk-icon>
+              </div>
               <h3 class="${styles.title}">
                 <span class="hidden md:inline">${this.t('helpTitleDesktop')}</span>
                 <span class="md:hidden">${this.t('helpTitleMobile')}</span>
               </h3>
             </div>
-            <jk-icon-button icon="x" label="${this.t('close')}" @click=${this._handleClose}></jk-icon-button>
+            <jk-icon-button
+              icon="x"
+              label="${this.t('close')}"
+              @click=${this._handleClose}
+            ></jk-icon-button>
           </div>
 
           <div class="${styles.content}">

@@ -1,30 +1,26 @@
-FROM node:24-alpine AS node-builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-FROM caddy:2-builder AS caddy-builder
-RUN xcaddy build \
-    --with github.com/mholt/caddy-webdav
-
-FROM alpine:3.24
+FROM golang:1.26-alpine AS builder
 
 WORKDIR /app
 
-RUN apk add --no-cache ca-certificates tzdata
+COPY go.mod ./
+COPY main.go ./
+COPY dist ./dist
 
-RUN addgroup -S -g 1000 caddy && \
-    adduser -S -u 1000 -G caddy caddy
+RUN CGO_ENABLED=0 go build \
+    -trimpath \
+    -ldflags="-s -w" \
+    -o /jump-key-server \
+    .
 
-COPY --from=caddy-builder /usr/bin/caddy /usr/bin/caddy
+FROM alpine:3.22
 
-COPY --from=node-builder --chown=caddy:caddy /app/dist/ /app/
+RUN addgroup -S jumpkey \
+    && adduser -S -G jumpkey jumpkey
 
-COPY --chown=caddy:caddy Caddyfile /etc/caddy/Caddyfile
+COPY --from=builder /jump-key-server /usr/local/bin/jump-key-server
 
-USER caddy
+USER jumpkey
+
 EXPOSE 8080
 
-CMD ["caddy", "run", "--config", "/etc/caddy/Caddyfile", "--adapter", "caddyfile"]
+ENTRYPOINT ["/usr/local/bin/jump-key-server"]

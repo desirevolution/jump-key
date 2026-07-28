@@ -58,10 +58,7 @@ export class JkConfigData extends LitElement {
       );
     } catch (e) {
       console.error('Failed to export config', e);
-      this._sendNotification(
-        'error',
-        this.t('tabDataExportFailed') || 'Export failed.'
-      );
+      this._sendNotification('error', this.t('tabDataExportFailed') || 'Export failed.');
     }
   }
 
@@ -85,10 +82,7 @@ export class JkConfigData extends LitElement {
           );
           this._sendNotification('success', this.t('tabDataImportSuccess'));
         } else {
-          this._sendNotification(
-            'error',
-            this.t('tabDataImportInvalidStructure')
-          );
+          this._sendNotification('error', this.t('tabDataImportInvalidStructure'));
         }
       } catch (err) {
         this._sendNotification('error', this.t('tabDataImportJsonError'));
@@ -117,9 +111,7 @@ export class JkConfigData extends LitElement {
               <jk-icon icon="download" class="w-6 h-6"></jk-icon>
             </div>
             <div class="${styles.exportTextContainer}">
-              <h3 class="${styles.exportTitle}">
-                ${this.t('tabDataBackupTitle')}
-              </h3>
+              <h3 class="${styles.exportTitle}">${this.t('tabDataBackupTitle')}</h3>
               <p class="${styles.exportDesc}">${this.t('tabDataBackupDesc')}</p>
             </div>
             <button @click="${this._exportConfig}" class="${styles.exportBtn}">
@@ -135,12 +127,8 @@ export class JkConfigData extends LitElement {
               <jk-icon icon="upload" class="w-5 h-5"></jk-icon>
             </div>
             <div>
-              <h3 class="${styles.importTitle}">
-                ${this.t('tabDataRestoreTitle')}
-              </h3>
-              <p class="${styles.importDesc}">
-                ${this.t('tabDataRestoreDesc')}
-              </p>
+              <h3 class="${styles.importTitle}">${this.t('tabDataRestoreTitle')}</h3>
+              <p class="${styles.importDesc}">${this.t('tabDataRestoreDesc')}</p>
             </div>
           </div>
 
@@ -154,12 +142,8 @@ export class JkConfigData extends LitElement {
             <div class="${styles.dropZoneIconBox}">
               <jk-icon icon="file-json" class="w-7 h-7"></jk-icon>
             </div>
-            <span class="${styles.dropZoneLabel}"
-              >${this.t('tabDataSelectFile')}</span
-            >
-            <span class="${styles.dropZoneSubLabel}"
-              >${this.t('tabDataOnlyJsonFiles')}</span
-            >
+            <span class="${styles.dropZoneLabel}">${this.t('tabDataSelectFile')}</span>
+            <span class="${styles.dropZoneSubLabel}">${this.t('tabDataOnlyJsonFiles')}</span>
           </div>
         </section>
       </div>

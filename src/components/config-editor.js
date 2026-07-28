@@ -117,16 +117,9 @@ export class JkConfigEditor extends LitElement {
   }
 
   render() {
-    const stateClass = this.isValid
-      ? styles.containerValid
-      : styles.containerInvalid;
+    const stateClass = this.isValid ? styles.containerValid : styles.containerInvalid;
 
-    return html`
-      <div
-        id="editorContainer"
-        class="${styles.containerBase} ${stateClass}"
-      ></div>
-    `;
+    return html` <div id="editorContainer" class="${styles.containerBase} ${stateClass}"></div> `;
   }
 }
 

@@ -81,9 +81,7 @@ export class JkSearchModal extends LitElement {
   }
 
   _handleClose() {
-    this.dispatchEvent(
-      new CustomEvent('close', { bubbles: true, composed: true })
-    );
+    this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
   }
 
   _handleInput(e) {
@@ -139,9 +137,7 @@ export class JkSearchModal extends LitElement {
 
   _handleSubmit(e) {
     e.preventDefault();
-    this.dispatchEvent(
-      new CustomEvent('execute-submit', { bubbles: true, composed: true })
-    );
+    this.dispatchEvent(new CustomEvent('execute-submit', { bubbles: true, composed: true }));
   }
 
   _renderEngine(engine, active) {
@@ -204,13 +200,9 @@ export class JkSearchModal extends LitElement {
       const firstSpaceIndex = commandString.indexOf(' ');
 
       if (firstSpaceIndex !== -1) {
-        const prefix = commandString
-          .substring(0, firstSpaceIndex)
-          .toLowerCase();
+        const prefix = commandString.substring(0, firstSpaceIndex).toLowerCase();
         searchTermsPreview = commandString.substring(firstSpaceIndex + 1);
-        matchedEngine = this.searchEngines.find(
-          (e) => e.prefix.toLowerCase() === prefix
-        );
+        matchedEngine = this.searchEngines.find((e) => e.prefix.toLowerCase() === prefix);
         if (matchedEngine) showPreviewBlock = true;
       } else {
         isFilteringEngines = true;
@@ -239,8 +231,7 @@ export class JkSearchModal extends LitElement {
 
     if (showPreviewBlock) {
       items.push({
-        render: (active) =>
-          this._renderPreview(matchedEngine, searchTermsPreview, active),
+        render: (active) => this._renderPreview(matchedEngine, searchTermsPreview, active),
       });
     }
 
@@ -296,19 +287,13 @@ export class JkSearchModal extends LitElement {
                 : ''
             }
 
-            <jk-icon-button
-              icon="x"
-              title="Close"
-              @click=${this._handleClose}
-            ></jk-icon-button>
+            <jk-icon-button icon="x" title="Close" @click=${this._handleClose}></jk-icon-button>
           </div>
 
           <div id="searchResults" class="${styles.resultsContainer}">
             ${
               (showAllEngines || isFilteringEngines) && items.length > 0
-                ? html`<div class="${styles.engineHeader}">
-                    ${this.t('searchEnginesTitle')}
-                  </div>`
+                ? html`<div class="${styles.engineHeader}">${this.t('searchEnginesTitle')}</div>`
                 : ''
             }
             ${items.map((item, i) => item.render(i === this.selectedIndex))}
@@ -316,13 +301,8 @@ export class JkSearchModal extends LitElement {
               this.searchQuery && items.length === 0
                 ? html`
                     <div class="${styles.emptyState}">
-                      <jk-icon
-                        icon="search-x"
-                        class="${styles.emptyIcon}"
-                      ></jk-icon>
-                      <span class="${styles.emptyText}"
-                        >${this.t('noServices')}</span
-                      >
+                      <jk-icon icon="search-x" class="${styles.emptyIcon}"></jk-icon>
+                      <span class="${styles.emptyText}">${this.t('noServices')}</span>
                     </div>
                   `
                 : ''

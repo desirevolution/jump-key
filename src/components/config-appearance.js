@@ -22,7 +22,8 @@ const styles = {
   details: 'mt-3 flex items-start justify-between gap-3 px-1',
   name: 'font-medium text-slate-50',
   desc: 'mt-0.5 text-xs leading-relaxed text-slate-400',
-  check: 'mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-indigo-500 jk-on-accent',
+  check:
+    'mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full bg-indigo-500 jk-on-accent',
 };
 
 export class JkConfigAppearance extends LitElement {
@@ -70,23 +71,14 @@ export class JkConfigAppearance extends LitElement {
           class="${styles.preview}"
           style="background:${theme.preview.background};border-color:${previewBorder}"
         >
-          <div
-            class="${styles.previewFavorite}"
-            style="background:${theme.preview.favorite}"
-          ></div>
+          <div class="${styles.previewFavorite}" style="background:${theme.preview.favorite}"></div>
           <div
             class="${styles.previewSurface}"
             style="background:${theme.preview.surface};border-color:${previewBorder}"
           >
-            <div
-              class="${styles.previewAccent}"
-              style="background:${theme.preview.accent}"
-            ></div>
+            <div class="${styles.previewAccent}" style="background:${theme.preview.accent}"></div>
             <div class="${styles.previewLine}" style="background:${previewLine}"></div>
-            <div
-              class="${styles.previewLineShort}"
-              style="background:${previewLineShort}"
-            ></div>
+            <div class="${styles.previewLineShort}" style="background:${previewLineShort}"></div>
           </div>
         </div>
 
@@ -95,9 +87,13 @@ export class JkConfigAppearance extends LitElement {
             <div class="${styles.name}">${this.t(theme.nameKey)}</div>
             <div class="${styles.desc}">${this.t(theme.descriptionKey)}</div>
           </div>
-          ${active
-            ? html`<span class="${styles.check}"><jk-icon icon="check" class="size-4"></jk-icon></span>`
-            : ''}
+          ${
+            active
+              ? html`<span class="${styles.check}"
+                  ><jk-icon icon="check" class="size-4"></jk-icon
+                ></span>`
+              : ''
+          }
         </div>
       </button>
     `;

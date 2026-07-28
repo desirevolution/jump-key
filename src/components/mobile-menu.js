@@ -26,7 +26,9 @@ const styles = {
 };
 
 export class JkMobileMenu extends LitElement {
-  createRenderRoot() { return this; }
+  createRenderRoot() {
+    return this;
+  }
 
   static properties = {
     show: { type: Boolean },
@@ -55,7 +57,10 @@ export class JkMobileMenu extends LitElement {
         @click=${() => this._emit('theme-change', { theme: theme.id })}
       >
         ${active ? html`<span class="${styles.selected}"><jk-icon icon="check" class="size-3"></jk-icon></span>` : ''}
-        <div class="${styles.preview}" style="background:${theme.preview.background};border-color:${theme.preview.text}33">
+        <div
+          class="${styles.preview}"
+          style="background:${theme.preview.background};border-color:${theme.preview.text}33"
+        >
           <span class="${styles.previewDot}" style="background:${theme.preview.accent}"></span>
           <span class="${styles.previewLine}" style="background:${theme.preview.surface}"></span>
         </div>
@@ -73,33 +78,67 @@ export class JkMobileMenu extends LitElement {
         <section class="${styles.sheet}" @click=${(e) => e.stopPropagation()}>
           <div class="${styles.header}">
             <div class="flex items-center gap-2">
-              ${this.mode === 'themes' ? html`
-                <jk-icon-button icon="arrow-left" label="${this.t('back')}" @click=${() => this._emit('back')}></jk-icon-button>
-              ` : ''}
-              <h3 class="${styles.title}">${this.t(this.mode === 'themes' ? 'mobileThemeTitle' : 'mobileMenuTitle')}</h3>
+              ${
+                this.mode === 'themes'
+                  ? html`
+                      <jk-icon-button
+                        icon="arrow-left"
+                        label="${this.t('back')}"
+                        @click=${() => this._emit('back')}
+                      ></jk-icon-button>
+                    `
+                  : ''
+              }
+              <h3 class="${styles.title}">
+                ${this.t(this.mode === 'themes' ? 'mobileThemeTitle' : 'mobileMenuTitle')}
+              </h3>
             </div>
-            <jk-icon-button icon="x" label="${this.t('close')}" @click=${() => this._emit('close')}></jk-icon-button>
+            <jk-icon-button
+              icon="x"
+              label="${this.t('close')}"
+              @click=${() => this._emit('close')}
+            ></jk-icon-button>
           </div>
 
-          ${this.mode === 'menu' ? html`
-            <div class="${styles.list}">
-              <button class="${styles.action}" @click=${() => this._emit('open-help')}>
-                <span class="${styles.actionIcon}"><jk-icon icon="circle-help" class="size-5"></jk-icon></span>
-                <span class="${styles.actionText}"><span class="${styles.actionTitle}">${this.t('mobileHelpAction')}</span><span class="${styles.actionDesc}">${this.t('mobileHelpActionDesc')}</span></span>
-                <jk-icon icon="chevron-right" class="${styles.chevron}"></jk-icon>
-              </button>
-              <button class="${styles.action}" @click=${() => this._emit('open-themes')}>
-                <span class="${styles.actionIcon}"><jk-icon icon="palette" class="size-5"></jk-icon></span>
-                <span class="${styles.actionText}"><span class="${styles.actionTitle}">${this.t('mobileThemeAction')}</span><span class="${styles.actionDesc}">${this.t(current.nameKey)}</span></span>
-                <jk-icon icon="chevron-right" class="${styles.chevron}"></jk-icon>
-              </button>
-            </div>
-          ` : html`
-            <div class="${styles.groupTitle}">${this.t('themeGroupDark')}</div>
-            <div class="${styles.themeGrid}">${THEMES.filter((x) => x.scheme === 'dark').map((x) => this._renderTheme(x))}</div>
-            <div class="${styles.groupTitle}">${this.t('themeGroupLight')}</div>
-            <div class="${styles.themeGrid}">${THEMES.filter((x) => x.scheme === 'light').map((x) => this._renderTheme(x))}</div>
-          `}
+          ${
+            this.mode === 'menu'
+              ? html`
+                  <div class="${styles.list}">
+                    <button class="${styles.action}" @click=${() => this._emit('open-help')}>
+                      <span class="${styles.actionIcon}"
+                        ><jk-icon icon="circle-help" class="size-5"></jk-icon
+                      ></span>
+                      <span class="${styles.actionText}"
+                        ><span class="${styles.actionTitle}">${this.t('mobileHelpAction')}</span
+                        ><span class="${styles.actionDesc}"
+                          >${this.t('mobileHelpActionDesc')}</span
+                        ></span
+                      >
+                      <jk-icon icon="chevron-right" class="${styles.chevron}"></jk-icon>
+                    </button>
+                    <button class="${styles.action}" @click=${() => this._emit('open-themes')}>
+                      <span class="${styles.actionIcon}"
+                        ><jk-icon icon="palette" class="size-5"></jk-icon
+                      ></span>
+                      <span class="${styles.actionText}"
+                        ><span class="${styles.actionTitle}">${this.t('mobileThemeAction')}</span
+                        ><span class="${styles.actionDesc}">${this.t(current.nameKey)}</span></span
+                      >
+                      <jk-icon icon="chevron-right" class="${styles.chevron}"></jk-icon>
+                    </button>
+                  </div>
+                `
+              : html`
+                  <div class="${styles.groupTitle}">${this.t('themeGroupDark')}</div>
+                  <div class="${styles.themeGrid}">
+                    ${THEMES.filter((x) => x.scheme === 'dark').map((x) => this._renderTheme(x))}
+                  </div>
+                  <div class="${styles.groupTitle}">${this.t('themeGroupLight')}</div>
+                  <div class="${styles.themeGrid}">
+                    ${THEMES.filter((x) => x.scheme === 'light').map((x) => this._renderTheme(x))}
+                  </div>
+                `
+          }
         </section>
       </div>
     `;

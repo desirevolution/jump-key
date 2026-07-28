@@ -1,9 +1,6 @@
 export { handleGlobalKeyDown } from './global.js';
 
-export {
-  handleFavoriteRecordingInput,
-  handleFavoriteShortcut,
-} from './favorites.js';
+export { handleFavoriteRecordingInput, handleFavoriteShortcut } from './favorites.js';
 
 export { handleSearchKeyDown } from './search.js';
 

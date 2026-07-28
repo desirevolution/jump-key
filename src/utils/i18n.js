@@ -49,8 +49,7 @@ export const translations = {
 
     // Favoriten & Aktionen
     confirmResetTitle: 'Favoriten zurücksetzen',
-    confirmReset:
-      'Möchtest du die Liste der häufig genutzten Services wirklich zurücksetzen?',
+    confirmReset: 'Möchtest du die Liste der häufig genutzten Services wirklich zurücksetzen?',
     confirmResetConfirm: 'Ja, zurücksetzen',
     confirmContinueResetTitle: 'Zuletzt verwendet zurücksetzen',
     confirmContinueReset:
@@ -72,7 +71,8 @@ export const translations = {
     hkSearch: 'Suche öffnen',
     hkFavs: 'Direkt-Favorit aufrufen',
     hkContinue: 'Zuletzt verwendeten Service aufrufen',
-    hkToggleLast: 'Zuletzt verwendete Services durchschalten (erneut drücken, solange die Startanzeige sichtbar ist)',
+    hkToggleLast:
+      'Zuletzt verwendete Services durchschalten (erneut drücken, solange die Startanzeige sichtbar ist)',
     hkCat: 'Kategorie-Hotkeys aktivieren',
     hkService: 'Service innerhalb einer Kategorie aufrufen',
     hkReset: 'Zurück zur Hauptübersicht / Abbrechen',
@@ -101,8 +101,7 @@ export const translations = {
     // Config: Appearance
     tabAppearance: 'Darstellung',
     appearanceTitle: 'Theme auswählen',
-    appearanceDescription:
-      'Das Theme wird sofort angewendet und für dieses Gerät gespeichert.',
+    appearanceDescription: 'Das Theme wird sofort angewendet und für dieses Gerät gespeichert.',
     themeGroupDark: 'Dunkel',
     themeGroupLight: 'Hell',
     themeMidnight: 'Midnight',
@@ -142,17 +141,14 @@ export const translations = {
     tabDataExportSuccess: 'Konfiguration erfolgreich exportiert!',
     tabDataExportFailed: 'Export fehlgeschlagen.',
     tabDataBackupTitle: 'Konfiguration sichern',
-    tabDataBackupDesc:
-      'Lade deine aktuellen Widgets und Suchmaschinen als .json-Datei herunter.',
+    tabDataBackupDesc: 'Lade deine aktuellen Widgets und Suchmaschinen als .json-Datei herunter.',
     tabDataRestoreTitle: 'Konfiguration wiederherstellen',
     tabDataRestoreDesc: 'Lade eine vorhandene JSON-Konfigurationsdatei hoch.',
     tabDataSelectFile: 'Datei auswählen',
     tabDataOnlyJsonFiles: 'Nur valide .json-Dateien',
     tabDataImportSuccess: 'Konfiguration erfolgreich geladen!',
-    tabDataImportInvalidStructure:
-      'Die hochgeladene Datei hat keine valide Dashboard-Struktur.',
-    tabDataImportJsonError:
-      'Fehler beim Lesen der JSON-Datei. Ungültige Syntax.',
+    tabDataImportInvalidStructure: 'Die hochgeladene Datei hat keine valide Dashboard-Struktur.',
+    tabDataImportJsonError: 'Fehler beim Lesen der JSON-Datei. Ungültige Syntax.',
 
     // Config: Tab Editor
     tabEditor: 'JSON-Editor',
@@ -160,8 +156,7 @@ export const translations = {
     tabEditorSaveDoneTitle: 'Erfolgreich',
     tabEditorSaveSuccess: 'Konfiguration erfolgreich gespeichert!',
     tabEditorSaveFailedTitle: 'Fehler beim Speichern',
-    tabEditorSaveFailed:
-      'Die Änderungen konnten nicht in die services.json geschrieben werden.',
+    tabEditorSaveFailed: 'Die Änderungen konnten nicht in die services.json geschrieben werden.',
 
     // Editor Discard Dialog
     discardChangesTitle: 'Änderungen verwerfen?',
@@ -228,13 +223,15 @@ export const translations = {
     confirmReset: 'Voulez-vous vraiment réinitialiser vos services fréquemment utilisés ?',
     confirmResetConfirm: 'Oui, réinitialiser',
     confirmContinueResetTitle: 'Réinitialiser les services récents',
-    confirmContinueReset: 'Voulez-vous vraiment réinitialiser la liste des services récemment utilisés ?',
+    confirmContinueReset:
+      'Voulez-vous vraiment réinitialiser la liste des services récemment utilisés ?',
     favAlreadyExists: 'est déjà un favori sur l’emplacement',
     favFull: 'Tous les emplacements de favoris sont occupés',
     favSaved: 'enregistré comme favori sur la touche {slot}',
     favRemoved: 'retiré de la touche {slot}',
     serviceCount: 'Services',
-    cannotFavoriteCategory: 'Les catégories ne peuvent pas être ajoutées aux favoris. Ouvrez la catégorie pour ajouter ses services.',
+    cannotFavoriteCategory:
+      'Les catégories ne peuvent pas être ajoutées aux favoris. Ouvrez la catégorie pour ajouter ses services.',
     favLabel: 'FAV',
     selectCategory: 'Choisir une catégorie',
     serviceLabel: 'Service',
@@ -243,7 +240,8 @@ export const translations = {
     hkSearch: 'Ouvrir la recherche',
     hkFavs: 'Ouvrir directement un favori',
     hkContinue: 'Ouvrir un service récemment utilisé',
-    hkToggleLast: 'Parcourir les services récents (appuyer de nouveau pendant l’affichage du lancement)',
+    hkToggleLast:
+      'Parcourir les services récents (appuyer de nouveau pendant l’affichage du lancement)',
     hkCat: 'Activer les raccourcis de catégories',
     hkService: 'Ouvrir un service dans la catégorie active',
     hkReset: 'Retour à la vue principale / Annuler',
@@ -306,13 +304,15 @@ export const translations = {
     tabDataExportSuccess: 'Configuration exportée avec succès !',
     tabDataExportFailed: 'Échec de l’exportation.',
     tabDataBackupTitle: 'Sauvegarder la configuration',
-    tabDataBackupDesc: 'Téléchargez vos widgets et moteurs de recherche actuels dans un fichier .json.',
+    tabDataBackupDesc:
+      'Téléchargez vos widgets et moteurs de recherche actuels dans un fichier .json.',
     tabDataRestoreTitle: 'Restaurer la configuration',
     tabDataRestoreDesc: 'Téléversez un fichier de configuration JSON existant.',
     tabDataSelectFile: 'Choisir un fichier',
     tabDataOnlyJsonFiles: 'Fichiers .json valides uniquement',
     tabDataImportSuccess: 'Configuration chargée avec succès !',
-    tabDataImportInvalidStructure: 'Le fichier téléversé ne possède pas une structure de tableau de bord valide.',
+    tabDataImportInvalidStructure:
+      'Le fichier téléversé ne possède pas une structure de tableau de bord valide.',
     tabDataImportJsonError: 'Erreur lors de la lecture du fichier JSON. Syntaxe invalide.',
     tabEditor: 'Éditeur JSON',
     tabEditorOk: 'OK',
@@ -321,10 +321,12 @@ export const translations = {
     tabEditorSaveFailedTitle: 'Échec de l’enregistrement',
     tabEditorSaveFailed: 'Impossible d’écrire les modifications dans services.json.',
     discardChangesTitle: 'Abandonner les modifications ?',
-    discardChangesMessage: 'Vous avez des modifications non enregistrées dans l’éditeur JSON. Voulez-vous vraiment fermer la fenêtre ?',
+    discardChangesMessage:
+      'Vous avez des modifications non enregistrées dans l’éditeur JSON. Voulez-vous vraiment fermer la fenêtre ?',
     discardConfirm: 'Oui, abandonner',
     tabEditorDiscardChangesTitle: 'Modifications non enregistrées',
-    tabEditorDiscardChangesMsg: 'Vous avez des modifications non enregistrées. Voulez-vous vraiment les abandonner ?',
+    tabEditorDiscardChangesMsg:
+      'Vous avez des modifications non enregistrées. Voulez-vous vraiment les abandonner ?',
     tabEditorDiscardChangesConfirm: 'Abandonner les modifications',
     tabEditorDiscardChangesCancel: 'Continuer la modification',
     tabEditorValid: 'Valide',
@@ -386,7 +388,8 @@ export const translations = {
     favSaved: 'guardado como favorito en la tecla {slot}',
     favRemoved: 'eliminado de la tecla {slot}',
     serviceCount: 'Servicios',
-    cannotFavoriteCategory: 'Las categorías no se pueden añadir a favoritos. Abre la categoría para añadir sus servicios.',
+    cannotFavoriteCategory:
+      'Las categorías no se pueden añadir a favoritos. Abre la categoría para añadir sus servicios.',
     favLabel: 'FAV',
     selectCategory: 'Seleccionar categoría',
     serviceLabel: 'Servicio',
@@ -395,7 +398,8 @@ export const translations = {
     hkSearch: 'Abrir búsqueda',
     hkFavs: 'Abrir favorito directo',
     hkContinue: 'Abrir servicio usado recientemente',
-    hkToggleLast: 'Recorrer los servicios recientes (pulsar de nuevo mientras se muestra el inicio)',
+    hkToggleLast:
+      'Recorrer los servicios recientes (pulsar de nuevo mientras se muestra el inicio)',
     hkCat: 'Activar atajos de categorías',
     hkService: 'Abrir servicio dentro de la categoría activa',
     hkReset: 'Volver a la vista principal / Cancelar',
@@ -473,7 +477,8 @@ export const translations = {
     tabEditorSaveFailedTitle: 'Error al guardar',
     tabEditorSaveFailed: 'No se pudieron escribir los cambios en services.json.',
     discardChangesTitle: '¿Descartar cambios?',
-    discardChangesMessage: 'Tienes cambios sin guardar en el editor JSON. ¿Quieres cerrar la ventana?',
+    discardChangesMessage:
+      'Tienes cambios sin guardar en el editor JSON. ¿Quieres cerrar la ventana?',
     discardConfirm: 'Sí, descartar',
     tabEditorDiscardChangesTitle: 'Cambios sin guardar',
     tabEditorDiscardChangesMsg: 'Tienes cambios sin guardar. ¿Quieres descartarlos?',
@@ -535,8 +540,7 @@ export const translations = {
     confirmReset: 'Do you really want to reset your frequently used services?',
     confirmResetConfirm: 'Yes, reset',
     confirmContinueResetTitle: 'Reset recently used',
-    confirmContinueReset:
-      'Do you really want to reset the list of recently used services?',
+    confirmContinueReset: 'Do you really want to reset the list of recently used services?',
     favAlreadyExists: 'is already a favorite on slot',
     favFull: 'All favorite slots are taken',
     favSaved: 'saved as favorite on key {slot}',
@@ -554,7 +558,8 @@ export const translations = {
     hkSearch: 'Open search',
     hkFavs: 'Launch direct favorite',
     hkContinue: 'Launch recently used service',
-    hkToggleLast: 'Cycle through recently used services (press again while launch feedback is visible)',
+    hkToggleLast:
+      'Cycle through recently used services (press again while launch feedback is visible)',
     hkCat: 'Activate category hotkeys',
     hkService: 'Launch service inside active category',
     hkReset: 'Back to main overview / Cancel',
@@ -583,8 +588,7 @@ export const translations = {
     // Config: Appearance
     tabAppearance: 'Appearance',
     appearanceTitle: 'Choose a theme',
-    appearanceDescription:
-      'The theme is applied immediately and saved on this device.',
+    appearanceDescription: 'The theme is applied immediately and saved on this device.',
     themeGroupDark: 'Dark',
     themeGroupLight: 'Light',
     themeMidnight: 'Midnight',
@@ -624,15 +628,13 @@ export const translations = {
     tabDataExportSuccess: 'Configuration successfully exported!',
     tabDataExportFailed: 'Export failed.',
     tabDataBackupTitle: 'Back up configuration',
-    tabDataBackupDesc:
-      'Download your current widgets and search engines as a .json file.',
+    tabDataBackupDesc: 'Download your current widgets and search engines as a .json file.',
     tabDataRestoreTitle: 'Restore configuration',
     tabDataRestoreDesc: 'Upload an existing JSON configuration file.',
     tabDataSelectFile: 'Select file',
     tabDataOnlyJsonFiles: 'Only valid .json files',
     tabDataImportSuccess: 'Configuration successfully loaded!',
-    tabDataImportInvalidStructure:
-      'The uploaded file does not have a valid dashboard structure.',
+    tabDataImportInvalidStructure: 'The uploaded file does not have a valid dashboard structure.',
     tabDataImportJsonError: 'Error reading the JSON file. Invalid syntax.',
 
     // Config: Tab Editor
@@ -651,8 +653,7 @@ export const translations = {
 
     // Fallback/Legacy Editor keys
     tabEditorDiscardChangesTitle: 'Unsaved Changes',
-    tabEditorDiscardChangesMsg:
-      'You have unsaved changes. Do you really want to discard them?',
+    tabEditorDiscardChangesMsg: 'You have unsaved changes. Do you really want to discard them?',
     tabEditorDiscardChangesConfirm: 'Discard changes',
     tabEditorDiscardChangesCancel: 'Continue editing',
     tabEditorValid: 'Valid',

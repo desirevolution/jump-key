@@ -133,10 +133,7 @@ export class JkToast extends LitElement {
               min-w-0
             "
           >
-            <jk-icon
-              icon="${config.icon}"
-              class="w-5 h-5 shrink-0 ${config.iconColor}"
-            ></jk-icon>
+            <jk-icon icon="${config.icon}" class="w-5 h-5 shrink-0 ${config.iconColor}"></jk-icon>
 
             <span
               class="

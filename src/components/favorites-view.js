@@ -40,7 +40,9 @@ export class JkFavoritesView extends LitElement {
     return html`
       <section class=${styles.section}>
         <div class=${styles.header}>
-          <div class=${styles.iconBadge}><jk-icon icon="star" class=${styles.icon}></jk-icon></div>
+          <div class=${styles.iconBadge}>
+            <jk-icon icon="star" class=${styles.icon}></jk-icon>
+          </div>
           <h2 class=${styles.title}>${this.t('favorites')}</h2>
           <jk-icon-button
             icon="trash-2"
@@ -51,17 +53,19 @@ export class JkFavoritesView extends LitElement {
           ></jk-icon-button>
         </div>
         <div class=${styles.grid}>
-          ${this.favorites.map((service) => html`
-            <jk-service-card
-              .name=${service.name}
-              .subtitle=${service.url}
-              .icon=${service.icon}
-              .favoriteSlot=${service.favSlot}
-              .isFavorite=${true}
-              @card-click=${(e) => this.dispatchEvent(new CustomEvent('service-click', { detail: { service, shiftKey: e.detail.shiftKey }, bubbles: true, composed: true }))}
-              @card-long-press=${() => this.dispatchEvent(new CustomEvent('delete-favorite-slot', { detail: { slot: service.favSlot }, bubbles: true, composed: true }))}
-            ></jk-service-card>
-          `)}
+          ${this.favorites.map(
+            (service) => html`
+              <jk-service-card
+                .name=${service.name}
+                .subtitle=${service.url}
+                .icon=${service.icon}
+                .favoriteSlot=${service.favSlot}
+                .isFavorite=${true}
+                @card-click=${(e) => this.dispatchEvent(new CustomEvent('service-click', { detail: { service, shiftKey: e.detail.shiftKey }, bubbles: true, composed: true }))}
+                @card-long-press=${() => this.dispatchEvent(new CustomEvent('delete-favorite-slot', { detail: { slot: service.favSlot }, bubbles: true, composed: true }))}
+              ></jk-service-card>
+            `
+          )}
         </div>
       </section>
     `;
@@ -73,7 +77,9 @@ export class JkFavoritesView extends LitElement {
     return html`
       <section class=${styles.continueSection}>
         <div class=${styles.header}>
-          <div class=${styles.continueIconBadge}><jk-icon icon="history" class=${styles.continueIcon}></jk-icon></div>
+          <div class=${styles.continueIconBadge}>
+            <jk-icon icon="history" class=${styles.continueIcon}></jk-icon>
+          </div>
           <h2 class=${styles.title}>${this.t('continue')}</h2>
           <jk-icon-button
             icon="trash-2"
@@ -84,16 +90,18 @@ export class JkFavoritesView extends LitElement {
           ></jk-icon-button>
         </div>
         <div class=${styles.grid}>
-          ${this.continueServices.map((service) => html`
-            <jk-service-card
-              .name=${service.name}
-              .subtitle=${service.url}
-              .icon=${service.icon}
-              .badgeText=${`⇧${service.continueSlot}`}
-              @card-click=${(e) => this.dispatchEvent(new CustomEvent('continue-click', { detail: { service, shiftKey: e.detail.shiftKey }, bubbles: true, composed: true }))}
-              @card-long-press=${() => this.dispatchEvent(new CustomEvent('delete-continue-entry', { detail: { service }, bubbles: true, composed: true }))}
-            ></jk-service-card>
-          `)}
+          ${this.continueServices.map(
+            (service) => html`
+              <jk-service-card
+                .name=${service.name}
+                .subtitle=${service.url}
+                .icon=${service.icon}
+                .badgeText=${`⇧${service.continueSlot}`}
+                @card-click=${(e) => this.dispatchEvent(new CustomEvent('continue-click', { detail: { service, shiftKey: e.detail.shiftKey }, bubbles: true, composed: true }))}
+                @card-long-press=${() => this.dispatchEvent(new CustomEvent('delete-continue-entry', { detail: { service }, bubbles: true, composed: true }))}
+              ></jk-service-card>
+            `
+          )}
         </div>
       </section>
     `;

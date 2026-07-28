@@ -117,8 +117,7 @@ export class JkConfigModal extends LitElement {
     }
 
     if (this._activeTab === 'editor') {
-      const isSaveShortcut =
-        (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's';
+      const isSaveShortcut = (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's';
       if (isSaveShortcut) {
         e.preventDefault();
         e.stopPropagation();
@@ -165,9 +164,7 @@ export class JkConfigModal extends LitElement {
 
   _forceClose() {
     this._showDiscardDialog = false;
-    this.dispatchEvent(
-      new CustomEvent('close', { bubbles: true, composed: true })
-    );
+    this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
   }
 
   _handleSave() {
@@ -188,9 +185,7 @@ export class JkConfigModal extends LitElement {
         new CustomEvent('notify', {
           detail: {
             type: 'success',
-            message:
-              this.t('tabEditorSaveSuccess') ||
-              'Configuration successfully saved!',
+            message: this.t('tabEditorSaveSuccess') || 'Configuration successfully saved!',
           },
           bubbles: true,
           composed: true,
@@ -205,8 +200,7 @@ export class JkConfigModal extends LitElement {
         new CustomEvent('notify', {
           detail: {
             type: 'error',
-            message:
-              this.t('tabEditorSaveFailed') || 'Error saving configuration.',
+            message: this.t('tabEditorSaveFailed') || 'Error saving configuration.',
           },
           bubbles: true,
           composed: true,
@@ -249,21 +243,13 @@ export class JkConfigModal extends LitElement {
   render() {
     if (!this.show) return html``;
 
-    const statusClass = this._isEditorConfigValid
-      ? styles.statusValid
-      : styles.statusInvalid;
+    const statusClass = this._isEditorConfigValid ? styles.statusValid : styles.statusInvalid;
     const tabAppearanceClass =
-      this._activeTab === 'appearance'
-        ? styles.sidebarBtnActive
-        : styles.sidebarBtnInactive;
+      this._activeTab === 'appearance' ? styles.sidebarBtnActive : styles.sidebarBtnInactive;
     const tabDataClass =
-      this._activeTab === 'data'
-        ? styles.sidebarBtnActive
-        : styles.sidebarBtnInactive;
+      this._activeTab === 'data' ? styles.sidebarBtnActive : styles.sidebarBtnInactive;
     const tabEditorClass =
-      this._activeTab === 'editor'
-        ? styles.sidebarBtnActive
-        : styles.sidebarBtnInactive;
+      this._activeTab === 'editor' ? styles.sidebarBtnActive : styles.sidebarBtnInactive;
     const saveBtnClass =
       this._isEditorConfigValid && this._hasEditorConfigChanged
         ? styles.btnPrimaryActive
@@ -337,9 +323,7 @@ export class JkConfigModal extends LitElement {
               </button>
             </aside>
 
-            <main class="${styles.contentArea}">
-              ${this._renderActiveTabContent()}
-            </main>
+            <main class="${styles.contentArea}">${this._renderActiveTabContent()}</main>
           </div>
 
           <div class="${styles.footer}">

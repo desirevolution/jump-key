@@ -20,7 +20,7 @@
  * Existing Tailwind color utilities consume these CSS variables, so the
  * component markup stays focused on layout while the palette is centralized.
  */
- :root,
+:root,
 [data-theme='midnight'] {
   color-scheme: dark;
   --jk-bg-page: #020617;
@@ -46,7 +46,7 @@
   --jk-card-gradient-top: #18233a;
   --jk-card-gradient-bottom: #0d1628;
   --jk-card-border: #33445f;
-  --jk-card-shadow-color: rgb(2 6 23 / 0.30);
+  --jk-card-shadow-color: rgb(2 6 23 / 0.3);
   --jk-card-icon-bg: #25334d;
 }
 
@@ -75,7 +75,7 @@
   --jk-card-gradient-top: #123746;
   --jk-card-gradient-bottom: #08232e;
   --jk-card-border: #225466;
-  --jk-card-shadow-color: rgb(1 18 25 / 0.30);
+  --jk-card-shadow-color: rgb(1 18 25 / 0.3);
   --jk-card-icon-bg: #164353;
 }
 
@@ -133,7 +133,7 @@
   --jk-card-gradient-top: #153326;
   --jk-card-gradient-bottom: #0b2017;
   --jk-card-border: #28543f;
-  --jk-card-shadow-color: rgb(2 15 10 / 0.30);
+  --jk-card-shadow-color: rgb(2 15 10 / 0.3);
   --jk-card-icon-bg: #1b402f;
 }
 
@@ -162,7 +162,7 @@
   --jk-card-gradient-top: #252a40;
   --jk-card-gradient-bottom: #181a28;
   --jk-card-border: #3d4665;
-  --jk-card-shadow-color: rgb(8 9 18 / 0.30);
+  --jk-card-shadow-color: rgb(8 9 18 / 0.3);
   --jk-card-icon-bg: #2c324b;
 }
 
@@ -191,7 +191,7 @@
   --jk-card-gradient-top: #343448;
   --jk-card-gradient-bottom: #202033;
   --jk-card-border: #4d4e66;
-  --jk-card-shadow-color: rgb(12 10 20 / 0.30);
+  --jk-card-shadow-color: rgb(12 10 20 / 0.3);
   --jk-card-icon-bg: #3b3c51;
 }
 
@@ -220,7 +220,7 @@
   --jk-card-gradient-top: #3a3733;
   --jk-card-gradient-bottom: #262320;
   --jk-card-border: #57514b;
-  --jk-card-shadow-color: rgb(15 12 8 / 0.30);
+  --jk-card-shadow-color: rgb(15 12 8 / 0.3);
   --jk-card-icon-bg: #45403a;
 }
 
@@ -343,21 +343,51 @@
   --jk-shadow-inset: inset 0 1px 4px rgb(0 0 0 / 0.18);
 
   /* Service-card tokens. Theme palettes may override the base colors above. */
-  --jk-card-background: linear-gradient(145deg, var(--jk-card-gradient-top), var(--jk-card-gradient-bottom));
-  --jk-card-background-hover: linear-gradient(145deg, color-mix(in srgb, var(--jk-card-gradient-top) 92%, var(--jk-accent) 8%), color-mix(in srgb, var(--jk-card-gradient-bottom) 96%, var(--jk-accent) 4%));
+  --jk-card-background: linear-gradient(
+    145deg,
+    var(--jk-card-gradient-top),
+    var(--jk-card-gradient-bottom)
+  );
+  --jk-card-background-hover: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--jk-card-gradient-top) 92%, var(--jk-accent) 8%),
+    color-mix(in srgb, var(--jk-card-gradient-bottom) 96%, var(--jk-accent) 4%)
+  );
   --jk-card-shadow: 0 10px 26px var(--jk-card-shadow-color);
-  --jk-card-shadow-hover: 0 16px 34px color-mix(in srgb, var(--jk-card-shadow-color) 82%, var(--jk-accent) 18%);
+  --jk-card-shadow-hover: 0 16px 34px
+    color-mix(in srgb, var(--jk-card-shadow-color) 82%, var(--jk-accent) 18%);
   --jk-card-icon-border: color-mix(in srgb, var(--jk-card-border) 78%, var(--jk-accent) 22%);
   --jk-card-icon-color: var(--jk-accent-bright);
 
-  --jk-card-favorite-top: color-mix(in srgb, var(--jk-card-gradient-top) 93%, var(--jk-favorite) 7%);
-  --jk-card-favorite-bottom: color-mix(in srgb, var(--jk-card-gradient-bottom) 96%, var(--jk-favorite) 4%);
-  --jk-card-favorite-background: linear-gradient(145deg, var(--jk-card-favorite-top), var(--jk-card-favorite-bottom));
+  --jk-card-favorite-top: color-mix(
+    in srgb,
+    var(--jk-card-gradient-top) 93%,
+    var(--jk-favorite) 7%
+  );
+  --jk-card-favorite-bottom: color-mix(
+    in srgb,
+    var(--jk-card-gradient-bottom) 96%,
+    var(--jk-favorite) 4%
+  );
+  --jk-card-favorite-background: linear-gradient(
+    145deg,
+    var(--jk-card-favorite-top),
+    var(--jk-card-favorite-bottom)
+  );
   --jk-card-favorite-border: color-mix(in srgb, var(--jk-card-border) 76%, var(--jk-favorite) 24%);
-  --jk-card-favorite-shadow: 0 10px 27px color-mix(in srgb, var(--jk-card-shadow-color) 88%, var(--jk-favorite) 12%);
+  --jk-card-favorite-shadow: 0 10px 27px
+    color-mix(in srgb, var(--jk-card-shadow-color) 88%, var(--jk-favorite) 12%);
   --jk-card-favorite-inset: color-mix(in srgb, var(--jk-favorite) 42%, transparent);
-  --jk-card-favorite-icon-bg: color-mix(in srgb, var(--jk-card-icon-bg) 88%, var(--jk-favorite) 12%);
-  --jk-card-favorite-icon-border: color-mix(in srgb, var(--jk-card-icon-border) 72%, var(--jk-favorite) 28%);
+  --jk-card-favorite-icon-bg: color-mix(
+    in srgb,
+    var(--jk-card-icon-bg) 88%,
+    var(--jk-favorite) 12%
+  );
+  --jk-card-favorite-icon-border: color-mix(
+    in srgb,
+    var(--jk-card-icon-border) 72%,
+    var(--jk-favorite) 28%
+  );
 
   --jk-accent-soft: color-mix(in srgb, var(--jk-accent-hover) 18%, transparent);
   --jk-accent-border: color-mix(in srgb, var(--jk-accent-hover) 38%, transparent);
@@ -421,12 +451,19 @@
   color: var(--jk-on-accent);
 }
 
-
 /* Semantic status utilities. Keep status meaning separate from favorite styling. */
-.jk-status-success { color: var(--jk-success); }
-.jk-status-warning { color: var(--jk-warning); }
-.jk-status-danger { color: var(--jk-danger); }
-.jk-status-info { color: var(--jk-info); }
+.jk-status-success {
+  color: var(--jk-success);
+}
+.jk-status-warning {
+  color: var(--jk-warning);
+}
+.jk-status-danger {
+  color: var(--jk-danger);
+}
+.jk-status-info {
+  color: var(--jk-info);
+}
 
 .jk-status-success-surface {
   color: var(--jk-success);
@@ -456,17 +493,35 @@
   --tw-ring-color: var(--jk-info-border);
 }
 
-.jk-status-success-border { border-color: var(--jk-success); }
-.jk-status-danger-border { border-color: var(--jk-danger); }
-.jk-status-warning-border { border-color: var(--jk-warning); }
-.jk-status-info-border { border-color: var(--jk-info); }
+.jk-status-success-border {
+  border-color: var(--jk-success);
+}
+.jk-status-danger-border {
+  border-color: var(--jk-danger);
+}
+.jk-status-warning-border {
+  border-color: var(--jk-warning);
+}
+.jk-status-info-border {
+  border-color: var(--jk-info);
+}
 
-.jk-status-success-accent { background: var(--jk-success); }
-.jk-status-warning-accent { background: var(--jk-warning); }
-.jk-status-danger-accent { background: var(--jk-danger); }
-.jk-status-info-accent { background: var(--jk-info); }
+.jk-status-success-accent {
+  background: var(--jk-success);
+}
+.jk-status-warning-accent {
+  background: var(--jk-warning);
+}
+.jk-status-danger-accent {
+  background: var(--jk-danger);
+}
+.jk-status-info-accent {
+  background: var(--jk-info);
+}
 
-.jk-favorite-color { color: var(--jk-favorite); }
+.jk-favorite-color {
+  color: var(--jk-favorite);
+}
 
 .jk-favorite-badge {
   color: var(--jk-favorite-text);
@@ -519,9 +574,11 @@
 }
 
 .jk-favorite-card:hover {
-  background: linear-gradient(145deg,
+  background: linear-gradient(
+    145deg,
     color-mix(in srgb, var(--jk-card-favorite-top) 94%, var(--jk-accent) 6%),
-    color-mix(in srgb, var(--jk-card-favorite-bottom) 96%, var(--jk-accent) 4%));
+    color-mix(in srgb, var(--jk-card-favorite-bottom) 96%, var(--jk-accent) 4%)
+  );
   border-color: color-mix(in srgb, var(--jk-card-favorite-border) 75%, var(--jk-accent) 25%);
   box-shadow:
     0 16px 34px color-mix(in srgb, var(--jk-card-shadow-color) 78%, var(--jk-favorite) 22%),
@@ -547,9 +604,15 @@
   border-color: var(--jk-danger);
 }
 
-.jk-shadow-card { box-shadow: var(--jk-shadow-card); }
-.jk-shadow-elevated { box-shadow: var(--jk-shadow-elevated); }
-.jk-shadow-inset { box-shadow: var(--jk-shadow-inset); }
+.jk-shadow-card {
+  box-shadow: var(--jk-shadow-card);
+}
+.jk-shadow-elevated {
+  box-shadow: var(--jk-shadow-elevated);
+}
+.jk-shadow-inset {
+  box-shadow: var(--jk-shadow-inset);
+}
 
 [data-color-scheme='light'] {
   --jk-favorite-text: color-mix(in srgb, var(--jk-favorite) 82%, black);
@@ -561,7 +624,6 @@
   --jk-shadow-elevated: 0 24px 70px rgb(15 23 42 / 0.18);
   --jk-shadow-inset: inset 0 1px 4px rgb(15 23 42 / 0.12);
 }
-
 
 [data-theme='daylight'] {
   --jk-favorite: #b45309;

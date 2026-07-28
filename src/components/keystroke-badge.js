@@ -7,8 +7,7 @@ const styles = {
   badgeDefault: 'border-slate-600/80 text-slate-100 shadow-slate-950/50',
   badgeValid: 'jk-status-success-surface shadow-lg',
   badgeInvalid: 'jk-status-danger-surface shadow-lg',
-  key:
-    'inline-flex min-w-9 items-center justify-center rounded-md border border-slate-600 bg-slate-800 px-2 py-1 font-mono text-base font-bold tracking-wider text-current shadow-inner',
+  key: 'inline-flex min-w-9 items-center justify-center rounded-md border border-slate-600 bg-slate-800 px-2 py-1 font-mono text-base font-bold tracking-wider text-current shadow-inner',
   separator: 'text-sm font-bold text-slate-500',
   icon: 'size-4 shrink-0',
   pendingDot: 'mx-1 size-2 shrink-0 rounded-full bg-slate-400 animate-pulse',

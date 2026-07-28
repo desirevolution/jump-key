@@ -1,9 +1,4 @@
-import {
-  DEFAULT_THEME,
-  THEME_STORAGE_KEY,
-  getTheme,
-  isKnownTheme,
-} from '../themes/themes.js';
+import { DEFAULT_THEME, THEME_STORAGE_KEY, getTheme, isKnownTheme } from '../themes/themes.js';
 
 export function loadTheme() {
   try {
@@ -19,9 +14,7 @@ export function applyTheme(themeId) {
   const theme = getTheme(themeId);
   document.documentElement.dataset.theme = theme.id;
   document.documentElement.dataset.colorScheme = theme.scheme;
-  document
-    .querySelector('meta[name="theme-color"]')
-    ?.setAttribute('content', theme.metaColor);
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme.metaColor);
   return theme.id;
 }
 

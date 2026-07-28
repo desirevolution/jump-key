@@ -87,10 +87,7 @@ function buildSearchItems(app) {
       type: 'engine-execute',
 
       action({ openInSameTab = false } = {}) {
-        const url = previewEngine.url.replace(
-          '%s',
-          encodeURIComponent(previewEngine.searchTerms)
-        );
+        const url = previewEngine.url.replace('%s', encodeURIComponent(previewEngine.searchTerms));
 
         if (openInSameTab) {
           window.location.assign(url);
@@ -165,9 +162,7 @@ function getSearchState(app) {
 
   const searchTerms = command.substring(space + 1);
 
-  const engine = app.searchEngines.find(
-    (item) => item.prefix.toLowerCase() === prefix
-  );
+  const engine = app.searchEngines.find((item) => item.prefix.toLowerCase() === prefix);
 
   if (engine) {
     result.previewEngine = {
