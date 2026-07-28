@@ -34,3 +34,5 @@ USER 10001
 EXPOSE 8080
 
 ENTRYPOINT ["/jump-key-server"]
+
+CMD [ "--host=0.0.0.0",  "--port=8080", "--config-dir=/app/config", "--icons-dir=/app/icons" ]
