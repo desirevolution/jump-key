@@ -1,4 +1,4 @@
-name: Build and Publish Docker Image
+name: Build and Publish
 
 on:
   push:
@@ -14,15 +14,21 @@ env:
 
 jobs:
   build:
+    name: Build Docker ${{ matrix.platform }}
+
     runs-on: ${{ matrix.runner }}
+
     strategy:
       fail-fast: false
       matrix:
         include:
           - platform: linux/amd64
             runner: ubuntu-latest
+            artifact_suffix: amd64
+
           - platform: linux/arm64
             runner: ubuntu-24.04-arm
+            artifact_suffix: arm64
 
     permissions:
       contents: read
@@ -55,7 +61,12 @@ jobs:
           context: .
           platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
-          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},push-by-digest=true,name-canonical=true,push=true
+          outputs: >-
+            type=image,
+            name=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }},
+            push-by-digest=true,
+            name-canonical=true,
+            push=true
           cache-from: type=gha,scope=${{ matrix.platform }}
           cache-to: type=gha,mode=max,scope=${{ matrix.platform }}
 
@@ -68,15 +79,21 @@ jobs:
       - name: Upload digest
         uses: actions/upload-artifact@v4
         with:
-          name: digests-${{ matrix.runner }}
+          name: digests-${{ matrix.artifact_suffix }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
 
   merge:
+    name: Create multi-arch Docker image
+
     runs-on: ubuntu-latest
-    needs: build
+
+    needs:
+      - build
+
     permissions:
+      contents: read
       packages: write
 
     steps:
@@ -112,18 +129,102 @@ jobs:
 
       - name: Create manifest list and push
         working-directory: /tmp/digests
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          TAGS: ${{ steps.meta.outputs.tags }}
         run: |
-          # 1. Build an array of -t <tag> flags
-          TAG_ARGS=()
-          while IFS= read -r tag; do
-            [ -n "$tag" ] && TAG_ARGS+=("-t" "$tag")
-          done <<< "${{ steps.meta.outputs.tags }}"
+          set -euo pipefail
 
-          # 2. Build an array of image digests
+          TAG_ARGS=()
+
+          while IFS= read -r tag; do
+            if [[ -n "$tag" ]]; then
+              TAG_ARGS+=("-t" "$tag")
+            fi
+          done <<< "$TAGS"
+
           DIGEST_ARGS=()
+
           for digest in *; do
-            [ -f "$digest" ] && DIGEST_ARGS+=("${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}@sha256:${digest}")
+            if [[ -f "$digest" ]]; then
+              DIGEST_ARGS+=("${IMAGE}@sha256:${digest}")
+            fi
           done
 
-          # 3. Create and push the multi-arch manifest
-          docker buildx imagetools create "${TAG_ARGS[@]}" "${DIGEST_ARGS[@]}"
+          if [[ ${#TAG_ARGS[@]} -eq 0 ]]; then
+            echo "No image tags generated"
+            exit 1
+          fi
+
+          if [[ ${#DIGEST_ARGS[@]} -eq 0 ]]; then
+            echo "No image digests found"
+            exit 1
+          fi
+
+          docker buildx imagetools create \
+            "${TAG_ARGS[@]}" \
+            "${DIGEST_ARGS[@]}"
+
+      - name: Inspect image
+        env:
+          IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          TAGS: ${{ steps.meta.outputs.tags }}
+        run: |
+          first_tag="$(printf '%s\n' "$TAGS" | head -n 1)"
+          docker buildx imagetools inspect "$first_tag"
+
+  release-binaries:
+    name: Build release binaries
+
+    if: github.event_name == 'release'
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Build frontend
+        run: |
+          npm ci
+          npm run build
+
+      - name: Verify frontend
+        run: |
+          test -f dist/index.html
+          test -f dist/config/services.json
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Run tests
+        run: go test ./...
+
+      - name: Build release archives
+        env:
+          VERSION: ${{ github.event.release.tag_name }}
+        run: |
+          chmod +x scripts/build-release.sh
+          ./scripts/build-release.sh "${VERSION#v}"
+
+      - name: Upload release files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          gh release upload \
+            "$RELEASE_TAG" \
+            release/* \
+            --clobber
