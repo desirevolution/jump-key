@@ -190,7 +190,7 @@ Remote-User header if detected is used as a part of the expected local config na
 ## Ideas/Todos
 
 - **Workspaces**: Work/private separation. (functional)
-- **Standalone server**: golang wrapper server, replaces the caddy setup. (technical)
+- ~~**Standalone server**: golang wrapper server, replaces the caddy setup. (technical)~~
 
 ## Disclaimer
 
