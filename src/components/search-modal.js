@@ -11,7 +11,6 @@ const styles = {
   iconBadge: `flex items-center justify-center size-9 rounded-xl bg-slate-700/60 ring-1 ring-slate-600/70 text-indigo-300`,
   form: `grow`,
   input: `w-full bg-transparent text-lg sm:text-xl font-medium tracking-tight text-slate-50 placeholder-slate-500 focus:outline-none`,
-  // FIX: Nur reine Tailwind-Klassen hier rein. Der Selektor-Name bleibt getrennt.
   resultsContainer: `overflow-y-auto p-2 space-y-1 grow scroll-py-2`,
   engineHeader: `px-3 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-500`,
   emptyState: `flex flex-col items-center justify-center py-10 text-slate-500`,
@@ -281,6 +280,7 @@ export class JkSearchModal extends LitElement {
                 .value=${this.searchQuery}
                 @input=${this._handleInput}
                 class="${styles.input}"
+                autocomplete="off"
               />
             </form>
 
