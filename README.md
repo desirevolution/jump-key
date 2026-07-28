@@ -16,6 +16,7 @@ https://github.com/user-attachments/assets/b2c4290e-f371-44eb-b47c-44d5a73de379
 
 ## Features
 
+- **NEW: standalone executable**: No docker needed anymore. Just download and run JumpKey directly on your pc/server. (Linux x86/arm64/arm6, Darwin arm64 and Windows x86 supported)
 - **Keyboard-Centric Navigation**: Navigate categories and launch services using sequential keyboard shortcuts.
 - **Category Organization**: Group services into configurable categories.
 - **Favorites**: Mark frequently used services as favorites for quick access.
@@ -29,7 +30,7 @@ https://github.com/user-attachments/assets/b2c4290e-f371-44eb-b47c-44d5a73de379
 - **Localization Support**: Automatic language detection with internationalization support. Currently DE, EN, FR, ES included.
 - **Icons**: Lucide icon name, local hosted images and urls.
 - **Themes**: 6 dark and 3 light themes included.
-- **Docker Ready**: Deploy using the included Docker Compose configuration. (amd64/arm64 ~60 mb image)
+- **Docker Ready**: Deploy using the included Docker Compose configuration. (amd64/arm64 ~8 mb image)
 - **Lightweight Architecture**: Built with Lit for fast rendering and minimal resource usage.
 - **Static Deployment**: No backend or database required. (Caddy + WebDav plugin)
 - **Simple Multi-User Support**: Map Remote-User header as part of the saved config file.
@@ -73,14 +74,24 @@ https://github.com/user-attachments/assets/b2c4290e-f371-44eb-b47c-44d5a73de379
 
 ## Quick Start
 
+### standalone executable
+
+Download and extract the version matching your architecture.
+
+Create directories for the config and icons and run:
+
+```bash
+jump-key --host 0.0.0.0 -port 8080 -config-dir ./config -icons-dir ./icons
+```
+
+
+### docker compose setup
+
 Copy/adjust [compose.yml](compose.yml) and /config/[services.json](services.example.json) and put all your custome icon images in /icon.
 
 Then run:
 
 ```bash
-# caddy webdav container needs write access to the config directory
-chown -R  100 config
-
 docker compose up -d
 ```
 
