@@ -78,7 +78,7 @@ https://github.com/user-attachments/assets/b2c4290e-f371-44eb-b47c-44d5a73de379
 
 Download and extract the version matching your architecture.
 
-Create directories for the config and icons and run:
+Create directories for the config and icons, add your config file (services.json) and run:
 
 ```bash
 jump-key --host 0.0.0.0 -port 8080 -config-dir ./config -icons-dir ./icons
