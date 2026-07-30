@@ -40,6 +40,24 @@
       }
     </script>
     <link rel="icon" type="image/x-icon" href="/jump-key.ico" />
+    <style>
+    body::before {
+      content: "DEMO";
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-30deg);
+      font-size: 25vw; /* Skaliert dynamisch mit der Bildschirmgröße */
+      font-weight: 900;
+      font-family: sans-serif;
+      color: rgba(255, 255, 255, 0.02);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      pointer-events: none; /* Macht das Wasserzeichen klicksicher */
+      z-index: 9999;
+      user-select: none;
+    }
+  </style>
   </head>
   <body class="p-4 sm:p-8 lg:w-4/5 mx-auto min-h-screen flex flex-col justify-between select-none">
     <a class="github-fork-ribbon" href="https://github.com/desirevolution/jump-key" data-ribbon="JumpKey on Github" title="Fork me on GitHub">Fork me on GitHub</a>
