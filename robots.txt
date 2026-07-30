@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://desirevolution.github.io/jump-key/sitemap.xml
