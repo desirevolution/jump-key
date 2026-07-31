@@ -161,17 +161,30 @@ The application is configured through the `config/services.json` file.
       "name": "Google",
       "prefix": "g",
       "url": "https://www.google.com/search?q=%s",
-      "icon": "search"
+      "icon": "iconify:logos:google-icon"
     },
     {
       "name": "Wikipedia",
       "prefix": "w",
       "url": "https://en.wikipedia.org/wiki/Special:Search?search=%s",
-      "icon": "book-open"
+      "icon": "lucide:book-open"
     }
   ]
 }
 ```
+
+## Icons
+
+| Icon value                     | Type         | Description                                                                                                            |
+| ------------------------------ | ------------ | ---------------------------------------------------------------------------------------------------------------------- |
+| `hammer`                       | Lucide       | Backwards-compatible shorthand. Equivalent to `lucide:hammer`.                                                         |
+| `lucide:hammer`                | Lucide       | Dynamically loaded Lucide icon.                                                                                        |
+| `iconify:mdi:home`             | Iconify      | Dynamically loaded icon from any Iconify icon set.                                                                     |
+| `https://example.com/icon.svg` | Remote image | Loads an icon from an external image URL.                                                                              |
+| `my-service.svg`               | Local image  | Loads an icon from the local `./icons` directory.  (`.svg`, `.png`, `.webp`, `.jpg`, `.jpeg`, `.gif` supported)        |
+
+You can find all available iconify/lucide icons here: 
+https://icon-sets.iconify.design/
 
 ## Security Notice
 
