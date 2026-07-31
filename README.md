@@ -203,7 +203,7 @@ Remote-User header if detected is used as a part of the expected local config na
 ## Ideas/Todos
 
 - **Workspaces**: Work/private separation. (functional)
-- **Iconify Icons**: Add https://icon-sets.iconify.design/ support. (functional)
+- ~~**Iconify Icons**: Add https://icon-sets.iconify.design/ support. (functional)~~
 - ~~**Standalone server**: golang wrapper server, replaces the caddy setup. (technical)~~
 
 ## Disclaimer
