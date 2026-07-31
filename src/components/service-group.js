@@ -54,7 +54,7 @@ export class JkServiceGroup extends LitElement {
       <section class="${styles.section}">
         <div class="${styles.header}">
           <div class="${styles.iconContainer}">
-            <jk-icon .icon=${this.icon || 'folder'} class="${styles.icon}"></jk-icon>
+            <jk-icon .icon=${this.icon || 'ui:folder'} class="${styles.icon}"></jk-icon>
           </div>
 
           <div class="${styles.titleWrapper}">

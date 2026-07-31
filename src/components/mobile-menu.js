@@ -56,7 +56,7 @@ export class JkMobileMenu extends LitElement {
         class="${styles.themeButton} ${active ? 'border-indigo-500/60 bg-indigo-500/10' : 'border-slate-700/60 bg-slate-800/40'}"
         @click=${() => this._emit('theme-change', { theme: theme.id })}
       >
-        ${active ? html`<span class="${styles.selected}"><jk-icon icon="check" class="size-3"></jk-icon></span>` : ''}
+        ${active ? html`<span class="${styles.selected}"><jk-icon icon="ui:check" class="size-3"></jk-icon></span>` : ''}
         <div
           class="${styles.preview}"
           style="background:${theme.preview.background};border-color:${theme.preview.text}33"
@@ -82,7 +82,7 @@ export class JkMobileMenu extends LitElement {
                 this.mode === 'themes'
                   ? html`
                       <jk-icon-button
-                        icon="arrow-left"
+                        icon="ui:arrow-left"
                         label="${this.t('back')}"
                         @click=${() => this._emit('back')}
                       ></jk-icon-button>
@@ -94,7 +94,7 @@ export class JkMobileMenu extends LitElement {
               </h3>
             </div>
             <jk-icon-button
-              icon="x"
+              icon="ui:x"
               label="${this.t('close')}"
               @click=${() => this._emit('close')}
             ></jk-icon-button>
@@ -106,7 +106,7 @@ export class JkMobileMenu extends LitElement {
                   <div class="${styles.list}">
                     <button class="${styles.action}" @click=${() => this._emit('open-help')}>
                       <span class="${styles.actionIcon}"
-                        ><jk-icon icon="circle-help" class="size-5"></jk-icon
+                        ><jk-icon icon="ui:circle-help" class="size-5"></jk-icon
                       ></span>
                       <span class="${styles.actionText}"
                         ><span class="${styles.actionTitle}">${this.t('mobileHelpAction')}</span
@@ -114,17 +114,17 @@ export class JkMobileMenu extends LitElement {
                           >${this.t('mobileHelpActionDesc')}</span
                         ></span
                       >
-                      <jk-icon icon="chevron-right" class="${styles.chevron}"></jk-icon>
+                      <jk-icon icon="ui:chevron-right" class="${styles.chevron}"></jk-icon>
                     </button>
                     <button class="${styles.action}" @click=${() => this._emit('open-themes')}>
                       <span class="${styles.actionIcon}"
-                        ><jk-icon icon="palette" class="size-5"></jk-icon
+                        ><jk-icon icon="ui:palette" class="size-5"></jk-icon
                       ></span>
                       <span class="${styles.actionText}"
                         ><span class="${styles.actionTitle}">${this.t('mobileThemeAction')}</span
                         ><span class="${styles.actionDesc}">${this.t(current.nameKey)}</span></span
                       >
-                      <jk-icon icon="chevron-right" class="${styles.chevron}"></jk-icon>
+                      <jk-icon icon="ui:chevron-right" class="${styles.chevron}"></jk-icon>
                     </button>
                   </div>
                 `

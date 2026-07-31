@@ -49,27 +49,27 @@ export class JkToast extends LitElement {
   render() {
     const config = {
       success: {
-        icon: 'circle-check',
+        icon: 'ui:circle-check',
         accent: 'jk-status-success-accent',
         border: 'jk-status-success-border',
         iconColor: 'jk-status-success',
       },
 
       error: {
-        icon: 'triangle-alert',
+        icon: 'ui:triangle-alert',
         accent: 'jk-status-danger-accent',
         border: 'jk-status-danger-border',
         iconColor: 'jk-status-danger',
       },
 
       warning: {
-        icon: 'triangle-alert',
+        icon: 'ui:triangle-alert',
         accent: 'jk-status-warning-accent',
         border: 'jk-status-warning-border',
         iconColor: 'jk-status-warning',
       },
     }[this.type] ?? {
-      icon: 'info',
+      icon: 'ui:info',
       accent: 'jk-status-info-accent',
       border: 'jk-status-info-border',
       iconColor: 'jk-status-info',

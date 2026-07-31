@@ -88,7 +88,7 @@ export class JkHelpModal extends LitElement {
       <div class="${styles.row}">
         <span class="${styles.rowDesc}">${desc}</span>
         <span class="${styles.actionBadge}"
-          ><jk-icon icon="${icon}" class="${styles.actionIcon}"></jk-icon>${label}</span
+          ><jk-icon icon="ui:${icon}" class="${styles.actionIcon}"></jk-icon>${label}</span
         >
       </div>
     `;
@@ -108,7 +108,7 @@ export class JkHelpModal extends LitElement {
           <div class="${styles.header}">
             <div class="${styles.headerLeft}">
               <div class="${styles.iconBadge}">
-                <jk-icon icon="circle-help" class="${styles.icon}"></jk-icon>
+                <jk-icon icon="ui:circle-help" class="${styles.icon}"></jk-icon>
               </div>
               <h3 class="${styles.title}">
                 <span class="hidden md:inline">${this.t('helpTitleDesktop')}</span>
@@ -116,7 +116,7 @@ export class JkHelpModal extends LitElement {
               </h3>
             </div>
             <jk-icon-button
-              icon="x"
+              icon="ui:x"
               label="${this.t('close')}"
               @click=${this._handleClose}
             ></jk-icon-button>

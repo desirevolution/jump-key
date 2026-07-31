@@ -262,7 +262,7 @@ export class JkConfigModal extends LitElement {
           <div class="${styles.header}">
             <div class="${styles.headerLeft}">
               <div class="${styles.iconBadge}">
-                <jk-icon icon="settings-2" class="${styles.icon}"></jk-icon>
+                <jk-icon icon="ui:settings-2" class="${styles.icon}"></jk-icon>
               </div>
               <div>
                 <h2 class="${styles.title}">JumpKey</h2>
@@ -278,7 +278,7 @@ export class JkConfigModal extends LitElement {
                   ? html`
                       <div class="${styles.statusBadge} ${statusClass}">
                         <jk-icon
-                          .icon="${this._isEditorConfigValid ? 'circle-check' : 'triangle-alert'}"
+                          .icon="${this._isEditorConfigValid ? 'ui:circle-check' : 'ui:triangle-alert'}"
                           class="size-4"
                         ></jk-icon>
                         <span
@@ -289,7 +289,7 @@ export class JkConfigModal extends LitElement {
                   : ''
               }
               <jk-icon-button
-                icon="x"
+                icon="ui:x"
                 label="${this.t('close') || 'Close'}"
                 @click="${this._handleClose}"
               ></jk-icon-button>
@@ -302,7 +302,7 @@ export class JkConfigModal extends LitElement {
                 @click="${() => this._setActiveTab('appearance')}"
                 class="${styles.sidebarBtn} ${tabAppearanceClass}"
               >
-                <jk-icon icon="palette" class="size-4"></jk-icon>
+                <jk-icon icon="ui:palette" class="size-4"></jk-icon>
                 ${this.t('tabAppearance')}
                 <kbd class="${styles.kbd}">1</kbd>
               </button>
@@ -310,7 +310,7 @@ export class JkConfigModal extends LitElement {
                 @click="${() => this._setActiveTab('data')}"
                 class="${styles.sidebarBtn} ${tabDataClass}"
               >
-                <jk-icon icon="database" class="size-4"></jk-icon>
+                <jk-icon icon="ui:database" class="size-4"></jk-icon>
                 ${this.t('tabData')}
                 <kbd class="${styles.kbd}">2</kbd>
               </button>
@@ -318,7 +318,7 @@ export class JkConfigModal extends LitElement {
                 @click="${() => this._setActiveTab('editor')}"
                 class="${styles.sidebarBtn} ${tabEditorClass}"
               >
-                <jk-icon icon="code-2" class="size-4"></jk-icon>
+                <jk-icon icon="ui:code-2" class="size-4"></jk-icon>
                 ${this.t('tabEditor')}
                 <kbd class="${styles.kbd}">3</kbd>
               </button>
@@ -369,7 +369,7 @@ export class JkConfigModal extends LitElement {
                 type="warning"
                 .title=${this.t('discardChangesTitle')}
                 .message=${this.t('discardChangesMessage')}
-                icon="triangle-alert"
+                icon="ui:triangle-alert"
                 iconColor="jk-status-warning"
                 .confirmLabel=${this.t('discardConfirm')}
                 .cancelLabel=${this.t('cancel')}

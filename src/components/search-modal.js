@@ -258,7 +258,7 @@ export class JkSearchModal extends LitElement {
         <div @click=${(e) => e.stopPropagation()} class="${styles.modal}">
           <div class="${styles.header}">
             <div class="${styles.iconBadge}">
-              <jk-icon icon="search" class="size-5"></jk-icon>
+              <jk-icon icon="ui:search" class="size-5"></jk-icon>
             </div>
 
             <form @submit=${this._handleSubmit} class="${styles.form}">
@@ -279,7 +279,7 @@ export class JkSearchModal extends LitElement {
               showQuickTrigger
                 ? html`
                     <jk-icon-button
-                      icon="globe"
+                      icon="ui:globe"
                       title="Search engines"
                       @click=${() => this._selectEngine('')}
                     ></jk-icon-button>
@@ -287,7 +287,7 @@ export class JkSearchModal extends LitElement {
                 : ''
             }
 
-            <jk-icon-button icon="x" title="Close" @click=${this._handleClose}></jk-icon-button>
+            <jk-icon-button icon="ui:x" title="Close" @click=${this._handleClose}></jk-icon-button>
           </div>
 
           <div id="searchResults" class="${styles.resultsContainer}">
@@ -301,7 +301,7 @@ export class JkSearchModal extends LitElement {
               this.searchQuery && items.length === 0
                 ? html`
                     <div class="${styles.emptyState}">
-                      <jk-icon icon="search-x" class="${styles.emptyIcon}"></jk-icon>
+                      <jk-icon icon="ui:search-x" class="${styles.emptyIcon}"></jk-icon>
                       <span class="${styles.emptyText}">${this.t('noServices')}</span>
                     </div>
                   `

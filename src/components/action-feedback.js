@@ -91,7 +91,7 @@ export class JkActionFeedback extends LitElement {
       <div class="${styles.container}" role="status" aria-live="polite">
         <div class="${styles.iconWrap}">
           <jk-icon
-            icon=${service.icon || 'external-link'}
+            icon=${service.icon || 'ui:external-link'}
             alt=${service.name}
             class="${styles.icon}"
           ></jk-icon>

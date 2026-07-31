@@ -527,7 +527,7 @@ class DashboardApp extends LitElement {
       show: true,
       title: this.t('confirmResetTitle'),
       message: this.t('confirmReset'),
-      icon: 'trash-2',
+      icon: 'ui:trash-2',
       iconColor: 'jk-status-danger',
       confirmLabel: this.t('confirmResetConfirm'),
       cancelLabel: this.t('cancel'),
@@ -544,7 +544,7 @@ class DashboardApp extends LitElement {
       show: true,
       title: this.t('confirmContinueResetTitle'),
       message: this.t('confirmContinueReset'),
-      icon: 'trash-2',
+      icon: 'ui:trash-2',
       iconColor: 'jk-status-danger',
       confirmLabel: this.t('confirmResetConfirm'),
       cancelLabel: this.t('cancel'),
@@ -828,7 +828,7 @@ class DashboardApp extends LitElement {
 
                 <jk-service-group
                   title="${this.t('categories')}"
-                  icon="folder"
+                  icon="ui:folder"
                   .services=${this.categories.map((cat) => ({
                     name: cat.category,
                     url: `${cat.services?.length ?? 0} ${this.t('serviceCount')}`,

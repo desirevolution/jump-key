@@ -116,7 +116,7 @@ export class JkDashboardHeader extends LitElement {
               title="${this.t ? this.t('helpHint') : ''}"
               class="${styles.helpButton}"
             >
-              <jk-icon icon="help-circle" class="size-5"></jk-icon>
+              <jk-icon icon="ui:help-circle" class="size-5"></jk-icon>
             </button>
           </div>
         </div>
@@ -124,19 +124,19 @@ export class JkDashboardHeader extends LitElement {
         <div class="${styles.rightSection}">
           <div class="${styles.actionGroup}">
             <jk-icon-button
-              icon="${this.isGridView ? 'rows-2' : 'layout-grid'}"
+              icon="${this.isGridView ? 'ui:rows-2' : 'ui:layout-grid'}"
               title="${this.t ? this.t('hkToggleView') : ''} [#]"
               @click=${() => this._dispatchEvent('toggle-view')}
             ></jk-icon-button>
 
             <jk-icon-button
-              icon="search"
+              icon="ui:search"
               title="${this.t ? this.t('hkSearch') : ''} [Space]"
               @click=${() => this._dispatchEvent('open-search')}
             ></jk-icon-button>
 
             <jk-icon-button
-              icon="settings"
+              icon="ui:settings"
               title="${this.t ? this.t('editConfig') : ''}"
               .desktopOnly=${true}
               @click=${() => this._dispatchEvent('open-config')}
@@ -144,7 +144,7 @@ export class JkDashboardHeader extends LitElement {
 
             <span class="md:hidden">
               <jk-icon-button
-                icon="ellipsis"
+                icon="ui:ellipsis"
                 label="${this.t ? this.t('mobileMenuTitle') : 'More'}"
                 @click=${() => this._dispatchEvent('open-mobile-menu')}
               ></jk-icon-button>

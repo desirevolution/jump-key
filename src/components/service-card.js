@@ -302,13 +302,13 @@ export class JkServiceCard extends LitElement {
                     this.favoriteSlot
                       ? html`
                           <span class=${styles.favoriteMobile} aria-label="Favorit" title="Favorit">
-                            <jk-icon icon="star" class="size-4"></jk-icon>
+                            <jk-icon icon="ui:star" class="size-4"></jk-icon>
                           </span>
                           <kbd
                             class=${styles.favoriteBadge}
                             title="Favoriten-Shortcut ${this.favoriteSlot}"
                           >
-                            <jk-icon icon="star" class="size-3.5"></jk-icon>
+                            <jk-icon icon="ui:star" class="size-3.5"></jk-icon>
                             ${this.favoriteSlot}
                           </kbd>
                         `
