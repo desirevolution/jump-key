@@ -1,5 +1,6 @@
 import { html, LitElement } from 'lit';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
+import { loadIcon } from 'iconify-icon';
 import 'iconify-icon';
 import { uiIcons } from '../icons/ui-icons.js';
 
@@ -17,14 +18,19 @@ export class JkIcon extends LitElement {
   static properties = {
     icon: { type: String },
     alt: { type: String },
-    _loadedDynamicIcon: { state: true },
+    _dynamicIconName: { state: true },
+    _dynamicIconData: { state: true },
+    _dynamicIconStatus: { state: true },
   };
 
   constructor() {
     super();
     this.icon = '';
     this.alt = '';
-    this._loadedDynamicIcon = '';
+    this._dynamicIconName = '';
+    this._dynamicIconData = null;
+    this._dynamicIconStatus = 'idle';
+    this._dynamicIconRequestId = 0;
   }
 
   createRenderRoot() {
@@ -35,9 +41,9 @@ export class JkIcon extends LitElement {
     return this.getAttribute('class') || styles.defaultIconSize;
   }
 
-  willUpdate(changedProperties) {
+  updated(changedProperties) {
     if (changedProperties.has('icon')) {
-      this._loadedDynamicIcon = '';
+      this.loadDynamicIcon();
     }
   }
 
@@ -66,6 +72,42 @@ export class JkIcon extends LitElement {
     return { type: 'dynamic', name: `lucide:${this.toKebabCase(icon)}` };
   }
 
+  async loadDynamicIcon() {
+    const parsed = this.parseIcon();
+    const requestId = ++this._dynamicIconRequestId;
+
+    this._dynamicIconName = '';
+    this._dynamicIconData = null;
+    this._dynamicIconStatus = 'idle';
+
+    if (parsed.type !== 'dynamic') return;
+
+    if (!ICONIFY_NAME_PATTERN.test(parsed.name)) {
+      console.warn(`[jk-icon] Invalid dynamic icon name: ${parsed.name}`);
+      this._dynamicIconStatus = 'error';
+      return;
+    }
+
+    this._dynamicIconName = parsed.name;
+    this._dynamicIconStatus = 'loading';
+
+    try {
+      const data = await loadIcon(parsed.name);
+
+      if (requestId !== this._dynamicIconRequestId || this.parseIcon().name !== parsed.name) {
+        return;
+      }
+
+      this._dynamicIconData = data;
+      this._dynamicIconStatus = 'loaded';
+    } catch (error) {
+      if (requestId !== this._dynamicIconRequestId) return;
+
+      this._dynamicIconStatus = 'error';
+      console.warn(`[jk-icon] Could not load Iconify icon: ${parsed.name}`, error);
+    }
+  }
+
   render() {
     const parsed = this.parseIcon();
 
@@ -81,7 +123,6 @@ export class JkIcon extends LitElement {
     }
 
     if (!ICONIFY_NAME_PATTERN.test(parsed.name)) {
-      console.warn(`[jk-icon] Invalid dynamic icon name: ${parsed.name}`);
       return this.renderUiIcon('icon-fallback');
     }
 
@@ -89,27 +130,24 @@ export class JkIcon extends LitElement {
   }
 
   renderDynamicIcon(name) {
-    const loaded = this._loadedDynamicIcon === name;
+    const loaded =
+      this._dynamicIconStatus === 'loaded' &&
+      this._dynamicIconName === name &&
+      this._dynamicIconData;
+
+    if (!loaded) {
+      return this.renderUiIcon('icon-fallback');
+    }
 
     return html`
-      <span class="grid ${this.hostClasses}" aria-label=${this.alt || name}>
-        <span class="col-start-1 row-start-1 ${loaded ? 'invisible' : ''}" aria-hidden="true">
-          ${this.renderUiIcon('icon-fallback')}
-        </span>
-        <iconify-icon
-          icon=${name}
-          aria-hidden="true"
-          class="${styles.iconify} col-start-1 row-start-1 ${loaded ? '' : 'invisible'} ${this.hostClasses}"
-          @load=${() => this.handleDynamicIconLoad(name)}
-        ></iconify-icon>
-      </span>
+      <iconify-icon
+        .icon=${this._dynamicIconData}
+        width="100%"
+        height="100%"
+        aria-hidden="true"
+        class="${styles.iconify} ${this.hostClasses}"
+      ></iconify-icon>
     `;
-  }
-
-  handleDynamicIconLoad(name) {
-    if (this.parseIcon().name === name) {
-      this._loadedDynamicIcon = name;
-    }
   }
 
   renderUiIcon(name) {
