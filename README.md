@@ -106,17 +106,17 @@ The application is configured through the `config/services.json` file.
 | `categories`                   | `Array`  | List of category objects grouping your web services.                                                 |
 | `categories[].category`        | `String` | The visible display name of the category block.                                                      |
 | `categories[].categoryKey`     | `String` | _(Optional)_ The keyboard hotkey character to activate this category. Auto-assigned if omitted.      |
-| `categories[].icon`            | `String` | Lucide icon identifier (e.g., `layout-grid`), image URL or filename matching an image in `./icons/`. |
+| `categories[].icon`            | `String` | [Jump to Icons](#icons)                                                                              |
 | `categories[].services`        | `Array`  | Array of links belonging inside this group.                                                          |
 | `categories[].services[].name` | `String` | Title of the specific web application or website.                                                    |
 | `categories[].services[].url`  | `String` | Full destination URL (e.g., `https://github.com`).                                                   |
 | `categories[].services[].key`  | `String` | _(Optional)_ Specific hotkey to launch this item once its category is open.                          |
-| `categories[].services[].icon` | `String` | Lucide icon identifier (e.g., `layout-grid`), image URL or filename matching an image in `./icons/`. |
+| `categories[].services[].icon` | `String` | [Jump to Icons](#icons)                                                                              |
 | `searchEngines`                | `Array`  | Custom query shortcuts available inside the unified search bar using the `:` indicator.              |
 | `searchEngines[].name`         | `String` | Display name of the external search provider.                                                        |
 | `searchEngines[].prefix`       | `String` | The keyword trigger text (e.g., `g` maps to searching via `:g <query>`).                             |
 | `searchEngines[].url`          | `String` | Search engine query URL string containing `%s` as the search term placeholder.                       |
-| `searchEngines[].icon`         | `String` | Lucide icon identifier (e.g., `layout-grid`), image URL or filename matching an image in `./icons/`. |
+| `searchEngines[].icon`         | `String` | [Jump to Icons](#icons)                                                                              |
 
 ### Sample `services.json`
 
@@ -180,11 +180,14 @@ The application is configured through the `config/services.json` file.
 | `hammer`                       | Lucide       | Backwards-compatible shorthand. Equivalent to `lucide:hammer`.                                                         |
 | `lucide:hammer`                | Lucide       | Dynamically loaded Lucide icon.                                                                                        |
 | `iconify:mdi:home`             | Iconify      | Dynamically loaded icon from any Iconify icon set.                                                                     |
-| `https://example.com/icon.svg` | Remote image | Loads an icon from an external image URL.                                                                              |
+| `https://example.com/icon.svg` | Remote image | Loads an icon from an external image URL.(may also contain query parameters)                                           |
 | `my-service.svg`               | Local image  | Loads an icon from the local `./icons` directory.  (`.svg`, `.png`, `.webp`, `.jpg`, `.jpeg`, `.gif` supported)        |
+
+If a dynamic icon cannot be loaded, JumpKey displays the built-in fallback icon.
 
 You can find all available iconify/lucide icons here: 
 https://icon-sets.iconify.design/
+
 
 ## Security Notice
 
