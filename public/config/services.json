@@ -63,12 +63,12 @@
         {
           "name": "GitHub",
           "url": "https://github.com",
-          "icon": "https://cdn.simpleicons.org/github"
+          "icon": "iconify:simple-icons:github"
         },
         {
           "name": "GitLab",
           "url": "https://gitlab.com",
-          "icon": "https://cdn.simpleicons.org/gitlab"
+          "icon": "iconify:logos:gitlab"
         },
         {
           "name": "Bitbucket",
@@ -129,12 +129,12 @@
         {
           "name": "Docker Hub",
           "url": "https://hub.docker.com",
-          "icon": "https://cdn.simpleicons.org/docker"
+          "icon": "iconify:logos:docker-icon"
         },
         {
           "name": "Kubernetes",
           "url": "https://kubernetes.io",
-          "icon": "https://cdn.simpleicons.org/kubernetes"
+          "icon": "iconify:logos:kubernetes"
         },
         {
           "name": "Portainer",
@@ -154,7 +154,7 @@
         {
           "name": "Google Cloud",
           "url": "https://cloud.google.com",
-          "icon": "https://cdn.simpleicons.org/googlecloud"
+          "icon": "iconify:logos:google-cloud"
         },
         {
           "name": "Cloudflare",
@@ -185,7 +185,7 @@
         {
           "name": "Home Assistant",
           "url": "https://www.home-assistant.io",
-          "icon": "https://cdn.simpleicons.org/homeassistant"
+          "icon": "iconify:logos:home-assistant"
         },
         {
           "name": "Nextcloud",
@@ -241,7 +241,7 @@
         {
           "name": "YouTube",
           "url": "https://youtube.com",
-          "icon": "https://cdn.simpleicons.org/youtube"
+          "icon": "iconify:logos:youtube-icon"
         },
         {
           "name": "Netflix",
@@ -261,7 +261,7 @@
         {
           "name": "Spotify",
           "url": "https://spotify.com",
-          "icon": "https://cdn.simpleicons.org/spotify"
+          "icon": "iconify:logos:spotify-icon"
         },
         {
           "name": "Apple Music",
@@ -297,7 +297,7 @@
         {
           "name": "Google Drive",
           "url": "https://drive.google.com",
-          "icon": "https://cdn.simpleicons.org/googledrive"
+          "icon": "iconify:logos:google-drive"
         },
         {
           "name": "Google Docs",
@@ -312,7 +312,7 @@
         {
           "name": "Dropbox",
           "url": "https://dropbox.com",
-          "icon": "https://cdn.simpleicons.org/dropbox"
+          "icon": "iconify:logos:dropbox"
         },
         {
           "name": "Todoist",
@@ -322,7 +322,7 @@
         {
           "name": "Trello",
           "url": "https://trello.com",
-          "icon": "https://cdn.simpleicons.org/trello"
+          "icon": "iconify:logos:trello"
         },
         {
           "name": "Jira",
@@ -333,7 +333,7 @@
     },
     {
       "category": "Tools",
-      "icon": "hammer",
+      "icon": "lucide:hammer",
       "services": [
         {
           "name": "Can I Use",
@@ -373,7 +373,7 @@
         {
           "name": "TinyPNG",
           "url": "https://tinypng.com",
-          "icon": "hammer"
+          "icon": "lucide:image-down"
         },
         {
           "name": "Speedtest",
@@ -393,7 +393,7 @@
       "prefix": "g",
       "name": "Google",
       "url": "https://www.google.com/search?q=%s",
-      "icon": "https://cdn.simpleicons.org/google"
+      "icon": "iconify:logos:google-icon"
     },
     {
       "prefix": "ddg",
@@ -405,13 +405,13 @@
       "prefix": "yt",
       "name": "YouTube",
       "url": "https://www.youtube.com/results?search_query=%s",
-      "icon": "https://cdn.simpleicons.org/youtube"
+      "icon": "iconify:logos:youtube-icon"
     },
     {
       "prefix": "gh",
       "name": "GitHub",
       "url": "https://github.com/search?q=%s",
-      "icon": "https://cdn.simpleicons.org/github"
+      "icon": "iconify:simple-icons:github"
     },
     {
       "prefix": "so",
@@ -435,7 +435,7 @@
       "prefix": "npm",
       "name": "npm",
       "url": "https://www.npmjs.com/search?q=%s",
-      "icon": "https://cdn.simpleicons.org/npm"
+      "icon": "iconify:logos:npm-icon"
     }
   ]
 }
