@@ -1,6 +1,5 @@
 import { html, LitElement } from 'lit';
 import { unsafeSVG } from 'lit/directives/unsafe-svg.js';
-import { lucideDynamicIconImports } from '@lucide/icons/dynamic';
 import 'iconify-icon';
 import { uiIcons } from '../icons/ui-icons.js';
 
@@ -18,15 +17,14 @@ export class JkIcon extends LitElement {
   static properties = {
     icon: { type: String },
     alt: { type: String },
-    _lucideIcon: { state: true },
+    _loadedDynamicIcon: { state: true },
   };
 
   constructor() {
     super();
     this.icon = '';
     this.alt = '';
-    this._lucideIcon = null;
-    this._loadId = 0;
+    this._loadedDynamicIcon = '';
   }
 
   createRenderRoot() {
@@ -39,7 +37,7 @@ export class JkIcon extends LitElement {
 
   willUpdate(changedProperties) {
     if (changedProperties.has('icon')) {
-      this.loadLucideIcon();
+      this._loadedDynamicIcon = '';
     }
   }
 
@@ -56,50 +54,16 @@ export class JkIcon extends LitElement {
       return { type: 'ui', name: icon.slice('ui:'.length) };
     }
 
-    if (icon.startsWith('lucide:')) {
-      return { type: 'lucide', name: icon.slice('lucide:'.length) };
-    }
-
     if (icon.startsWith('iconify:')) {
-      return { type: 'iconify', name: icon.slice('iconify:'.length) };
+      return { type: 'dynamic', name: icon.slice('iconify:'.length) };
     }
 
-    // Backwards compatibility: unprefixed icon names are Lucide icons.
-    return { type: 'lucide', name: icon };
-  }
-
-  async loadLucideIcon() {
-    const loadId = ++this._loadId;
-    const parsed = this.parseIcon();
-
-    this._lucideIcon = null;
-
-    if (parsed.type !== 'lucide' || !parsed.name) return;
-
-    const iconName = this.toKebabCase(parsed.name);
-    const loadIcon = lucideDynamicIconImports[iconName];
-
-    if (!loadIcon) {
-      console.warn(`[jk-icon] Unknown Lucide icon: ${parsed.name}`);
-      return;
+    if (icon.startsWith('lucide:')) {
+      return { type: 'dynamic', name: `lucide:${this.toKebabCase(icon.slice('lucide:'.length))}` };
     }
 
-    try {
-      const importedIcon = await loadIcon();
-      const icon = this.normalizeLucideIcon(importedIcon);
-
-      if (!icon) {
-        throw new TypeError(`Invalid Lucide icon data for: ${parsed.name}`);
-      }
-
-      if (loadId === this._loadId) {
-        this._lucideIcon = icon;
-      }
-    } catch (error) {
-      if (loadId === this._loadId) {
-        console.warn(`[jk-icon] Could not load Lucide icon: ${parsed.name}`, error);
-      }
-    }
+    // Backwards compatibility: unprefixed names are dynamic Lucide icons.
+    return { type: 'dynamic', name: `lucide:${this.toKebabCase(icon)}` };
   }
 
   render() {
@@ -113,42 +77,50 @@ export class JkIcon extends LitElement {
     }
 
     if (parsed.type === 'ui') {
-      const icon = uiIcons[this.toKebabCase(parsed.name)];
-
-      if (!icon) {
-        console.warn(`[jk-icon] Unknown UI icon: ${parsed.name}`);
-        return html``;
-      }
-
-      return html`${unsafeSVG(this.renderLucideIcon(icon))}`;
+      return this.renderUiIcon(parsed.name);
     }
 
-    if (parsed.type === 'iconify') {
-      if (!ICONIFY_NAME_PATTERN.test(parsed.name)) {
-        console.warn(`[jk-icon] Invalid Iconify icon name: ${parsed.name}`);
-        return html``;
-      }
-
-      return html`<iconify-icon
-        icon=${parsed.name}
-        aria-label=${this.alt || parsed.name}
-        class="${styles.iconify} ${this.hostClasses}"
-      ></iconify-icon>`;
+    if (!ICONIFY_NAME_PATTERN.test(parsed.name)) {
+      console.warn(`[jk-icon] Invalid dynamic icon name: ${parsed.name}`);
+      return this.renderUiIcon('icon-fallback');
     }
 
-    if (!this._lucideIcon) return html``;
-
-    return html`${unsafeSVG(this.renderLucideIcon(this._lucideIcon))}`;
+    return this.renderDynamicIcon(parsed.name);
   }
 
-  normalizeLucideIcon(importedIcon) {
-    const candidates = [
-      importedIcon,
-      importedIcon?.default,
-      ...Object.values(importedIcon || {}),
-    ];
+  renderDynamicIcon(name) {
+    const loaded = this._loadedDynamicIcon === name;
 
-    return candidates.find((candidate) => Array.isArray(candidate?.node)) || null;
+    return html`
+      <span class="grid ${this.hostClasses}" aria-label=${this.alt || name}>
+        <span class="col-start-1 row-start-1 ${loaded ? 'invisible' : ''}" aria-hidden="true">
+          ${this.renderUiIcon('icon-fallback')}
+        </span>
+        <iconify-icon
+          icon=${name}
+          aria-hidden="true"
+          class="${styles.iconify} col-start-1 row-start-1 ${loaded ? '' : 'invisible'} ${this.hostClasses}"
+          @load=${() => this.handleDynamicIconLoad(name)}
+        ></iconify-icon>
+      </span>
+    `;
+  }
+
+  handleDynamicIconLoad(name) {
+    if (this.parseIcon().name === name) {
+      this._loadedDynamicIcon = name;
+    }
+  }
+
+  renderUiIcon(name) {
+    const iconName = this.toKebabCase(name);
+    const icon = uiIcons[iconName] || uiIcons['icon-fallback'];
+
+    if (!uiIcons[iconName]) {
+      console.warn(`[jk-icon] Unknown UI icon: ${name}`);
+    }
+
+    return html`${unsafeSVG(this.renderLucideIcon(icon))}`;
   }
 
   renderLucideIcon(icon) {
