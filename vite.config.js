@@ -3,6 +3,11 @@ import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig({
+  optimizeDeps: {
+    // Keep Lucide's runtime icon imports outside Vite's dependency pre-bundle.
+    // Otherwise optimized icon chunks can become stale after cache invalidation.
+    exclude: ['@lucide/icons', '@lucide/icons/dynamic'],
+  },
   plugins: [
     tailwindcss(),
     VitePWA({

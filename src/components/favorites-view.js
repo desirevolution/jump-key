@@ -41,11 +41,11 @@ export class JkFavoritesView extends LitElement {
       <section class=${styles.section}>
         <div class=${styles.header}>
           <div class=${styles.iconBadge}>
-            <jk-icon icon="star" class=${styles.icon}></jk-icon>
+            <jk-icon icon="ui:star" class=${styles.icon}></jk-icon>
           </div>
           <h2 class=${styles.title}>${this.t('favorites')}</h2>
           <jk-icon-button
-            icon="trash-2"
+            icon="ui:trash-2"
             variant="text"
             .text=${this.t('resetFavs')}
             class=${styles.resetButton}
@@ -78,11 +78,11 @@ export class JkFavoritesView extends LitElement {
       <section class=${styles.continueSection}>
         <div class=${styles.header}>
           <div class=${styles.continueIconBadge}>
-            <jk-icon icon="history" class=${styles.continueIcon}></jk-icon>
+            <jk-icon icon="ui:history" class=${styles.continueIcon}></jk-icon>
           </div>
           <h2 class=${styles.title}>${this.t('continue')}</h2>
           <jk-icon-button
-            icon="trash-2"
+            icon="ui:trash-2"
             variant="text"
             .text=${this.t('resetContinue')}
             class=${styles.resetButton}

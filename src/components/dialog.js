@@ -129,7 +129,7 @@ export class JkDialog extends LitElement {
               <p class="${styles.message}">${this.message}</p>
             </div>
 
-            <jk-icon-button icon="x" @click=${this._handleCancel}></jk-icon-button>
+            <jk-icon-button icon="ui:x" @click=${this._handleCancel}></jk-icon-button>
           </div>
 
           <div class="${styles.footer}">

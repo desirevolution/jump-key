@@ -90,7 +90,7 @@ export class JkConfigAppearance extends LitElement {
           ${
             active
               ? html`<span class="${styles.check}"
-                  ><jk-icon icon="check" class="size-4"></jk-icon
+                  ><jk-icon icon="ui:check" class="size-4"></jk-icon
                 ></span>`
               : ''
           }

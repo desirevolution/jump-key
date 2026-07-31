@@ -108,14 +108,14 @@ export class JkConfigData extends LitElement {
         <section class="${styles.exportCard}">
           <div class="${styles.exportBody}">
             <div class="${styles.exportIconBox}">
-              <jk-icon icon="download" class="w-6 h-6"></jk-icon>
+              <jk-icon icon="ui:download" class="w-6 h-6"></jk-icon>
             </div>
             <div class="${styles.exportTextContainer}">
               <h3 class="${styles.exportTitle}">${this.t('tabDataBackupTitle')}</h3>
               <p class="${styles.exportDesc}">${this.t('tabDataBackupDesc')}</p>
             </div>
             <button @click="${this._exportConfig}" class="${styles.exportBtn}">
-              <jk-icon icon="download" class="w-4 h-4"></jk-icon>
+              <jk-icon icon="ui:download" class="w-4 h-4"></jk-icon>
               ${this.t('tabDataExport')}
             </button>
           </div>
@@ -124,7 +124,7 @@ export class JkConfigData extends LitElement {
         <section class="${styles.importCard}">
           <div class="${styles.importHeader}">
             <div class="${styles.importIconBox}">
-              <jk-icon icon="upload" class="w-5 h-5"></jk-icon>
+              <jk-icon icon="ui:upload" class="w-5 h-5"></jk-icon>
             </div>
             <div>
               <h3 class="${styles.importTitle}">${this.t('tabDataRestoreTitle')}</h3>
@@ -140,7 +140,7 @@ export class JkConfigData extends LitElement {
               class="${styles.fileInput}"
             />
             <div class="${styles.dropZoneIconBox}">
-              <jk-icon icon="file-json" class="w-7 h-7"></jk-icon>
+              <jk-icon icon="ui:file-json" class="w-7 h-7"></jk-icon>
             </div>
             <span class="${styles.dropZoneLabel}">${this.t('tabDataSelectFile')}</span>
             <span class="${styles.dropZoneSubLabel}">${this.t('tabDataOnlyJsonFiles')}</span>

@@ -42,11 +42,11 @@ export class JkKeystrokeBadge extends LitElement {
 
   renderStatus() {
     if (this.isValid) {
-      return html`<jk-icon icon="check" class="${styles.icon} jk-status-success"></jk-icon>`;
+      return html`<jk-icon icon="ui:check" class="${styles.icon} jk-status-success"></jk-icon>`;
     }
 
     if (this.isInvalid) {
-      return html`<jk-icon icon="x" class="${styles.icon} jk-status-danger"></jk-icon>`;
+      return html`<jk-icon icon="ui:x" class="${styles.icon} jk-status-danger"></jk-icon>`;
     }
 
     return html`<span class="${styles.pendingDot}" aria-hidden="true"></span>`;

@@ -26,7 +26,7 @@ export class JkGridView extends LitElement {
     if (!this.categories || this.categories.length === 0) {
       return html`
         <div class="${styles.emptyState}">
-          <jk-icon icon="folder-open" class="${styles.emptyIcon}"></jk-icon>
+          <jk-icon icon="ui:folder-open" class="${styles.emptyIcon}"></jk-icon>
           <span class="${styles.emptyText}">
             ${this.t ? this.t('noServices') : 'No services'}
           </span>
