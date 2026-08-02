@@ -60,6 +60,7 @@ export class JkHelpModal extends LitElement {
     }
 
     shortcuts.push({ keys: ['-'], desc: this.t('hkToggleLast') });
+    shortcuts.push({ keys: ['Shift', '-'], desc: this.t('hkOpenContinue') });
 
     shortcuts.push(
       { keys: ['A-Z'], desc: this.t('hkCat') },
