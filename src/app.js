@@ -100,7 +100,7 @@ class DashboardApp extends LitElement {
     this.mobileMenuMode = 'menu';
     this.isInvalidInput = false;
     this.isValidInput = false;
-    this.isGridView = readJsonStorage(STORAGE_KEYS.gridView, false);
+    this.isGridView = readJsonStorage(STORAGE_KEYS.gridView, true);
 
     // User Data & Search
     this.favorites = readJsonStorage(STORAGE_KEYS.favorites, {});
