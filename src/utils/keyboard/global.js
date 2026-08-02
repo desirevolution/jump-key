@@ -119,22 +119,37 @@ export function handleGlobalKeyDown(e, app) {
   }
 
   /*
-   * Zwischen den beiden letzten Services wechseln
-   */
-  if (e.key === '-') {
-    e.preventDefault();
-    app.toggleLastService();
-    return;
-  }
-
-  /*
    * Hilfe
+   *
+   * Muss vor layoutabhängigen Symbol-Shortcuts geprüft werden.
    */
   if (e.key === '?') {
     e.preventDefault();
 
     app.showHelp = true;
 
+    return;
+  }
+
+  /*
+   * Continue-Übersicht öffnen
+   *
+   * Layoutabhängig über das tatsächlich erzeugte Zeichen erkennen.
+   * Eine Prüfung auf e.code === 'Minus' würde auf deutschen Layouts
+   * auch Shift + ß (= ?) abfangen und damit den Hilfe-Shortcut blockieren.
+   */
+  if (e.key === '_') {
+    e.preventDefault();
+    app.openContinueView('_');
+    return;
+  }
+
+  /*
+   * Durch die zuletzt verwendeten Services wechseln
+   */
+  if (e.key === '-') {
+    e.preventDefault();
+    app.toggleLastService();
     return;
   }
 

@@ -38,6 +38,7 @@ export const translations = {
     noServices: 'Keine Services gefunden.',
     favorites: 'Favoriten',
     continue: 'Zuletzt verwendet',
+    continueEmpty: 'Keine zuletzt verwendeten Services vorhanden.',
     resetFavs: 'Zurücksetzen',
     resetContinue: 'Zurücksetzen',
     categories: 'Kategorien',
@@ -73,6 +74,7 @@ export const translations = {
     hkContinue: 'Zuletzt verwendeten Service aufrufen',
     hkToggleLast:
       'Zuletzt verwendete Services durchschalten (erneut drücken, solange die Startanzeige sichtbar ist)',
+    hkOpenContinue: 'Übersicht der zuletzt verwendeten Services öffnen',
     hkCat: 'Kategorie-Hotkeys aktivieren',
     hkService: 'Service innerhalb einer Kategorie aufrufen',
     hkReset: 'Zurück zur Hauptübersicht / Abbrechen',
@@ -211,6 +213,7 @@ export const translations = {
     noServices: 'Aucun service trouvé.',
     favorites: 'Favoris',
     continue: 'Récemment utilisés',
+    continueEmpty: 'Aucun service récemment utilisé.',
     resetFavs: 'Réinitialiser',
     resetContinue: 'Réinitialiser',
     categories: 'Catégories',
@@ -242,6 +245,7 @@ export const translations = {
     hkContinue: 'Ouvrir un service récemment utilisé',
     hkToggleLast:
       'Parcourir les services récents (appuyer de nouveau pendant l’affichage du lancement)',
+    hkOpenContinue: 'Ouvrir la liste des services récemment utilisés',
     hkCat: 'Activer les raccourcis de catégories',
     hkService: 'Ouvrir un service dans la catégorie active',
     hkReset: 'Retour à la vue principale / Annuler',
@@ -370,6 +374,7 @@ export const translations = {
     noServices: 'No se encontraron servicios.',
     favorites: 'Favoritos',
     continue: 'Usados recientemente',
+    continueEmpty: 'No hay servicios usados recientemente.',
     resetFavs: 'Restablecer',
     resetContinue: 'Restablecer',
     categories: 'Categorías',
@@ -400,6 +405,7 @@ export const translations = {
     hkContinue: 'Abrir servicio usado recientemente',
     hkToggleLast:
       'Recorrer los servicios recientes (pulsar de nuevo mientras se muestra el inicio)',
+    hkOpenContinue: 'Abrir la lista de servicios usados recientemente',
     hkCat: 'Activar atajos de categorías',
     hkService: 'Abrir servicio dentro de la categoría activa',
     hkReset: 'Volver a la vista principal / Cancelar',
@@ -526,6 +532,7 @@ export const translations = {
     noServices: 'No services found.',
     favorites: 'Favorites',
     continue: 'Continue',
+    continueEmpty: 'No recently used services available.',
     resetFavs: 'Reset',
     resetContinue: 'Reset',
     categories: 'Categories',
@@ -560,6 +567,7 @@ export const translations = {
     hkContinue: 'Launch recently used service',
     hkToggleLast:
       'Cycle through recently used services (press again while launch feedback is visible)',
+    hkOpenContinue: 'Open the recently used services overview',
     hkCat: 'Activate category hotkeys',
     hkService: 'Launch service inside active category',
     hkReset: 'Back to main overview / Cancel',
