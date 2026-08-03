@@ -58,6 +58,12 @@ export class JkActionFeedback extends LitElement {
     this.finish(false);
   }
 
+  confirm() {
+    if (!this.resolvePending) return false;
+    this.finish(true);
+    return true;
+  }
+
   finish(shouldLaunch, hide = true) {
     clearTimeout(this.hideTimer);
     this.hideTimer = null;

@@ -151,7 +151,15 @@ class DashboardApp extends LitElement {
   }
 
   handleKeyDown(e) {
-    const continuesLastUsedCycle = e.key === '-' && this.actionManager.activeType === 'launch';
+    const hasPendingLaunch = this.actionManager.activeType === 'launch';
+
+    if (e.key === 'Enter' && hasPendingLaunch) {
+      e.preventDefault();
+      this.confirmPendingAction();
+      return;
+    }
+
+    const continuesLastUsedCycle = e.key === '-' && hasPendingLaunch;
 
     this.cancelPendingAction();
 
@@ -269,6 +277,13 @@ class DashboardApp extends LitElement {
 
   cancelPendingAction() {
     return this.actionManager.cancel();
+  }
+
+  confirmPendingAction() {
+    if (this.actionManager.activeType !== 'launch') return false;
+
+    const feedback = this.querySelector('jk-action-feedback');
+    return feedback?.confirm() ?? false;
   }
 
   enterUiMode() {
