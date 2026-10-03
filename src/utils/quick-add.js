@@ -20,7 +20,7 @@ export function buildQuickConfig(config, { url, name, category, newCategory, key
     if (next.categories.some(c => c.category.toLowerCase() === newCategory.trim().toLowerCase())) throw new Error('quickCategoryExists');
     target = { category: newCategory.trim(), services: [] };
     next.categories.push(target);
-  } else target = next.categories[Number(category)];
+  } else if (/^\d+$/.test(category ?? '')) target = next.categories[Number(category)];
   if (!target) throw new Error('quickCategoryRequired');
   if (target.services.some(s => { try { return new URL(s.url, globalThis.location?.origin || 'https://jumpkey.invalid').href === parsed.href; } catch { return s.url === url.trim(); } })) throw new Error('quickDuplicate');
   const service = { name: name.trim() || parsed.hostname, url: parsed.href };
@@ -36,6 +36,7 @@ export function buildQuickConfig(config, { url, name, category, newCategory, key
 }
 
 export function suggestKey(config, category, name) {
+  if (category !== 'new' && !/^\d+$/.test(category ?? '')) return '';
   const target = category === 'new' ? { category: 'New', services: [] } : config?.categories[Number(category)];
   if (!target) return '';
   const existing = generateShortcuts([target])[0];

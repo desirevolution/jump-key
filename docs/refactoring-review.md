@@ -53,3 +53,18 @@ Validation: existing and quick-add Node tests passed; production/PWA build passe
 ## Editor follow-up — 2026-10-03
 
 Editor displays computed category/service keys again while retaining extra JSON fields. Detailed validation collects all existing checks with paths and duplicate origins; parse errors are displayed separately. Page Up/Down uses the constrained visible editor height to move the caret and scroll, including Shift selection. Quick-add disables saving for invalid/incomplete input, duplicate URLs and shortcut conflicts; automatic suggestions follow the name/hostname/category until manually overridden. Validator regression tests and frontend build passed. Actual browser Page Up/Down behavior remains unverified in this environment.
+
+
+## Shortcut placement, translations and help
+
+- Category and service shortcuts sit between icon and name; subtitles align with the name. Favorite cards show their digit there, with a subtle star instead of a second shortcut badge.
+- French and Spanish now include quick-add, installation and validation text. A small regression check compares translation keys, placeholders and literal references across all four languages.
+- Help covers quick-add, favorite recording, recent entries, editor shortcuts and mobile installation/sharing. Favorite shortcuts remain documented in grid view; the recent-items shortcut is shown as `_`, independent of keyboard layout.
+- Node tests and production build passed. Browser rendering was not verified in this environment.
+
+
+## Desktop bookmarklet
+
+- Settings → Import & Export provides a draggable bookmarklet for the current installation, including its base path. It opens the existing share/quick-add flow in a new tab with URL and title, without an opener.
+- Incoming links require an explicit category selection; no category is remembered. Blank selections cannot resolve to the first category.
+- Updated desktop help, README and all four translations. Tests cover bookmarklet execution/encoding and empty category validation. Node tests and production build passed; actual browser drag-and-drop was not verified.

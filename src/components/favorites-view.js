@@ -13,7 +13,7 @@ const styles = {
   continueIcon: `size-4 text-indigo-300`,
   title: `text-sm font-semibold tracking-wide text-slate-200`,
   resetButton: `ml-auto`,
-  grid: `grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(280px,1fr))]`,
+  grid: `grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))]`,
 };
 
 export class JkFavoritesView extends LitElement {
@@ -61,6 +61,7 @@ export class JkFavoritesView extends LitElement {
                 .icon=${service.icon}
                 .favoriteSlot=${service.favSlot}
                 .isFavorite=${true}
+                .highlightKey=${true}
                 @card-click=${(e) => this.dispatchEvent(new CustomEvent('service-click', { detail: { service, shiftKey: e.detail.shiftKey }, bubbles: true, composed: true }))}
                 @card-long-press=${() => this.dispatchEvent(new CustomEvent('delete-favorite-slot', { detail: { slot: service.favSlot }, bubbles: true, composed: true }))}
               ></jk-service-card>
@@ -97,6 +98,7 @@ export class JkFavoritesView extends LitElement {
                 .subtitle=${service.url}
                 .icon=${service.icon}
                 .badgeText=${`⇧${service.continueSlot}`}
+                .highlightKey=${true}
                 @card-click=${(e) => this.dispatchEvent(new CustomEvent('continue-click', { detail: { service, shiftKey: e.detail.shiftKey }, bubbles: true, composed: true }))}
                 @card-long-press=${() => this.dispatchEvent(new CustomEvent('delete-continue-entry', { detail: { service }, bubbles: true, composed: true }))}
               ></jk-service-card>

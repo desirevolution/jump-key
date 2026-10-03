@@ -7,12 +7,12 @@ import './icon.js';
 export class QuickAdd extends LitElement {
   static properties = { config: {}, initial: {}, categoryKey: {}, t: {}, url: {}, name: {}, category: {}, newCategory: {}, key: {}, icon: {}, error: {}, saving: {} };
   createRenderRoot() { return this; }
-  constructor() { super(); Object.assign(this, { url:'', name:'', category:'0', newCategory:'', key:'', icon:'', error:'', saving:false, keyEdited:false }); }
+  constructor() { super(); Object.assign(this, { url:'', name:'', category:'', newCategory:'', key:'', icon:'', error:'', saving:false, keyEdited:false }); }
   firstUpdated() {
     this.url = this.initial?.url || '';
     this.name = this.initial?.name || '';
     const index = generateShortcuts(this.config.categories).findIndex(c => c.categoryKey === this.categoryKey);
-    this.category = this.config.categories.length ? String(Math.max(0, index)) : 'new';
+    this.category = index >= 0 && !this.initial?.url ? String(index) : '';
     this.suggest();
     this.updateComplete.then(() => { this.querySelector('dialog').showModal(); this.querySelector('input').focus(); });
   }
@@ -48,7 +48,8 @@ export class QuickAdd extends LitElement {
           ${field('URL', this.url, e => {this.url=e.target.value; this.suggest();}, {required:true,type:'url'})}
           ${field(this.t('quickName'), this.name, e => {this.name=e.target.value; this.suggest();})}
           <p class="text-xs text-slate-400">${this.t('quickNameHint')} ${this.hostName()}</p>
-          <label>${this.t('quickCategory')}<select .value=${this.category} @change=${e => {this.category=e.target.value;this.suggest();}}>
+          <label>${this.t('quickCategory')}<select required .value=${this.category} @change=${e => {this.category=e.target.value;this.suggest();}}>
+            <option value="" disabled>${this.t('selectCategory')}</option>
             ${this.config?.categories.map((c,i)=>html`<option value=${String(i)}>${c.category}</option>`)}
             <option value="new">${this.t('quickNewCategory')}</option>
           </select></label>

@@ -18,3 +18,7 @@ test('new category and link saved together without mutating source',()=>{
 test('shared text URLs are extracted without interpreting markup',()=>{
  assert.deepEqual(sharedLink(new URLSearchParams({text:'Look https://example.com/x',title:'Example'})),{url:'https://example.com/x',name:'Example'});
 });
+test('an empty category cannot silently select the first category', () => {
+ assert.throws(() => buildQuickConfig(config, {...input, category:''}), /quickCategoryRequired/);
+ assert.equal(suggestKey(config, '', 'Another'), '');
+});

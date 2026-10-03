@@ -15,13 +15,10 @@ const styles = {
   iconPressing: `scale-95`,
   iconReady: `scale-105`,
   icon: `size-8 transition-transform duration-200 group-hover:scale-105`,
-  content: `relative z-10 flex min-w-0 grow flex-col justify-center pr-10 sm:pr-24`,
-  name: `truncate text-lg font-semibold leading-tight tracking-tight transition-colors duration-200`,
-  subtitle: `mt-1 truncate text-sm leading-snug text-slate-400 transition-colors duration-200 group-hover:text-slate-300`,
-  badges: `absolute right-4 top-4 z-20 flex items-center gap-1.5`,
-  badge: `hidden h-7 min-w-7 items-center justify-center rounded-lg border px-2 text-xs font-semibold uppercase tracking-widest transition-all duration-200 sm:inline-flex`,
-  favoriteBadge: `jk-favorite-badge hidden h-7 min-w-7 items-center justify-center gap-1 rounded-lg border px-2 text-xs font-semibold sm:inline-flex`,
-  favoriteMobile: `jk-favorite-badge inline-flex size-7 items-center justify-center rounded-lg border sm:hidden`,
+  content: `relative z-10 grid min-w-0 grow grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2`,
+  name: `col-start-2 row-start-1 truncate text-lg font-semibold leading-tight tracking-tight transition-colors duration-200`,
+  subtitle: `col-start-2 row-start-2 mt-1 truncate text-sm leading-snug text-slate-400 transition-colors duration-200 group-hover:text-slate-300`,
+  badge: `col-start-1 row-start-1 row-span-2 self-center inline-flex h-7 min-w-7 items-center justify-center rounded-lg border px-2 text-xs font-semibold uppercase tracking-widest transition-all duration-200`,
 };
 
 export class JkServiceCard extends LitElement {
@@ -286,6 +283,7 @@ export class JkServiceCard extends LitElement {
         </div>
 
         <div class=${styles.content}>
+          ${(this.badgeText || this.favoriteSlot) ? html`<kbd class="${styles.badge} ${this._getBadgeClasses()} ${this.highlightKey ? 'jk-next-key' : ''}">${String(this.badgeText || this.favoriteSlot).toUpperCase()}</kbd>` : html`<span class="col-start-1 row-start-1 row-span-2"></span>`}
           <span
             class="${styles.name} ${this.isReady ? 'text-indigo-200' : 'text-slate-50 group-hover:text-indigo-200'}"
           >
@@ -295,39 +293,7 @@ export class JkServiceCard extends LitElement {
           <span class=${styles.subtitle}> ${displaySubtitle} </span>
         </div>
 
-        ${
-          this.favoriteSlot || this.badgeText
-            ? html`
-                <div class=${styles.badges}>
-                  ${
-                    this.favoriteSlot
-                      ? html`
-                          <span class=${styles.favoriteMobile} aria-label="Favorit" title="Favorit">
-                            <jk-icon icon="ui:star" class="size-4"></jk-icon>
-                          </span>
-                          <kbd
-                            class=${styles.favoriteBadge}
-                            title="Favoriten-Shortcut ${this.favoriteSlot}"
-                          >
-                            <jk-icon icon="ui:star" class="size-3.5"></jk-icon>
-                            ${this.favoriteSlot}
-                          </kbd>
-                        `
-                      : ''
-                  }
-                  ${
-                    this.badgeText
-                      ? html`
-                          <kbd class="${styles.badge} ${this._getBadgeClasses()} ${this.highlightKey ? 'jk-next-key' : ''}">
-                            ${this.badgeText.toUpperCase()}
-                          </kbd>
-                        `
-                      : ''
-                  }
-                </div>
-              `
-            : ''
-        }
+        ${this.isFavorite ? html`<jk-icon icon="ui:star" class="size-3.5 shrink-0 text-indigo-300/60" aria-hidden="true"></jk-icon>` : ''}
 
         <style>
           @keyframes jk-long-press-fill {

@@ -109,6 +109,8 @@ The server exposes `GET /healthz` for health checks. Configuration uploads are l
 
 Press `+` on the dashboard or use the desktop plus button. On mobile, choose **Add link** from the menu. Paste a URL, choose a category (or create one), and save with `Ctrl+Enter`. The name defaults to the hostname. The suggested shortcut can be edited; icons are optional. New links are appended to the category. Duplicate URLs are rejected within the selected category by this dialog; the JSON editor remains unrestricted.
 
+On desktop, open **Settings → Import & Export** and drag **Add to JumpKey** to your bookmarks bar. Click it on a page to open JumpKey in a new tab with the URL and page title filled in. Choose a category and save; no category is remembered.
+
 On supported Android browsers, an installed JumpKey PWA can receive links through **Share → JumpKey**. Review the shared link before saving. Sharing support depends on the browser and OS.
 
 The mobile installation banner can be dismissed permanently for this browser. Installation remains available from the menu. When a native prompt is unavailable, JumpKey shows browser instructions. The controls are hidden when running as an installed app. Use HTTPS (or localhost) for PWA features.

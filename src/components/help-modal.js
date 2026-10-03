@@ -17,7 +17,7 @@ const styles = {
   keysContainer: `flex shrink-0 items-center gap-1`,
   contextBadge: `mr-1 rounded-lg border border-indigo-500/20 bg-indigo-500/10 px-1.5 py-0.5 text-[10px] font-bold text-indigo-300`,
   kbd: `inline-flex h-7 min-w-8 items-center justify-center rounded-lg border border-slate-700 bg-slate-950 px-2 text-xs font-bold text-indigo-300 jk-shadow-inset`,
-  actionBadge: `inline-flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-950/70 px-2 py-1 text-xs font-semibold text-indigo-200`,
+  actionBadge: `inline-flex shrink-0 max-w-[45%] items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-950/70 px-2 py-1 text-xs font-semibold text-indigo-200`,
   actionIcon: `size-3.5`,
   footer: `mt-5 text-center text-[11px] text-slate-500`,
 };
@@ -50,17 +50,16 @@ export class JkHelpModal extends LitElement {
       { keys: [':'], desc: this.t('hkSearchEngines') },
       { keys: ['?'], desc: this.t('helpOpen') },
       { keys: ['Ctrl', ','], desc: this.t('editConfig') },
-      { keys: ['Ctrl', '1/2/3'], desc: this.t('hkSwitchTabs') },
+      { keys: ['+'], desc: this.t('quickAdd') },
+      { keys: ['Ctrl', '0–9'], desc: this.t('hkFavoriteRecord') },
       { keys: ['#'], desc: this.t('hkToggleView') },
     ];
 
-    if (!this.isGridView) {
-      shortcuts.push({ keys: ['0-9'], desc: this.t('hkFavs') });
-      shortcuts.push({ keys: ['Shift', '0-9'], desc: this.t('hkContinue') });
-    }
+    shortcuts.push({ keys: ['0-9'], desc: this.t('hkFavs') });
+    shortcuts.push({ keys: ['Shift', '0-9'], desc: this.t('hkContinue') });
 
     shortcuts.push({ keys: ['-'], desc: this.t('hkToggleLast') });
-    shortcuts.push({ keys: ['Shift', '-'], desc: this.t('hkOpenContinue') });
+    shortcuts.push({ keys: ['_'], desc: this.t('hkOpenContinue') });
 
     shortcuts.push(
       { keys: ['A-Z'], desc: this.t('hkCat') },
@@ -68,7 +67,11 @@ export class JkHelpModal extends LitElement {
       { keys: ['↑', '↓'], desc: this.t('hkNavigate') },
       { keys: ['Enter'], desc: this.t('hkOpenSelection') },
       { keys: ['Shift', 'Enter'], desc: this.t('hkOpenSelectionSameTab') },
-      { keys: ['ESC'], desc: this.t('hkReset') }
+      { keys: ['ESC'], desc: this.t('hkReset') },
+      { keys: ['Ctrl/Cmd', 'Enter'], desc: this.t('helpQuickSave') },
+      { keys: ['Ctrl/Cmd', '1/2/3'], desc: this.t('hkSwitchTabs') },
+      { keys: ['Ctrl/Cmd', 'S'], desc: this.t('helpEditorSave') },
+      { keys: ['Page Up/Down'], desc: this.t('helpEditorPage') }
     );
 
     return shortcuts.map(
@@ -146,6 +149,17 @@ export class JkHelpModal extends LitElement {
                 ${this._renderActionRow('search', this.t('helpSearchButton'), this.t('helpTouchSearch'))}
                 ${this._renderActionRow('layout-grid', this.t('helpViewButton'), this.t('helpTouchView'))}
                 ${this._renderActionRow('ellipsis', this.t('helpMoreButton'), this.t('helpTouchMore'))}
+              </div>
+              <p class="px-3 pt-3 text-sm leading-relaxed text-slate-300">${this.t('helpRecentRemove')}</p>
+            </div>
+            <div class="space-y-3 px-3 text-sm leading-relaxed text-slate-300">
+              <div class="${styles.sectionTitle}">${this.t('helpLinksSection')}</div>
+              <p class="hidden md:block">${this.t('helpAddLink')}</p>
+              <p class="hidden md:block">${this.t('helpBookmarklet')}</p>
+              <div class="space-y-3 md:hidden">
+                <p>${this.t('helpMobileAdd')}</p>
+                <p>${this.t('helpInstall')}</p>
+                <p>${this.t('helpShare')}</p>
               </div>
             </div>
           </div>
