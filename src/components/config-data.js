@@ -28,6 +28,8 @@ export class JkConfigData extends LitElement {
   }
 
   static properties = {
+    configuration: { type: Object },
+    readOnly: { type: Boolean },
     categories: { type: Array },
     searchEngines: { type: Array },
     t: { type: Function },
@@ -36,7 +38,7 @@ export class JkConfigData extends LitElement {
   _exportConfig() {
     try {
       const configData = JSON.stringify(
-        { categories: this.categories, searchEngines: this.searchEngines },
+        this.configuration ?? { categories: this.categories, searchEngines: this.searchEngines },
         null,
         2
       );
@@ -63,6 +65,7 @@ export class JkConfigData extends LitElement {
   }
 
   _handleImport(e) {
+    if (this.readOnly) return;
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -134,6 +137,7 @@ export class JkConfigData extends LitElement {
 
           <div class="${styles.dropZone}">
             <input
+              ?disabled=${this.readOnly}
               type="file"
               accept=".json"
               @change="${this._handleImport}"

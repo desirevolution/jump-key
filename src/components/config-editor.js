@@ -1,8 +1,8 @@
 import { html, LitElement } from 'lit';
-import { validateConfig } from '../utils/config-validator.js';
+import { getConfigErrors } from '../utils/config-validator.js';
 
 import { createEditor } from 'prism-code-editor';
-import { addEditorHotkey, defaultCommands } from 'prism-code-editor/commands';
+import { defaultCommands } from 'prism-code-editor/commands';
 import { cursorPosition } from 'prism-code-editor/cursor';
 import { indentGuides } from 'prism-code-editor/guides';
 import { highlightBracketPairs } from 'prism-code-editor/highlight-brackets';
@@ -26,6 +26,9 @@ export class JkConfigEditor extends LitElement {
   }
 
   static properties = {
+    errors: { state: true },
+    t: { type: Function },
+    readOnly: { type: Boolean },
     value: { type: String },
     originalValue: { type: String },
     isValid: { type: Boolean },
@@ -33,6 +36,8 @@ export class JkConfigEditor extends LitElement {
 
   constructor() {
     super();
+    this.errors = [];
+    this.t = key => key;
     this.value = '';
     this.originalValue = '';
     this.isValid = true;
@@ -45,24 +50,35 @@ export class JkConfigEditor extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    // Falls Prism-Code-Editor eine Teardown-Methode hat:
-    // this._editorInstance?.destroy();
+    this._editorInstance?.remove();
     this._editorInstance = null;
   }
 
-  editorRows(editor) {
-    const textarea = editor.textarea;
+  updated(changed) {
+    if (changed.has('readOnly')) this._editorInstance?.setOptions({ readOnly: this.readOnly });
+  }
 
-    // 1. Hole die tatsächliche visuelle Höhe der TextArea (in Pixeln)
-    const clientHeight = 300;
-
-    // 2. Berechne die Zeilenhöhe (Line-Height) aus dem CSS
-    const style = window.getComputedStyle(textarea);
-    const lineHeight = parseFloat(style.lineHeight);
-    const editorWrapper = editor.textarea.closest('.prism-code-editor');
-    const korrekteHoehe = editorWrapper.clientHeight;
-
-    return Math.floor(clientHeight / lineHeight);
+  pageKey(e) {
+    if (!['PageDown', 'PageUp'].includes(e.key) || e.ctrlKey || e.metaKey || e.altKey) return;
+    const editor = this._editorInstance;
+    if (!editor || e.target !== editor.textarea) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const input = editor.textarea;
+    const viewport = this.querySelector('#editorContainer');
+    const lineHeight = parseFloat(getComputedStyle(input).lineHeight) || 20;
+    const lines = input.value.split('\n');
+    const caret = input.selectionDirection === 'backward' ? input.selectionStart : input.selectionEnd;
+    const before = input.value.slice(0, caret).split('\n');
+    const row = before.length - 1, column = before.at(-1).length;
+    const step = Math.max(1, Math.floor(viewport.clientHeight / lineHeight) - 1);
+    const target = Math.max(0, Math.min(lines.length - 1, row + (e.key === 'PageDown' ? step : -step)));
+    const offset = lines.slice(0, target).reduce((sum, line) => sum + line.length + 1, 0) + Math.min(column, lines[target].length);
+    if (e.shiftKey) {
+      const anchor = input.selectionDirection === 'backward' ? input.selectionEnd : input.selectionStart;
+      input.setSelectionRange(Math.min(anchor, offset), Math.max(anchor, offset), offset < anchor ? 'backward' : 'forward');
+    } else input.setSelectionRange(offset, offset);
+    viewport.scrollTop += (target - row) * lineHeight;
   }
 
   initEditor() {
@@ -70,11 +86,13 @@ export class JkConfigEditor extends LitElement {
     if (!container) return;
 
     container.innerHTML = '';
+    container.addEventListener('keydown', e => this.pageKey(e), true);
 
     this._editorInstance = createEditor(
       container,
       {
         value: this.value,
+        readOnly: this.readOnly,
         language: 'json',
         theme: 'jump-key-dark',
         onUpdate: (val) => {
@@ -82,8 +100,10 @@ export class JkConfigEditor extends LitElement {
           let valid = false;
           try {
             const parsed = JSON.parse(val);
-            valid = validateConfig(parsed);
+            this.errors = getConfigErrors(parsed);
+            valid = this.errors.length === 0;
           } catch (err) {
+            this.errors = [{ path: '$', code: 'syntax', detail: err.message }];
             valid = false;
           }
 
@@ -119,7 +139,9 @@ export class JkConfigEditor extends LitElement {
   render() {
     const stateClass = this.isValid ? styles.containerValid : styles.containerInvalid;
 
-    return html` <div id="editorContainer" class="${styles.containerBase} ${stateClass}"></div> `;
+    return html`
+      ${this.errors.length ? html`<ul class="jk-config-errors" aria-live="polite">${this.errors.map(error => html`<li><code>${error.path}</code>: ${this.t('validation_' + error.code)} ${error.other || error.detail || ''}</li>`)}</ul>` : ''}
+      <div id="editorContainer" class="${styles.containerBase} ${stateClass}"></div>`;
   }
 }
 

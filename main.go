@@ -18,6 +18,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -46,6 +47,7 @@ type options struct {
 }
 
 type server struct {
+	configMu  sync.Mutex
 	distFS    fs.FS
 	configDir string
 	iconsDir  string
@@ -249,6 +251,8 @@ func (s *server) handleHealth(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) handleConfig(w http.ResponseWriter, r *http.Request) {
+	s.configMu.Lock()
+	defer s.configMu.Unlock()
 	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
 
 	filename, err := resolveConfigFilename(r.URL.Path, r.Header.Get("Remote-User"))
@@ -351,8 +355,8 @@ func (s *server) putConfigFile(w http.ResponseWriter, r *http.Request, filename 
 		http.Error(w, "request body is empty", http.StatusBadRequest)
 		return
 	}
-	if !json.Valid(data) {
-		http.Error(w, "invalid JSON", http.StatusBadRequest)
+	if err := validateConfiguration(data); err != nil {
+		http.Error(w, "invalid configuration: "+err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -363,6 +367,19 @@ func (s *server) putConfigFile(w http.ResponseWriter, r *http.Request, filename 
 		return
 	}
 
+	if !created && !strings.Contains(filepath.Base(filename), ".backup-") {
+		previous, err := os.ReadFile(filename)
+		if err != nil {
+			http.Error(w, "failed to read configuration for backup", http.StatusInternalServerError)
+			return
+		}
+		backup := strings.TrimSuffix(filename, ".json") + ".backup-" + time.Now().UTC().Format("2006-01-02T15-04-05.000000000") + ".json"
+		if err := atomicWrite(backup, previous, 0o644); err != nil {
+			s.logger.Error("backup failed", "error", err)
+			http.Error(w, "failed to back up configuration", http.StatusInternalServerError)
+			return
+		}
+	}
 	if err := atomicWrite(filename, data, 0o644); err != nil {
 		s.logger.Error("failed to write configuration", "path", filename, "error", err)
 		http.Error(w, "failed to save configuration", http.StatusInternalServerError)

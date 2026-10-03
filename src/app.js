@@ -1,3 +1,7 @@
+import './components/quick-add.js';
+import { InstallController } from './utils/install.js';
+import { sharedLink } from './utils/quick-add.js';
+import { migrateConfig, migrateReferences, persistConfig } from './utils/configuration.js';
 import { html, LitElement } from 'lit';
 import { detectLang, t } from './utils/i18n.js';
 import {
@@ -48,6 +52,8 @@ class DashboardApp extends LitElement {
   }
 
   static properties = {
+    showQuickAdd: { type: Boolean },
+    savingConfig: { type: Boolean },
     categories: { type: Array },
     searchEngines: { type: Array },
     // UI State
@@ -85,6 +91,8 @@ class DashboardApp extends LitElement {
 
   constructor() {
     super();
+
+    this.installController = new InstallController(this);
 
     // Data & Navigation State
     this.categories = [];
@@ -184,51 +192,32 @@ class DashboardApp extends LitElement {
     this.showToast(this.t('themeChanged', { theme: this.t(selectedTheme.nameKey) }), 'info');
   }
 
-  async saveConfiguration(updatedConfig) {
-    try {
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const backupResponse = await fetch(`/config/services.backup-${timestamp}.json`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedConfig, null, 2),
-      });
-
-      if (!backupResponse.ok) {
-        throw new Error('Failed to create configuration backup.');
-      }
-
-      const response = await fetch('/config/services.json', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedConfig, null, 2),
-      });
-
-      if (response.ok) {
-        if (updatedConfig.categories) {
-          this.categories = generateShortcuts(updatedConfig.categories);
-        } else {
-          this.categories = generateShortcuts(updatedConfig);
-        }
-
-        if (updatedConfig.searchEngines) {
-          this.searchEngines = updatedConfig.searchEngines;
-        }
-
-        this.showConfigModal = false;
-
-        this.showToast(this.t('editConfigSaveDone'), 'success');
-      } else {
-        this.showToast(this.t('editConfigSaveFailed'), 'error');
-      }
-    } catch (error) {
-      console.error('WebDAV Error:', error);
-      this.showToast(this.t('editConfigSaveFailed'), 'error');
-    }
+  applyConfiguration(config) {
+    const refs = migrateReferences(config, this.favorites, this.continueHistory);
+    this.favorites = refs.favorites;
+    this.continueHistory = refs.history;
+    writeJsonStorage(STORAGE_KEYS.favorites, this.favorites);
+    writeJsonStorage(STORAGE_KEYS.continueHistory, this.continueHistory);
+    this.configuration = config;
+    this.categories = generateShortcuts(config.categories);
+    this.searchEngines = config.searchEngines;
+    writeJsonStorage(STORAGE_KEYS.configCache, config);
   }
 
   async handleSaveConfig(e) {
-    const updatedConfig = e.detail.newConfig ?? e.detail.config;
-    await this.saveConfiguration(updatedConfig);
+    if (this.savingConfig) return;
+    this.savingConfig = true;
+    try {
+      const config = await persistConfig(e.detail.newConfig, { base: import.meta.env.BASE_URL });
+      this.applyConfiguration(config);
+      this.showConfigModal = false;
+      this.showToast(this.t('editConfigSaveDone'), 'success');
+    } catch (error) {
+      console.error('Configuration save failed:', error);
+      this.showToast(this.t('editConfigSaveFailed'), 'error');
+    } finally {
+      this.savingConfig = false;
+    }
   }
 
   // --------------------------------------------------
@@ -240,18 +229,35 @@ class DashboardApp extends LitElement {
     this.theme = saveTheme(this.theme);
 
     try {
-      const res = await fetch('./config/services.json');
+      const res = await fetch(`${import.meta.env.BASE_URL}config/services.json`);
       if (!res.ok) throw new Error(`Configuration request failed: ${res.status}`);
       const data = await res.json();
-      writeJsonStorage(STORAGE_KEYS.configCache, data);
-      this.categories = generateShortcuts(data.categories || data);
-      this.searchEngines = data.searchEngines || [];
-    } catch {
-      const data = readJsonStorage(STORAGE_KEYS.configCache, null);
-      if (data) {
-        this.categories = generateShortcuts(data.categories || data);
-        this.searchEngines = data.searchEngines || [];
+      const config = migrateConfig(data);
+      if (JSON.stringify(data) !== JSON.stringify(config)) {
+        try {
+          await persistConfig(config, { base: import.meta.env.BASE_URL });
+        } catch (error) {
+          console.error('Migration could not be saved; it will be retried on the next load.', error);
+          this.showToast(this.t('editConfigSaveFailed'), 'error');
+        }
       }
+      this.applyConfiguration(config);
+    } catch (error) {
+      console.error('Configuration load failed:', error);
+      try {
+        const data = readJsonStorage(STORAGE_KEYS.configCache, null);
+        if (data) this.applyConfiguration(migrateConfig(data));
+      } catch (cacheError) {
+        console.error('Invalid configuration cache:', cacheError);
+      }
+    }
+    if (!this.isConnected) return;
+    const params = new URLSearchParams(location.search);
+    if (params.get('share') === '1' && this.configuration) {
+      this.openQuickAdd(sharedLink(params));
+      // Remove shared URLs from browser history after handing them to the dialog.
+      for (const key of ['share', 'url', 'text', 'title']) params.delete(key);
+      history.replaceState(history.state, '', location.pathname + (params.size ? '?' + params : '') + location.hash);
     }
 
     window.addEventListener('keydown', this.handleKeyDown);
@@ -412,7 +418,7 @@ class DashboardApp extends LitElement {
   showActionFeedback(service) {
     const category = this.categories.find((item) =>
       item.services?.some(
-        (candidate) => candidate.name === service.name && candidate.url === service.url
+        (candidate) => candidate.id === service.id
       )
     );
 
@@ -430,8 +436,8 @@ class DashboardApp extends LitElement {
     if (!service?.name || !service?.url) return;
 
     this.continueHistory = [
-      service.name,
-      ...this.continueHistory.filter((name) => name !== service.name),
+      service.id,
+      ...this.continueHistory.filter((id) => id !== service.id),
     ].slice(0, 10);
 
     this.lastUsedCycleIndex = 0;
@@ -623,7 +629,7 @@ class DashboardApp extends LitElement {
   removeContinueService(service) {
     if (!service?.name) return;
 
-    const nextHistory = this.continueHistory.filter((name) => name !== service.name);
+    const nextHistory = this.continueHistory.filter((id) => id !== service.id);
     if (nextHistory.length === this.continueHistory.length) return;
 
     this.continueHistory = nextHistory;
@@ -639,7 +645,7 @@ class DashboardApp extends LitElement {
   }
 
   handleServiceLongPress(service) {
-    const existingSlot = FAVORITE_SLOTS.find((slot) => this.favorites[slot] === service.name);
+    const existingSlot = FAVORITE_SLOTS.find((slot) => this.favorites[slot] === service.id);
 
     if (existingSlot) {
       this.handleDeleteFavoriteSlot(existingSlot);
@@ -652,7 +658,7 @@ class DashboardApp extends LitElement {
       return;
     }
 
-    this.favorites = { ...this.favorites, [freeSlot]: service.name };
+    this.favorites = { ...this.favorites, [freeSlot]: service.id };
     writeJsonStorage(STORAGE_KEYS.favorites, this.favorites);
 
     this.resetInput(true);
@@ -673,7 +679,7 @@ class DashboardApp extends LitElement {
   }
 
   handleDeleteFavoriteSlot(slot) {
-    const serviceName = this.favorites[slot];
+    const serviceName = getFavorites(this.categories, this.favorites).find(s => s.favSlot === slot)?.name;
     if (!serviceName) return;
 
     this.lastDeletedFavorite = { slot, name: serviceName };
@@ -697,10 +703,29 @@ class DashboardApp extends LitElement {
   // Layout Helper Snippets
   // --------------------------------------------------
 
+  openQuickAdd(initial = {}) {
+    if (!this.configuration) return;
+    this.cancelPendingAction();
+    this.showSearch = false;
+    this.showMobileMenu = false;
+    this.quickInitial = initial;
+    this.showQuickAdd = true;
+  }
+
+  async installApp() {
+    this.showMobileMenu = false;
+    try { if (await this.installController.install()) return; } catch {}
+    this.dialogConfig = { show: true, type: 'info', title: this.t('installApp'),
+      message: this.t(/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ? 'installIOS' : 'installBrowser'),
+      confirmLabel: this.t('close'), onConfirm: null };
+  }
+
   templateConfigModal() {
     return html`
       <jk-config-modal
         .show=${this.showConfigModal}
+        .configuration=${this.configuration}
+        .saving=${this.savingConfig}
         .categories=${this.categories}
         .searchEngines=${this.searchEngines}
         .theme=${this.theme}
@@ -718,6 +743,9 @@ class DashboardApp extends LitElement {
       <jk-mobile-menu
         .show=${this.showMobileMenu}
         .mode=${this.mobileMenuMode}
+        .canInstall=${this.installController.available}
+        @install-app=${this.installApp}
+        @quick-add=${() => this.openQuickAdd()}
         .theme=${this.theme}
         .t=${this.t}
         @close=${() => {
@@ -840,6 +868,10 @@ class DashboardApp extends LitElement {
       ${this.templateKeyBadge()} ${this.templateActionFeedback()} ${this.templateHelpModal()}
       ${this.templateSearchModal(filteredServices)} ${this.templateConfigModal()}
       ${this.templateMobileMenu()} ${this.templateDialog()}
+      ${this.showQuickAdd ? html`<jk-quick-add .config=${this.configuration} .initial=${this.quickInitial} .categoryKey=${this.activeCategoryKey} .t=${this.t}
+        @close=${() => {this.showQuickAdd=false;}}
+        @saved=${e => {this.applyConfiguration(e.detail);this.showQuickAdd=false;this.showToast(this.t('editConfigSaveDone'),'success');}}
+      ></jk-quick-add>` : ''}
 
       <jk-toast
         .show=${this.toastConfig.show}
@@ -851,6 +883,7 @@ class DashboardApp extends LitElement {
       ></jk-toast>
 
       <jk-dashboard-header
+        @quick-add=${() => this.openQuickAdd()}
         .isGridView=${this.isGridView}
         .lang=${this.lang}
         .t=${this.t}
@@ -867,6 +900,12 @@ class DashboardApp extends LitElement {
         @toggle-view=${this.toggleViewMode}
       ></jk-dashboard-header>
 
+      ${this.installController.available && !this.installController.dismissed ? html`
+        <aside class="jk-install-banner md:hidden" aria-label=${this.t('installApp')}>
+          <div><strong>${this.t('installApp')}</strong><p>${this.t('installHint')}</p></div>
+          <button @click=${this.installApp}>${this.t('installAction')}</button>
+          <button aria-label=${this.t('close')} @click=${()=>this.installController.dismiss()}>×</button>
+        </aside>` : ''}
       <main class="${styles.mainContent}">
         ${
           showMain && !this.isGridView
@@ -888,6 +927,7 @@ class DashboardApp extends LitElement {
 
                 <jk-service-group
                   title="${this.t('categories')}"
+                  .highlightKeys=${true}
                   icon="ui:folder"
                   .services=${[
                     ...(continueServices.length

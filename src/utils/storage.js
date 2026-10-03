@@ -9,5 +9,11 @@ export function readJsonStorage(key, fallback) {
 }
 
 export function writeJsonStorage(key, value) {
-  localStorage.setItem(key, JSON.stringify(value));
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch (error) {
+    console.warn(`Could not persist "${key}".`, error);
+    return false;
+  }
 }

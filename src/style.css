@@ -651,3 +651,43 @@
   --jk-danger: #c23b35;
   --jk-info: #1675b5;
 }
+
+/* Emphasize the next available keyboard step without resizing the cards. */
+kbd.jk-next-key {
+  display: inline-flex;
+  background-color: var(--jk-accent);
+  color: var(--jk-on-accent);
+  border-color: var(--jk-accent-bright);
+  font-size: 0.9375rem;
+  font-weight: 800;
+  box-shadow: 0 2px 0 var(--jk-accent-strong);
+}
+
+.jk-quick-dialog {
+  width: min(36rem, calc(100vw - 1.5rem)); max-height: 90dvh;
+  margin: auto; padding: 1.25rem; border: 1px solid var(--jk-accent-border);
+  border-radius: 1rem; background: var(--color-slate-900); color: var(--color-slate-100);
+  overflow-y: auto;
+}
+.jk-quick-dialog::backdrop { background: #000a; backdrop-filter: blur(4px); }
+.jk-quick-dialog header, .jk-quick-dialog footer { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
+.jk-quick-dialog h2 { font-size:1.125rem; font-weight:700; }
+.jk-quick-dialog fieldset { display:grid; gap:0.75rem; margin:1rem 0; min-width:0; }
+.jk-quick-dialog label { display:grid; gap:0.25rem; font-size:0.875rem; }
+.jk-quick-dialog input, .jk-quick-dialog select { width:100%; min-width:0; padding:0.625rem; border:1px solid var(--color-slate-600); border-radius:0.5rem; background:var(--color-slate-800); color:inherit; font-size:1rem; }
+.jk-quick-dialog button, .jk-install-banner button { min-height:44px; padding:0.5rem 0.75rem; border-radius:0.5rem; cursor:pointer; }
+.jk-quick-dialog button:disabled { opacity:0.5; cursor:wait; }
+.jk-install-banner { display:flex; align-items:center; gap:0.5rem; margin-top:0.75rem; padding:0.5rem 0.75rem; background:var(--jk-accent-soft); border:1px solid var(--jk-accent-border); border-radius:0.75rem; font-size:0.875rem; }
+.jk-install-banner div { flex:1; min-width:0; }
+.jk-install-banner p { font-size:0.75rem; }
+@media (min-width:768px) { .jk-install-banner { display:none; } }
+@media (max-width:767px) {
+  body { padding:0.75rem; }
+  jk-dashboard-header jk-icon-button button { width:44px; height:44px; }
+  jk-mobile-menu section { padding-bottom:max(1.25rem,env(safe-area-inset-bottom)); max-height:85dvh; }
+}
+
+jk-config-editor { display:flex; flex-direction:column; height:100%; min-height:0; }
+jk-config-editor #editorContainer { height:0; min-height:160px; flex:1; overflow:auto; }
+.jk-config-errors { flex:none; max-height:9rem; overflow:auto; padding:0.75rem; margin-bottom:0.5rem; border:1px solid var(--jk-danger); border-radius:0.5rem; font-size:0.8rem; overflow-wrap:anywhere; }
+.jk-config-errors li + li { margin-top:0.4rem; }

@@ -12,7 +12,7 @@ RUN apk add --no-cache ca-certificates tzdata
 WORKDIR /app
 
 COPY go.mod ./
-COPY main.go ./
+COPY *.go ./
 COPY --from=node-builder /app/dist/ ./dist/
 
 RUN CGO_ENABLED=0 go build \

@@ -34,6 +34,7 @@ export class JkServiceCard extends LitElement {
     subtitle: { type: String },
     icon: { type: String },
     badgeText: { type: String },
+    highlightKey: { type: Boolean },
     isFavorite: { type: Boolean },
     favoriteSlot: { type: String },
 
@@ -281,7 +282,7 @@ export class JkServiceCard extends LitElement {
         <div class="${styles.glow} ${this.isPressing || this.isReady ? 'opacity-100' : ''}"></div>
 
         <div class="${styles.iconContainer} ${this._getIconClasses()}">
-          <jk-icon .icon=${this.icon} class=${styles.icon}></jk-icon>
+          <jk-icon .icon=${this.icon || 'ui:link'} class=${styles.icon}></jk-icon>
         </div>
 
         <div class=${styles.content}>
@@ -317,7 +318,7 @@ export class JkServiceCard extends LitElement {
                   ${
                     this.badgeText
                       ? html`
-                          <kbd class="${styles.badge} ${this._getBadgeClasses()}">
+                          <kbd class="${styles.badge} ${this._getBadgeClasses()} ${this.highlightKey ? 'jk-next-key' : ''}">
                             ${this.badgeText.toUpperCase()}
                           </kbd>
                         `

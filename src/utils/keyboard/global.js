@@ -21,6 +21,12 @@ function getDigitFromEvent(e) {
 }
 
 export function handleGlobalKeyDown(e, app) {
+  if (app.showQuickAdd) return;
+  if (e.key === '+' && !e.ctrlKey && !e.altKey && !e.metaKey && !app.showConfigModal && !app.showSearch && !app.showHelp && !e.target.closest?.('input, textarea, select, [contenteditable="true"]')) {
+    e.preventDefault(); app.openQuickAdd(); return;
+  }
+  // The modal owns its shortcuts, including Escape and unsaved-change handling.
+  if (app.showConfigModal) return;
   /*
    * Ctrl + Zahl
    *
@@ -45,24 +51,12 @@ export function handleGlobalKeyDown(e, app) {
    * Escape
    */
   if (e.key === 'Escape') {
-    if (app.showConfigModal) {
-      app.showConfigModal = false;
-      return;
-    }
-
     if (app.favoriteRecording) {
       app.favoriteRecording = null;
     }
 
     app.resetInput(true);
 
-    return;
-  }
-
-  /*
-   * Config Modal blockiert globale Shortcuts
-   */
-  if (app.showConfigModal) {
     return;
   }
 
