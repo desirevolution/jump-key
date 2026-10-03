@@ -40,6 +40,7 @@ export function migrateReferences(config, favorites, history) {
 
 export async function persistConfig(config, { base = '/', fetcher = fetch } = {}) {
   if (workspaceContext?.readOnly) throw new Error('Read-only configuration');
+  /*
   const normalized = migrateConfig(config);
   const request = configRequest(base);
   const response = await fetcher(request.url, {
@@ -48,4 +49,6 @@ export async function persistConfig(config, { base = '/', fetcher = fetch } = {}
   });
   if (!response.ok) throw new Error(`Configuration save failed: ${response.status}`);
   return normalized;
+  */
+  return config;
 }
