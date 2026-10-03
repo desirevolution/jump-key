@@ -11,7 +11,7 @@ function pickKey(preferredChars, usedKeys) {
 }
 
 export function generateShortcuts(data) {
-  const usedCategoryKeys = new Set(RESERVED_KEYS);
+  const usedCategoryKeys = new Set([...RESERVED_KEYS, ...data.map(c => c.categoryKey?.toLowerCase()).filter(Boolean)]);
 
   return data.map((cat) => {
     let categoryKey = cat.categoryKey?.toLowerCase() ?? '';
@@ -21,7 +21,7 @@ export function generateShortcuts(data) {
     }
     if (categoryKey) usedCategoryKeys.add(categoryKey);
 
-    const usedServiceKeys = new Set();
+    const usedServiceKeys = new Set((cat.services ?? []).map(s => s.key?.toLowerCase()).filter(Boolean));
     const services = (cat.services ?? []).map((service) => {
       let serviceKey = service.key?.toLowerCase() ?? '';
       if (!serviceKey) {
@@ -85,7 +85,7 @@ export function getFavorites(categories, favorites) {
   FAVORITE_SLOTS.forEach((slot) => {
     const serviceName = favorites[slot];
     if (serviceName) {
-      const originalService = allServices.find((s) => s.name === serviceName);
+      const originalService = allServices.find((s) => s.id === serviceName);
       if (originalService) {
         result.push({
           ...originalService,
@@ -107,7 +107,7 @@ export function addFavoriteSlots(categories, favorites) {
     ...category,
     services: (category.services ?? []).map((service) => ({
       ...service,
-      favSlot: slotsByName.get(service.name) ?? '',
+      favSlot: slotsByName.get(service.id) ?? '',
     })),
   }));
 }
@@ -121,7 +121,7 @@ export function getContinueServices(categories, continueHistory) {
 
   return (continueHistory ?? [])
     .map((serviceName, index) => {
-      const originalService = allServices.find((service) => service.name === serviceName);
+      const originalService = allServices.find((service) => service.id === serviceName);
       if (!originalService) return null;
 
       return {

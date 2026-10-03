@@ -1,4 +1,6 @@
 import {
+  Plus,
+  Link,
   ArrowLeft,
   Check,
   CircleCheck,
@@ -34,6 +36,8 @@ import {
 } from '@lucide/icons';
 
 export const uiIcons = {
+  plus: Plus,
+  link: Link,
   'arrow-left': ArrowLeft,
   check: Check,
   'circle-check': CircleCheck,

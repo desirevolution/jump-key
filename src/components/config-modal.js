@@ -1,3 +1,5 @@
+import { generateShortcuts } from '../utils/shortcuts.js';
+import { validateConfig } from '../utils/config-validator.js';
 import { html, LitElement } from 'lit';
 import './icon.js';
 import './icon-button.js';
@@ -40,6 +42,8 @@ export class JkConfigModal extends LitElement {
   }
 
   static properties = {
+    configuration: { type: Object },
+    saving: { type: Boolean },
     show: { type: Boolean },
     categories: { type: Array },
     searchEngines: { type: Array },
@@ -73,7 +77,7 @@ export class JkConfigModal extends LitElement {
     if (changed.has('show')) {
       if (this.show) {
         this._editorValue = JSON.stringify(
-          { categories: this.categories, searchEngines: this.searchEngines },
+          { ...(this.configuration ?? { searchEngines: this.searchEngines }), categories: generateShortcuts(this.configuration?.categories ?? this.categories) },
           null,
           2
         );
@@ -147,6 +151,7 @@ export class JkConfigModal extends LitElement {
   }
 
   _handleConfigImported(e) {
+    if (this.saving) return;
     const importedConfig = e.detail;
     this._editorValue = JSON.stringify(importedConfig, null, 2);
     this._isEditorConfigValid = true;
@@ -155,6 +160,7 @@ export class JkConfigModal extends LitElement {
   }
 
   _handleClose() {
+    if (this.saving) return;
     if (this._hasEditorConfigChanged) {
       this._showDiscardDialog = true;
     } else {
@@ -168,45 +174,18 @@ export class JkConfigModal extends LitElement {
   }
 
   _handleSave() {
+    if (this.saving || !this._hasEditorConfigChanged) return;
     try {
       const newConfig = JSON.parse(this._editorValue);
-      const previousConfig = JSON.parse(this._originalConfigString);
-
-      localStorage.setItem('services-cache', JSON.stringify(newConfig));
-
-      this.dispatchEvent(
-        new CustomEvent('save', {
-          detail: { newConfig, previousConfig },
-          bubbles: true,
-          composed: true,
-        })
-      );
-
-      this.dispatchEvent(
-        new CustomEvent('notify', {
-          detail: {
-            type: 'success',
-            message: this.t('tabEditorSaveSuccess') || 'Configuration successfully saved!',
-          },
-          bubbles: true,
-          composed: true,
-        })
-      );
-
-      this._originalConfigString = this._editorValue;
-      this._hasEditorConfigChanged = false;
-      this._forceClose();
-    } catch (e) {
-      this.dispatchEvent(
-        new CustomEvent('notify', {
-          detail: {
-            type: 'error',
-            message: this.t('tabEditorSaveFailed') || 'Error saving configuration.',
-          },
-          bubbles: true,
-          composed: true,
-        })
-      );
+      if (!validateConfig(newConfig)) throw new Error('Invalid configuration');
+      this.dispatchEvent(new CustomEvent('save', {
+        detail: { newConfig }, bubbles: true, composed: true,
+      }));
+    } catch {
+      this.dispatchEvent(new CustomEvent('notify', {
+        detail: { type: 'error', message: this.t('editConfigSaveFailed') },
+        bubbles: true, composed: true,
+      }));
     }
   }
 
@@ -222,6 +201,8 @@ export class JkConfigModal extends LitElement {
       case 'data':
         return html`
           <jk-config-data
+            .configuration=${this.configuration}
+            .readOnly=${this.saving}
             .categories="${this.categories}"
             .searchEngines="${this.searchEngines}"
             .t="${this.t}"
@@ -232,6 +213,8 @@ export class JkConfigModal extends LitElement {
       default:
         return html`
           <jk-config-editor
+            .t=${this.t}
+            .readOnly=${this.saving}
             .value="${this._editorValue}"
             .originalValue="${this._originalConfigString}"
             .isValid="${this._isEditorConfigValid}"
@@ -252,7 +235,7 @@ export class JkConfigModal extends LitElement {
     const tabEditorClass =
       this._activeTab === 'editor' ? styles.sidebarBtnActive : styles.sidebarBtnInactive;
     const saveBtnClass =
-      this._isEditorConfigValid && this._hasEditorConfigChanged
+      this._isEditorConfigValid && this._hasEditorConfigChanged && !this.saving
         ? styles.btnPrimaryActive
         : styles.btnPrimaryDisabled;
 
@@ -267,7 +250,7 @@ export class JkConfigModal extends LitElement {
               <div>
                 <h2 class="${styles.title}">JumpKey</h2>
                 <p class="${styles.subtitle}">
-                  ${this.t('configSubtitle') || 'Configuration & Backup'}
+                  ${this.t('configSubtitle')}
                 </p>
               </div>
             </div>
@@ -341,10 +324,10 @@ export class JkConfigModal extends LitElement {
                     <button
                       type="button"
                       @click="${this._handleSave}"
-                      ?disabled="${!this._isEditorConfigValid || !this._hasEditorConfigChanged}"
+                      ?disabled="${this.saving || !this._isEditorConfigValid || !this._hasEditorConfigChanged}"
                       class="${styles.btnPrimary} ${saveBtnClass}"
                     >
-                      ${this.t('editConfigSave') || 'Save'}
+                      ${this.saving ? this.t('configSaving') : this.t('editConfigSave')}
                     </button>
                   `
                 : html`

@@ -1,3 +1,4 @@
+import { getFavoriteService } from '../shortcuts.js';
 import { writeJsonStorage } from '../storage.js';
 
 const FAVORITES_STORAGE_KEY = 'dashboard_favs';
@@ -32,7 +33,7 @@ export function handleFavoriteShortcut(slot, app) {
  * Favorit löschen
  */
 function requestFavoriteDelete(slot, app) {
-  app.showToast(`"${app.favorites[slot]}" ${app.t('favRemoved', { slot })}`, 'info');
+  app.showToast(`"${getFavoriteService(app.categories, app.favorites, slot)?.name ?? ""}" ${app.t('favRemoved', { slot })}`, 'info');
 
   const { [slot]: _removed, ...remainingFavorites } = app.favorites;
   app.favorites = remainingFavorites;
@@ -142,7 +143,7 @@ function handleFavoriteService(key, recording, app) {
  * Favorit speichern
  */
 function saveFavorite(slot, service, app) {
-  app.favorites = { ...app.favorites, [slot]: service.name };
+  app.favorites = { ...app.favorites, [slot]: service.id };
   saveFavorites(app);
 }
 

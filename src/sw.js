@@ -9,9 +9,8 @@ import {
 
 import { NavigationRoute, registerRoute } from 'workbox-routing';
 
-import { CacheFirst, NetworkFirst } from 'workbox-strategies';
+import { CacheFirst } from 'workbox-strategies';
 
-import { CacheableResponsePlugin } from 'workbox-cacheable-response';
 
 import { ExpirationPlugin } from 'workbox-expiration';
 
@@ -28,7 +27,7 @@ precacheAndRoute(self.__WB_MANIFEST);
 //
 const navigationHandler = createHandlerBoundToURL(import.meta.env.BASE_URL + 'index.html');
 
-registerRoute(new NavigationRoute(navigationHandler));
+registerRoute(new NavigationRoute(navigationHandler, { denylist: [/\/config\//, /\/icons\//, /\/healthz$/] }));
 
 //
 // Bilder
@@ -57,46 +56,8 @@ registerRoute(
   })
 );
 
-//
-// services.json
-//
-// Network First
-// 200 -> Cache aktualisieren
-// 500/502/503 -> Cache verwenden
-// Offline -> Cache verwenden
-//
-registerRoute(
-  ({ url }) => url.pathname.endsWith('/config/services.json'),
-  new NetworkFirst({
-    cacheName: 'services',
-
-    networkTimeoutSeconds: 3,
-
-    fetchOptions: {
-      cache: 'reload',
-    },
-
-    plugins: [
-      // Nur 200 im Cache speichern
-      new CacheableResponsePlugin({
-        statuses: [200],
-      }),
-
-      new ExpirationPlugin({
-        maxEntries: 1,
-        maxAgeSeconds: 60 * 60 * 24 * 30,
-      }),
-
-      // 5xx wie Netzwerkfehler behandeln
-      {
-        async fetchDidSucceed({ response }) {
-          if (response.status >= 500) {
-            throw new Error('Server Error');
-          }
-
-          return response;
-        },
-      },
-    ],
-  })
-);
+// Personal configuration has one authoritative offline cache, owned by the app.
+// Remove the old duplicate cache so a saved configuration cannot revert offline.
+self.addEventListener('activate', event => {
+  event.waitUntil(caches.delete('services'));
+});

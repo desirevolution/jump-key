@@ -1,44 +1,34 @@
 <p align="center">
-  <img src="./public/jump-key.png" alt="logo" width="80" height="80" />
+  <img src="./public/jump-key.png" alt="JumpKey logo" width="80" height="80" />
 </p>
 
 <h1 align="center">JumpKey</h1>
 
-#### JumpKey — A minimalist, keyboard-driven, local-first start page for your services and links.
+JumpKey is a keyboard-first dashboard for your self-hosted apps and bookmarks.
 
 <p align="center">
   <img src="screenshots/screenshot_1.png?v=3" alt="Grid dashboard">
 </p>
 
+[Try the demo](https://desirevolution.github.io/jump-key/)
+
 https://github.com/user-attachments/assets/b2c4290e-f371-44eb-b47c-44d5a73de379
 
-## [Live Demo](https://desirevolution.github.io/jump-key/)
+## What it does
 
-## Features
-
-- **NEW: standalone executable**: No docker needed anymore. Just download and run JumpKey directly on your pc/server. (Linux x86/arm64/arm6, Darwin arm64 and Windows x86 supported)
-- **Keyboard-Centric Navigation**: Navigate categories and launch services using sequential keyboard shortcuts.
-- **Category Organization**: Group services into configurable categories.
-- **Favorites**: Mark frequently used services as favorites for quick access.
-- **Last Used**: Mark last used services for quick access.
-- **Instant Search**: Filter services in real time while typing.
-- **Search Engine Integration**: Configure multiple search engines for quick web searches.
-- **Built-in Configuration Editor**: Edit the configuration directly from the web interface.
-- **Configuration Import/Export**: Create/restore local configuration backup.
-- **Configuration Validation**: Validate JSON before applying changes.
-- **Responsive User Interface**: Optimized for desktop and mobile devices.
-- **Localization Support**: Automatic language detection with internationalization support. Currently DE, EN, FR, ES included.
-- **Icons**: Lucide icon name, local hosted images and urls.
-- **Themes**: 6 dark and 3 light themes included.
-- **Docker Ready**: Deploy using the included Docker Compose configuration. (amd64/arm64 ~8 mb image)
-- **Lightweight Architecture**: Built with Lit for fast rendering and minimal resource usage.
-- **Static Deployment**: No backend or database required. (Caddy + WebDav plugin)
-- **Simple Multi-User Support**: Map Remote-User header as part of the saved config file.
+- Two overview modes: all services, or categories with favorites.
+- Ten favorite slots and a Continue list of recently opened services.
+- Search by service or category name, plus custom search commands such as `:g linux`.
+- A JSON editor with configuration validation, import, export and automatic backups.
+- Seven dark and three light themes, with English, German, French and Spanish translations.
+- Local images, image URLs, Lucide and Iconify icons.
+- Desktop and mobile layouts, with PWA installation and offline access to the dashboard.
+- A Lit frontend bundled with a Go server, available as a standalone executable or Docker container. No database needed.
 
 ## Screenshots
 
 <p align="center">
-  <a href="screenshots/screenshot_2.png">
+  <a href="screenshots/screenshot_1.png">
     <img src="screenshots/screenshot_1.png?v=2" width="300">
   </a>
   <a href="screenshots/screenshot_3.png">
@@ -55,70 +45,109 @@ https://github.com/user-attachments/assets/b2c4290e-f371-44eb-b47c-44d5a73de379
   </a>
 </p>
 
-## Keyboard Shortcuts
+## Quick start
 
-| Shortcut                          | Action                                                                                      |
-| --------------------------------- | ------------------------------------------------------------------------------------------- |
-| `A-Z`                             | Select a category                                                                           |
-| `A-Z` → `A-Z`                     | Launch a service from the selected category                                                 |
-| `1-0`                             | Open a favorite                                                                             |
-| `Shift + 1-0`                     | Open a recent service                                                                       |
-| `-`                               | Cycle through recently used services (press `-` again before launch to select the next one) |
-| `Space`                           | Open search                                                                                 |
-| `#`                               | Toggle between grouped and grid view                                                        |
-| `Esc`                             | Cancel the current input or pending launch                                                  |
-| `Shift + Click` / `Shift + Enter` | Open in the current tab                                                                     |
-| `Ctrl + 1-0`                      | Assign a favorite to a slot                                                                 |
-| `Ctrl + ,`                        | Open configuration                                                                          |
-| `?`                               | Show keyboard help                                                                          |
+### Docker Compose
 
-## Quick Start
-
-### standalone executable
-
-Download and extract the version matching your architecture.
-
-Create directories for the config and icons, add your config file (services.json) and run:
+Place [compose.yml](compose.yml) in your installation directory. Create `config` and `icons` alongside it, then copy your configuration to `config/services.json`. You can start with the small [example configuration](public/config/services.json).
 
 ```bash
-jump-key --host 0.0.0.0 -port 8080 -config-dir ./config -icons-dir ./icons
-```
-
-
-### docker compose setup
-
-Copy/adjust [compose.yml](compose.yml) and /config/[services.json](services.example.json) and put all your custome icon images in /icon.
-
-Then run:
-
-```bash
+mkdir -p config icons
 docker compose up -d
 ```
 
+The supplied Compose file uses these mappings:
+
+| Host | Container | Purpose |
+| --- | --- | --- |
+| `./config` | `/app/config` | Configuration files and automatic backups; must be writable. |
+| `./icons` | `/app/icons` | Custom icon images; the directory is required even when empty. |
+| Port `8080` | Port `8080` | HTTP interface. |
+
+Open `http://localhost:8080`, or use the server's address from another device. The image listens on `0.0.0.0:8080` and is built for Linux amd64 and arm64. It does not create a default configuration unless `--copy-default-config` is supplied.
+
+To generate a default configuration through Compose, add the following under the `jump-key` service. A Compose `command` replaces the image's default arguments, so include all required options:
+
+```yaml
+command:
+  - --host=0.0.0.0
+  - --port=8080
+  - --config-dir=/app/config
+  - --icons-dir=/app/icons
+  - --copy-default-config
+```
+
+### Standalone executable
+
+Download and extract the release for your platform. Release archives are built for Linux amd64, arm64 and ARMv6, macOS arm64, and Windows amd64.
+
+Create both directories before starting the server:
+
+```bash
+mkdir -p config icons
+./jump-key --config-dir ./config --icons-dir ./icons --copy-default-config
+```
+
+Open `http://localhost:8080`. On Windows, run `jump-key.exe` with the same options. Add `--host 0.0.0.0` to listen on all IPv4 interfaces instead of localhost.
+
+`--copy-default-config` copies the embedded example only when `services.json` does not exist. It never overwrites an existing file and does not create the directories.
+
+### Server options
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `--host` | `127.0.0.1` | Listen address: an IP address or `localhost`. Docker overrides this to `0.0.0.0`. |
+| `--port` | `8080` | HTTP port, from 1 to 65535. |
+| `--config-dir` | None; required | Existing writable directory containing configuration and backups. |
+| `--icons-dir` | None; required | Existing directory containing custom icons. Can be empty. |
+| `--copy-default-config` | `false` | Copy the embedded example to `services.json` if missing. |
+| `--help` | — | Show command-line usage. |
+
+The server exposes `GET /healthz` for health checks. Configuration uploads are limited to 2 MiB. Settings are provided through command-line flags; there are no application-specific environment-variable equivalents.
+
+## Adding links
+
+Press `+` on the dashboard or use the desktop plus button. On mobile, choose **Add link** from the menu. Paste a URL, choose a category (or create one), and save with `Ctrl+Enter`. The name defaults to the hostname. The suggested shortcut can be edited; icons are optional. New links are appended to the category. Duplicate URLs are rejected within the selected category by this dialog; the JSON editor remains unrestricted.
+
+On desktop, open **Settings → Import & Export** and drag **Add to JumpKey** to your bookmarks bar. Click it on a page to open JumpKey in a new tab with the URL and page title filled in. Choose a category and save; no category is remembered.
+
+On supported Android browsers, an installed JumpKey PWA can receive links through **Share → JumpKey**. Review the shared link before saving. Sharing support depends on the browser and OS.
+
+The mobile installation banner can be dismissed permanently for this browser. Installation remains available from the menu. When a native prompt is unavailable, JumpKey shows browser instructions. The controls are hidden when running as an installed app. Use HTTPS (or localhost) for PWA features.
+
 ## Configuration
 
-The application is configured through the `config/services.json` file.
+The browser loads `/config/services.json`. The server reads it from `--config-dir`, with optional filename selection through the `Remote-User` header described below.
 
-### Available Options
+Open settings with `Ctrl + ,`. The JSON editor and import function use the same configuration structure. Importing a file loads it into the editor; save to apply it. Export downloads the current configuration, without browser-local favorites or preferences.
 
-| Key                            | Type     | Description                                                                                          |
-| :----------------------------- | :------- | :--------------------------------------------------------------------------------------------------- |
-| `categories`                   | `Array`  | List of category objects grouping your web services.                                                 |
-| `categories[].category`        | `String` | The visible display name of the category block.                                                      |
-| `categories[].categoryKey`     | `String` | _(Optional)_ The keyboard hotkey character to activate this category. Auto-assigned if omitted.      |
-| `categories[].icon`            | `String` | [Jump to Icons](#icons)                                                                              |
-| `categories[].services`        | `Array`  | Array of links belonging inside this group.                                                          |
-| `categories[].services[].name` | `String` | Title of the specific web application or website.                                                    |
-| `categories[].services[].url`  | `String` | Full destination URL (e.g., `https://github.com`).                                                   |
-| `categories[].services[].key`  | `String` | _(Optional)_ Specific hotkey to launch this item once its category is open.                          |
-| `categories[].services[].icon` | `String` | [Jump to Icons](#icons)                                                                              |
-| `searchEngines`                | `Array`  | Custom query shortcuts available inside the unified search bar using the `:` indicator.              |
-| `searchEngines[].name`         | `String` | Display name of the external search provider.                                                        |
-| `searchEngines[].prefix`       | `String` | The keyword trigger text (e.g., `g` maps to searching via `:g <query>`).                             |
-| `searchEngines[].url`          | `String` | Search engine query URL string containing `%s` as the search term placeholder.                       |
-| `searchEngines[].icon`         | `String` | [Jump to Icons](#icons)                                                                              |
+### Configuration fields
 
-### Sample `services.json`
+| Field | Type | Required | Description |
+| --- | --- | --- | --- |
+| `categories` | Array | Yes | Category objects. May be empty. |
+| `categories[].category` | String | Yes | Non-empty category name. |
+| `categories[].categoryKey` | String | No | One letter `a`–`z`, unique across categories, ignoring case. Omit or leave empty for automatic assignment. |
+| `categories[].icon` | String | No | Category icon; see [Icons](#icons). |
+| `categories[].services` | Array | Yes | Service objects. May be empty. |
+| `categories[].services[].name` | String | Yes | Non-empty display name. |
+| `categories[].services[].url` | String | Yes | Non-empty destination URL. Use an absolute URL for external services; relative URLs resolve against JumpKey. |
+| `categories[].services[].id` | String | No for new entries | Stable, non-empty identity, unique across all services. Added automatically when missing. Preserve existing IDs. |
+| `categories[].services[].key` | String | No | One letter `a`–`z`, unique within its category, ignoring case. Omit or leave empty for automatic assignment. |
+| `categories[].services[].icon` | String | No | Service icon; see [Icons](#icons). |
+| `searchEngines` | Array | Yes | Search engine objects. Use `[]` if none are needed. |
+| `searchEngines[].name` | String | Yes | Non-empty display name. |
+| `searchEngines[].prefix` | String | Yes | Non-empty command prefix, unique ignoring case. Use a token without spaces, such as `g`. |
+| `searchEngines[].url` | String | Yes | Non-empty search URL. Include `%s` where the URL-encoded query should go. |
+| `searchEngines[].icon` | String | No | Search engine icon; see [Icons](#icons). |
+
+Automatic shortcuts prefer letters in the entry's name and reserve all explicit keys first. There are 26 letter keys at each level; entries beyond the available keys remain accessible by mouse, touch or search. Set keys explicitly if you want them to remain unchanged when renaming or reordering entries.
+
+Names do not have to be unique. Service IDs do. When copying a service to create a new one, remove its `id` field and adjust or remove its `key`. The app generates the new ID when saving. Keep the ID when editing or moving an existing service so favorites and Continue references stay attached to it.
+
+Additional JSON fields are preserved, but do not add behavior unless the app supports them. Preferences such as theme, favorites, Continue history and view mode are stored in the browser, not in `services.json`.
+
+### Example `services.json`
 
 ```json
 {
@@ -173,42 +202,119 @@ The application is configured through the `config/services.json` file.
 }
 ```
 
+
+The example intentionally omits service IDs. They are generated automatically. `github.png` refers to a file you place in the icons directory.
+
+## Search and keyboard controls
+
+Press `Space` to search service and category names. Enter `:` to list search engines, or type a command such as `:g jumpkey`. Use the arrow keys to select a result and `Enter` to open it.
+
+### Dashboard
+
+| Shortcut | Action |
+| --- | --- |
+| `A`–`Z` | Select a category from the overview. |
+| Category letter, then service letter | Open a service in the selected category. |
+| `1`–`9`, `0` | Open a favorite from the overview. |
+| `Ctrl + 1`–`9`, `0` | Assign an empty favorite slot by choosing a category and service; remove the favorite if the slot is occupied. |
+| `Shift + 1`–`9`, `0` | Open the corresponding Continue entry. |
+| `_` | Open the Continue overview. |
+| `-` | Cycle through recent services; press again before the pending launch to advance. |
+| `Space` | Open search. |
+| `#` | Switch overview modes when no category is selected. |
+| `Esc` | Cancel the current input, close search or cancel a pending launch. |
+| `Shift + Click` | Open a service in the current tab. |
+| `Ctrl + ,` | Open settings. |
+| `?` | Show keyboard help. |
+
+### Search and settings
+
+| Context | Shortcut | Action |
+| --- | --- | --- |
+| Search | `↑` / `↓` | Select the previous or next result. |
+| Search | `Enter` | Open the selected result or select a search engine. |
+| Search | `Shift + Enter` | Open the selected service or search query in the current tab. |
+| Settings | `Ctrl/Cmd + 1`, `2`, `3` | Select Appearance, Data or JSON editor. |
+| JSON editor | `Ctrl/Cmd + S` | Save valid changes. |
+| Settings | `Esc` | Close settings; ask before discarding unsaved changes. |
+
 ## Icons
 
-| Icon value                     | Type         | Description                                                                                                            |
-| ------------------------------ | ------------ | ---------------------------------------------------------------------------------------------------------------------- |
-| `hammer`                       | Lucide       | Backwards-compatible shorthand. Equivalent to `lucide:hammer`.                                                         |
-| `lucide:hammer`                | Lucide       | Dynamically loaded Lucide icon.                                                                                        |
-| `iconify:mdi:home`             | Iconify      | Dynamically loaded icon from any Iconify icon set.                                                                     |
-| `https://example.com/icon.svg` | Remote image | Loads an icon from an external image URL.(may also contain query parameters)                                           |
-| `my-service.svg`               | Local image  | Loads an icon from the local `./icons` directory.  (`.svg`, `.png`, `.webp`, `.jpg`, `.jpeg`, `.gif` supported)        |
+| Value | Source | Description |
+| --- | --- | --- |
+| `hammer` | Lucide | Shorthand for `lucide:hammer`. |
+| `lucide:hammer` | Lucide via Iconify | Dynamically loaded icon. |
+| `iconify:mdi:home` | Iconify | Icon from the specified collection. |
+| `https://example.com/icon.svg` | Remote image | Image URL, including optional query parameters. |
+| `my-service.svg` | Local image | File in `--icons-dir`, served under `/icons/`. |
 
-If a dynamic icon cannot be loaded, JumpKey displays the built-in fallback icon.
+Local image filenames support `.svg`, `.png`, `.webp`, `.jpg`, `.jpeg` and `.gif`. Browse icons at [Iconify](https://icon-sets.iconify.design/).
 
-You can find all available iconify/lucide icons here: 
-https://icon-sets.iconify.design/
+Dynamic icons require access to the icon provider when not already cached. A built-in fallback is shown while loading or if a dynamic icon cannot be loaded. Local images are useful when you want to avoid external icon requests.
 
+## Saving and backups
 
-## Security Notice
+The server backs up the old configuration before saving a replacement. Backups are stored next to the configuration as `services.backup-<timestamp>.json`. If the backup fails, the server keeps the old file. If saving fails, the editor stays open with your changes.
 
-JumpKey is intended for trusted environments only. It is designed to run on a local network or behind an authentication proxy such as Authelia, Authentik, or a similar SSO solution.
-Therefore, I don't plan to spend extra effort hardening it for Internet-facing deployments. If you expose it publicly, you are responsible for providing appropriate authentication and security.
+Backups are not deleted automatically. To restore one, stop JumpKey, copy the backup over the configuration file, restart, and reload the page while online.
 
-## Multi-user support (Authelia etc.)
+### Upgrading older configurations
 
-Remote-User header if detected is used as a part of the expected local config name:
+The app adds missing service IDs when it loads a configuration and saves the result to the server. This save also creates a backup. Favorites and Continue entries stored by name are converted to IDs in each browser. If several services have the same name, the first match is used, as before. You do not need to clear browser data.
 
-| "Remote-User" header | expected config file | (automatic) backup file                              |
-| -------------------- | -------------------- | ---------------------------------------------------- |
-| not set              | services.json        | services.backup-2026-07-25T06-54-03-332Z.json        |
-| arthur               | services.arthur.json | services.arthur.backup-2026-07-25T06-54-03-332Z.json |
+If the migration cannot be saved, the app uses it locally and tries again on the next online load.
 
-## Ideas/Todos
+### Browser storage and offline use
 
-- **Workspaces**: Work/private separation. (functional)
-- ~~**Iconify Icons**: Add https://icon-sets.iconify.design/ support. (functional)~~
-- ~~**Standalone server**: golang wrapper server, replaces the caddy setup. (technical)~~
+The browser keeps the last loaded or saved configuration for offline use. Load the app online first. The linked services still need to be reachable; caching the dashboard does not cache those services.
 
-## Disclaimer
+Favorites, Continue history, theme and view mode stay in the browser. They are not included in the JSON export or synchronized between devices.
 
-#### Project was build with AI support. I am a lazy dev...
+Concurrent edits are not detected. If two devices save different versions, the last save wins.
+
+## Authentication and user-specific files
+
+JumpKey is intended for trusted environments, such as a local network or an authentication proxy setup using Authelia or Authentik. It does not provide its own authentication. Hardening it as a public Internet-facing service is outside the project's scope; if you expose it publicly, you are responsible for authentication and security.
+
+If the proxy supplies `Remote-User`, the server selects a user-specific filename:
+
+| `Remote-User` | Configuration | Backup pattern |
+| --- | --- | --- |
+| Absent | `services.json` | `services.backup-<timestamp>.json` |
+| `arthur` | `services.arthur.json` | `services.arthur.backup-<timestamp>.json` |
+
+User values may contain ASCII letters, digits, dots, underscores and hyphens. The server does not automatically fall back to `services.json` when a user-specific file is missing. The `--copy-default-config` flag only initializes the shared `services.json`.
+
+The authentication proxy must set the identity header itself and prevent clients from bypassing it. The header is a filename selector, not proof of authentication. Browser storage and offline caches are not separated by account: use one account per browser profile for this installation.
+
+## Development
+
+Use Node 24 and Go 1.26, matching the Docker build and `go.mod`.
+
+```bash
+npm ci
+npm test
+npm run build
+go test ./...
+go build -o jump-key .
+```
+
+Build the frontend before compiling or testing Go: `dist` is embedded in the executable.
+
+`npm run dev` and [compose.dev.yml](compose.dev.yml) run the frontend development server. They do not implement configuration writes; use the Go server to verify persistence. `npm run preview` previews the frontend build only.
+
+After building the frontend, `scripts/build-release.sh VERSION` creates standalone release archives in `release`. Its optional second argument changes the output directory; the script clears that directory before building. The GitHub Pages demo is maintained separately on the `demo` branch.
+
+## Ideas / TODOs
+
+- Workspaces for separate work and personal links.
+- ~~Iconify icon support.~~ Implemented.
+- ~~Standalone Go server to replace the Caddy setup.~~ Implemented.
+
+## About this project
+
+This project was built with AI assistance. I'm a lazy dev.
+
+## License
+
+[MIT](LICENSE).

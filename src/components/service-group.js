@@ -9,8 +9,8 @@ const styles = {
   icon: `size-4 text-indigo-300`,
   titleWrapper: `flex items-center gap-2 min-w-0`,
   title: `text-sm font-semibold tracking-wide text-slate-200 truncate`,
-  badge: `hidden sm:inline-flex items-center rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-2 py-0.5 font-mono text-[11px] font-bold text-indigo-300`,
-  grid: `grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(280px,1fr))]`,
+  badge: `inline-flex shrink-0 items-center rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-2 py-0.5 font-mono text-[11px] font-bold text-indigo-300`,
+  grid: `grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))]`,
 };
 
 export class JkServiceGroup extends LitElement {
@@ -22,6 +22,8 @@ export class JkServiceGroup extends LitElement {
     title: { type: String },
     icon: { type: String },
     badgeText: { type: String },
+    highlightKeys: { type: Boolean },
+    highlightCategoryKey: { type: Boolean },
     services: { type: Array },
   };
 
@@ -58,12 +60,12 @@ export class JkServiceGroup extends LitElement {
           </div>
 
           <div class="${styles.titleWrapper}">
-            <h2 class="${styles.title}">${this.title}</h2>
             ${
               this.badgeText
-                ? html` <kbd class="${styles.badge}"> ${this.badgeText.toUpperCase()} </kbd> `
+                ? html` <kbd class="${styles.badge} ${this.highlightCategoryKey ? 'jk-next-key' : ''}"> ${this.badgeText.toUpperCase()} </kbd> `
                 : ''
             }
+            <h2 class="${styles.title}">${this.title}</h2>
           </div>
         </div>
 
@@ -75,6 +77,7 @@ export class JkServiceGroup extends LitElement {
                 .subtitle=${service.url}
                 .icon=${service.icon}
                 .badgeText=${service.key}
+                .highlightKey=${this.highlightKeys}
                 .favoriteSlot=${service.favSlot || ''}
                 .isFavorite=${Boolean(service.favSlot)}
                 @card-click=${(e) => this._handleCardClick(e, service)}
