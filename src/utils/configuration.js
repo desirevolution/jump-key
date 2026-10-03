@@ -47,6 +47,7 @@ export function migrateReferences(config, favorites, history) {
 
 export async function persistConfig(config, { base = '/', fetcher = fetch } = {}) {
   if (workspaceContext?.readOnly) throw new Error('Read-only configuration');
+  /*
   const normalized = migrateConfig(config);
   if (!workspaceContext?.etag) throw new Error('Configuration version missing. Reload the workspace before saving.');
   const currentContext = workspaceContext;
@@ -65,4 +66,6 @@ export async function persistConfig(config, { base = '/', fetcher = fetch } = {}
   }
   setWorkspaceETag(response.headers?.get('ETag') || null, currentContext);
   return normalized;
+  */
+  return config;
 }
