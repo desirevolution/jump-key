@@ -1,11 +1,11 @@
 import { html, LitElement } from 'lit';
-import { buildQuickConfig, suggestKey } from '../utils/quick-add.js';
+import { buildQuickConfig, buildEditConfig, suggestKey } from '../utils/quick-add.js';
 import { generateShortcuts } from '../utils/shortcuts.js';
 import { persistConfig } from '../utils/configuration.js';
 import './icon.js';
 
 export class QuickAdd extends LitElement {
-  static properties = { config: {}, initial: {}, categoryKey: {}, t: {}, url: {}, name: {}, category: {}, newCategory: {}, key: {}, icon: {}, error: {}, saving: {} };
+  static properties = { serviceId: {}, config: {}, initial: {}, categoryKey: {}, t: {}, url: {}, name: {}, category: {}, newCategory: {}, key: {}, icon: {}, error: {}, saving: {} };
   createRenderRoot() { return this; }
   constructor() { super(); Object.assign(this, { url:'', name:'', category:'', newCategory:'', key:'', icon:'', error:'', saving:false, keyEdited:false }); }
   firstUpdated() {
@@ -13,6 +13,20 @@ export class QuickAdd extends LitElement {
     this.name = this.initial?.name || '';
     const index = generateShortcuts(this.config.categories).findIndex(c => c.categoryKey === this.categoryKey);
     this.category = index >= 0 && !this.initial?.url ? String(index) : '';
+    if (this.initial?.serviceId) {
+      this.serviceId = this.initial.serviceId;
+      const categories = generateShortcuts(this.config.categories);
+      const source = categories.findIndex(c => c.services.some(s => s.id === this.serviceId));
+      const service = categories[source]?.services.find(s => s.id === this.serviceId);
+      if (service) {
+        this.category = String(source);
+        this.url = service.url;
+        this.name = service.name;
+        this.icon = service.icon || '';
+        this.key = service.key || '';
+        this.keyEdited = true;
+      }
+    }
     this.suggest();
     this.updateComplete.then(() => { this.querySelector('dialog').showModal(); this.querySelector('input').focus(); });
   }
@@ -21,7 +35,7 @@ export class QuickAdd extends LitElement {
   close() { if (!this.saving) this.dispatchEvent(new CustomEvent('close')); }
   get validationError() {
     if (!this.config) return 'quickCategoryRequired';
-    try { buildQuickConfig(this.config, this); return ''; }
+    try { (this.serviceId ? buildEditConfig : buildQuickConfig)(this.config, this); return ''; }
     catch (error) { return error.message.startsWith('quick') ? error.message : 'quickInvalidUrl'; }
   }
   async save(e) {
@@ -29,7 +43,7 @@ export class QuickAdd extends LitElement {
     if (this.saving || this.validationError || !this.querySelector('form').reportValidity()) return;
     this.error = '';
     try {
-      const next = buildQuickConfig(this.config, this);
+      const next = (this.serviceId ? buildEditConfig : buildQuickConfig)(this.config, this);
       this.saving = true;
       const config = await persistConfig(next, { base: import.meta.env.BASE_URL });
       this.dispatchEvent(new CustomEvent('saved', { detail: config }));
@@ -43,7 +57,7 @@ export class QuickAdd extends LitElement {
       e.stopPropagation(); if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') this.save(e);
     }}>
       <form @submit=${this.save}>
-        <header><h2>${this.t('quickAdd')}</h2><button type="button" aria-label=${this.t('close')} ?disabled=${this.saving} @click=${this.close}>×</button></header>
+        <header><h2>${this.t(this.serviceId ? 'editService' : 'quickAdd')}</h2><button type="button" aria-label=${this.t('close')} ?disabled=${this.saving} @click=${this.close}>×</button></header>
         <fieldset ?disabled=${this.saving}>
           ${field('URL', this.url, e => {this.url=e.target.value; this.suggest();}, {required:true,type:'url'})}
           ${field(this.t('quickName'), this.name, e => {this.name=e.target.value; this.suggest();})}
@@ -54,7 +68,7 @@ export class QuickAdd extends LitElement {
             <option value="new">${this.t('quickNewCategory')}</option>
           </select></label>
           ${this.category === 'new' ? field(this.t('quickNewCategory'), this.newCategory, e=>this.newCategory=e.target.value, {required:true}) : ''}
-          ${field(this.t('quickKey'), this.key, e=>{this.key=e.target.value;this.keyEdited=true;})}
+          ${field(this.t(this.serviceId ? 'editKey' : 'quickKey'), this.key, e=>{this.key=e.target.value;this.keyEdited=true;})}
           <label>${this.t('quickIcon')}<div class="flex items-center gap-3"><input .value=${this.icon} @input=${e=>this.icon=e.target.value} placeholder="lucide:link" autocomplete="off"><jk-icon .icon=${this.icon.trim() || 'ui:link'} class="size-6 shrink-0"></jk-icon></div></label>
         </fieldset>
         ${this.error || (this.url && this.validationError) ? html`<p role="status" class="jk-status-danger">${this.error || this.t(this.validationError)}</p>` : ''}

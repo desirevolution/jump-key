@@ -1,3 +1,4 @@
+import { t, detectLang } from '../utils/i18n.js';
 import { html, LitElement } from 'lit';
 import './icon.js';
 
@@ -27,6 +28,7 @@ export class JkServiceCard extends LitElement {
   }
 
   static properties = {
+    serviceId: { type: String },
     name: { type: String },
     subtitle: { type: String },
     icon: { type: String },
@@ -262,6 +264,7 @@ export class JkServiceCard extends LitElement {
       : this.subtitle || '';
 
     return html`
+      <div class="jk-card-shell relative">
       <div
         role="button"
         tabindex="0"
@@ -271,8 +274,14 @@ export class JkServiceCard extends LitElement {
         @pointerup=${this._handlePointerUp}
         @pointercancel=${this._handlePointerCancel}
         @lostpointercapture=${this._handleLostPointerCapture}
+        @keydown=${e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault(); e.stopPropagation();
+            this.dispatchEvent(new CustomEvent('card-click', { detail: { service: this._getServiceData(), shiftKey: e.shiftKey }, bubbles: true, composed: true }));
+          }
+        }}
         @click=${this._handleNativeClick}
-        class="${styles.card} ${this._getCardClasses()}"
+        class="${styles.card} ${this._getCardClasses()} ${this.serviceId ? 'jk-card-has-actions' : ''}"
       >
         ${this._renderAccent()}
 
@@ -282,7 +291,7 @@ export class JkServiceCard extends LitElement {
           <jk-icon .icon=${this.icon || 'ui:link'} class=${styles.icon}></jk-icon>
         </div>
 
-        <div class=${styles.content}>
+        <div class="jk-card-content ${styles.content}">
           ${(this.badgeText || this.favoriteSlot) ? html`<kbd class="${styles.badge} ${this._getBadgeClasses()} ${this.highlightKey ? 'jk-next-key' : ''}">${String(this.badgeText || this.favoriteSlot).toUpperCase()}</kbd>` : html`<span class="col-start-1 row-start-1 row-span-2"></span>`}
           <span
             class="${styles.name} ${this.isReady ? 'text-indigo-200' : 'text-slate-50 group-hover:text-indigo-200'}"
@@ -290,10 +299,13 @@ export class JkServiceCard extends LitElement {
             ${this.name}
           </span>
 
-          <span class=${styles.subtitle}> ${displaySubtitle} </span>
+          <span class="jk-card-subtitle ${styles.subtitle}"> ${displaySubtitle} </span>
         </div>
 
-        ${this.isFavorite ? html`<jk-icon icon="ui:star" class="size-3.5 shrink-0 text-indigo-300/60" aria-hidden="true"></jk-icon>` : ''}
+        ${this.isFavorite ? html`<span class="jk-card-favorite ${this.badgeText ? '' : 'md:hidden'} inline-flex shrink-0 items-center gap-1 text-sm text-indigo-300" aria-label=${t(detectLang(), 'favorites')}>
+          <jk-icon icon="ui:star" class="size-3.5" aria-hidden="true"></jk-icon>
+          ${this.badgeText && this.favoriteSlot ? html`<span class="hidden md:inline">${this.favoriteSlot}</span>` : ''}
+        </span>` : ''}
 
         <style>
           @keyframes jk-long-press-fill {
@@ -328,6 +340,10 @@ export class JkServiceCard extends LitElement {
             }
           }
         </style>
+      </div>
+      ${this.serviceId ? html`<button type="button" class="jk-card-actions" aria-label=${t(detectLang(), 'serviceActions') + ': ' + this.name} aria-haspopup="dialog"
+        @keydown=${e => e.stopPropagation()}
+        @click=${e => { e.stopPropagation(); this.dispatchEvent(new CustomEvent('service-actions', {detail: {id:this.serviceId, anchor:e.currentTarget}, bubbles:true, composed:true})); }}><jk-icon icon="ui:ellipsis-vertical" class="size-5"></jk-icon></button>` : ''}
       </div>
     `;
   }

@@ -105,6 +105,14 @@ Open `http://localhost:8080`. On Windows, run `jump-key.exe` with the same optio
 
 The server exposes `GET /healthz` for health checks. Configuration uploads are limited to 2 MiB. Settings are provided through command-line flags; there are no application-specific environment-variable equivalents.
 
+## Service actions and mobile layout
+
+Open **⋮** on a service tile to edit it, add or remove it from favorites, or copy its URL. The button is always visible on mobile and appears on hover or keyboard focus on desktop. Use `Tab` to reach it. Actions open in a bottom sheet on mobile and beside the button on desktop. Desktop category/grid tiles show the assigned favorite number next to the star; favorite tiles already show it beside the name. Pressing and holding a tile still works as before.
+
+**Edit service** opens the same form used for adding links, with the current values filled in. You can change the name, URL, icon, shortcut, or category, including creating a new destination category. The service keeps its ID, favorites, and history. Its position stays the same within a category; moving it appends it to the destination category. Duplicate URL and shortcut checks exclude the service being edited. Renaming does not replace its shortcut; conflicts in the destination category must be resolved before saving. Categories themselves are still edited in the JSON editor.
+
+On small screens, shortcuts are hidden, tiles use more of the available width, and category headers show service counts. **Back to overview** returns from a category or recent-services view.
+
 ## Adding links
 
 Press `+` on the dashboard or use the desktop plus button. On mobile, choose **Add link** from the menu. Paste a URL, choose a category (or create one), and save with `Ctrl+Enter`. The name defaults to the hostname. The suggested shortcut can be edited; icons are optional. New links are appended to the category. Duplicate URLs are rejected within the selected category by this dialog; the JSON editor remains unrestricted.

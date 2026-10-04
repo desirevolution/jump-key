@@ -154,6 +154,10 @@ export class JkHelpModal extends LitElement {
             </div>
             <div class="space-y-3 px-3 text-sm leading-relaxed text-slate-300">
               <div class="${styles.sectionTitle}">${this.t('helpLinksSection')}</div>
+              <p>${this.t('helpServiceActions')}</p>
+              <p class="hidden md:block">${this.t('helpDesktopActions')}</p>
+              <p class="md:hidden">${this.t('helpMobileLayout')}</p>
+              <p>${this.t('helpEditService')}</p>
               <p class="hidden md:block">${this.t('helpAddLink')}</p>
               <p class="hidden md:block">${this.t('helpBookmarklet')}</p>
               <div class="space-y-3 md:hidden">

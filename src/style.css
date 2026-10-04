@@ -682,7 +682,7 @@ kbd.jk-next-key {
 .jk-install-banner p { font-size:0.75rem; }
 @media (min-width:768px) { .jk-install-banner { display:none; } }
 @media (max-width:767px) {
-  body { padding:0.75rem; }
+  body { padding:0.75rem !important; }
   jk-dashboard-header jk-icon-button button { width:44px; height:44px; }
   jk-mobile-menu section { padding-bottom:max(1.25rem,env(safe-area-inset-bottom)); max-height:85dvh; }
 }
@@ -691,3 +691,47 @@ jk-config-editor { display:flex; flex-direction:column; height:100%; min-height:
 jk-config-editor #editorContainer { height:0; min-height:160px; flex:1; overflow:auto; }
 .jk-config-errors { flex:none; max-height:9rem; overflow:auto; padding:0.75rem; margin-bottom:0.5rem; border:1px solid var(--jk-danger); border-radius:0.5rem; font-size:0.8rem; overflow-wrap:anywhere; }
 .jk-config-errors li + li { margin-top:0.4rem; }
+
+/* Actions are siblings of the launch target, so they never launch the service. */
+.jk-card-has-actions { padding-right:3.5rem; }
+.jk-card-actions { position:absolute; right:0.25rem; top:50%; transform:translateY(-50%); width:44px; height:44px; display:flex; align-items:center; justify-content:center; border-radius:0.75rem; color:var(--jk-accent); }
+.jk-card-actions:hover, .jk-card-actions:focus-visible { background:var(--jk-accent-soft); }
+.jk-service-actions { max-width:26rem; }
+.jk-service-actions h2 { overflow-wrap:anywhere; }
+.jk-service-action { display:flex; align-items:center; gap:0.75rem; width:100%; text-align:left; padding:0.75rem; margin-top:0.5rem; border-radius:0.75rem; }
+.jk-service-action:hover, .jk-service-action:focus-visible { background:var(--jk-accent-soft); }
+@media (min-width:768px) and (hover:hover) {
+  .jk-card-actions { opacity:0; }
+  .jk-card-shell:hover .jk-card-actions, .jk-card-shell:focus-within .jk-card-actions { opacity:1; }
+}
+@media (max-width:767px) {
+  .jk-mobile-group { padding:0; border:0; background:transparent; border-radius:0; }
+  jk-service-card kbd, jk-service-group kbd { display:none !important; }
+  .jk-service-card { padding:12px; gap:12px; }
+  .jk-service-card.jk-card-has-actions { padding-right:48px; }
+  .jk-service-card-icon { width:40px; height:40px; }
+  .jk-service-card-icon > jk-icon { width:26px; height:26px; }
+  .jk-card-content { display:flex; flex-direction:column; align-items:stretch; justify-content:center; gap:0; }
+  .jk-card-content > span:empty { display:none; }
+  .jk-card-content > span:not(.jk-card-subtitle) { font-size:1rem; }
+  jk-help-modal [role=dialog] { padding-bottom:max(1.25rem,env(safe-area-inset-bottom)); }
+  .jk-quick-dialog { max-height:calc(100dvh - 1.5rem); padding-bottom:max(1.25rem,env(safe-area-inset-bottom)); }
+  jk-search-modal > div { padding:12px; }
+  jk-search-modal > div > div { max-height:calc(100dvh - 24px); }
+}
+
+
+/* Service actions: anchored desktop menu and mobile bottom sheet. */
+dialog.jk-service-actions {
+  position:fixed; inset:auto; margin:0; width:min(20rem,calc(100vw - 24px));
+  max-height:calc(100dvh - 24px); padding:1rem;
+}
+dialog.jk-service-actions::backdrop { background:transparent; backdrop-filter:none; }
+@media (max-width:767px) {
+  dialog.jk-service-actions {
+    inset:auto 0 0; width:100%; max-width:none; max-height:85dvh;
+    border-radius:1.5rem 1.5rem 0 0; padding:1.25rem;
+    padding-bottom:max(1.25rem,env(safe-area-inset-bottom));
+  }
+  dialog.jk-service-actions::backdrop { background:rgb(2 6 23 / 70%); backdrop-filter:blur(4px); }
+}

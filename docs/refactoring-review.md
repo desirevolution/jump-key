@@ -68,3 +68,11 @@ Editor displays computed category/service keys again while retaining extra JSON 
 - Settings → Import & Export provides a draggable bookmarklet for the current installation, including its base path. It opens the existing share/quick-add flow in a new tab with URL and title, without an opener.
 - Incoming links require an explicit category selection; no category is remembered. Blank selections cannot resolve to the first category.
 - Updated desktop help, README and all four translations. Tests cover bookmarklet execution/encoding and empty category validation. Node tests and production build passed; actual browser drag-and-drop was not verified.
+
+
+## Mobile layout and service editing
+
+- Small screens use a single outer gutter, compact service cards and unframed groups. Category/service shortcut badges are hidden; category headers show counts and category/recent views offer a back button.
+- Service cards expose a separate action button, always visible on mobile/touch and on hover or keyboard focus on desktop. A native dialog offers edit, favorite toggle and URL copy without launching the service.
+- The existing quick-add form also edits services by ID, preserving unknown service fields, favorites/history and same-category position. Moves append to the destination. Validation excludes the edited entry and checks destination URL/shortcut collisions.
+- DE/EN/FR/ES, help and README cover the new controls. Focused edit/move tests, i18n checks and production build passed. Browser/Android visual and touch validation remains outstanding.
