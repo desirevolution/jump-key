@@ -76,3 +76,11 @@ Editor displays computed category/service keys again while retaining extra JSON 
 - Service cards expose a separate action button, always visible on mobile/touch and on hover or keyboard focus on desktop. A native dialog offers edit, favorite toggle and URL copy without launching the service.
 - The existing quick-add form also edits services by ID, preserving unknown service fields, favorites/history and same-category position. Moves append to the destination. Validation excludes the edited entry and checks destination URL/shortcut collisions.
 - DE/EN/FR/ES, help and README cover the new controls. Focused edit/move tests, i18n checks and production build passed. Browser/Android visual and touch validation remains outstanding.
+
+
+## Position and deletion
+
+- Add/edit supports first, last and after-service positioning. Existing edits preselect their current position; destination changes default to last.
+- Deleting asks for confirmation. Deleting or moving the final service offers an unchecked option to remove its empty category. Cancel preserves form values; failed saves preserve the current configuration.
+- Successful saves clean removed favorite/history references and leave a removed active category. IDs and references survive moves.
+- Updated all four languages, help and README. 19 tests and production build passed; Android/browser visual checks remain outstanding.

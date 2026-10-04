@@ -735,3 +735,10 @@ dialog.jk-service-actions::backdrop { background:transparent; backdrop-filter:no
   }
   dialog.jk-service-actions::backdrop { background:rgb(2 6 23 / 70%); backdrop-filter:blur(4px); }
 }
+
+.jk-quick-dialog .jk-empty-category-option { display:flex; align-items:flex-start; gap:0.75rem; margin:1rem 0; min-height:44px; }
+.jk-quick-dialog .jk-empty-category-option input { width:1.25rem; height:1.25rem; flex:none; margin-top:0.15rem; }
+
+.jk-quick-dialog .jk-delete-service { display:inline-flex; align-items:center; justify-content:center; gap:0.5rem; color:var(--jk-danger); border:1px solid var(--jk-danger); border-radius:0.75rem; padding:0.625rem 0.875rem; margin:1rem 0; }
+.jk-quick-dialog .jk-delete-service:hover { background:color-mix(in srgb,var(--jk-danger) 12%,transparent); }
+.jk-quick-dialog button:disabled { cursor:not-allowed; }

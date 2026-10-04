@@ -14,7 +14,7 @@ export function sharedLink(params) {
   return { url: '', name: params.get('title') || '' };
 }
 
-export function buildQuickConfig(config, { url, name, category, newCategory, key, icon }) {
+export function buildQuickConfig(config, { url, name, category, newCategory, key, icon, position }) {
   let parsed;
   try { parsed = new URL(url.trim()); } catch { throw new Error('quickInvalidUrl'); }
   if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('quickInvalidUrl');
@@ -36,7 +36,7 @@ export function buildQuickConfig(config, { url, name, category, newCategory, key
     service.key = key.trim().toLowerCase();
   }
   if (icon.trim()) service.icon = icon.trim();
-  target.services.push(service);
+  target.services.splice(insertionIndex(target.services, position), 0, service);
   return next;
 }
 
@@ -58,12 +58,41 @@ export function buildEditConfig(config, input) {
   // Freeze the other effective shortcuts before removing the edited entry.
   next.categories = generateShortcuts(next.categories);
   next.categories[sourceIndex].services.splice(position, 1);
-  const updated = buildQuickConfig(next, input);
+  // Lit form properties are prototype accessors, not enumerable own fields.
+  const { url, name, category, newCategory, key, icon } = input;
+  const updated = buildQuickConfig(next, { url, name, category, newCategory, key, icon, position: 'bottom' });
   const targetIndex = input.category === 'new' ? updated.categories.length - 1 : Number(input.category);
   const target = updated.categories[targetIndex];
   const edited = { ...original, ...target.services.pop(), id: original.id };
   if (!input.icon.trim()) delete edited.icon;
   if (!input.key.trim()) delete edited.key;
-  target.services.splice(targetIndex === sourceIndex ? position : target.services.length, 0, edited);
+  const destination = input.position === undefined && targetIndex === sourceIndex
+    ? position : insertionIndex(target.services, input.position);
+  target.services.splice(destination, 0, edited);
+  if (input.removeEmptyCategory && sourceIndex !== targetIndex && updated.categories[sourceIndex].services.length === 0) {
+    updated.categories.splice(sourceIndex, 1);
+  }
   return updated;
+}
+
+
+function insertionIndex(services, position = 'bottom') {
+  if (position === 'top') return 0;
+  if (position === 'bottom') return services.length;
+  if (typeof position === 'string' && position.startsWith('after:')) {
+    const index = services.findIndex(s => s.id === position.slice(6));
+    if (index >= 0) return index + 1;
+  }
+  throw new Error('quickPositionInvalid');
+}
+
+export function buildDeleteConfig(config, serviceId, removeEmptyCategory = false) {
+  const next = structuredClone(config);
+  next.categories = generateShortcuts(next.categories);
+  const categoryIndex = next.categories.findIndex(c => c.services.some(s => s.id === serviceId));
+  if (categoryIndex < 0) throw new Error('quickServiceMissing');
+  const category = next.categories[categoryIndex];
+  category.services = category.services.filter(s => s.id !== serviceId);
+  if (removeEmptyCategory && category.services.length === 0) next.categories.splice(categoryIndex, 1);
+  return next;
 }
