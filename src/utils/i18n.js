@@ -1,5 +1,6 @@
 export const translations = {
   de: {
+    helpFormValidation: "Ungespeicherte Eingaben werden vor dem Schließen abgefragt. Validierungsfehler stehen direkt am betroffenen Feld.",
     quickValidationFailed: "Die Eingaben konnten nicht geprüft werden. Bitte den Dialog erneut öffnen.",
     servicePosition: "Position",
     positionTop: "Ganz oben",
@@ -248,6 +249,7 @@ export const translations = {
     tabEditorInvalid: 'Ungültig',
   },
   fr: {
+    helpFormValidation: "Fermer avec des modifications non enregistrées demande confirmation. Les erreurs apparaissent près du champ concerné.",
     quickValidationFailed: "Impossible de vérifier le formulaire. Rouvrez la fenêtre.",
     servicePosition: "Position",
     positionTop: "Au début",
@@ -480,6 +482,7 @@ export const translations = {
     tabEditorInvalid: 'Invalide',
   },
   es: {
+    helpFormValidation: "Cerrar con cambios sin guardar requiere confirmación. Los errores aparecen junto al campo correspondiente.",
     quickValidationFailed: "No se pudo validar el formulario. Vuelve a abrir el diálogo.",
     servicePosition: "Posición",
     positionTop: "Al principio",
@@ -708,6 +711,7 @@ export const translations = {
     tabEditorInvalid: 'No válido',
   },
   en: {
+    helpFormValidation: "Closing with unsaved input asks for confirmation. Validation errors appear next to the affected field.",
     quickValidationFailed: "Could not validate the form. Please reopen the dialog.",
     servicePosition: "Position",
     positionTop: "First",

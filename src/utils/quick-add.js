@@ -96,3 +96,17 @@ export function buildDeleteConfig(config, serviceId, removeEmptyCategory = false
   if (removeEmptyCategory && category.services.length === 0) next.categories.splice(categoryIndex, 1);
   return next;
 }
+
+export function quickFormSnapshot(form) {
+  return JSON.stringify(['url', 'name', 'category', 'position', 'key', 'icon'].map(key => form[key] ?? '')
+    .concat(form.category === 'new' ? form.newCategory ?? '' : ''));
+}
+
+export function quickErrorField(code, category) {
+  if (['quickInvalidUrl', 'quickDuplicate'].includes(code)) return 'url';
+  if (['quickInvalidKey', 'quickKeyUsed'].includes(code)) return 'key';
+  if (code === 'quickPositionInvalid') return 'position';
+  if (code === 'quickCategoryExists') return 'newCategory';
+  if (code === 'quickCategoryRequired') return category === 'new' ? 'newCategory' : 'category';
+  return '';
+}

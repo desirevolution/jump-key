@@ -10,7 +10,7 @@ const styles = {
   exportTextContainer: `grow min-w-0`,
   exportTitle: `text-sm font-bold text-slate-50 tracking-wide`,
   exportDesc: `text-xs text-slate-400 mt-1 leading-relaxed`,
-  exportBtn: `shrink-0 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-sm font-semibold jk-on-accent border border-indigo-500/30 shadow-lg shadow-indigo-500/10 transition-all active:scale-95 cursor-pointer`,
+  exportBtn: `jk-btn jk-btn-primary shrink-0`,
   importCard: `bg-slate-900/40 border border-slate-700/60 rounded-2xl p-5`,
   importHeader: `flex items-center gap-3 mb-4`,
   importIconBox: `flex items-center justify-center w-10 h-10 rounded-xl bg-slate-800 text-indigo-400 border border-slate-700`,

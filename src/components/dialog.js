@@ -13,8 +13,8 @@ const styles = {
   title: `text-xl font-semibold tracking-tight text-slate-50`,
   message: `mt-2 text-sm leading-6 text-slate-300`,
   footer: `flex justify-end gap-3 border-t border-slate-700/70 bg-slate-900/30 px-6 py-4`,
-  cancelBtn: `rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-200 transition-all duration-200 hover:border-indigo-500/50 hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-indigo-500/30`,
-  confirmBtn: `rounded-xl border border-indigo-500 bg-indigo-500/20 px-4 py-2 text-sm font-medium text-indigo-100 transition-all duration-200 hover:bg-indigo-500/30 hover:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/40`,
+  cancelBtn: `jk-btn jk-btn-secondary`,
+  confirmBtn: `jk-btn`,
 };
 
 export class JkDialog extends LitElement {
@@ -23,6 +23,7 @@ export class JkDialog extends LitElement {
   }
 
   static properties = {
+    destructive: { type: Boolean },
     show: { type: Boolean },
     title: { type: String },
     message: { type: String },
@@ -51,8 +52,8 @@ export class JkDialog extends LitElement {
     if (changed.has('show')) {
       if (this.show) {
         window.addEventListener('keydown', this._handleKeyDown, true);
-        // Autofocus the primary action button on open
-        this._focusButton('confirmBtn');
+        // Prefer the safe action in destructive confirmations.
+        this._focusButton(this.destructive && this.cancelLabel ? 'cancelBtn' : 'confirmBtn');
       } else {
         window.removeEventListener('keydown', this._handleKeyDown, true);
       }
@@ -143,7 +144,7 @@ export class JkDialog extends LitElement {
                 : ''
             }
 
-            <button id="confirmBtn" @click=${this._handleConfirm} class="${styles.confirmBtn}">
+            <button id="confirmBtn" @click=${this._handleConfirm} class="${styles.confirmBtn} ${this.destructive ? 'jk-btn-danger-filled' : 'jk-btn-primary'}">
               ${this.confirmLabel}
             </button>
           </div>
