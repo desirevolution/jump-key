@@ -202,6 +202,7 @@ class DashboardApp extends LitElement {
     writeJsonStorage(STORAGE_KEYS.continueHistory, this.continueHistory);
     this.configuration = config;
     this.categories = generateShortcuts(config.categories);
+    if (this.activeCategoryKey && !this.categories.some(c => c.categoryKey === this.activeCategoryKey)) this.resetNavigationInput(false);
     this.searchEngines = config.searchEngines;
     writeJsonStorage(STORAGE_KEYS.configCache, config);
   }

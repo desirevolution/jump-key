@@ -1,6 +1,7 @@
+import { migrateReferences } from '../src/utils/configuration.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import {buildEditConfig, buildQuickConfig, suggestKey, sharedLink, hasSharedInput} from '../src/utils/quick-add.js';
+import {buildDeleteConfig, buildEditConfig, buildQuickConfig, suggestKey, sharedLink, hasSharedInput} from '../src/utils/quick-add.js';
 const config={categories:[{category:'Tools',services:[{name:'Alpha',url:'https://example.com/',id:'old'}]},{category:'Other',services:[]}],searchEngines:[]};
 const input={url:'https://new.example',name:'Another',category:'0',newCategory:'',key:'',icon:''};
 test('suggestion reserves generated keys and same-category duplicates fail',()=>{
@@ -56,4 +57,41 @@ test('moving appends, retains ID and rejects destination conflicts', () => {
  assert.throws(()=>buildEditConfig(source,{...edit,serviceId:'missing'}),/quickServiceMissing/);
  const created=buildEditConfig(source,{...edit,category:'new',newCategory:'C'});
  assert.equal(created.categories[2].services[0].id,'one');
+});
+
+test('position selects first, after a service or last without changing other IDs', () => {
+ const source={categories:[{category:'A',services:[{id:'a',name:'A',url:'https://a.example',key:'a'},{id:'b',name:'B',url:'https://b.example',key:'b'},{id:'c',name:'C',url:'https://c.example',key:'c'}]}],searchEngines:[]};
+ const edit={...input,serviceId:'c',key:'c',position:'after:a'};
+ assert.deepEqual(buildEditConfig(source,edit).categories[0].services.map(s=>s.id),['a','c','b']);
+ assert.deepEqual(buildEditConfig(source,{...edit,position:'top'}).categories[0].services.map(s=>s.id),['c','a','b']);
+ assert.deepEqual(buildEditConfig(source,{...edit,serviceId:'a',key:'a',position:'bottom'}).categories[0].services.map(s=>s.id),['b','c','a']);
+ assert.equal(buildQuickConfig(source,{...input,position:'top'}).categories[0].services[0].name,input.name);
+ assert.throws(()=>buildEditConfig(source,{...edit,position:'after:missing'}),/quickPositionInvalid/);
+ assert.deepEqual(source.categories[0].services.map(s=>s.id),['a','b','c']);
+});
+test('deletion and moving remove an empty category only when selected', () => {
+ const source={categories:[{category:'A',services:[{id:'a',name:'A',url:'https://a.example',key:'a'}]},{category:'B',services:[]}],searchEngines:[]};
+ assert.equal(buildDeleteConfig(source,'a').categories.length,2);
+ const deleted=buildDeleteConfig(source,'a',true);
+ assert.equal(deleted.categories[0].category,'B');
+ assert.deepEqual(migrateReferences(deleted,{'1':'a'},['a']),{favorites:{},history:[]});
+ const move={...input,serviceId:'a',category:'1',removeEmptyCategory:true};
+ const moved=buildEditConfig(source,move);
+ assert.equal(moved.categories.length,1);
+ assert.equal(moved.categories[0].services[0].id,'a');
+ assert.deepEqual(migrateReferences(moved,{'1':'a'},['a']),{favorites:{'1':'a'},history:['a']});
+ assert.equal(buildEditConfig(source,{...move,removeEmptyCategory:false}).categories.length,2);
+ assert.equal(buildEditConfig(source,{...move,category:'new',newCategory:'C'}).categories.at(-1).services[0].id,'a');
+ assert.equal(source.categories[0].services.length,1);
+});
+
+test('editing accepts reactive form properties exposed through prototype getters', () => {
+ const values={...input,serviceId:'old',name:'Gemini',url:'https://gemini.google.com',key:'g',position:'top'};
+ const prototype=Object.fromEntries(Object.keys(values).map(key=>[key,{get(){return values[key];}}]));
+ const form=Object.create(Object.defineProperties({},prototype));
+ assert.equal(Object.keys(form).length,0);
+ const result=buildEditConfig(config,form);
+ assert.equal(result.categories[0].services[0].url,'https://gemini.google.com/');
+ assert.equal(result.categories[0].services[0].id,'old');
+ assert.equal(result.categories[0].services[0].key,'g');
 });
