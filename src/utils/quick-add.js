@@ -1,5 +1,10 @@
 import { generateShortcuts } from './shortcuts.js';
 
+// GET share targets can replace the action query, dropping our share=1 marker.
+export function hasSharedInput(params) {
+  return params.get('share') === '1' || ['url', 'text', 'title'].some(key => params.has(key));
+}
+
 export function sharedLink(params) {
   const candidates = [params.get('url'), params.get('text')];
   for (const value of candidates) {

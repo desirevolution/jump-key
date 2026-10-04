@@ -1,6 +1,6 @@
 import './components/quick-add.js';
 import { InstallController } from './utils/install.js';
-import { sharedLink } from './utils/quick-add.js';
+import { sharedLink, hasSharedInput } from './utils/quick-add.js';
 import { migrateConfig, migrateReferences, persistConfig } from './utils/configuration.js';
 import { html, LitElement } from 'lit';
 import { detectLang, t } from './utils/i18n.js';
@@ -253,7 +253,7 @@ class DashboardApp extends LitElement {
     }
     if (!this.isConnected) return;
     const params = new URLSearchParams(location.search);
-    if (params.get('share') === '1' && this.configuration) {
+    if (hasSharedInput(params) && this.configuration) {
       this.openQuickAdd(sharedLink(params));
       // Remove shared URLs from browser history after handing them to the dialog.
       for (const key of ['share', 'url', 'text', 'title']) params.delete(key);
