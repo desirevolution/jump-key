@@ -47,3 +47,23 @@ export function suggestKey(config, category, name) {
   const existing = generateShortcuts([target])[0];
   return generateShortcuts([{ ...existing, services: [...existing.services, { name: name || 'Link', url: '' }] }])[0].services.at(-1).key || '';
 }
+
+export function buildEditConfig(config, input) {
+  const next = structuredClone(config);
+  const sourceIndex = next.categories.findIndex(c => c.services.some(s => s.id === input.serviceId));
+  if (sourceIndex < 0) throw new Error('quickServiceMissing');
+  const source = next.categories[sourceIndex];
+  const position = source.services.findIndex(s => s.id === input.serviceId);
+  const original = source.services[position];
+  // Freeze the other effective shortcuts before removing the edited entry.
+  next.categories = generateShortcuts(next.categories);
+  next.categories[sourceIndex].services.splice(position, 1);
+  const updated = buildQuickConfig(next, input);
+  const targetIndex = input.category === 'new' ? updated.categories.length - 1 : Number(input.category);
+  const target = updated.categories[targetIndex];
+  const edited = { ...original, ...target.services.pop(), id: original.id };
+  if (!input.icon.trim()) delete edited.icon;
+  if (!input.key.trim()) delete edited.key;
+  target.services.splice(targetIndex === sourceIndex ? position : target.services.length, 0, edited);
+  return updated;
+}

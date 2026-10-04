@@ -1,3 +1,4 @@
+import './components/service-actions.js';
 import './components/quick-add.js';
 import { InstallController } from './utils/install.js';
 import { sharedLink, hasSharedInput } from './utils/quick-add.js';
@@ -36,7 +37,7 @@ import './components/action-feedback.js';
 import './components/mobile-menu.js';
 
 const styles = {
-  mainContent: 'container mx-auto px-4 pt-8 pb-6',
+  mainContent: 'container mx-auto px-0 pt-4 pb-6 md:px-4 md:pt-8',
 };
 
 const STORAGE_KEYS = {
@@ -52,6 +53,7 @@ class DashboardApp extends LitElement {
   }
 
   static properties = {
+    actionService: { type: Object },
     showQuickAdd: { type: Boolean },
     savingConfig: { type: Boolean },
     categories: { type: Array },
@@ -703,6 +705,26 @@ class DashboardApp extends LitElement {
   // Layout Helper Snippets
   // --------------------------------------------------
 
+  async handleServiceAction(action) {
+    const service = this.actionService;
+    if (!service) return;
+    if (action === 'copy') {
+      try {
+        await navigator.clipboard.writeText(service.url);
+        this.showToast(this.t('urlCopied'), 'success');
+      } catch {
+        this.showToast(this.t('urlCopyFailed'), 'error');
+        return;
+      }
+    }
+    this.actionService = null;
+    if (action === 'favorite') this.handleServiceLongPress(service);
+    if (action === 'edit') {
+      await this.updateComplete;
+      this.openQuickAdd({ serviceId: service.id });
+    }
+  }
+
   openQuickAdd(initial = {}) {
     if (!this.configuration) return;
     this.cancelPendingAction();
@@ -873,6 +895,9 @@ class DashboardApp extends LitElement {
         @saved=${e => {this.applyConfiguration(e.detail);this.showQuickAdd=false;this.showToast(this.t('editConfigSaveDone'),'success');}}
       ></jk-quick-add>` : ''}
 
+      ${this.actionService ? html`<jk-service-actions .anchor=${this.actionAnchor} .service=${this.actionService}
+        .favorite=${Object.values(this.favorites).includes(this.actionService.id)} .t=${this.t}
+        @action=${e => this.handleServiceAction(e.detail)}></jk-service-actions>` : ''}
       <jk-toast
         .show=${this.toastConfig.show}
         .message=${this.toastConfig.message}
@@ -906,7 +931,13 @@ class DashboardApp extends LitElement {
           <button @click=${this.installApp}>${this.t('installAction')}</button>
           <button aria-label=${this.t('close')} @click=${()=>this.installController.dismiss()}>×</button>
         </aside>` : ''}
-      <main class="${styles.mainContent}">
+      <main class="${styles.mainContent}" @service-actions=${e => {
+        this.cancelPendingAction();
+        this.cancelInputResetTimer();
+        this.actionAnchor = e.detail.anchor;
+        this.actionService = this.categories.flatMap(c => c.services).find(s => s.id === e.detail.id);
+      }}>
+        ${this.activeCategoryKey || this.showContinueView ? html`<button type="button" class="mb-3 flex min-h-11 items-center gap-2 text-sm text-indigo-300 md:hidden" @click=${()=>this.resetNavigationInput(true)}><jk-icon icon="ui:arrow-left" class="size-4"></jk-icon>${this.t('backOverview')}</button>` : ''}
         ${
           showMain && !this.isGridView
             ? html`

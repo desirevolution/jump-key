@@ -1,4 +1,5 @@
 import {
+  Pencil,
   Plus,
   Link,
   ArrowLeft,
@@ -10,6 +11,7 @@ import {
   Database,
   Download,
   Ellipsis,
+  EllipsisVertical,
   ExternalLink,
   FileJson,
   Folder,
@@ -36,6 +38,7 @@ import {
 } from '@lucide/icons';
 
 export const uiIcons = {
+  pencil: Pencil,
   plus: Plus,
   link: Link,
   'arrow-left': ArrowLeft,
@@ -47,6 +50,7 @@ export const uiIcons = {
   database: Database,
   download: Download,
   ellipsis: Ellipsis,
+  'ellipsis-vertical': EllipsisVertical,
   'external-link': ExternalLink,
   'file-json': FileJson,
   folder: Folder,

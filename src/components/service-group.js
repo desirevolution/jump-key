@@ -3,7 +3,7 @@ import './service-card.js';
 import './icon.js';
 
 const styles = {
-  section: `rounded-2xl border border-slate-700/50 bg-slate-900/20 p-4 sm:p-5 transition-colors duration-300`,
+  section: `jk-mobile-group rounded-2xl border border-slate-700/50 bg-slate-900/20 p-4 sm:p-5 transition-colors duration-300`,
   header: `flex items-center gap-3 mb-4`,
   iconContainer: `flex items-center justify-center size-8 rounded-xl bg-slate-800/70 ring-1 ring-slate-700/70`,
   icon: `size-4 text-indigo-300`,
@@ -67,12 +67,14 @@ export class JkServiceGroup extends LitElement {
             }
             <h2 class="${styles.title}">${this.title}</h2>
           </div>
+          ${this.badgeText ? html`<span class="ml-auto text-sm text-slate-400 md:hidden">${this.services?.length ?? 0}</span>` : ''}
         </div>
 
         <div class="${styles.grid}">
           ${(this.services ?? []).map(
             (service) => html`
               <jk-service-card
+                .serviceId=${service.id}
                 .name=${service.name}
                 .subtitle=${service.url}
                 .icon=${service.icon}
