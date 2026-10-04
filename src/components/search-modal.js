@@ -287,7 +287,7 @@ export class JkSearchModal extends LitElement {
                 : ''
             }
 
-            <jk-icon-button icon="ui:x" title="Close" @click=${this._handleClose}></jk-icon-button>
+            <jk-icon-button icon="ui:x" .label=${this.t('close')} @click=${this._handleClose}></jk-icon-button>
           </div>
 
           <div id="searchResults" class="${styles.resultsContainer}">

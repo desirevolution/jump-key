@@ -84,3 +84,19 @@ Editor displays computed category/service keys again while retaining extra JSON 
 - Deleting asks for confirmation. Deleting or moving the final service offers an unchecked option to remove its empty category. Cancel preserves form values; failed saves preserve the current configuration.
 - Successful saves clean removed favorite/history references and leave a removed active category. IDs and references survive moves.
 - Updated all four languages, help and README. 19 tests and production build passed; Android/browser visual checks remain outstanding.
+
+
+## Edit dialog review
+
+- Synchronize category and position selects after their options render, including when cancelling confirmation. Previously the displayed option could differ from the internal value.
+- Position selection is disabled until a category is chosen; hostname fallback guidance is only shown for an empty name. Tests cover unchanged saves for middle and last services.
+- Wide-screen header/content alignment is now implemented: removed the inner container cap and horizontal padding; outer margins and tile minimum widths are retained.
+- Add/edit now confirms discarding changed fields through close, cancel or Escape, and associates validation errors with their controls. Confirmation cancellation retains values. Help, translations and README are updated. Browser visual verification remains outstanding.
+
+
+## Shared action buttons
+
+- Dialog, configuration, export and installation actions share primary, secondary, outlined-danger and confirmed-danger variants. Standardized 44px targets, spacing, typography, focus and disabled states.
+- Icon controls share secondary styling; service action triggers retain compact placement and common focus outlines. Navigation tiles/menu rows retain dedicated layouts.
+- Edit form footer separates deletion from cancel/save, stacking on narrow screens. Destructive generic confirmations initially focus cancel.
+- Tests and production build passed; visual browser verification remains outstanding.

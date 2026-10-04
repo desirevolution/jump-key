@@ -29,11 +29,9 @@ const styles = {
   kbd: `ml-auto hidden sm:inline-flex text-[10px] text-slate-500`,
   contentArea: `flex-1 min-w-0 overflow-y-auto`,
   footer: `flex justify-end gap-3 mt-5 pt-4 border-t border-slate-700/50`,
-  btnSecondary: `px-5 py-2.5 rounded-xl text-sm font-medium text-slate-300 bg-slate-800 border border-slate-700 hover:bg-slate-700 transition-all`,
-  btnSecondaryWhite: `px-5 py-2.5 rounded-xl text-sm font-medium text-slate-50 bg-slate-800 border border-slate-700 hover:bg-slate-700`,
-  btnPrimary: `px-5 py-2.5 rounded-xl text-sm font-medium jk-on-accent transition-all`,
-  btnPrimaryActive: `bg-indigo-600 hover:bg-indigo-500 cursor-pointer`,
-  btnPrimaryDisabled: `bg-slate-700 text-slate-500 cursor-not-allowed opacity-50`,
+  btnSecondary: `jk-btn jk-btn-secondary`,
+  btnSecondaryWhite: `jk-btn jk-btn-secondary`,
+  btnPrimary: `jk-btn jk-btn-primary`,
 };
 
 export class JkConfigModal extends LitElement {
@@ -234,10 +232,7 @@ export class JkConfigModal extends LitElement {
       this._activeTab === 'data' ? styles.sidebarBtnActive : styles.sidebarBtnInactive;
     const tabEditorClass =
       this._activeTab === 'editor' ? styles.sidebarBtnActive : styles.sidebarBtnInactive;
-    const saveBtnClass =
-      this._isEditorConfigValid && this._hasEditorConfigChanged && !this.saving
-        ? styles.btnPrimaryActive
-        : styles.btnPrimaryDisabled;
+
 
     return html`
       <div @click="${this._handleClose}" class="${styles.overlay}">
@@ -325,7 +320,7 @@ export class JkConfigModal extends LitElement {
                       type="button"
                       @click="${this._handleSave}"
                       ?disabled="${this.saving || !this._isEditorConfigValid || !this._hasEditorConfigChanged}"
-                      class="${styles.btnPrimary} ${saveBtnClass}"
+                      class="${styles.btnPrimary}"
                     >
                       ${this.saving ? this.t('configSaving') : this.t('editConfigSave')}
                     </button>
@@ -350,6 +345,7 @@ export class JkConfigModal extends LitElement {
               <jk-dialog
                 .show=${this._showDiscardDialog}
                 type="warning"
+                .destructive=${true}
                 .title=${this.t('discardChangesTitle')}
                 .message=${this.t('discardChangesMessage')}
                 icon="ui:triangle-alert"

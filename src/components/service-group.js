@@ -10,7 +10,7 @@ const styles = {
   titleWrapper: `flex items-center gap-2 min-w-0`,
   title: `text-sm font-semibold tracking-wide text-slate-200 truncate`,
   badge: `inline-flex shrink-0 items-center rounded-lg border border-indigo-500/30 bg-indigo-500/10 px-2 py-0.5 font-mono text-[11px] font-bold text-indigo-300`,
-  grid: `grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))]`,
+  grid: `grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] md:grid-cols-[repeat(auto-fill,minmax(min(100%,320px),1fr))]`,
 };
 
 export class JkServiceGroup extends LitElement {

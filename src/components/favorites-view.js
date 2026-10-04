@@ -13,7 +13,7 @@ const styles = {
   continueIcon: `size-4 text-indigo-300`,
   title: `text-sm font-semibold tracking-wide text-slate-200`,
   resetButton: `ml-auto`,
-  grid: `grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))]`,
+  grid: `grid grid-cols-1 gap-3 sm:gap-4 grid-cols-[repeat(auto-fill,minmax(min(100%,280px),1fr))] md:grid-cols-[repeat(auto-fill,minmax(min(100%,320px),1fr))]`,
 };
 
 export class JkFavoritesView extends LitElement {

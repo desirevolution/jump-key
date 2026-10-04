@@ -1,7 +1,7 @@
 import { migrateReferences } from '../src/utils/configuration.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import {buildDeleteConfig, buildEditConfig, buildQuickConfig, suggestKey, sharedLink, hasSharedInput} from '../src/utils/quick-add.js';
+import {quickFormSnapshot, quickErrorField, buildDeleteConfig, buildEditConfig, buildQuickConfig, suggestKey, sharedLink, hasSharedInput} from '../src/utils/quick-add.js';
 const config={categories:[{category:'Tools',services:[{name:'Alpha',url:'https://example.com/',id:'old'}]},{category:'Other',services:[]}],searchEngines:[]};
 const input={url:'https://new.example',name:'Another',category:'0',newCategory:'',key:'',icon:''};
 test('suggestion reserves generated keys and same-category duplicates fail',()=>{
@@ -94,4 +94,40 @@ test('editing accepts reactive form properties exposed through prototype getters
  assert.equal(result.categories[0].services[0].url,'https://gemini.google.com/');
  assert.equal(result.categories[0].services[0].id,'old');
  assert.equal(result.categories[0].services[0].key,'g');
+});
+
+test('saving unchanged middle and last services preserves their order', () => {
+ const source={categories:[{category:'A',services:[
+  {id:'a',name:'A',url:'https://a.example/',key:'a'},
+  {id:'b',name:'B',url:'https://b.example/',key:'b'},
+  {id:'c',name:'C',url:'https://c.example/',key:'c'}]}],searchEngines:[]};
+ for (const [index,id] of [[1,'b'],[2,'c']]) {
+  const service=source.categories[0].services[index];
+  const next=buildEditConfig(source,{...input,...service,serviceId:id,position:'after:'+source.categories[0].services[index-1].id});
+  assert.deepEqual(next.categories[0].services.map(s=>s.id),['a','b','c']);
+ }
+});
+
+
+test('form change detection includes ordering and supports restoring original values', () => {
+ const original={...input,position:'bottom'};
+ const baseline=quickFormSnapshot(original);
+ for(const field of ['url','name','category','position','key','icon']) {
+  const edited={...original,[field]:'changed'};
+  assert.notEqual(quickFormSnapshot(edited),baseline);
+  edited[field]=original[field];
+  assert.equal(quickFormSnapshot(edited),baseline);
+ }
+ assert.equal(quickFormSnapshot({...original,newCategory:'unused'}),baseline);
+ assert.notEqual(quickFormSnapshot({...original,category:'new',newCategory:'A'}),quickFormSnapshot({...original,category:'new',newCategory:'B'}));
+});
+test('validation errors target the relevant form control', () => {
+ assert.equal(quickErrorField('quickDuplicate','0'),'url');
+ assert.equal(quickErrorField('quickInvalidUrl','0'),'url');
+ assert.equal(quickErrorField('quickKeyUsed','0'),'key');
+ assert.equal(quickErrorField('quickCategoryRequired','new'),'newCategory');
+ assert.equal(quickErrorField('quickCategoryRequired',''),'category');
+ assert.equal(quickErrorField('quickCategoryExists','new'),'newCategory');
+ assert.equal(quickErrorField('quickPositionInvalid','0'),'position');
+ assert.equal(quickErrorField('quickServiceMissing','0'),'');
 });

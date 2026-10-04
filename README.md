@@ -107,9 +107,13 @@ The server exposes `GET /healthz` for health checks. Configuration uploads are l
 
 ## Service actions and mobile layout
 
+Desktop content aligns with the header and uses the available width for additional tile columns. Outer margins and minimum tile width are retained.
+
 Open **⋮** on a service tile to edit it, add or remove it from favorites, or copy its URL. The button is always visible on mobile and appears on hover or keyboard focus on desktop. Use `Tab` to reach it. Actions open in a bottom sheet on mobile and beside the button on desktop. Desktop category/grid tiles show the assigned favorite number next to the star; favorite tiles already show it beside the name. Pressing and holding a tile still works as before.
 
-**Edit service** opens the same form used for adding links, with the current values filled in. You can change the name, URL, icon, shortcut, or category, including creating a new destination category. The service keeps its ID, favorites, and history. The **Position** selector offers first, last, or after another service. Editing starts at the current position; adding or moving defaults to last. Duplicate URL and shortcut checks exclude the service being edited. Renaming does not replace its shortcut; conflicts in the destination category must be resolved before saving. **Delete service** in the edit dialog asks for confirmation and removes the service from favorites and history after a successful save. If deleting or moving the last service leaves a category empty, the confirmation offers an unchecked option to delete that category too. Otherwise the empty category is kept. Other category changes remain in the JSON editor.
+**Edit service** opens the same form used for adding links, with the current values filled in. You can change the name, URL, icon, shortcut, or category, including creating a new destination category. The service keeps its ID, favorites, and history. The **Position** selector offers first, last, or after another service. Editing starts at the current position; adding or moving defaults to last. Duplicate URL and shortcut checks exclude the service being edited. Renaming does not replace its shortcut; conflicts in the destination category must be resolved before saving. Closing an add/edit form with unsaved changes asks before discarding them. Validation messages appear next to the affected fields.
+
+**Delete service** in the edit dialog asks for confirmation and removes the service from favorites and history after a successful save. If deleting or moving the last service leaves a category empty, the confirmation offers an unchecked option to delete that category too. Otherwise the empty category is kept. Other category changes remain in the JSON editor.
 
 On small screens, shortcuts are hidden, tiles use more of the available width, and category headers show service counts. **Back to overview** returns from a category or recent-services view.
 
@@ -314,6 +318,7 @@ Build the frontend before compiling or testing Go: `dist` is embedded in the exe
 After building the frontend, `scripts/build-release.sh VERSION` creates standalone release archives in `release`. Its optional second argument changes the output directory; the script clears that directory before building. The GitHub Pages demo is maintained separately on the `demo` branch.
 
 ## Ideas / TODOs
+
 
 - Workspaces for separate work and personal links.
 - ~~Iconify icon support.~~ Implemented.

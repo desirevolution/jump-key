@@ -37,7 +37,7 @@ import './components/action-feedback.js';
 import './components/mobile-menu.js';
 
 const styles = {
-  mainContent: 'container mx-auto px-0 pt-4 pb-6 md:px-4 md:pt-8',
+  mainContent: 'w-full pt-4 pb-6 md:pt-8',
 };
 
 const STORAGE_KEYS = {
@@ -793,6 +793,7 @@ class DashboardApp extends LitElement {
     return html`
       <jk-dialog
         .show=${this.dialogConfig.show}
+        .destructive=${this.dialogConfig.icon === 'ui:trash-2'}
         .type=${this.dialogConfig.type || 'info'}
         .title=${this.dialogConfig.title}
         .message=${this.dialogConfig.message}
@@ -929,8 +930,8 @@ class DashboardApp extends LitElement {
       ${this.installController.available && !this.installController.dismissed ? html`
         <aside class="jk-install-banner md:hidden" aria-label=${this.t('installApp')}>
           <div><strong>${this.t('installApp')}</strong><p>${this.t('installHint')}</p></div>
-          <button @click=${this.installApp}>${this.t('installAction')}</button>
-          <button aria-label=${this.t('close')} @click=${()=>this.installController.dismiss()}>×</button>
+          <button class="jk-btn jk-btn-primary" @click=${this.installApp}>${this.t('installAction')}</button>
+          <jk-icon-button icon="ui:x" .label=${this.t('close')} @click=${()=>this.installController.dismiss()}></jk-icon-button>
         </aside>` : ''}
       <main class="${styles.mainContent}" @service-actions=${e => {
         this.cancelPendingAction();

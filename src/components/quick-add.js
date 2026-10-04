@@ -1,8 +1,9 @@
 import { html, LitElement } from 'lit';
-import { buildQuickConfig, buildEditConfig, buildDeleteConfig, suggestKey } from '../utils/quick-add.js';
+import { buildQuickConfig, buildEditConfig, buildDeleteConfig, suggestKey, quickFormSnapshot, quickErrorField } from '../utils/quick-add.js';
 import { generateShortcuts } from '../utils/shortcuts.js';
 import { persistConfig } from '../utils/configuration.js';
 import './icon.js';
+import './icon-button.js';
 
 export class QuickAdd extends LitElement {
   static properties = { position: {}, confirmAction: {}, removeEmptyCategory: {}, serviceId: {}, config: {}, initial: {}, categoryKey: {}, t: {}, url: {}, name: {}, category: {}, newCategory: {}, key: {}, icon: {}, error: {}, saving: {} };
@@ -31,11 +32,35 @@ export class QuickAdd extends LitElement {
       }
     }
     this.suggest();
+    this.initialSnapshot = quickFormSnapshot(this);
     this.updateComplete.then(() => { this.querySelector('dialog').showModal(); this.querySelector('input').focus(); });
+  }
+  updated() {
+    // Apply selection after Lit has inserted/replaced the option elements.
+    // This also restores selection when returning from a confirmation screen.
+    for (const name of ['category', 'position']) {
+      const select = this.querySelector(`select[name="${name}"]`);
+      if (select) select.value = this[name];
+    }
   }
   suggest() { if (!this.keyEdited) this.key = suggestKey(this.config, this.category, this.name.trim() || this.hostName()); }
   hostName() { try { return new URL(this.url).hostname; } catch { return ''; } }
-  close() { if (!this.saving) { if (this.confirmAction) this.cancelConfirmation(); else this.dispatchEvent(new CustomEvent('close')); } }
+  get hasChanges() { return this.initialSnapshot !== undefined && quickFormSnapshot(this) !== this.initialSnapshot; }
+  close() {
+    if (this.saving) return;
+    if (this.confirmAction) this.cancelConfirmation();
+    else if (this.hasChanges) this.askConfirmation('discard');
+    else this.dispatchEvent(new CustomEvent('close'));
+  }
+  fieldError(name) {
+    const code = this.validationError;
+    if (name === 'url' && !this.url && !this.hasChanges) return '';
+    return quickErrorField(code, this.category) === name ? code : '';
+  }
+  renderFieldError(name) {
+    const code = this.fieldError(name);
+    return code ? html`<span id=${'quick-error-' + name} class="jk-status-danger text-sm" aria-live="polite">${this.t(code)}</span>` : '';
+  }
   get validationError() {
     if (!this.config) return 'quickCategoryRequired';
     try { (this.serviceId ? buildEditConfig : buildQuickConfig)(this.config, this); return ''; }
@@ -84,41 +109,47 @@ export class QuickAdd extends LitElement {
     } finally { this.saving = false; }
   }
   renderConfirmation() {
+    if (this.confirmAction === 'discard') return html`
+      <header><h2>${this.t('discardChangesTitle')}</h2></header>
+      <p class="my-4">${this.t('discardChangesMessage')}</p>
+      <footer><button type="button" class="jk-btn jk-btn-secondary" data-confirm-cancel @click=${this.cancelConfirmation}>${this.t('tabEditorDiscardChangesCancel')}</button>
+      <button type="button" class="jk-btn jk-btn-danger-filled" @click=${()=>this.dispatchEvent(new CustomEvent('close'))}>${this.t('discardConfirm')}</button></footer>`;
     return html`<header><h2>${this.t(this.confirmAction === 'delete' ? 'deleteService' : 'confirmMoveTitle')}</h2></header>
       <p class="my-4">${this.t(this.confirmAction === 'delete' ? 'confirmDeleteService' : 'confirmMoveService', { name: this.sourceService?.name || '' })}</p>
       ${this.sourceCategory?.services.length === 1 ? html`<label class="jk-empty-category-option"><input type="checkbox" .checked=${this.removeEmptyCategory} ?disabled=${this.saving} @change=${e => this.removeEmptyCategory=e.target.checked}>${this.t('removeEmptyCategory', { category:this.sourceCategory.category })}</label>` : ''}
       ${this.error ? html`<p role="alert" class="jk-status-danger my-3">${this.error}</p>` : ''}
-      <footer><button type="button" data-confirm-cancel ?disabled=${this.saving} @click=${this.cancelConfirmation}>${this.t('cancel')}</button>
-      <button type="button" class=${this.confirmAction === 'delete' ? 'jk-status-danger' : 'jk-on-accent bg-indigo-600'} ?disabled=${this.saving} @click=${()=>this.persist(this.confirmAction)}>${this.t(this.saving ? 'configSaving' : this.confirmAction === 'delete' ? 'deleteService' : 'editConfigSave')}</button></footer>`;
+      <footer><button type="button" class="jk-btn jk-btn-secondary" data-confirm-cancel ?disabled=${this.saving} @click=${this.cancelConfirmation}>${this.t('cancel')}</button>
+      <button type="button" class=${this.confirmAction === 'delete' ? 'jk-btn jk-btn-danger-filled' : 'jk-btn jk-btn-primary'} ?disabled=${this.saving} @click=${()=>this.persist(this.confirmAction)}>${this.t(this.saving ? 'configSaving' : this.confirmAction === 'delete' ? 'deleteService' : 'editConfigSave')}</button></footer>`;
   }
   render() {
-    const field = (label, value, handler, attrs = {}) => html`<label>${label}<input .value=${value} @input=${handler} ?required=${attrs.required} type=${attrs.type || 'text'} autocomplete="off"></label>`;
+    const field = (label, value, handler, attrs = {}) => html`<label>${label}<input .value=${value} @input=${handler} ?required=${attrs.required} type=${attrs.type || 'text'} autocomplete="off" aria-invalid=${this.fieldError(attrs.name) ? 'true' : 'false'} aria-describedby=${this.fieldError(attrs.name) ? 'quick-error-' + attrs.name : ''}>${attrs.name ? this.renderFieldError(attrs.name) : ''}</label>`;
     return html`<dialog class="jk-quick-dialog" @cancel=${e => {e.preventDefault(); this.close();}} @keydown=${e => {
       e.stopPropagation(); if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') this.save(e);
     }}>
       ${this.confirmAction ? this.renderConfirmation() : html`<form @submit=${this.save}>
-        <header><h2>${this.t(this.serviceId ? 'editService' : 'quickAdd')}</h2><button type="button" aria-label=${this.t('close')} ?disabled=${this.saving} @click=${this.close}>×</button></header>
+        <header><h2>${this.t(this.serviceId ? 'editService' : 'quickAdd')}</h2><jk-icon-button icon="ui:x" .label=${this.t('close')} .disabled=${this.saving} @click=${this.close}></jk-icon-button></header>
         <fieldset ?disabled=${this.saving}>
-          ${field('URL', this.url, e => {this.url=e.target.value; this.suggest();}, {required:true,type:'url'})}
+          ${field('URL', this.url, e => {this.url=e.target.value; this.suggest();}, {required:true,type:'url',name:'url'})}
           ${field(this.t('quickName'), this.name, e => {this.name=e.target.value; this.suggest();})}
-          <p class="text-xs text-slate-400">${this.t('quickNameHint')} ${this.hostName()}</p>
-          <label>${this.t('quickCategory')}<select required .value=${this.category} @change=${e => {this.category=e.target.value;this.position=this.serviceId && this.category===String(this.sourceIndex) ? this.originalPosition : 'bottom';this.removeEmptyCategory=false;this.suggest();}}>
+          ${!this.name.trim() ? html`<p class="text-xs text-slate-400">${this.t('quickNameHint')} ${this.hostName()}</p>` : ''}
+          <label>${this.t('quickCategory')}<select name="category" required aria-invalid=${this.fieldError('category') ? 'true' : 'false'} aria-describedby="quick-error-category" @change=${e => {this.category=e.target.value;this.position=this.serviceId && this.category===String(this.sourceIndex) ? this.originalPosition : 'bottom';this.removeEmptyCategory=false;this.suggest();}}>
             <option value="" disabled>${this.t('selectCategory')}</option>
             ${this.config?.categories.map((c,i)=>html`<option value=${String(i)}>${c.category}</option>`)}
             <option value="new">${this.t('quickNewCategory')}</option>
-          </select></label>
-          ${this.category === 'new' ? field(this.t('quickNewCategory'), this.newCategory, e=>this.newCategory=e.target.value, {required:true}) : ''}
-          <label>${this.t('servicePosition')}<select .value=${this.position} @change=${e=>this.position=e.target.value}>
+          </select>${this.renderFieldError('category')}</label>
+          ${this.category === 'new' ? field(this.t('quickNewCategory'), this.newCategory, e=>this.newCategory=e.target.value, {required:true,name:'newCategory'}) : ''}
+          <label>${this.t('servicePosition')}<select name="position" aria-invalid=${this.fieldError('position') ? 'true' : 'false'} aria-describedby="quick-error-position" ?disabled=${!this.category} @change=${e=>this.position=e.target.value}>
             <option value="top">${this.t('positionTop')}</option>
             ${(/^\d+$/.test(this.category) ? this.config?.categories[Number(this.category)]?.services ?? [] : []).filter(s=>s.id!==this.serviceId).map(s=>html`<option value=${'after:'+s.id}>${this.t('positionAfter', { name:s.name })}</option>`)}
             <option value="bottom">${this.t('positionBottom')}</option>
-          </select></label>
-          ${field(this.t(this.serviceId ? 'editKey'  : 'quickKey'), this.key, e=>{this.key=e.target.value;this.keyEdited=true;})}
+          </select>${this.renderFieldError('position')}</label>
+          ${field(this.t(this.serviceId ? 'editKey'  : 'quickKey'), this.key, e=>{this.key=e.target.value;this.keyEdited=true;}, {name:'key'})}
           <label>${this.t('quickIcon')}<div class="flex items-center gap-3"><input .value=${this.icon} @input=${e=>this.icon=e.target.value} placeholder="lucide:link" autocomplete="off"><jk-icon .icon=${this.icon.trim() || 'ui:link'} class="size-6 shrink-0"></jk-icon></div></label>
         </fieldset>
-        ${this.error || (this.url && this.validationError) ? html`<p role="status" class="jk-status-danger">${this.error || this.t(this.validationError)}</p>` : ''}
-        ${this.serviceId ? html`<button type="button" class="jk-delete-service" ?disabled=${this.saving} @click=${()=>this.askConfirmation('delete')}><jk-icon icon="ui:trash-2" class="size-4" aria-hidden="true"></jk-icon>${this.t('deleteService')}</button>` : ''}
-        <footer><button type="button" ?disabled=${this.saving} @click=${this.close}>${this.t('cancel')}</button><button class="jk-on-accent bg-indigo-600" ?disabled=${this.saving || Boolean(this.validationError)} type="submit">${this.t(this.saving?'configSaving':'editConfigSave')}</button></footer>
+        ${this.error || (this.validationError && !quickErrorField(this.validationError, this.category)) ? html`<p role="status" class="jk-status-danger">${this.error || this.t(this.validationError)}</p>` : ''}
+        <footer class="jk-form-footer">
+        ${this.serviceId ? html`<button type="button" class="jk-btn jk-btn-danger jk-delete-service" ?disabled=${this.saving} @click=${()=>this.askConfirmation('delete')}><jk-icon icon="ui:trash-2" class="size-4" aria-hidden="true"></jk-icon>${this.t('deleteService')}</button>` : ''}
+        <div class="jk-form-footer-actions"><button type="button" class="jk-btn jk-btn-secondary" ?disabled=${this.saving} @click=${this.close}>${this.t('cancel')}</button><button class="jk-btn jk-btn-primary" ?disabled=${this.saving || Boolean(this.validationError)} type="submit">${this.t(this.saving?'configSaving':'editConfigSave')}</button></div></footer>
       </form>`}
     </dialog>`;
   }

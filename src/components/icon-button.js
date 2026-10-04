@@ -1,3 +1,4 @@
+import { t, detectLang } from '../utils/i18n.js';
 import { html, LitElement } from 'lit';
 
 import './icon.js';
@@ -36,8 +37,8 @@ export class JkIconButton extends LitElement {
     // Varianten-Klassen
     // Wichtig: Kein inline-flex hier, damit visibilityClasses die Kontrolle behält
     const variantClasses = isTextVariant
-      ? 'group items-center gap-1.5 px-2 py-1 rounded-lg text-xs text-slate-400 transition-all duration-200 jk-danger-action focus:outline-none focus:ring-2'
-      : 'group items-center justify-center size-9 rounded-xl border border-slate-600/70 bg-slate-700/50 text-slate-400 transition-all duration-200 hover:bg-indigo-500/15 hover:border-indigo-500/40 hover:text-indigo-200 active:scale-95 disabled:opacity-40 disabled:pointer-events-none disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-indigo-500/40';
+      ? 'jk-btn jk-btn-danger group'
+      : 'jk-btn jk-btn-secondary jk-icon-control group';
 
     // Icon-Klassen
     const iconClasses = isTextVariant
@@ -48,7 +49,7 @@ export class JkIconButton extends LitElement {
       <button
         type="button"
         ?disabled=${this.disabled}
-        aria-label=${this.label || this.text || this.icon || 'button'}
+        aria-label=${this.label || this.text || (this.icon === 'ui:x' ? t(detectLang(), 'close') : this.icon) || 'button'}
         class="${visibilityClasses} ${variantClasses}"
       >
         <jk-icon .icon=${this.icon} class=${iconClasses}></jk-icon>
@@ -58,7 +59,7 @@ export class JkIconButton extends LitElement {
             ? html`
                 <span
                   class="
-                    text-[11px]
+                    text-sm
                     font-medium
                     leading-none
                     pointer-events-none
