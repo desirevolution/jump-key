@@ -50,8 +50,14 @@ export class JkActionFeedback extends LitElement {
       this.resolvePending = resolve;
       this.hideTimer = setTimeout(() => {
         this.finish(true);
-      }, DISPLAY_DURATION);
+      }, feedback.duration ?? DISPLAY_DURATION);
     });
+  }
+
+  updated(changed) {
+    if (changed.has('feedback') && this.feedback) {
+      this.querySelector('[data-launch-countdown]')?.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], { duration: this.feedback.duration ?? DISPLAY_DURATION, fill: 'forwards' });
+    }
   }
 
   cancel() {
@@ -104,7 +110,7 @@ export class JkActionFeedback extends LitElement {
         </div>
 
         <div class="${styles.content}">
-          <div class="${styles.name}">${service.name}</div>
+          <div class="${styles.name}">${service.name}</div><div class="mt-2 h-0.5 overflow-hidden bg-slate-700" aria-hidden="true"><div data-launch-countdown class="h-full origin-left bg-emerald-400"></div></div>
           <div class="${styles.meta}">
             <span class="${styles.pendingDot}" aria-hidden="true"></span>
             ${service.category ? html`<span class="${styles.category}">${service.category}</span>` : ''}

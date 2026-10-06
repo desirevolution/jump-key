@@ -121,7 +121,7 @@ On small screens, shortcuts are hidden, tiles use more of the available width, a
 
 Press `+` on the dashboard or use the desktop plus button. On mobile, choose **Add link** from the menu. Paste a URL, choose a category (or create one), and save with `Ctrl+Enter`. The name defaults to the hostname. The suggested shortcut can be edited; icons are optional. New links default to the end of the category; use **Position** to choose another location. Duplicate URLs are rejected within the selected category by this dialog; the JSON editor remains unrestricted.
 
-On desktop, open **Settings → Import & Export** and drag **Add to JumpKey** to your bookmarks bar. Click it on a page to open JumpKey in a new tab with the URL and page title filled in. Choose a category and save; no category is remembered.
+On desktop, open **Settings → General** and drag **Add to JumpKey** to your bookmarks bar. Click it on a page to open JumpKey in a new tab with the URL and page title filled in. Choose a category and save; no category is remembered.
 
 On supported Android browsers, an installed JumpKey PWA can receive links through **Share → JumpKey**. Review the shared link before saving. Sharing support depends on the browser and OS.
 
@@ -225,6 +225,7 @@ Press `Space` to search service and category names. Enter `:` to list search eng
 
 | Shortcut | Action |
 | --- | --- |
+| `Ctrl+E`, category key, service key | Edit a service. `Esc` cancels the selection. |
 | `A`–`Z` | Select a category from the overview. |
 | Category letter, then service letter | Open a service in the selected category. |
 | `1`–`9`, `0` | Open a favorite from the overview. |
@@ -243,10 +244,13 @@ Press `Space` to search service and category names. Enter `:` to list search eng
 
 | Context | Shortcut | Action |
 | --- | --- | --- |
+| Add/edit service | `Tab` / `Shift+Tab` | Move between fields and actions. |
+| Add/edit service | `Ctrl/Cmd + Enter` | Save valid changes. |
+| Add/edit service | `Esc` | Go back from a confirmation or close; ask before discarding changes. |
 | Search | `↑` / `↓` | Select the previous or next result. |
 | Search | `Enter` | Open the selected result or select a search engine. |
 | Search | `Shift + Enter` | Open the selected service or search query in the current tab. |
-| Settings | `Ctrl/Cmd + 1`, `2`, `3` | Select Appearance, Data or JSON editor. |
+| Settings | `Ctrl/Cmd + 1`, `2`, `3`, `4` | Select General, Appearance, Data or JSON editor. |
 | JSON editor | `Ctrl/Cmd + S` | Save valid changes. |
 | Settings | `Esc` | Close settings; ask before discarding unsaved changes. |
 
@@ -260,7 +264,7 @@ Press `Space` to search service and category names. Enter `:` to list search eng
 | `https://example.com/icon.svg` | Remote image | Image URL, including optional query parameters. |
 | `my-service.svg` | Local image | File in `--icons-dir`, served under `/icons/`. |
 
-Local image filenames support `.svg`, `.png`, `.webp`, `.jpg`, `.jpeg` and `.gif`. Browse icons at [Iconify](https://icon-sets.iconify.design/).
+Local image filenames support `.svg`, `.png`, `.webp`, `.jpg`, `.jpeg` and `.gif`. Browse [Lucide](https://lucide.dev/icons/) or [Iconify](https://icon-sets.iconify.design/) directly from the add/edit dialog. For an Iconify name such as `mdi:home`, enter `iconify:mdi:home`. Leave the field empty to use the default link icon.
 
 Dynamic icons require access to the icon provider when not already cached. A built-in fallback is shown while loading or if a dynamic icon cannot be loaded. Local images are useful when you want to avoid external icon requests.
 
@@ -331,3 +335,7 @@ This project was built with AI assistance. I'm a lazy dev.
 ## License
 
 [MIT](LICENSE).
+
+### Local timing preferences
+
+Settings → General stores preferences immediately in this browser. Category timeout defaults to 3 seconds (0–30, whole seconds); keyboard launch delay defaults to 1.2 seconds (0–5, steps of 0.1). Turn either off for zero delay. Category clicks stay open and service clicks launch immediately. The category countdown never pauses on hover or focus. Use Back to overview on desktop or mobile. The bookmarklet is now at the bottom of General.

@@ -51,6 +51,7 @@ export class JkHelpModal extends LitElement {
       { keys: ['?'], desc: this.t('helpOpen') },
       { keys: ['Ctrl', ','], desc: this.t('editConfig') },
       { keys: ['+'], desc: this.t('quickAdd') },
+      { keys: ['Ctrl+E', 'A–Z', 'A–Z'], desc: this.t('hkEditService') },
       { keys: ['Ctrl', '0–9'], desc: this.t('hkFavoriteRecord') },
       { keys: ['#'], desc: this.t('hkToggleView') },
     ];
@@ -69,7 +70,7 @@ export class JkHelpModal extends LitElement {
       { keys: ['Shift', 'Enter'], desc: this.t('hkOpenSelectionSameTab') },
       { keys: ['ESC'], desc: this.t('hkReset') },
       { keys: ['Ctrl/Cmd', 'Enter'], desc: this.t('helpQuickSave') },
-      { keys: ['Ctrl/Cmd', '1/2/3'], desc: this.t('hkSwitchTabs') },
+      { keys: ['Ctrl/Cmd', '1/2/3/4'], desc: this.t('hkSwitchTabs') },
       { keys: ['Ctrl/Cmd', 'S'], desc: this.t('helpEditorSave') },
       { keys: ['Page Up/Down'], desc: this.t('helpEditorPage') }
     );
@@ -152,14 +153,14 @@ export class JkHelpModal extends LitElement {
               </div>
               <p class="px-3 pt-3 text-sm leading-relaxed text-slate-300">${this.t('helpRecentRemove')}</p>
             </div>
-            <div class="space-y-3 px-3 text-sm leading-relaxed text-slate-300">
-              <div class="${styles.sectionTitle}">${this.t('helpLinksSection')}</div>
+            <details class="space-y-3 px-3 text-sm leading-relaxed text-slate-300">
+              <summary class="cursor-pointer rounded-lg py-2 font-semibold focus-visible:outline-2">${this.t('helpLinksSection')}</summary>
               <p>${this.t('helpServiceActions')}</p>
               <p class="hidden md:block">${this.t('helpDesktopActions')}</p>
               <p class="md:hidden">${this.t('helpMobileLayout')}</p>
               <p>${this.t('helpEditService')}</p>
               <p>${this.t('helpPositionDelete')}</p>
-              <p>${this.t('helpFormValidation')}</p>
+              <p>${this.t('helpFormValidation')}</p><p>${this.t('localTimingHint')}</p>
               <p class="hidden md:block">${this.t('helpAddLink')}</p>
               <p class="hidden md:block">${this.t('helpBookmarklet')}</p>
               <div class="space-y-3 md:hidden">
@@ -167,7 +168,7 @@ export class JkHelpModal extends LitElement {
                 <p>${this.t('helpInstall')}</p>
                 <p>${this.t('helpShare')}</p>
               </div>
-            </div>
+            </details>
           </div>
 
           <div class="${styles.footer}">

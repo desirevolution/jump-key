@@ -6,6 +6,7 @@ import './icon-button.js';
 import './dialog.js';
 import './config-appearance.js';
 import './config-data.js';
+import './config-general.js';
 import './config-editor.js';
 
 const styles = {
@@ -40,6 +41,7 @@ export class JkConfigModal extends LitElement {
   }
 
   static properties = {
+    preferences: { type: Object },
     configuration: { type: Object },
     saving: { type: Boolean },
     show: { type: Boolean },
@@ -61,7 +63,7 @@ export class JkConfigModal extends LitElement {
     this.categories = [];
     this.searchEngines = [];
     this.theme = 'midnight';
-    this._activeTab = 'appearance';
+    this._activeTab = 'general';
     this._isEditorConfigValid = true;
     this._hasEditorConfigChanged = false;
     this._editorValue = '';
@@ -83,7 +85,7 @@ export class JkConfigModal extends LitElement {
         this._isEditorConfigValid = true;
         this._hasEditorConfigChanged = false;
         this._showDiscardDialog = false;
-        this._activeTab = 'appearance';
+        this._activeTab = 'general';
         window.addEventListener('keydown', this._handleKeyDown, true);
       } else {
         window.removeEventListener('keydown', this._handleKeyDown, true);
@@ -100,22 +102,8 @@ export class JkConfigModal extends LitElement {
     if (this._showDiscardDialog) return;
 
     if (e.ctrlKey || e.metaKey) {
-      if (e.key === '1') {
-        e.preventDefault();
-        e.stopPropagation();
-        this._setActiveTab('appearance');
-        return;
-      } else if (e.key === '2') {
-        e.preventDefault();
-        e.stopPropagation();
-        this._setActiveTab('data');
-        return;
-      } else if (e.key === '3') {
-        e.preventDefault();
-        e.stopPropagation();
-        this._setActiveTab('editor');
-        return;
-      }
+      const tab = { '1': 'general', '2': 'appearance', '3': 'data', '4': 'editor' }[e.key];
+      if (tab) { e.preventDefault(); e.stopPropagation(); this._setActiveTab(tab); return; }
     }
 
     if (this._activeTab === 'editor') {
@@ -189,6 +177,8 @@ export class JkConfigModal extends LitElement {
 
   _renderActiveTabContent() {
     switch (this._activeTab) {
+      case 'general':
+        return html`<jk-config-general .preferences=${this.preferences} .t=${this.t}></jk-config-general>`;
       case 'appearance':
         return html`
           <jk-config-appearance
@@ -276,13 +266,14 @@ export class JkConfigModal extends LitElement {
 
           <div class="${styles.mainArea}">
             <aside class="${styles.sidebar}">
+              <button @click=${()=>this._setActiveTab('general')} class="${styles.sidebarBtn} ${this._activeTab === 'general' ? styles.sidebarBtnActive : styles.sidebarBtnInactive}"><jk-icon icon="ui:settings-2" class="size-4"></jk-icon>${this.t('tabGeneral')}<kbd class="${styles.kbd}">1</kbd></button>
               <button
                 @click="${() => this._setActiveTab('appearance')}"
                 class="${styles.sidebarBtn} ${tabAppearanceClass}"
               >
                 <jk-icon icon="ui:palette" class="size-4"></jk-icon>
                 ${this.t('tabAppearance')}
-                <kbd class="${styles.kbd}">1</kbd>
+                <kbd class="${styles.kbd}">2</kbd>
               </button>
               <button
                 @click="${() => this._setActiveTab('data')}"
@@ -290,7 +281,7 @@ export class JkConfigModal extends LitElement {
               >
                 <jk-icon icon="ui:database" class="size-4"></jk-icon>
                 ${this.t('tabData')}
-                <kbd class="${styles.kbd}">2</kbd>
+                <kbd class="${styles.kbd}">3</kbd>
               </button>
               <button
                 @click="${() => this._setActiveTab('editor')}"
@@ -298,7 +289,7 @@ export class JkConfigModal extends LitElement {
               >
                 <jk-icon icon="ui:code-2" class="size-4"></jk-icon>
                 ${this.t('tabEditor')}
-                <kbd class="${styles.kbd}">3</kbd>
+                <kbd class="${styles.kbd}">4</kbd>
               </button>
             </aside>
 

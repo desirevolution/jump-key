@@ -10,6 +10,7 @@ export class QuickAdd extends LitElement {
   createRenderRoot() { return this; }
   constructor() { super(); Object.assign(this, { position:'bottom', confirmAction:'', removeEmptyCategory:false, url:'', name:'', category:'', newCategory:'', key:'', icon:'', error:'', saving:false, keyEdited:false }); }
   firstUpdated() {
+    this.returnFocus = document.activeElement;
     this.url = this.initial?.url || '';
     this.name = this.initial?.name || '';
     const index = generateShortcuts(this.config.categories).findIndex(c => c.categoryKey === this.categoryKey);
@@ -34,6 +35,11 @@ export class QuickAdd extends LitElement {
     this.suggest();
     this.initialSnapshot = quickFormSnapshot(this);
     this.updateComplete.then(() => { this.querySelector('dialog').showModal(); this.querySelector('input').focus(); });
+  }
+  disconnectedCallback() {
+    this.querySelector('dialog')?.close();
+    super.disconnectedCallback();
+    if (this.returnFocus?.isConnected) this.returnFocus.focus();
   }
   updated() {
     // Apply selection after Lit has inserted/replaced the option elements.
@@ -72,6 +78,7 @@ export class QuickAdd extends LitElement {
   get sourceCategory() { return this.config?.categories[this.sourceIndex]; }
   get sourceService() { return this.sourceCategory?.services.find(s => s.id === this.serviceId); }
   async askConfirmation(action) {
+    this.confirmFocus = document.activeElement?.getAttribute('data-focus') || document.activeElement?.getAttribute('name');
     this.error = '';
     this.removeEmptyCategory = false;
     this.confirmAction = action;
@@ -83,7 +90,8 @@ export class QuickAdd extends LitElement {
     this.error = '';
     this.removeEmptyCategory = false;
     await this.updateComplete;
-    this.querySelector('input')?.focus();
+    const target = [...this.querySelectorAll('[name], [data-focus]')].find(el => (el.getAttribute('data-focus') || el.getAttribute('name')) === this.confirmFocus);
+    (target || this.querySelector('input'))?.focus();
   }
   async save(e) {
     e?.preventDefault();
@@ -122,8 +130,8 @@ export class QuickAdd extends LitElement {
       <button type="button" class=${this.confirmAction === 'delete' ? 'jk-btn jk-btn-danger-filled' : 'jk-btn jk-btn-primary'} ?disabled=${this.saving} @click=${()=>this.persist(this.confirmAction)}>${this.t(this.saving ? 'configSaving' : this.confirmAction === 'delete' ? 'deleteService' : 'editConfigSave')}</button></footer>`;
   }
   render() {
-    const field = (label, value, handler, attrs = {}) => html`<label>${label}<input .value=${value} @input=${handler} ?required=${attrs.required} type=${attrs.type || 'text'} autocomplete="off" aria-invalid=${this.fieldError(attrs.name) ? 'true' : 'false'} aria-describedby=${this.fieldError(attrs.name) ? 'quick-error-' + attrs.name : ''}>${attrs.name ? this.renderFieldError(attrs.name) : ''}</label>`;
-    return html`<dialog class="jk-quick-dialog" @cancel=${e => {e.preventDefault(); this.close();}} @keydown=${e => {
+    const field = (label, value, handler, attrs = {}) => html`<label>${label}<input name=${attrs.name || 'name'} .value=${value} @input=${handler} ?required=${attrs.required} type=${attrs.type || 'text'} autocomplete="off" aria-invalid=${this.fieldError(attrs.name) ? 'true' : 'false'} aria-describedby=${this.fieldError(attrs.name) ? 'quick-error-' + attrs.name : ''}>${attrs.name ? this.renderFieldError(attrs.name) : ''}</label>`;
+    return html`<dialog class="jk-quick-dialog" aria-label=${this.t(this.confirmAction === 'delete' ? 'deleteService' : this.confirmAction === 'move' ? 'confirmMoveTitle' : this.confirmAction === 'discard' ? 'discardChangesTitle' : this.serviceId ? 'editService' : 'quickAdd')} @cancel=${e => {e.preventDefault(); this.close();}} @keydown=${e => {
       e.stopPropagation(); if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') this.save(e);
     }}>
       ${this.confirmAction ? this.renderConfirmation() : html`<form @submit=${this.save}>
@@ -144,12 +152,17 @@ export class QuickAdd extends LitElement {
             <option value="bottom">${this.t('positionBottom')}</option>
           </select>${this.renderFieldError('position')}</label>
           ${field(this.t(this.serviceId ? 'editKey'  : 'quickKey'), this.key, e=>{this.key=e.target.value;this.keyEdited=true;}, {name:'key'})}
-          <label>${this.t('quickIcon')}<div class="flex items-center gap-3"><input .value=${this.icon} @input=${e=>this.icon=e.target.value} placeholder="lucide:link" autocomplete="off"><jk-icon .icon=${this.icon.trim() || 'ui:link'} class="size-6 shrink-0"></jk-icon></div></label>
+          <label>${this.t('quickIcon')}<div class="flex items-center gap-3"><input name="icon" .value=${this.icon} @input=${e=>this.icon=e.target.value} placeholder="lucide:house / iconify:mdi:home" autocomplete="off"><jk-icon .icon=${this.icon.trim() || 'ui:link'} class="size-6 shrink-0"></jk-icon></div></label>
+          <details class="text-sm"><summary class="cursor-pointer rounded-lg py-2 focus-visible:outline-2">${this.t('quickIconHelp')}</summary>
+          <p id="quick-icon-hint" class="text-xs text-slate-400">${this.t('quickIconHint')}</p>
+          <p class="flex flex-wrap gap-4 text-sm"><a class="underline" href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer">${this.t('browseLucide')}</a><a class="underline" href="https://icon-sets.iconify.design/" target="_blank" rel="noopener noreferrer">${this.t('browseIconify')}</a></p>
+          </details>
         </fieldset>
+        <p class="hidden md:block text-xs text-slate-400 my-3">${this.t('quickKeyboardHint')}</p>
         ${this.error || (this.validationError && !quickErrorField(this.validationError, this.category)) ? html`<p role="status" class="jk-status-danger">${this.error || this.t(this.validationError)}</p>` : ''}
         <footer class="jk-form-footer">
-        ${this.serviceId ? html`<button type="button" class="jk-btn jk-btn-danger jk-delete-service" ?disabled=${this.saving} @click=${()=>this.askConfirmation('delete')}><jk-icon icon="ui:trash-2" class="size-4" aria-hidden="true"></jk-icon>${this.t('deleteService')}</button>` : ''}
-        <div class="jk-form-footer-actions"><button type="button" class="jk-btn jk-btn-secondary" ?disabled=${this.saving} @click=${this.close}>${this.t('cancel')}</button><button class="jk-btn jk-btn-primary" ?disabled=${this.saving || Boolean(this.validationError)} type="submit">${this.t(this.saving?'configSaving':'editConfigSave')}</button></div></footer>
+        ${this.serviceId ? html`<button type="button" data-focus="delete" class="jk-btn jk-btn-danger jk-delete-service" ?disabled=${this.saving} @click=${()=>this.askConfirmation('delete')}><jk-icon icon="ui:trash-2" class="size-4" aria-hidden="true"></jk-icon>${this.t('deleteService')}</button>` : ''}
+        <div class="jk-form-footer-actions"><button type="button" data-focus="cancel" class="jk-btn jk-btn-secondary" ?disabled=${this.saving} @click=${this.close}>${this.t('cancel')}</button><button data-focus="save" class="jk-btn jk-btn-primary" ?disabled=${this.saving || Boolean(this.validationError)} type="submit">${this.t(this.saving?'configSaving':'editConfigSave')}</button></div></footer>
       </form>`}
     </dialog>`;
   }

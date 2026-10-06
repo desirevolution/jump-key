@@ -1,3 +1,4 @@
+import { normalizeTimings } from './utils/preferences.js';
 import './components/service-actions.js';
 import './components/quick-add.js';
 import { InstallController } from './utils/install.js';
@@ -77,6 +78,8 @@ class DashboardApp extends LitElement {
     // Keyboard navigation
     selectedIndex: { type: Number },
     // Data
+    preferences: { type: Object },
+    categoryCountdown: { type: Number },
     favorites: { type: Object },
     continueHistory: { type: Array },
     lang: { type: String },
@@ -126,7 +129,10 @@ class DashboardApp extends LitElement {
     // Timers & Modes
     this.resetTimeout = null;
     this.actionManager = new ActionManager();
+    this.preferences = normalizeTimings(readJsonStorage('dashboard_timings', {}));
+    this.categoryCountdown = 0;
     this.favoriteRecording = null;
+    this.editRecording = null;
 
     // Dialog state
     this.dialogConfig = {
@@ -280,6 +286,7 @@ class DashboardApp extends LitElement {
   // --------------------------------------------------
 
   cancelInputResetTimer() {
+    this.categoryCountdown = 0;
     clearTimeout(this.resetTimeout);
     this.resetTimeout = null;
   }
@@ -308,6 +315,7 @@ class DashboardApp extends LitElement {
   }
 
   resetNavigationInput(updateHistory = true) {
+    this.editRecording = null;
     this.cancelInputResetTimer();
     this.activeCategoryKey = '';
     this.showContinueView = false;
@@ -329,6 +337,7 @@ class DashboardApp extends LitElement {
   }
 
   resetInput(updateHistory = true) {
+    this.editRecording = null;
     const state = window.history.state;
 
     this.cancelPendingAction();
@@ -348,6 +357,17 @@ class DashboardApp extends LitElement {
     this.isGridView = !this.isGridView;
     writeJsonStorage(STORAGE_KEYS.gridView, this.isGridView);
     this.resetInput(true);
+  }
+
+  startCategoryTimer() {
+    this.cancelInputResetTimer();
+    const duration = this.preferences.categoryTimeout * 1000;
+    if (!duration) return;
+    this.startResetTimer(duration);
+    this.categoryCountdown = duration;
+    this.updateComplete.then(() => {
+      this.querySelector('[data-category-countdown]')?.animate([{ transform: 'scaleX(1)' }, { transform: 'scaleX(0)' }], { duration, fill: 'forwards' });
+    });
   }
 
   startResetTimer(duration = 3000) {
@@ -376,9 +396,9 @@ class DashboardApp extends LitElement {
 
     this.cancelInputResetTimer();
 
-    const action = keyboardFeedback ? this.startPendingLaunch() : null;
+    const action = keyboardFeedback && this.preferences.launchDelay > 0 ? this.startPendingLaunch() : null;
 
-    if (keyboardFeedback) {
+    if (keyboardFeedback && this.preferences.launchDelay > 0) {
       if (shortcutLabel) {
         this.currentInput = shortcutLabel;
       } else if (this.activeCategoryKey && service.key) {
@@ -427,6 +447,7 @@ class DashboardApp extends LitElement {
 
     return (
       this.querySelector('jk-action-feedback')?.show({
+        duration: this.preferences.launchDelay * 1000,
         service: {
           ...service,
           category: service.category || category?.category || '',
@@ -731,6 +752,9 @@ class DashboardApp extends LitElement {
     this.cancelPendingAction();
     this.showSearch = false;
     this.showMobileMenu = false;
+    this.editRecording = null;
+    this.favoriteRecording = null;
+    this.cancelInputResetTimer();
     this.quickInitial = initial;
     this.showQuickAdd = true;
   }
@@ -747,6 +771,8 @@ class DashboardApp extends LitElement {
     return html`
       <jk-config-modal
         .show=${this.showConfigModal}
+        .preferences=${this.preferences}
+        @preferences-change=${e => { this.preferences=e.detail; writeJsonStorage('dashboard_timings',this.preferences); this.cancelInputResetTimer(); }}
         .configuration=${this.configuration}
         .saving=${this.savingConfig}
         .categories=${this.categories}
@@ -939,7 +965,7 @@ class DashboardApp extends LitElement {
         this.actionAnchor = e.detail.anchor;
         this.actionService = this.categories.flatMap(c => c.services).find(s => s.id === e.detail.id);
       }}>
-        ${this.activeCategoryKey || this.showContinueView ? html`<button type="button" class="mb-3 flex min-h-11 items-center gap-2 text-sm text-indigo-300 md:hidden" @click=${()=>this.resetNavigationInput(true)}><jk-icon icon="ui:arrow-left" class="size-4"></jk-icon>${this.t('backOverview')}</button>` : ''}
+        ${this.activeCategoryKey || this.showContinueView ? html`<button type="button" class="mb-3 flex min-h-11 items-center gap-2 text-sm text-indigo-300" @click=${()=>this.resetNavigationInput(true)}><jk-icon icon="ui:arrow-left" class="size-4"></jk-icon>${this.t('backOverview')}</button>${this.categoryCountdown ? html`<div class="mb-3 h-0.5 w-40 overflow-hidden rounded bg-slate-700" aria-hidden="true"><div data-category-countdown class="h-full origin-left bg-indigo-400"></div></div>` : ''}` : ''}
         ${
           showMain && !this.isGridView
             ? html`
@@ -996,7 +1022,7 @@ class DashboardApp extends LitElement {
                     this.showContinueView = false;
                     this.currentInput = key.toUpperCase();
 
-                    this.startResetTimer();
+                    this.cancelInputResetTimer();
 
                     window.history.pushState({ view: 'category', key }, '');
                   }}

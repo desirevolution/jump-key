@@ -21,7 +21,23 @@ function getDigitFromEvent(e) {
 }
 
 export function handleGlobalKeyDown(e, app) {
-  if (app.showQuickAdd) return;
+  if (app.showQuickAdd || app.actionService || app.dialogConfig?.show || e.isComposing) return;
+  if (e.target.closest?.('input, textarea, select, [contenteditable="true"]') && !app.showSearch) return;
+  if (e.key.toLowerCase() === 'e' && e.ctrlKey && !e.altKey && !e.metaKey && !app.showConfigModal && !app.showSearch && !app.showHelp) {
+    e.preventDefault();
+    app.resetInput(false);
+    app.favoriteRecording = null;
+    app.editRecording = { categoryKey: '' };
+    app.currentInput = app.t('editSelectCategory');
+    return;
+  }
+  if (app.editRecording && !app.showConfigModal && !app.showSearch && !app.showHelp) {
+    e.preventDefault();
+    if (e.key === 'Escape') { app.resetInput(false); return; }
+    if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
+    handleEditInput(e.key.toLowerCase(), app);
+    return;
+  }
   if (e.key === '+' && !e.ctrlKey && !e.altKey && !e.metaKey && !app.showConfigModal && !app.showSearch && !app.showHelp && !e.target.closest?.('input, textarea, select, [contenteditable="true"]')) {
     e.preventDefault(); app.openQuickAdd(); return;
   }
@@ -71,11 +87,7 @@ export function handleGlobalKeyDown(e, app) {
   /*
    * Help schließen
    */
-  if (app.showHelp) {
-    e.preventDefault();
-    app.showHelp = false;
-    return;
-  }
+  if (app.showHelp) return;
 
   /*
    * Keine Shortcuts in Inputs
@@ -186,4 +198,23 @@ export function handleGlobalKeyDown(e, app) {
   if (e.key.length === 1) {
     handleNavigationKeyDown(e.key.toLowerCase(), app);
   }
+}
+
+function handleEditInput(key, app) {
+  const recording = app.editRecording;
+  if (!recording.categoryKey) {
+    const category = app.categories.find(c => c.categoryKey === key);
+    app.isInvalidInput = !category;
+    if (!category) return;
+    recording.categoryKey = key;
+    app.activeCategoryKey = key;
+    app.currentInput = app.t('editSelectService', { category: category.category });
+    return;
+  }
+  const service = app.categories.find(c => c.categoryKey === recording.categoryKey)?.services.find(s => s.key === key);
+  app.isInvalidInput = !service;
+  if (!service) return;
+  app.editRecording = null;
+  app.resetKeyboardInput();
+  app.openQuickAdd({ serviceId: service.id });
 }
