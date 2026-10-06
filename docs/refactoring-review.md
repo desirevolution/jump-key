@@ -100,3 +100,10 @@ Editor displays computed category/service keys again while retaining extra JSON 
 - Icon controls share secondary styling; service action triggers retain compact placement and common focus outlines. Navigation tiles/menu rows retain dedicated layouts.
 - Edit form footer separates deletion from cancel/save, stacking on narrow screens. Destructive generic confirmations initially focus cancel.
 - Tests and production build passed; visual browser verification remains outstanding.
+
+
+### Service editing by keyboard
+- Added `Ctrl+E`, category key, service key to open editing; Escape cancels selection.
+- Restored focus after confirmations, labelled the native dialog, and added keyboard hints.
+- Added Lucide/Iconify examples and catalogue links, with all four translations, help and README updates.
+- Build and unit tests pass; interactive browser focus verification remains outstanding.

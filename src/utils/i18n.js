@@ -1,5 +1,20 @@
 export const translations = {
   de: {
+    tabGeneral: "Allgemein",
+    categoryTimeout: "Kategorie automatisch verlassen",
+    launchDelay: "Startverzögerung bei Tastaturbedienung",
+    timingSeconds: "Sekunden",
+    localTimingHint: "Gilt nur für Tastaturbedienung. Aus = 0. Änderungen werden sofort in diesem Browser gespeichert.",
+
+    quickIconHelp: "Icon-Hilfe (Lucide / Iconify)",
+    editSelectCategory: "Bearbeiten: Kategorie wählen (Esc: abbrechen)",
+    editSelectService: "Bearbeiten: {category} → Service wählen (Esc: abbrechen)",
+    hkEditService: "Service bearbeiten: Ctrl+E → Kategorie → Service",
+    quickIconHint: "Leer lassen für das Standard-Icon. Lucide: lucide:house. Iconify: iconify:mdi:home (iconify: vor den kopierten Namen setzen).",
+    browseLucide: "Lucide durchsuchen ↗",
+    browseIconify: "Iconify durchsuchen ↗",
+    quickKeyboardHint: "Ctrl/Cmd+Enter: speichern · Esc: zurück / schließen",
+
     helpFormValidation: "Ungespeicherte Eingaben werden vor dem Schließen abgefragt. Validierungsfehler stehen direkt am betroffenen Feld.",
     quickValidationFailed: "Die Eingaben konnten nicht geprüft werden. Bitte den Dialog erneut öffnen.",
     servicePosition: "Position",
@@ -32,7 +47,7 @@ export const translations = {
     bookmarkletTitle: "Seiten vom Browser hinzufügen",
     bookmarkletLabel: "Zu JumpKey hinzufügen",
     bookmarkletHelp: "Ziehe diesen Link in deine Lesezeichenleiste. Klicke dort auf ihn, wenn du eine Seite hinzufügen möchtest. JumpKey öffnet sich in einem neuen Tab mit URL und Seitentitel. Wähle eine Kategorie und speichere.",
-    helpBookmarklet: "In den Einstellungen unter Import & Export kannst du „Zu JumpKey hinzufügen“ in deine Lesezeichenleiste ziehen. Damit übernimmst du URL und Titel der geöffneten Seite.",
+    helpBookmarklet: "In den Einstellungen unter Allgemein kannst du „Zu JumpKey hinzufügen“ in deine Lesezeichenleiste ziehen. Damit übernimmst du URL und Titel der geöffneten Seite.",
 
     helpRecentRemove: "Zuletzt verwendeten Eintrag durch Gedrückthalten entfernen; über den Papierkorb die Liste leeren.",
     hkFavoriteRecord: "Favoritenplatz belegen: danach Kategorie und Service wählen. Belegten Platz entfernen.",
@@ -249,6 +264,21 @@ export const translations = {
     tabEditorInvalid: 'Ungültig',
   },
   fr: {
+    tabGeneral: "Général",
+    categoryTimeout: "Quitter automatiquement la catégorie",
+    launchDelay: "Délai d’ouverture au clavier",
+    timingSeconds: "Secondes",
+    localTimingHint: "Uniquement pour le clavier. Désactivé = 0. Les modifications sont enregistrées immédiatement dans ce navigateur.",
+
+    quickIconHelp: "Aide sur les icônes (Lucide / Iconify)",
+    editSelectCategory: "Modifier : choisir une catégorie (Échap : annuler)",
+    editSelectService: "Modifier : {category} → choisir un service (Échap : annuler)",
+    hkEditService: "Modifier un service : Ctrl+E → catégorie → service",
+    quickIconHint: "Laisser vide pour l’icône par défaut. Lucide : lucide:house. Iconify : iconify:mdi:home (ajouter iconify: devant le nom copié).",
+    browseLucide: "Parcourir Lucide ↗",
+    browseIconify: "Parcourir Iconify ↗",
+    quickKeyboardHint: "Ctrl/Cmd+Entrée : enregistrer · Échap : retour / fermer",
+
     helpFormValidation: "Fermer avec des modifications non enregistrées demande confirmation. Les erreurs apparaissent près du champ concerné.",
     quickValidationFailed: "Impossible de vérifier le formulaire. Rouvrez la fenêtre.",
     servicePosition: "Position",
@@ -281,7 +311,7 @@ export const translations = {
     bookmarkletTitle: "Ajouter des pages depuis le navigateur",
     bookmarkletLabel: "Ajouter à JumpKey",
     bookmarkletHelp: "Glissez ce lien dans votre barre de favoris. Cliquez dessus depuis une page pour ouvrir JumpKey dans un nouvel onglet avec son URL et son titre. Choisissez une catégorie et enregistrez.",
-    helpBookmarklet: "Dans les paramètres, sous Importation et exportation, glissez « Ajouter à JumpKey » dans votre barre de favoris pour reprendre l’URL et le titre de la page.",
+    helpBookmarklet: "Dans les paramètres, sous Général, glissez « Ajouter à JumpKey » dans votre barre de favoris pour reprendre l’URL et le titre de la page.",
 
     helpRecentRemove: "Maintenez un élément récent pour le retirer ; utilisez la corbeille pour vider la liste.",
     hkFavoriteRecord: "Attribuer un favori : choisir ensuite la catégorie et le service. Libérer un emplacement occupé.",
@@ -482,6 +512,21 @@ export const translations = {
     tabEditorInvalid: 'Invalide',
   },
   es: {
+    tabGeneral: "General",
+    categoryTimeout: "Salir automáticamente de la categoría",
+    launchDelay: "Retardo de apertura con teclado",
+    timingSeconds: "Segundos",
+    localTimingHint: "Solo para el teclado. Desactivado = 0. Los cambios se guardan inmediatamente en este navegador.",
+
+    quickIconHelp: "Ayuda de iconos (Lucide / Iconify)",
+    editSelectCategory: "Editar: elegir categoría (Esc: cancelar)",
+    editSelectService: "Editar: {category} → elegir servicio (Esc: cancelar)",
+    hkEditService: "Editar servicio: Ctrl+E → categoría → servicio",
+    quickIconHint: "Dejar vacío para el icono predeterminado. Lucide: lucide:house. Iconify: iconify:mdi:home (añadir iconify: delante del nombre copiado).",
+    browseLucide: "Explorar Lucide ↗",
+    browseIconify: "Explorar Iconify ↗",
+    quickKeyboardHint: "Ctrl/Cmd+Enter: guardar · Esc: volver / cerrar",
+
     helpFormValidation: "Cerrar con cambios sin guardar requiere confirmación. Los errores aparecen junto al campo correspondiente.",
     quickValidationFailed: "No se pudo validar el formulario. Vuelve a abrir el diálogo.",
     servicePosition: "Posición",
@@ -514,7 +559,7 @@ export const translations = {
     bookmarkletTitle: "Añadir páginas desde el navegador",
     bookmarkletLabel: "Añadir a JumpKey",
     bookmarkletHelp: "Arrastra este enlace a la barra de marcadores. Púlsalo desde una página para abrir JumpKey en otra pestaña con su URL y título. Elige una categoría y guarda.",
-    helpBookmarklet: "En los ajustes, en Importar y exportar, arrastra «Añadir a JumpKey» a la barra de marcadores para usar la URL y el título de la página.",
+    helpBookmarklet: "En los ajustes, en General, arrastra «Añadir a JumpKey» a la barra de marcadores para usar la URL y el título de la página.",
 
     helpRecentRemove: "Mantén pulsado un elemento reciente para quitarlo; usa la papelera para vaciar la lista.",
     hkFavoriteRecord: "Asignar un favorito: después elige categoría y servicio. Quitar uno ya asignado.",
@@ -711,6 +756,21 @@ export const translations = {
     tabEditorInvalid: 'No válido',
   },
   en: {
+    tabGeneral: "General",
+    categoryTimeout: "Automatically leave category",
+    launchDelay: "Keyboard launch delay",
+    timingSeconds: "Seconds",
+    localTimingHint: "Applies only to keyboard actions. Off = 0. Changes are saved immediately in this browser.",
+
+    quickIconHelp: "Icon help (Lucide / Iconify)",
+    editSelectCategory: "Edit: choose category (Esc: cancel)",
+    editSelectService: "Edit: {category} → choose service (Esc: cancel)",
+    hkEditService: "Edit service: Ctrl+E → category → service",
+    quickIconHint: "Leave empty for the default icon. Lucide: lucide:house. Iconify: iconify:mdi:home (add iconify: before the copied name).",
+    browseLucide: "Browse Lucide ↗",
+    browseIconify: "Browse Iconify ↗",
+    quickKeyboardHint: "Ctrl/Cmd+Enter: save · Esc: back / close",
+
     helpFormValidation: "Closing with unsaved input asks for confirmation. Validation errors appear next to the affected field.",
     quickValidationFailed: "Could not validate the form. Please reopen the dialog.",
     servicePosition: "Position",
@@ -743,7 +803,7 @@ export const translations = {
     bookmarkletTitle: "Add pages from your browser",
     bookmarkletLabel: "Add to JumpKey",
     bookmarkletHelp: "Drag this link to your bookmarks bar. Click it while viewing a page to open JumpKey in a new tab with its URL and title. Choose a category and save.",
-    helpBookmarklet: "In settings under Import & Export, drag “Add to JumpKey” to your bookmarks bar to fill in the current page’s URL and title.",
+    helpBookmarklet: "In settings under General, drag “Add to JumpKey” to your bookmarks bar to fill in the current page’s URL and title.",
 
     helpRecentRemove: "Hold a recently used entry to remove it; use the trash button to clear the list.",
     hkFavoriteRecord: "Assign a favorite slot: then choose category and service. Remove an occupied slot.",

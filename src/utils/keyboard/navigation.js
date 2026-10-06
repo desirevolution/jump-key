@@ -83,7 +83,7 @@ function openCategory(category, app) {
 
   app.isInvalidInput = false;
 
-  app.startResetTimer();
+  app.startCategoryTimer();
 
   window.history.pushState(
     {

@@ -1,4 +1,3 @@
-import { createBookmarklet } from '../utils/bookmarklet.js';
 import { html, LitElement } from 'lit';
 import { validateConfig } from '../utils/config-validator.js';
 
@@ -109,16 +108,6 @@ export class JkConfigData extends LitElement {
   render() {
     return html`
       <div class="${styles.wrapper}">
-        <section class="hidden md:block rounded-2xl border border-slate-700/60 bg-slate-800/40 p-5">
-          <h3 class="${styles.exportTitle}">${this.t('bookmarkletTitle')}</h3>
-          <p class="mt-2 text-sm text-slate-400">${this.t('bookmarkletHelp')}</p>
-          <a
-            href=${createBookmarklet(import.meta.env.BASE_URL, window.location.href)}
-            draggable="true"
-            @click=${e => e.preventDefault()}
-            class="mt-4 inline-flex cursor-grab rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-4 py-3 text-sm font-semibold text-indigo-300"
-          >${this.t('bookmarkletLabel')}</a>
-        </section>
         <section class="${styles.exportCard}">
           <div class="${styles.exportBody}">
             <div class="${styles.exportIconBox}">
