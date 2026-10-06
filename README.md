@@ -288,6 +288,10 @@ Favorites, Continue history, theme and view mode stay in the browser. They are n
 
 Concurrent edits are not detected. If two devices save different versions, the last save wins.
 
+### Local timing preferences
+
+Settings → General stores preferences immediately in this browser. Category timeout defaults to 3 seconds (0–30, whole seconds); keyboard launch delay defaults to 1.2 seconds (0–5, steps of 0.1). Turn either off for zero delay. Category clicks stay open and service clicks launch immediately. The category countdown never pauses on hover or focus. Use Back to overview on desktop or mobile. The bookmarklet is now at the bottom of General.
+
 ## Authentication and user-specific files
 
 JumpKey is intended for trusted environments, such as a local network or an authentication proxy setup using Authelia or Authentik. It does not provide its own authentication. Hardening it as a public Internet-facing service is outside the project's scope; if you expose it publicly, you are responsible for authentication and security.
@@ -336,6 +340,3 @@ This project was built with AI assistance. I'm a lazy dev.
 
 [MIT](LICENSE).
 
-### Local timing preferences
-
-Settings → General stores preferences immediately in this browser. Category timeout defaults to 3 seconds (0–30, whole seconds); keyboard launch delay defaults to 1.2 seconds (0–5, steps of 0.1). Turn either off for zero delay. Category clicks stay open and service clicks launch immediately. The category countdown never pauses on hover or focus. Use Back to overview on desktop or mobile. The bookmarklet is now at the bottom of General.
