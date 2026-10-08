@@ -1,5 +1,6 @@
 export const translations = {
   de: {
+    workspaceNext: "Nächster Workspace",
     workspace: "Workspace",
     workspaceFailed: "Workspace konnte nicht geladen werden. Bitte Verbindung und Konfigurationsdatei prüfen.",
     hkWorkspace: "Zum nächsten Workspace wechseln (erneut drücken: weiter; Enter: sofort; Esc: abbrechen)",
@@ -268,6 +269,7 @@ export const translations = {
     tabEditorInvalid: 'Ungültig',
   },
   fr: {
+    workspaceNext: "Espace suivant",
     workspace: "Espace de travail",
     workspaceFailed: "Impossible de charger cet espace. Vérifiez la connexion et le fichier de configuration.",
     hkWorkspace: "Parcourir les espaces (répéter : suivant ; Entrée : ouvrir ; Échap : annuler)",
@@ -520,6 +522,7 @@ export const translations = {
     tabEditorInvalid: 'Invalide',
   },
   es: {
+    workspaceNext: "Siguiente espacio",
     workspace: "Espacio de trabajo",
     workspaceFailed: "No se pudo cargar el espacio. Revisa la conexión y el archivo de configuración.",
     hkWorkspace: "Recorrer espacios (repetir: siguiente; Enter: cambiar; Esc: cancelar)",
@@ -768,6 +771,7 @@ export const translations = {
     tabEditorInvalid: 'No válido',
   },
   en: {
+    workspaceNext: "Next workspace",
     workspace: "Workspace",
     workspaceFailed: "Could not load workspace. Check your connection and configuration file.",
     hkWorkspace: "Cycle workspaces (press again: next; Enter: switch; Esc: cancel)",

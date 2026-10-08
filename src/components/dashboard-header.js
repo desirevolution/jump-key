@@ -28,6 +28,9 @@ export class JkDashboardHeader extends LitElement {
 
   static get properties() {
     return {
+      hasWorkspaces: { type: Boolean },
+      workspaceName: { type: String },
+      workspaceOpen: { type: Boolean },
       isGridView: { type: Boolean },
       lang: { type: String },
       t: { type: Function },
@@ -92,6 +95,13 @@ export class JkDashboardHeader extends LitElement {
     this.dispatchEvent(new CustomEvent(eventName, { bubbles: true, composed: true }));
   }
 
+  workspaceButton(mobile = false) {
+    return html`<button type="button" class=${mobile ? 'jk-workspace-trigger jk-workspace-trigger-mobile' : 'jk-workspace-trigger jk-workspace-trigger-desktop'} aria-haspopup="dialog" aria-expanded=${String(Boolean(this.workspaceOpen))} aria-label=${this.t('workspace') + ': ' + this.workspaceName} title=${this.workspaceName} @click=${e=>this.dispatchEvent(new CustomEvent('open-workspaces',{detail:{anchor:e.currentTarget},bubbles:true,composed:true}))}>
+      ${mobile ? html`<span class="jk-workspace-brand">Jump<span>Key</span></span>` : ''}
+      <span class="jk-workspace-trigger-name"><span>${this.workspaceName}</span><span aria-hidden="true" class="jk-workspace-chevron">⌄</span></span>
+    </button>`;
+  }
+
   render() {
     return html`
       <div class="${styles.container}">
@@ -100,12 +110,14 @@ export class JkDashboardHeader extends LitElement {
             href="https://github.com/desirevolution/jump-key"
             target="_blank"
             rel="noopener noreferrer"
-            class="${styles.logoShell}"
+            class="${styles.logoShell} ${this.hasWorkspaces ? 'jk-workspace-logo' : ''}"
           >
             <img src="/jump-key.png" alt="JumpKey" class="${styles.logoImg}" />
           </a>
 
-          <div class="${styles.titleContainer}">
+          ${this.hasWorkspaces ? this.workspaceButton(true) : ''}
+          <div class="${styles.titleContainer} ${this.hasWorkspaces ? 'jk-workspace-title' : ''}">
+            <div class="flex items-center gap-2">
             <div class="${styles.brandTextWrapper}">
               <span class="${styles.brandJump}">Jump</span>
               <span class="${styles.brandKey}">Key</span>
@@ -118,6 +130,8 @@ export class JkDashboardHeader extends LitElement {
             >
               <jk-icon icon="ui:help-circle" class="size-5"></jk-icon>
             </button>
+            </div>
+            ${this.hasWorkspaces ? this.workspaceButton() : ''}
           </div>
         </div>
 

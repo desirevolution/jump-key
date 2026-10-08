@@ -351,7 +351,7 @@ Each workspace is a complete, independently usable configuration file in the con
 
 Workspace IDs use lowercase ASCII letters, digits and single hyphens between words. `default` is reserved. Backups are excluded. Names are derived from filenames. Renaming a workspace creates a new local storage scope. A file can be copied to another installation as `services.json` without changing its contents.
 
-With multiple workspaces, use the button above the dashboard. Backspace previews the next workspace, wrapping around; press again to advance, Enter to switch immediately, or Esc to cancel. The keyboard launch delay also controls workspace switching; zero switches immediately. These shortcuts do not act in forms or dialogs. Mouse selection switches immediately. The default workspace comes first, followed by alphabetical IDs.
+With multiple workspaces, use the workspace selector in the dashboard header. Backspace previews the next workspace, wrapping around; press again to advance, Enter to switch immediately, or Esc to cancel. The keyboard launch delay also controls workspace switching; zero switches immediately. These shortcuts do not act in forms or dialogs. Mouse selection switches immediately. The default workspace comes first, followed by alphabetical IDs.
 
 The last selected workspace is remembered. `?workspace=work` selects one directly. Settings, the JSON editor and import/export act on the current workspace; its filename is shown in the editor. General preferences remain shared. Favorites, recent services and configuration caches are separated by user and workspace. Existing favorites and recent history are adopted once by the first default workspace loaded after upgrading.
 

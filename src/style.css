@@ -772,6 +772,42 @@ dialog.jk-service-actions::backdrop { background:transparent; backdrop-filter:no
 }
 @media (prefers-reduced-motion:reduce) { .jk-btn { transition:none; } }
 
-.jk-workspace-picker { position:fixed; margin:0; inset:auto 0 0; width:100%; max-width:none; max-height:80vh; overflow:auto; padding:1rem; border:1px solid var(--jk-border-strong); border-radius:1rem 1rem 0 0; background:var(--jk-surface-elevated,#0f172a); color:var(--jk-text-primary,#f8fafc); }
-.jk-workspace-picker::backdrop { background:#02061799; }
-@media(min-width:768px) { .jk-workspace-picker { inset:auto; width:20rem; max-width:calc(100vw - 16px); border-radius:1rem; } }
+/* Workspace controls: header dropdown on desktop, bottom sheet on mobile. */
+.jk-workspace-trigger { color:var(--jk-text-primary,#f8fafc); cursor:pointer; min-height:36px; border-radius:.6rem; text-align:left; }
+.jk-workspace-trigger:focus-visible,.jk-workspace-option:focus-visible { outline:2px solid var(--jk-accent-bright,#818cf8); outline-offset:2px; }
+.jk-workspace-trigger-desktop { display:flex; padding:.3rem .6rem; margin-left:-.6rem; color:var(--jk-text-secondary,#cbd5e1); font-size:.8rem; }
+.jk-workspace-trigger:hover { background:var(--jk-surface-elevated,#1e293b); }
+.jk-workspace-trigger-name { display:flex; align-items:center; gap:.6rem; min-width:0; }
+.jk-workspace-trigger-name>span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:15rem; }
+.jk-workspace-chevron { flex-shrink:0; opacity:.7; }
+.jk-workspace-title { flex-direction:column; align-items:flex-start; gap:0; }
+.jk-workspace-trigger-mobile { display:none; }
+.jk-workspace-picker { position:fixed; margin:0; inset:auto 0 0; width:100%; max-width:none; max-height:80dvh; overflow:auto; padding:.6rem 1rem max(1rem,env(safe-area-inset-bottom)); border:1px solid var(--jk-border-strong,#334155); border-radius:1.5rem 1.5rem 0 0; background:var(--jk-surface-elevated,#0f172a); color:var(--jk-text-primary,#f8fafc); box-shadow:0 16px 50px #0005; }
+.jk-workspace-picker::backdrop { background:#02061788; }
+.jk-workspace-sheet-handle { width:2rem; height:4px; margin:0 auto .5rem; border-radius:9px; background:var(--jk-border-strong,#64748b); }
+.jk-workspace-picker-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.2rem .25rem .6rem; }
+.jk-workspace-picker-header strong { font-size:.9rem; }
+.jk-workspace-options { display:flex; flex-direction:column; gap:.35rem; }
+.jk-workspace-option { display:flex; align-items:center; gap:.8rem; width:100%; min-height:60px; padding:.65rem .8rem; border:1px solid transparent; border-radius:.8rem; text-align:left; cursor:pointer; }
+.jk-workspace-option:hover { background:color-mix(in srgb,var(--jk-accent,#6366f1) 10%,transparent); }
+.jk-workspace-option[aria-current="true"] { background:color-mix(in srgb,var(--jk-accent,#6366f1) 15%,transparent); border-color:color-mix(in srgb,var(--jk-accent,#6366f1) 35%,transparent); }
+.jk-workspace-option-avatar { display:grid; place-items:center; flex-shrink:0; width:2rem; height:2rem; border-radius:.6rem; font-weight:600; background:color-mix(in srgb,var(--jk-accent,#6366f1) 15%,transparent); }
+.jk-workspace-option-name { flex:1; min-width:0; overflow-wrap:anywhere; font-size:.9rem; }
+.jk-workspace-option-check { width:1rem; flex-shrink:0; color:var(--jk-accent-bright,#a5b4fc); }
+.jk-workspace-picker-hint { display:none; }
+@media(min-width:768px) {
+ .jk-workspace-picker { inset:auto; width:19rem; max-width:calc(100vw - 24px); border-radius:1rem; padding:.6rem; }
+ .jk-workspace-picker::backdrop { background:transparent; }
+ .jk-workspace-sheet-handle { display:none; }
+ .jk-workspace-option { min-height:48px; padding:.5rem .65rem; }
+ .jk-workspace-picker-hint { display:block; margin:.6rem .3rem .1rem; padding-top:.65rem; border-top:1px solid var(--jk-border-strong,#334155); font-size:.7rem; color:var(--jk-text-secondary,#94a3b8); }
+}
+@media(max-width:767px) {
+ .jk-workspace-logo,.jk-workspace-title { display:none; }
+ .jk-workspace-trigger-mobile { display:flex; flex-direction:column; justify-content:center; gap:.15rem; min-height:48px; min-width:0; padding:.2rem .4rem; }
+ .jk-workspace-brand { font-size:.7rem; font-weight:600; color:var(--jk-text-secondary,#94a3b8); }
+ .jk-workspace-brand>span { color:var(--jk-accent-bright,#a5b4fc); }
+ .jk-workspace-trigger-name { font-size:.9rem; font-weight:600; width:100%; }
+ .jk-workspace-trigger-name>span:first-child { max-width:100%; }
+ jk-dashboard-header .hidden.sm\:block { display:none; }
+}

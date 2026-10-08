@@ -979,9 +979,13 @@ class DashboardApp extends LitElement {
         }}
       ></jk-toast>
 
-      ${this.workspaces.length > 1 ? html`<button class="jk-btn jk-btn-secondary mb-3" ?disabled=${this.workspaceLoading} @click=${e=>{this.enterUiMode();this.workspaceAnchor=e.currentTarget;this.showWorkspacePicker=true;}}>${this.t('workspace')}: ${this.workspaces.find(w=>w.id===this.workspaceId)?.name || '—'} ▾</button>` : ''}
+
       ${this.showWorkspacePicker ? html`<jk-workspace-picker .items=${this.workspaces} .active=${this.workspaceId} .anchor=${this.workspaceAnchor} .t=${this.t} @close=${()=>this.showWorkspacePicker=false} @select=${e=>this.switchWorkspace(e.detail)}></jk-workspace-picker>` : ''}
       <jk-dashboard-header ?inert=${this.workspaceLoading}
+        .workspaceName=${this.workspaces.find(w=>w.id===this.workspaceId)?.name || '—'}
+        .hasWorkspaces=${this.workspaces.length > 1}
+        .workspaceOpen=${this.showWorkspacePicker}
+        @open-workspaces=${e=>{this.enterUiMode();this.workspaceAnchor=e.detail.anchor;this.showWorkspacePicker=true;}}
         @quick-add=${() => this.openQuickAdd()}
         .isGridView=${this.isGridView}
         .lang=${this.lang}

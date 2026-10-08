@@ -1,16 +1,61 @@
 import { html, LitElement } from 'lit';
+import './icon-button.js';
+
 export class WorkspacePicker extends LitElement {
- static properties={items:{},active:{},t:{},anchor:{}};
- createRenderRoot(){return this;}
- firstUpdated(){
-  const dialog=this.querySelector('dialog'); dialog.showModal();
-  if(matchMedia('(min-width:768px)').matches && this.anchor){const r=this.anchor.getBoundingClientRect();dialog.style.top=`${r.bottom+6}px`;dialog.style.left=`${Math.max(8,Math.min(r.left,innerWidth-dialog.offsetWidth-8))}px`;}
-  this.querySelector('[aria-current="true"]')?.focus();
- }
- disconnectedCallback(){this.querySelector('dialog')?.close();super.disconnectedCallback();if(this.anchor?.isConnected)this.anchor.focus();}
- close(){this.dispatchEvent(new CustomEvent('close'));}
- render(){return html`<dialog class="jk-workspace-picker" aria-label=${this.t('workspace')} @cancel=${e=>{e.preventDefault();this.close();}} @click=${e=>{if(e.target===e.currentTarget){const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)this.close();}}} @keydown=${e=>{
- e.stopPropagation();if(['ArrowUp','ArrowDown','Home','End'].includes(e.key)){e.preventDefault();const buttons=[...this.querySelectorAll('[data-workspace]')];const i=buttons.indexOf(document.activeElement);buttons[e.key==='Home'?0:e.key==='End'?buttons.length-1:(i+(e.key==='ArrowDown'?1:-1)+buttons.length)%buttons.length]?.focus();}
- }}><header class="flex items-center justify-between p-2"><strong>${this.t('workspace')}</strong><jk-icon-button icon="ui:x" .label=${this.t('close')} @click=${this.close}></jk-icon-button></header>${this.items.map(w=>html`<button data-workspace class="block w-full rounded-lg p-3 text-left hover:bg-slate-700 focus-visible:outline-2" aria-current=${String(w.id===this.active)} @click=${()=>this.dispatchEvent(new CustomEvent('select',{detail:w.id}))}>${w.id===this.active?'✓ ':''}${w.name}</button>`)}</dialog>`;}
+  static properties = { items: {}, active: {}, t: {}, anchor: {} };
+  createRenderRoot() { return this; }
+  constructor() { super(); this.position = this.position.bind(this); }
+  firstUpdated() {
+    this.querySelector('dialog').showModal();
+    this.position();
+    window.addEventListener('resize', this.position);
+    window.addEventListener('scroll', this.position, true);
+    this.querySelector('[aria-current="true"]')?.focus();
+  }
+  position() {
+    const dialog = this.querySelector('dialog');
+    if (!dialog) return;
+    if (!matchMedia('(min-width:768px)').matches || !this.anchor) {
+      dialog.style.top = ''; dialog.style.left = ''; dialog.style.maxHeight = ''; return;
+    }
+    const rect = this.anchor.getBoundingClientRect();
+    dialog.style.maxHeight = `${Math.max(100, innerHeight - 24)}px`;
+    const top = rect.bottom + 8;
+    dialog.style.top = `${Math.max(12, Math.min(top, innerHeight - dialog.offsetHeight - 12))}px`;
+    dialog.style.left = `${Math.max(12, Math.min(rect.left, innerWidth - dialog.offsetWidth - 12))}px`;
+  }
+  disconnectedCallback() {
+    window.removeEventListener('resize', this.position);
+    window.removeEventListener('scroll', this.position, true);
+    this.querySelector('dialog')?.close();
+    super.disconnectedCallback();
+    if (this.anchor?.isConnected) this.anchor.focus();
+  }
+  close() { this.dispatchEvent(new CustomEvent('close')); }
+  handleKeys(e) {
+    e.stopPropagation();
+    if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) return;
+    e.preventDefault();
+    const buttons = [...this.querySelectorAll('[data-workspace]')];
+    const index = buttons.indexOf(document.activeElement);
+    const next = e.key === 'Home' ? 0 : e.key === 'End' ? buttons.length - 1 : (index + (e.key === 'ArrowDown' ? 1 : -1) + buttons.length) % buttons.length;
+    buttons[next]?.focus();
+  }
+  render() {
+    return html`<dialog class="jk-workspace-picker" aria-label=${this.t('workspace')} @cancel=${e=>{e.preventDefault();this.close();}} @keydown=${this.handleKeys} @click=${e=>{
+      if(e.target!==e.currentTarget) return;
+      const r=e.currentTarget.getBoundingClientRect();
+      if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom) this.close();
+    }}>
+      <div class="jk-workspace-sheet-handle" aria-hidden="true"></div>
+      <header class="jk-workspace-picker-header"><strong>${this.t('workspace')}</strong><jk-icon-button icon="ui:x" .label=${this.t('close')} @click=${this.close}></jk-icon-button></header>
+      <div class="jk-workspace-options">${this.items.map(w=>html`<button type="button" data-workspace class="jk-workspace-option" aria-current=${String(w.id===this.active)} @click=${()=>w.id===this.active ? this.close() : this.dispatchEvent(new CustomEvent('select',{detail:w.id}))}>
+        <span class="jk-workspace-option-avatar" aria-hidden="true">${w.name.slice(0,1).toUpperCase()}</span>
+        <span class="jk-workspace-option-name">${w.name}</span>
+        <span class="jk-workspace-option-check" aria-hidden="true">${w.id===this.active?'✓':''}</span>
+      </button>`)}</div>
+      <footer class="jk-workspace-picker-hint"><kbd>Backspace</kbd> · ${this.t('workspaceNext')}</footer>
+    </dialog>`;
+  }
 }
 customElements.define('jk-workspace-picker',WorkspacePicker);
