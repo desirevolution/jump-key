@@ -1,5 +1,9 @@
 export const translations = {
   de: {
+    workspace: "Workspace",
+    workspaceFailed: "Workspace konnte nicht geladen werden. Bitte Verbindung und Konfigurationsdatei prüfen.",
+    hkWorkspace: "Zum nächsten Workspace wechseln (erneut drücken: weiter; Enter: sofort; Esc: abbrechen)",
+
     tabGeneral: "Allgemein",
     categoryTimeout: "Kategorie automatisch verlassen",
     launchDelay: "Startverzögerung bei Tastaturbedienung",
@@ -264,6 +268,10 @@ export const translations = {
     tabEditorInvalid: 'Ungültig',
   },
   fr: {
+    workspace: "Espace de travail",
+    workspaceFailed: "Impossible de charger cet espace. Vérifiez la connexion et le fichier de configuration.",
+    hkWorkspace: "Parcourir les espaces (répéter : suivant ; Entrée : ouvrir ; Échap : annuler)",
+
     tabGeneral: "Général",
     categoryTimeout: "Quitter automatiquement la catégorie",
     launchDelay: "Délai d’ouverture au clavier",
@@ -512,6 +520,10 @@ export const translations = {
     tabEditorInvalid: 'Invalide',
   },
   es: {
+    workspace: "Espacio de trabajo",
+    workspaceFailed: "No se pudo cargar el espacio. Revisa la conexión y el archivo de configuración.",
+    hkWorkspace: "Recorrer espacios (repetir: siguiente; Enter: cambiar; Esc: cancelar)",
+
     tabGeneral: "General",
     categoryTimeout: "Salir automáticamente de la categoría",
     launchDelay: "Retardo de apertura con teclado",
@@ -756,6 +768,10 @@ export const translations = {
     tabEditorInvalid: 'No válido',
   },
   en: {
+    workspace: "Workspace",
+    workspaceFailed: "Could not load workspace. Check your connection and configuration file.",
+    hkWorkspace: "Cycle workspaces (press again: next; Enter: switch; Esc: cancel)",
+
     tabGeneral: "General",
     categoryTimeout: "Automatically leave category",
     launchDelay: "Keyboard launch delay",

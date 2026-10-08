@@ -27,7 +27,7 @@ precacheAndRoute(self.__WB_MANIFEST);
 //
 const navigationHandler = createHandlerBoundToURL(import.meta.env.BASE_URL + 'index.html');
 
-registerRoute(new NavigationRoute(navigationHandler, { denylist: [/\/config\//, /\/icons\//, /\/healthz$/] }));
+registerRoute(new NavigationRoute(navigationHandler, { denylist: [/\/api\//, /\/config\//, /\/icons\//, /\/healthz$/] }));
 
 //
 // Bilder

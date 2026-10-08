@@ -1,3 +1,5 @@
+import { initializeWorkspaces, switchWorkspace } from './utils/workspaces.js';
+import './components/workspace-picker.js';
 import { normalizeTimings } from './utils/preferences.js';
 import './components/service-actions.js';
 import './components/quick-add.js';
@@ -78,6 +80,10 @@ class DashboardApp extends LitElement {
     // Keyboard navigation
     selectedIndex: { type: Number },
     // Data
+    workspaces: { type: Array },
+    workspaceId: {},
+    workspaceLoading: {},
+    showWorkspacePicker: {},
     preferences: { type: Object },
     categoryCountdown: { type: Number },
     favorites: { type: Object },
@@ -115,11 +121,14 @@ class DashboardApp extends LitElement {
     this.mobileMenuMode = 'menu';
     this.isInvalidInput = false;
     this.isValidInput = false;
+    this.workspaces=[];
+    this.workspaceId='default';
+    this.storageKeys={...STORAGE_KEYS};
     this.isGridView = readJsonStorage(STORAGE_KEYS.gridView, false);
 
     // User Data & Search
-    this.favorites = readJsonStorage(STORAGE_KEYS.favorites, {});
-    this.continueHistory = readJsonStorage(STORAGE_KEYS.continueHistory, []);
+    this.favorites = readJsonStorage(this.storageKeys.favorites, {});
+    this.continueHistory = readJsonStorage(this.storageKeys.continueHistory, []);
     this.lastUsedCycleIndex = 0;
     this.continueLastUsedCycle = false;
     this.searchQuery = '';
@@ -167,6 +176,17 @@ class DashboardApp extends LitElement {
   }
 
   handleKeyDown(e) {
+    const blocked = this.showQuickAdd || this.showConfigModal || this.showSearch || this.showHelp || this.showMobileMenu || this.actionService || this.dialogConfig?.show || this.showWorkspacePicker || e.isComposing || e.target?.closest?.('input, textarea, select, [contenteditable="true"], button, a');
+    if (!blocked && e.key === 'Backspace' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      e.preventDefault();
+      if (!e.repeat && this.workspaces.length > 1) this.cycleWorkspace();
+      return;
+    }
+    if (this.actionManager.activeType === 'workspace' && e.key === 'Enter' && !blocked) {
+      e.preventDefault(); this.querySelector('jk-action-feedback')?.confirm(); return;
+    }
+    if (this.workspaceLoading) return;
+
     const hasPendingLaunch = this.actionManager.activeType === 'launch';
 
     if (e.key === 'Enter' && hasPendingLaunch) {
@@ -190,6 +210,22 @@ class DashboardApp extends LitElement {
       this.continueLastUsedCycle = false;
     }
   }
+  async cycleWorkspace() {
+    const previous = this.actionManager.activeType === 'workspace' ? this.pendingWorkspace : this.workspaceLoading ? this.workspaceRequested : this.workspaceId;
+    const index = this.workspaces.findIndex(w=>w.id===previous);
+    const target = this.workspaces[(index+1)%this.workspaces.length];
+    this.pendingWorkspace = target.id;
+    this.cancelInputResetTimer();
+    if (!this.preferences.launchDelay) { this.switchWorkspace(target.id); return; }
+    const feedback = this.querySelector('jk-action-feedback');
+    const action = this.actionManager.start({type:'workspace',cancel:()=>feedback?.cancel()});
+    const confirmed = await feedback.show({service:{name:target.name,category:this.t('workspace'),icon:'ui:layout-grid'},duration:this.preferences.launchDelay*1000});
+    if(!this.actionManager.isActive(action)) return;
+    this.actionManager.complete(action);
+    if(confirmed) this.switchWorkspace(target.id);
+  }
+  switchWorkspace(id) { this.showWorkspacePicker=false; return switchWorkspace(this,id); }
+
   handleThemeChange(e) {
     this.theme = saveTheme(e.detail.theme);
   }
@@ -204,13 +240,13 @@ class DashboardApp extends LitElement {
     const refs = migrateReferences(config, this.favorites, this.continueHistory);
     this.favorites = refs.favorites;
     this.continueHistory = refs.history;
-    writeJsonStorage(STORAGE_KEYS.favorites, this.favorites);
-    writeJsonStorage(STORAGE_KEYS.continueHistory, this.continueHistory);
+    writeJsonStorage(this.storageKeys.favorites, this.favorites);
+    writeJsonStorage(this.storageKeys.continueHistory, this.continueHistory);
     this.configuration = config;
     this.categories = generateShortcuts(config.categories);
     if (this.activeCategoryKey && !this.categories.some(c => c.categoryKey === this.activeCategoryKey)) this.resetNavigationInput(false);
     this.searchEngines = config.searchEngines;
-    writeJsonStorage(STORAGE_KEYS.configCache, config);
+    writeJsonStorage(this.storageKeys.configCache, config);
   }
 
   async handleSaveConfig(e) {
@@ -238,6 +274,9 @@ class DashboardApp extends LitElement {
     this.theme = saveTheme(this.theme);
 
     try {
+      const supported = await initializeWorkspaces(this);
+      if (!supported) {
+    try {
       const res = await fetch(`${import.meta.env.BASE_URL}config/services.json`);
       if (!res.ok) throw new Error(`Configuration request failed: ${res.status}`);
       const data = await res.json();
@@ -254,12 +293,15 @@ class DashboardApp extends LitElement {
     } catch (error) {
       console.error('Configuration load failed:', error);
       try {
-        const data = readJsonStorage(STORAGE_KEYS.configCache, null);
+        const data = readJsonStorage(this.storageKeys.configCache, null);
         if (data) this.applyConfiguration(migrateConfig(data));
       } catch (cacheError) {
         console.error('Invalid configuration cache:', cacheError);
       }
     }
+
+      }
+    } catch(error) { this.showToast(this.t('workspaceFailed'),'error'); }
     if (!this.isConnected) return;
     const params = new URLSearchParams(location.search);
     if (hasSharedInput(params) && this.configuration) {
@@ -465,7 +507,7 @@ class DashboardApp extends LitElement {
     ].slice(0, 10);
 
     this.lastUsedCycleIndex = 0;
-    writeJsonStorage(STORAGE_KEYS.continueHistory, this.continueHistory);
+    writeJsonStorage(this.storageKeys.continueHistory, this.continueHistory);
   }
 
   openContinueView(shortcutLabel = '') {
@@ -500,7 +542,7 @@ class DashboardApp extends LitElement {
       window.history.pushState({ view: 'continue' }, '');
     }
 
-    this.startResetTimer();
+    if (shortcutLabel) this.startCategoryTimer();
   }
 
   launchContinueSlot(slot) {
@@ -625,7 +667,7 @@ class DashboardApp extends LitElement {
       cancelLabel: this.t('cancel'),
       onConfirm: () => {
         this.favorites = {};
-        localStorage.removeItem(STORAGE_KEYS.favorites);
+        localStorage.removeItem(this.storageKeys.favorites);
         this.requestUpdate();
       },
     };
@@ -643,7 +685,7 @@ class DashboardApp extends LitElement {
       onConfirm: () => {
         this.continueHistory = [];
         this.lastUsedCycleIndex = 0;
-        localStorage.removeItem(STORAGE_KEYS.continueHistory);
+        localStorage.removeItem(this.storageKeys.continueHistory);
         this.resetNavigationInput(true);
         this.requestUpdate();
       },
@@ -658,7 +700,7 @@ class DashboardApp extends LitElement {
 
     this.continueHistory = nextHistory;
     this.lastUsedCycleIndex = 0;
-    writeJsonStorage(STORAGE_KEYS.continueHistory, this.continueHistory);
+    writeJsonStorage(this.storageKeys.continueHistory, this.continueHistory);
     this.showToast(`"${service.name}" ${this.t('continueRemoved')}`, 'success');
 
     if (!nextHistory.length && this.showContinueView) {
@@ -683,7 +725,7 @@ class DashboardApp extends LitElement {
     }
 
     this.favorites = { ...this.favorites, [freeSlot]: service.id };
-    writeJsonStorage(STORAGE_KEYS.favorites, this.favorites);
+    writeJsonStorage(this.storageKeys.favorites, this.favorites);
 
     this.resetInput(true);
 
@@ -710,7 +752,7 @@ class DashboardApp extends LitElement {
 
     const { [slot]: _removed, ...remainingFavorites } = this.favorites;
     this.favorites = remainingFavorites;
-    writeJsonStorage(STORAGE_KEYS.favorites, this.favorites);
+    writeJsonStorage(this.storageKeys.favorites, this.favorites);
 
     this.showToast(`"${serviceName}" ${this.t('favRemoved', { slot })}`, 'success');
 
@@ -770,6 +812,8 @@ class DashboardApp extends LitElement {
   templateConfigModal() {
     return html`
       <jk-config-modal
+        .workspaceLabel=${this.workspaces.find(w=>w.id===this.workspaceId)?.name || ''}
+        .workspaceFile=${this.workspaces.find(w=>w.id===this.workspaceId)?.file || ''}
         .show=${this.showConfigModal}
         .preferences=${this.preferences}
         @preferences-change=${e => { this.preferences=e.detail; writeJsonStorage('dashboard_timings',this.preferences); this.cancelInputResetTimer(); }}
@@ -935,7 +979,9 @@ class DashboardApp extends LitElement {
         }}
       ></jk-toast>
 
-      <jk-dashboard-header
+      ${this.workspaces.length > 1 ? html`<button class="jk-btn jk-btn-secondary mb-3" ?disabled=${this.workspaceLoading} @click=${e=>{this.enterUiMode();this.workspaceAnchor=e.currentTarget;this.showWorkspacePicker=true;}}>${this.t('workspace')}: ${this.workspaces.find(w=>w.id===this.workspaceId)?.name || '—'} ▾</button>` : ''}
+      ${this.showWorkspacePicker ? html`<jk-workspace-picker .items=${this.workspaces} .active=${this.workspaceId} .anchor=${this.workspaceAnchor} .t=${this.t} @close=${()=>this.showWorkspacePicker=false} @select=${e=>this.switchWorkspace(e.detail)}></jk-workspace-picker>` : ''}
+      <jk-dashboard-header ?inert=${this.workspaceLoading}
         @quick-add=${() => this.openQuickAdd()}
         .isGridView=${this.isGridView}
         .lang=${this.lang}
@@ -959,7 +1005,7 @@ class DashboardApp extends LitElement {
           <button class="jk-btn jk-btn-primary" @click=${this.installApp}>${this.t('installAction')}</button>
           <jk-icon-button icon="ui:x" .label=${this.t('close')} @click=${()=>this.installController.dismiss()}></jk-icon-button>
         </aside>` : ''}
-      <main class="${styles.mainContent}" @service-actions=${e => {
+      <main ?inert=${this.workspaceLoading} class="${styles.mainContent}" @service-actions=${e => {
         this.cancelPendingAction();
         this.cancelInputResetTimer();
         this.actionAnchor = e.detail.anchor;

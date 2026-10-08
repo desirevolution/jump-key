@@ -771,3 +771,7 @@ dialog.jk-service-actions::backdrop { background:transparent; backdrop-filter:no
   .jk-form-footer-actions .jk-btn { flex:1; }
 }
 @media (prefers-reduced-motion:reduce) { .jk-btn { transition:none; } }
+
+.jk-workspace-picker { position:fixed; margin:0; inset:auto 0 0; width:100%; max-width:none; max-height:80vh; overflow:auto; padding:1rem; border:1px solid var(--jk-border-strong); border-radius:1rem 1rem 0 0; background:var(--jk-surface-elevated,#0f172a); color:var(--jk-text-primary,#f8fafc); }
+.jk-workspace-picker::backdrop { background:#02061799; }
+@media(min-width:768px) { .jk-workspace-picker { inset:auto; width:20rem; max-width:calc(100vw - 16px); border-radius:1rem; } }

@@ -79,7 +79,8 @@ export class JkServiceCard extends LitElement {
 
     this._longPressTriggered = false;
     this._suppressClick = false;
-    this.isPressing = true;
+    clearTimeout(this._visualPressTimer);
+    this._visualPressTimer=setTimeout(()=>{this.isPressing=true;},150);
     this.isReady = false;
 
     event.currentTarget.setPointerCapture?.(event.pointerId);
@@ -197,6 +198,7 @@ export class JkServiceCard extends LitElement {
   }
 
   _resetPressState() {
+    clearTimeout(this._visualPressTimer);
     this.isPressing = false;
     this.isReady = false;
 
@@ -240,7 +242,7 @@ export class JkServiceCard extends LitElement {
 
   _renderAccent() {
     const fillClasses = this.isPressing
-      ? 'animate-[jk-long-press-fill_600ms_linear_forwards]'
+      ? 'animate-[jk-long-press-fill_450ms_linear_forwards]'
       : this.isReady
         ? 'h-full animate-[jk-long-press-pulse_900ms_ease-in-out_infinite]'
         : 'h-0';
@@ -334,7 +336,7 @@ export class JkServiceCard extends LitElement {
           }
 
           @media (prefers-reduced-motion: reduce) {
-            .animate-[jk-long-press-fill_600ms_linear_forwards],
+            .animate-[jk-long-press-fill_450ms_linear_forwards],
             .animate-[jk-long-press-pulse_900ms_ease-in-out_infinite] {
               animation: none;
             }

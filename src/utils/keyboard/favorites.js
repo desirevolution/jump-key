@@ -151,7 +151,7 @@ function saveFavorite(slot, service, app) {
  * LocalStorage schreiben
  */
 function saveFavorites(app) {
-  writeJsonStorage(FAVORITES_STORAGE_KEY, app.favorites);
+  writeJsonStorage(app.storageKeys?.favorites || FAVORITES_STORAGE_KEY, app.favorites);
 }
 
 /**

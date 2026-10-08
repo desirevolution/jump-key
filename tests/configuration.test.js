@@ -50,3 +50,15 @@ test('save awaits server confirmation and rejects failed writes', async () => {
   assert.deepEqual(JSON.parse(captured[1].body), result);
   await assert.rejects(persistConfig(legacy(), { fetcher: async () => ({ ok: false, status: 500 }) }), /500/);
 });
+
+test('workspace persistence uses the selected workspace and expected user', async () => {
+  const { setWorkspaceContext, persistConfig } = await import('../src/utils/configuration.js');
+  setWorkspaceContext({ id: 'work', user: 'arthur' });
+  try {
+    await persistConfig({ categories: [], searchEngines: [] }, { fetcher: async (url, options) => {
+      assert.equal(url, '/config/services.json?workspace=work');
+      assert.equal(options.headers['X-JumpKey-User'], 'arthur');
+      return { ok: true };
+    }});
+  } finally { setWorkspaceContext(null); }
+});
