@@ -41,6 +41,8 @@ export class JkConfigModal extends LitElement {
   }
 
   static properties = {
+    workspaceLabel: {},
+    workspaceFile: {},
     preferences: { type: Object },
     configuration: { type: Object },
     saving: { type: Boolean },
@@ -200,6 +202,7 @@ export class JkConfigModal extends LitElement {
       case 'editor':
       default:
         return html`
+          <p class="mb-3 text-sm text-slate-400">${this.workspaceFile}</p>
           <jk-config-editor
             .t=${this.t}
             .readOnly=${this.saving}
@@ -235,7 +238,7 @@ export class JkConfigModal extends LitElement {
               <div>
                 <h2 class="${styles.title}">JumpKey</h2>
                 <p class="${styles.subtitle}">
-                  ${this.t('configSubtitle')}
+                  ${this.t('configSubtitle')} ${this.workspaceLabel ? ' · ' + this.t('workspace') + ': ' + this.workspaceLabel : ''}
                 </p>
               </div>
             </div>

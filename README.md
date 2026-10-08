@@ -284,13 +284,9 @@ If the migration cannot be saved, the app uses it locally and tries again on the
 
 The browser keeps the last loaded or saved configuration for offline use. Load the app online first. The linked services still need to be reachable; caching the dashboard does not cache those services.
 
-Favorites, Continue history, theme and view mode stay in the browser. They are not included in the JSON export or synchronized between devices.
+Favorites and Continue history stay in the browser, separately for each workspace. Theme and view mode remain browser-wide. They are not included in the JSON export or synchronized between devices.
 
 Concurrent edits are not detected. If two devices save different versions, the last save wins.
-
-### Local timing preferences
-
-Settings → General stores preferences immediately in this browser. Category timeout defaults to 3 seconds (0–30, whole seconds); keyboard launch delay defaults to 1.2 seconds (0–5, steps of 0.1). Turn either off for zero delay. Category clicks stay open and service clicks launch immediately. The category countdown never pauses on hover or focus. Use Back to overview on desktop or mobile. The bookmarklet is now at the bottom of General.
 
 ## Authentication and user-specific files
 
@@ -305,7 +301,7 @@ If the proxy supplies `Remote-User`, the server selects a user-specific filename
 
 User values may contain ASCII letters, digits, dots, underscores and hyphens. The server does not automatically fall back to `services.json` when a user-specific file is missing. The `--copy-default-config` flag only initializes the shared `services.json`.
 
-The authentication proxy must set the identity header itself and prevent clients from bypassing it. The header is a filename selector, not proof of authentication. Browser storage and offline caches are not separated by account: use one account per browser profile for this installation.
+The authentication proxy must set the identity header itself and prevent clients from bypassing it. The header is a filename selector, not proof of authentication. With workspace support, configuration caches, favorites and history are scoped by account and workspace. Offline access uses the last known identity; use separate browser profiles when accounts must be isolated.
 
 ## Development
 
@@ -340,3 +336,25 @@ This project was built with AI assistance. I'm a lazy dev.
 
 [MIT](LICENSE).
 
+### Local timing preferences
+
+Settings → General stores preferences immediately in this browser. Category timeout defaults to 3 seconds (0–30, whole seconds); keyboard launch delay defaults to 1.2 seconds (0–5, steps of 0.1). Turn either off for zero delay. Category clicks stay open and service clicks launch immediately. The category countdown never pauses on hover or focus. Use Back to overview on desktop or mobile. The bookmarklet is now at the bottom of General.
+
+## Workspaces
+
+Each workspace is a complete, independently usable configuration file in the config directory. Create files manually; the server lists them automatically. Existing `services.json` (or `services.<user>.json`) remains the default workspace.
+
+| Workspace | Without Remote-User | Remote-User: arthur |
+| --- | --- | --- |
+| Default | `services.json` | `services.arthur.json` |
+| Work | `work.workspace.json` | `work.workspace.arthur.json` |
+
+Workspace IDs use lowercase ASCII letters, digits and single hyphens between words. `default` is reserved. Backups are excluded. Names are derived from filenames. Renaming a workspace creates a new local storage scope. A file can be copied to another installation as `services.json` without changing its contents.
+
+With multiple workspaces, use the button above the dashboard. Backspace previews the next workspace, wrapping around; press again to advance, Enter to switch immediately, or Esc to cancel. The keyboard launch delay also controls workspace switching; zero switches immediately. These shortcuts do not act in forms or dialogs. Mouse selection switches immediately. The default workspace comes first, followed by alphabetical IDs.
+
+The last selected workspace is remembered. `?workspace=work` selects one directly. Settings, the JSON editor and import/export act on the current workspace; its filename is shown in the editor. General preferences remain shared. Favorites, recent services and configuration caches are separated by user and workspace. Existing favorites and recent history are adopted once by the first default workspace loaded after upgrading.
+
+On load errors, no other configuration is silently substituted. Offline use requires a previously loaded workspace and uses the last known user identity in that browser. Offline storage is not an authentication boundary: use separate browser profiles for separate accounts. A frontend-only deployment without the workspace endpoint keeps single-config behavior.
+
+The recent-services view opened with `_` uses the category timeout and countdown; mouse selection has no timeout. Long-press feedback appears after 150 ms without extending the total hold time.

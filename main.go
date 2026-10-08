@@ -86,6 +86,7 @@ func main() {
 
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", app.handleHealth)
+	mux.HandleFunc("/api/workspaces", app.handleWorkspaces)
 	mux.HandleFunc("/config/", app.handleConfig)
 	mux.HandleFunc("/icons/", app.handleIcons)
 	mux.HandleFunc("/", app.handleStatic)
@@ -261,6 +262,17 @@ func (s *server) handleConfig(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if expected, ok := r.Header["X-Jumpkey-User"]; ok && (len(expected) != 1 || expected[0] != r.Header.Get("Remote-User")) {
+		http.Error(w, "user changed; reload required", http.StatusConflict)
+		return
+	}
+	if id := r.URL.Query().Get("workspace"); id != "" && id != "default" {
+		if r.URL.Path != "/config/services.json" || !workspacePattern.MatchString(id) {
+			http.NotFound(w, r)
+			return
+		}
+		filename = workspaceFilename(id, r.Header.Get("Remote-User"))
+	}
 	target := filepath.Join(s.configDir, filename)
 
 	switch r.Method {

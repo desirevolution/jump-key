@@ -46,6 +46,7 @@ export class JkHelpModal extends LitElement {
 
   _renderKeyboardRows() {
     const shortcuts = [
+      { keys: ['Backspace'], desc: this.t('hkWorkspace') },
       { keys: ['Space'], desc: this.t('hkSearch') },
       { keys: [':'], desc: this.t('hkSearchEngines') },
       { keys: ['?'], desc: this.t('helpOpen') },

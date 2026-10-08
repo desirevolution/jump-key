@@ -1,3 +1,8 @@
+let workspaceContext = null;
+export function setWorkspaceContext(context) { workspaceContext = context; }
+export function configRequest(base = '/', context = workspaceContext) {
+  return { url: `${base}config/services.json${context ? '?workspace=' + encodeURIComponent(context.id) : ''}`, headers: context ? { 'X-JumpKey-User': context.user } : {} };
+}
 import { validateConfig } from './config-validator.js';
 
 // Deterministic legacy IDs let offline browsers migrate the same file consistently.
@@ -35,8 +40,9 @@ export function migrateReferences(config, favorites, history) {
 
 export async function persistConfig(config, { base = '/', fetcher = fetch } = {}) {
   const normalized = migrateConfig(config);
-  const response = await fetcher(`${base}config/services.json`, {
-    method: 'PUT', headers: { 'Content-Type': 'application/json' },
+  const request = configRequest(base);
+  const response = await fetcher(request.url, {
+    method: 'PUT', headers: { ...request.headers, 'Content-Type': 'application/json' },
     body: JSON.stringify(normalized, null, 2),
   });
   if (!response.ok) throw new Error(`Configuration save failed: ${response.status}`);
