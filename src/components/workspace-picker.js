@@ -34,6 +34,11 @@ export class WorkspacePicker extends LitElement {
   close() { this.dispatchEvent(new CustomEvent('close')); }
   handleKeys(e) {
     e.stopPropagation();
+    if (e.key === 'Backspace' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+      e.preventDefault();
+      if (!e.repeat) this.dispatchEvent(new CustomEvent('cycle'));
+      return;
+    }
     if (!['ArrowUp', 'ArrowDown', 'Home', 'End'].includes(e.key)) return;
     e.preventDefault();
     const buttons = [...this.querySelectorAll('[data-workspace]')];

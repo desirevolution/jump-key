@@ -803,11 +803,23 @@ dialog.jk-service-actions::backdrop { background:transparent; backdrop-filter:no
  .jk-workspace-picker-hint { display:block; margin:.6rem .3rem .1rem; padding-top:.65rem; border-top:1px solid var(--jk-border-strong,#334155); font-size:.7rem; color:var(--jk-text-secondary,#94a3b8); }
 }
 @media(max-width:767px) {
- .jk-workspace-logo,.jk-workspace-title { display:none; }
+ .jk-workspace-title { display:flex; min-width:0; }
+ .jk-workspace-title>div { min-width:0; }
+ .jk-workspace-title .font-mono { font-size:1rem; }
+ jk-dashboard-header .jk-workspace-logo { display:flex; }
  .jk-workspace-trigger-mobile { display:flex; flex-direction:column; justify-content:center; gap:.15rem; min-height:48px; min-width:0; padding:.2rem .4rem; }
  .jk-workspace-brand { font-size:.7rem; font-weight:600; color:var(--jk-text-secondary,#94a3b8); }
  .jk-workspace-brand>span { color:var(--jk-accent-bright,#a5b4fc); }
  .jk-workspace-trigger-name { font-size:.9rem; font-weight:600; width:100%; }
  .jk-workspace-trigger-name>span:first-child { max-width:100%; }
  jk-dashboard-header .hidden.sm\:block { display:none; }
+}
+
+/* Same workspace typography across screen sizes; brand is never a menu trigger. */
+.jk-workspace-trigger-desktop { font-family:inherit; font-weight:500; font-size:.8125rem; color:var(--jk-text-secondary,#cbd5e1); max-width:100%; }
+@media(max-width:767px) {
+ .jk-workspace-trigger-desktop { min-height:44px; padding:.3rem .25rem; margin-left:-.25rem; }
+ .jk-workspace-trigger-desktop .jk-workspace-trigger-name { font-size:inherit; font-weight:inherit; }
+ jk-dashboard-header .jk-workspace-logo { width:2rem; height:2rem; }
+ jk-dashboard-header .jk-workspace-logo img { width:1.75rem; height:1.75rem; }
 }

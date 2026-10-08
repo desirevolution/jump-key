@@ -176,7 +176,8 @@ class DashboardApp extends LitElement {
   }
 
   handleKeyDown(e) {
-    const blocked = this.showQuickAdd || this.showConfigModal || this.showSearch || this.showHelp || this.showMobileMenu || this.actionService || this.dialogConfig?.show || this.showWorkspacePicker || e.isComposing || e.target?.closest?.('input, textarea, select, [contenteditable="true"], button, a');
+    const workspaceTrigger = e.target?.closest?.('.jk-workspace-trigger');
+    const blocked = this.showQuickAdd || this.showConfigModal || this.showSearch || this.showHelp || this.showMobileMenu || this.actionService || this.dialogConfig?.show || this.showWorkspacePicker || e.isComposing || (!workspaceTrigger && e.target?.closest?.('input, textarea, select, [contenteditable="true"], button, a'));
     if (!blocked && e.key === 'Backspace' && !e.ctrlKey && !e.altKey && !e.metaKey) {
       e.preventDefault();
       if (!e.repeat && this.workspaces.length > 1) this.cycleWorkspace();
@@ -980,7 +981,7 @@ class DashboardApp extends LitElement {
       ></jk-toast>
 
 
-      ${this.showWorkspacePicker ? html`<jk-workspace-picker .items=${this.workspaces} .active=${this.workspaceId} .anchor=${this.workspaceAnchor} .t=${this.t} @close=${()=>this.showWorkspacePicker=false} @select=${e=>this.switchWorkspace(e.detail)}></jk-workspace-picker>` : ''}
+      ${this.showWorkspacePicker ? html`<jk-workspace-picker .items=${this.workspaces} .active=${this.workspaceId} .anchor=${this.workspaceAnchor} .t=${this.t} @cycle=${async()=>{this.showWorkspacePicker=false;await this.updateComplete;this.cycleWorkspace();}} @close=${()=>this.showWorkspacePicker=false} @select=${e=>this.switchWorkspace(e.detail)}></jk-workspace-picker>` : ''}
       <jk-dashboard-header ?inert=${this.workspaceLoading}
         .workspaceName=${this.workspaces.find(w=>w.id===this.workspaceId)?.name || '—'}
         .hasWorkspaces=${this.workspaces.length > 1}

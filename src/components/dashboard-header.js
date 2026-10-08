@@ -95,9 +95,8 @@ export class JkDashboardHeader extends LitElement {
     this.dispatchEvent(new CustomEvent(eventName, { bubbles: true, composed: true }));
   }
 
-  workspaceButton(mobile = false) {
-    return html`<button type="button" class=${mobile ? 'jk-workspace-trigger jk-workspace-trigger-mobile' : 'jk-workspace-trigger jk-workspace-trigger-desktop'} aria-haspopup="dialog" aria-expanded=${String(Boolean(this.workspaceOpen))} aria-label=${this.t('workspace') + ': ' + this.workspaceName} title=${this.workspaceName} @click=${e=>this.dispatchEvent(new CustomEvent('open-workspaces',{detail:{anchor:e.currentTarget},bubbles:true,composed:true}))}>
-      ${mobile ? html`<span class="jk-workspace-brand">Jump<span>Key</span></span>` : ''}
+  workspaceButton() {
+    return html`<button type="button" class="jk-workspace-trigger jk-workspace-trigger-desktop" aria-haspopup="dialog" aria-expanded=${String(Boolean(this.workspaceOpen))} aria-label=${this.t('workspace') + ': ' + this.workspaceName} title=${this.workspaceName} @click=${e=>this.dispatchEvent(new CustomEvent('open-workspaces',{detail:{anchor:e.currentTarget},bubbles:true,composed:true}))}>
       <span class="jk-workspace-trigger-name"><span>${this.workspaceName}</span><span aria-hidden="true" class="jk-workspace-chevron">⌄</span></span>
     </button>`;
   }
@@ -115,7 +114,6 @@ export class JkDashboardHeader extends LitElement {
             <img src="/jump-key.png" alt="JumpKey" class="${styles.logoImg}" />
           </a>
 
-          ${this.hasWorkspaces ? this.workspaceButton(true) : ''}
           <div class="${styles.titleContainer} ${this.hasWorkspaces ? 'jk-workspace-title' : ''}">
             <div class="flex items-center gap-2">
             <div class="${styles.brandTextWrapper}">
