@@ -7,52 +7,62 @@
         {
           "name": "ChatGPT",
           "url": "https://chatgpt.com",
-          "icon": "sparkles"
+          "icon": "sparkles",
+          "id": "svc-fd157e7230aac209"
         },
         {
           "name": "Claude",
           "url": "https://claude.ai",
-          "icon": "https://cdn.simpleicons.org/anthropic"
+          "icon": "https://cdn.simpleicons.org/anthropic",
+          "id": "svc-c1537298c2f6708a"
         },
         {
           "name": "Gemini",
           "url": "https://gemini.google.com",
-          "icon": "https://cdn.simpleicons.org/googlegemini"
+          "icon": "https://cdn.simpleicons.org/googlegemini",
+          "id": "svc-798cd0f0c4ed1ce2"
         },
         {
           "name": "Perplexity",
           "url": "https://www.perplexity.ai",
-          "icon": "https://cdn.simpleicons.org/perplexity"
+          "icon": "https://cdn.simpleicons.org/perplexity",
+          "id": "svc-3c6c864e2524677"
         },
         {
           "name": "Mistral",
           "url": "https://mistral.ai",
-          "icon": "https://cdn.simpleicons.org/mistralai"
+          "icon": "https://cdn.simpleicons.org/mistralai",
+          "id": "svc-8ce0c841f9ed4ac4"
         },
         {
           "name": "Hugging Face",
           "url": "https://huggingface.co",
-          "icon": "https://cdn.simpleicons.org/huggingface"
+          "icon": "https://cdn.simpleicons.org/huggingface",
+          "id": "svc-6311951b561a82a2"
         },
         {
           "name": "Ollama",
           "url": "https://ollama.com",
-          "icon": "https://cdn.simpleicons.org/ollama"
+          "icon": "https://cdn.simpleicons.org/ollama",
+          "id": "svc-f910f9e2a666887f"
         },
         {
           "name": "OpenRouter",
           "url": "https://openrouter.ai",
-          "icon": "https://cdn.simpleicons.org/openrouter"
+          "icon": "https://cdn.simpleicons.org/openrouter",
+          "id": "svc-85d3e4bc4cc4922c"
         },
         {
           "name": "Replicate",
           "url": "https://replicate.com",
-          "icon": "https://cdn.simpleicons.org/replicate"
+          "icon": "https://cdn.simpleicons.org/replicate",
+          "id": "svc-2c71ad4182c2291"
         },
         {
           "name": "Groq",
           "url": "https://groq.com",
-          "icon": "sparkles"
+          "icon": "sparkles",
+          "id": "svc-6a3c290428ecda7d"
         }
       ]
     },
@@ -63,62 +73,74 @@
         {
           "name": "GitHub",
           "url": "https://github.com",
-          "icon": "iconify:simple-icons:github"
+          "icon": "iconify:simple-icons:github",
+          "id": "svc-e3e2f7159b8816de"
         },
         {
           "name": "GitLab",
           "url": "https://gitlab.com",
-          "icon": "iconify:logos:gitlab"
+          "icon": "iconify:logos:gitlab",
+          "id": "svc-9b647ea3c00bbd4e"
         },
         {
           "name": "Bitbucket",
           "url": "https://bitbucket.org",
-          "icon": "https://cdn.simpleicons.org/bitbucket"
+          "icon": "https://cdn.simpleicons.org/bitbucket",
+          "id": "svc-200921d0fecc9225"
         },
         {
           "name": "Stack Overflow",
           "url": "https://stackoverflow.com",
-          "icon": "https://cdn.simpleicons.org/stackoverflow"
+          "icon": "https://cdn.simpleicons.org/stackoverflow",
+          "id": "svc-802bd0c32e7e59a8"
         },
         {
           "name": "MDN",
           "url": "https://developer.mozilla.org",
-          "icon": "https://cdn.simpleicons.org/mdnwebdocs"
+          "icon": "https://cdn.simpleicons.org/mdnwebdocs",
+          "id": "svc-6c5b9f1a9aacccf0"
         },
         {
           "name": "CodePen",
           "url": "https://codepen.io",
-          "icon": "code"
+          "icon": "code",
+          "id": "svc-a0b996c06a7a8067"
         },
         {
           "name": "JSFiddle",
           "url": "https://jsfiddle.net",
-          "icon": "https://cdn.simpleicons.org/jsfiddle"
+          "icon": "https://cdn.simpleicons.org/jsfiddle",
+          "id": "svc-286d231efb4b7cf0"
         },
         {
           "name": "DevDocs",
           "url": "https://devdocs.io",
-          "icon": "https://cdn.simpleicons.org/readthedocs"
+          "icon": "https://cdn.simpleicons.org/readthedocs",
+          "id": "svc-c9367d3003b261d7"
         },
         {
           "name": "npm",
           "url": "https://npmjs.com",
-          "icon": "https://cdn.simpleicons.org/npm"
+          "icon": "https://cdn.simpleicons.org/npm",
+          "id": "svc-f3ddc9e3796801fd"
         },
         {
           "name": "PyPI",
           "url": "https://pypi.org",
-          "icon": "https://cdn.simpleicons.org/python"
+          "icon": "https://cdn.simpleicons.org/python",
+          "id": "svc-cb0263836541465f"
         },
         {
           "name": "Rust Crates",
           "url": "https://crates.io",
-          "icon": "https://cdn.simpleicons.org/rust"
+          "icon": "https://cdn.simpleicons.org/rust",
+          "id": "svc-75086c8ff7c66539"
         },
         {
           "name": "Go Packages",
           "url": "https://pkg.go.dev",
-          "icon": "https://cdn.simpleicons.org/go"
+          "icon": "https://cdn.simpleicons.org/go",
+          "id": "svc-c03d26245f791c97"
         }
       ]
     },
@@ -129,52 +151,62 @@
         {
           "name": "Docker Hub",
           "url": "https://hub.docker.com",
-          "icon": "iconify:logos:docker-icon"
+          "icon": "iconify:logos:docker-icon",
+          "id": "svc-3f8a2740e70b6e57"
         },
         {
           "name": "Kubernetes",
           "url": "https://kubernetes.io",
-          "icon": "iconify:logos:kubernetes"
+          "icon": "iconify:logos:kubernetes",
+          "id": "svc-7e3ba2a1842ec8da"
         },
         {
           "name": "Portainer",
           "url": "https://www.portainer.io",
-          "icon": "https://cdn.simpleicons.org/portainer"
+          "icon": "https://cdn.simpleicons.org/portainer",
+          "id": "svc-932c3a8ece284b23"
         },
         {
           "name": "AWS",
           "url": "https://aws.amazon.com",
-          "icon": "cloud"
+          "icon": "cloud",
+          "id": "svc-71813c31182ec52b"
         },
         {
           "name": "Azure",
           "url": "https://azure.microsoft.com",
-          "icon": "cloud"
+          "icon": "cloud",
+          "id": "svc-5760b1dc98dc1c99"
         },
         {
           "name": "Google Cloud",
           "url": "https://cloud.google.com",
-          "icon": "iconify:logos:google-cloud"
+          "icon": "iconify:logos:google-cloud",
+          "id": "svc-22f50a4b56bcb75"
         },
         {
           "name": "Cloudflare",
           "url": "https://cloudflare.com",
-          "icon": "https://cdn.simpleicons.org/cloudflare"
+          "icon": "https://cdn.simpleicons.org/cloudflare",
+          "id": "svc-2492a43f0d69c5df"
         },
         {
           "name": "Vercel",
           "url": "https://vercel.com",
-          "icon": "https://cdn.simpleicons.org/vercel"
+          "icon": "https://cdn.simpleicons.org/vercel",
+          "id": "svc-cabe669a902f168b"
         },
         {
           "name": "Netlify",
           "url": "https://netlify.com",
-          "icon": "https://cdn.simpleicons.org/netlify"
+          "icon": "https://cdn.simpleicons.org/netlify",
+          "id": "svc-91fe3047f725129f"
         },
         {
           "name": "DigitalOcean",
           "url": "https://digitalocean.com",
-          "icon": "https://cdn.simpleicons.org/digitalocean"
+          "icon": "https://cdn.simpleicons.org/digitalocean",
+          "id": "svc-68548afd677e55f5"
         }
       ]
     },
@@ -185,52 +217,62 @@
         {
           "name": "Home Assistant",
           "url": "https://www.home-assistant.io",
-          "icon": "iconify:logos:home-assistant"
+          "icon": "iconify:logos:home-assistant",
+          "id": "svc-3aa7b3944d016255"
         },
         {
           "name": "Nextcloud",
           "url": "https://nextcloud.com",
-          "icon": "https://cdn.simpleicons.org/nextcloud"
+          "icon": "https://cdn.simpleicons.org/nextcloud",
+          "id": "svc-cd5fdea80e04b556"
         },
         {
           "name": "Immich",
           "url": "https://immich.app",
-          "icon": "https://cdn.simpleicons.org/immich"
+          "icon": "https://cdn.simpleicons.org/immich",
+          "id": "svc-37c416aa57147344"
         },
         {
           "name": "Jellyfin",
           "url": "https://jellyfin.org",
-          "icon": "https://cdn.simpleicons.org/jellyfin"
+          "icon": "https://cdn.simpleicons.org/jellyfin",
+          "id": "svc-da83251d3426b52d"
         },
         {
           "name": "TrueNAS",
           "url": "https://www.truenas.com",
-          "icon": "https://cdn.simpleicons.org/truenas"
+          "icon": "https://cdn.simpleicons.org/truenas",
+          "id": "svc-34f49fce4436ca27"
         },
         {
           "name": "Proxmox",
           "url": "https://www.proxmox.com",
-          "icon": "https://cdn.simpleicons.org/proxmox"
+          "icon": "https://cdn.simpleicons.org/proxmox",
+          "id": "svc-b63a771a1558b39b"
         },
         {
           "name": "Vaultwarden",
           "url": "https://github.com/dani-garcia/vaultwarden",
-          "icon": "https://cdn.simpleicons.org/bitwarden"
+          "icon": "https://cdn.simpleicons.org/bitwarden",
+          "id": "svc-2398cb17a7ff637b"
         },
         {
           "name": "Pi-hole",
           "url": "https://pi-hole.net",
-          "icon": "https://cdn.simpleicons.org/pihole"
+          "icon": "https://cdn.simpleicons.org/pihole",
+          "id": "svc-139a5a6d440f4800"
         },
         {
           "name": "Grafana",
           "url": "https://grafana.com",
-          "icon": "https://cdn.simpleicons.org/grafana"
+          "icon": "https://cdn.simpleicons.org/grafana",
+          "id": "svc-488676568a5afb1e"
         },
         {
           "name": "Prometheus",
           "url": "https://prometheus.io",
-          "icon": "https://cdn.simpleicons.org/prometheus"
+          "icon": "https://cdn.simpleicons.org/prometheus",
+          "id": "svc-ef1e4ee468bedd89"
         }
       ]
     },
@@ -241,42 +283,50 @@
         {
           "name": "YouTube",
           "url": "https://youtube.com",
-          "icon": "iconify:logos:youtube-icon"
+          "icon": "iconify:logos:youtube-icon",
+          "id": "svc-c7512e6b1709c41b"
         },
         {
           "name": "Netflix",
           "url": "https://netflix.com",
-          "icon": "https://cdn.simpleicons.org/netflix"
+          "icon": "https://cdn.simpleicons.org/netflix",
+          "id": "svc-5e803c81988168e7"
         },
         {
           "name": "Disney+",
           "url": "https://www.disneyplus.com",
-          "icon": "film"
+          "icon": "film",
+          "id": "svc-995df6a6af729751"
         },
         {
           "name": "Prime Video",
           "url": "https://www.primevideo.com",
-          "icon": "film"
+          "icon": "film",
+          "id": "svc-bbb1ead420392544"
         },
         {
           "name": "Spotify",
           "url": "https://spotify.com",
-          "icon": "iconify:logos:spotify-icon"
+          "icon": "iconify:logos:spotify-icon",
+          "id": "svc-c74324fa512197b3"
         },
         {
           "name": "Apple Music",
           "url": "https://music.apple.com",
-          "icon": "https://cdn.simpleicons.org/applemusic"
+          "icon": "https://cdn.simpleicons.org/applemusic",
+          "id": "svc-534fbf897ed1febd"
         },
         {
           "name": "Twitch",
           "url": "https://twitch.tv",
-          "icon": "https://cdn.simpleicons.org/twitch"
+          "icon": "https://cdn.simpleicons.org/twitch",
+          "id": "svc-2345f89b8945465e"
         },
         {
           "name": "Plex",
           "url": "https://plex.tv",
-          "icon": "https://cdn.simpleicons.org/plex"
+          "icon": "https://cdn.simpleicons.org/plex",
+          "id": "svc-dee2e7f9951f6f5e"
         }
       ]
     },
@@ -287,47 +337,56 @@
         {
           "name": "Notion",
           "url": "https://notion.so",
-          "icon": "https://cdn.simpleicons.org/notion"
+          "icon": "https://cdn.simpleicons.org/notion",
+          "id": "svc-aead4542e04ef05a"
         },
         {
           "name": "Obsidian",
           "url": "https://obsidian.md",
-          "icon": "https://cdn.simpleicons.org/obsidian"
+          "icon": "https://cdn.simpleicons.org/obsidian",
+          "id": "svc-31f66da6a00d2d29"
         },
         {
           "name": "Google Drive",
           "url": "https://drive.google.com",
-          "icon": "iconify:logos:google-drive"
+          "icon": "iconify:logos:google-drive",
+          "id": "svc-4b48def3b7d3c655"
         },
         {
           "name": "Google Docs",
           "url": "https://docs.google.com",
-          "icon": "https://cdn.simpleicons.org/googledocs"
+          "icon": "https://cdn.simpleicons.org/googledocs",
+          "id": "svc-22db0fba62456f55"
         },
         {
           "name": "Microsoft 365",
           "url": "https://office.com",
-          "icon": "briefcase"
+          "icon": "briefcase",
+          "id": "svc-25a89de615d1b219"
         },
         {
           "name": "Dropbox",
           "url": "https://dropbox.com",
-          "icon": "iconify:logos:dropbox"
+          "icon": "iconify:logos:dropbox",
+          "id": "svc-69f6658822ae441f"
         },
         {
           "name": "Todoist",
           "url": "https://todoist.com",
-          "icon": "https://cdn.simpleicons.org/todoist"
+          "icon": "https://cdn.simpleicons.org/todoist",
+          "id": "svc-66b45024be41bbd3"
         },
         {
           "name": "Trello",
           "url": "https://trello.com",
-          "icon": "iconify:logos:trello"
+          "icon": "iconify:logos:trello",
+          "id": "svc-d1566b01b73591ad"
         },
         {
           "name": "Jira",
           "url": "https://atlassian.com/software/jira",
-          "icon": "https://cdn.simpleicons.org/jira"
+          "icon": "https://cdn.simpleicons.org/jira",
+          "id": "svc-3f19cbe96b1e9b6a"
         }
       ]
     },
@@ -338,52 +397,62 @@
         {
           "name": "Can I Use",
           "url": "https://caniuse.com",
-          "icon": "https://www.google.com/s2/favicons?sz=128&domain=caniuse.com"
+          "icon": "https://www.google.com/s2/favicons?sz=128&domain=caniuse.com",
+          "id": "svc-f0e2fd2332b656b2"
         },
         {
           "name": "JSON Crack",
           "url": "https://jsoncrack.com",
-          "icon": "https://www.google.com/s2/favicons?sz=128&domain=jsoncrack.com"
+          "icon": "https://www.google.com/s2/favicons?sz=128&domain=jsoncrack.com",
+          "id": "svc-b9ab028518aee69a"
         },
         {
           "name": "JSON Formatter",
           "url": "https://jsonformatter.org",
-          "icon": "https://www.google.com/s2/favicons?sz=128&domain=jsonformatter.org"
+          "icon": "https://www.google.com/s2/favicons?sz=128&domain=jsonformatter.org",
+          "id": "svc-45c5a05608d08235"
         },
         {
           "name": "Regex101",
           "url": "https://regex101.com",
-          "icon": "https://www.google.com/s2/favicons?sz=128&domain=regex101.com"
+          "icon": "https://www.google.com/s2/favicons?sz=128&domain=regex101.com",
+          "id": "svc-e1eb35a4dbccfdf0"
         },
         {
           "name": "CyberChef",
           "url": "https://gchq.github.io/CyberChef/",
-          "icon": "https://www.google.com/s2/favicons?sz=128&domain=gchq.github.io"
+          "icon": "https://www.google.com/s2/favicons?sz=128&domain=gchq.github.io",
+          "id": "svc-1520665448f27c11"
         },
         {
           "name": "Excalidraw",
           "url": "https://excalidraw.com",
-          "icon": "https://cdn.simpleicons.org/excalidraw"
+          "icon": "https://cdn.simpleicons.org/excalidraw",
+          "id": "svc-d4b368dc261fc70a"
         },
         {
           "name": "Draw.io",
           "url": "https://app.diagrams.net",
-          "icon": "https://www.google.com/s2/favicons?sz=128&domain=app.diagrams.net"
+          "icon": "https://www.google.com/s2/favicons?sz=128&domain=app.diagrams.net",
+          "id": "svc-6162a4574953d73"
         },
         {
           "name": "TinyPNG",
           "url": "https://tinypng.com",
-          "icon": "lucide:image-down"
+          "icon": "lucide:image-down",
+          "id": "svc-e99f2f9146fd3a0"
         },
         {
           "name": "Speedtest",
           "url": "https://speedtest.net",
-          "icon": "https://cdn.simpleicons.org/speedtest"
+          "icon": "https://cdn.simpleicons.org/speedtest",
+          "id": "svc-d60a3eb2dde1e0e"
         },
         {
           "name": "Shields.io",
           "url": "https://shields.io",
-          "icon": "https://www.google.com/s2/favicons?sz=128&domain=shields.io"
+          "icon": "https://www.google.com/s2/favicons?sz=128&domain=shields.io",
+          "id": "svc-65fed92b337e5415"
         }
       ]
     }

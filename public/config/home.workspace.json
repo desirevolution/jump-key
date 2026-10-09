@@ -1,0 +1,164 @@
+{
+  "categories": [
+    {
+      "category": "Media",
+      "categoryKey": "m",
+      "icon": "lucide:play",
+      "services": [
+        {
+          "id": "demo-home-m-y",
+          "name": "YouTube",
+          "key": "y",
+          "url": "https://www.youtube.com/",
+          "icon": "iconify:simple-icons:youtube"
+        },
+        {
+          "id": "demo-home-m-s",
+          "name": "Spotify",
+          "key": "s",
+          "url": "https://open.spotify.com/",
+          "icon": "iconify:simple-icons:spotify"
+        },
+        {
+          "id": "demo-home-m-j",
+          "name": "Jellyfin",
+          "key": "j",
+          "url": "https://jellyfin.org/",
+          "icon": "iconify:simple-icons:jellyfin"
+        },
+        {
+          "id": "demo-home-m-a",
+          "name": "Internet Archive",
+          "key": "a",
+          "url": "https://archive.org/",
+          "icon": "lucide:archive"
+        }
+      ]
+    },
+    {
+      "category": "Smart Home",
+      "categoryKey": "h",
+      "icon": "lucide:house",
+      "services": [
+        {
+          "id": "demo-home-h-h",
+          "name": "Home Assistant",
+          "key": "h",
+          "url": "https://www.home-assistant.io/",
+          "icon": "iconify:simple-icons:homeassistant"
+        },
+        {
+          "id": "demo-home-h-n",
+          "name": "Node-RED",
+          "key": "n",
+          "url": "https://nodered.org/",
+          "icon": "iconify:simple-icons:nodered"
+        },
+        {
+          "id": "demo-home-h-z",
+          "name": "Zigbee2MQTT",
+          "key": "z",
+          "url": "https://www.zigbee2mqtt.io/",
+          "icon": "lucide:radio"
+        },
+        {
+          "id": "demo-home-h-e",
+          "name": "ESPHome",
+          "key": "e",
+          "url": "https://esphome.io/",
+          "icon": "iconify:simple-icons:esphome"
+        }
+      ]
+    },
+    {
+      "category": "Everyday",
+      "categoryKey": "e",
+      "icon": "lucide:sun",
+      "services": [
+        {
+          "id": "demo-home-e-o",
+          "name": "OpenStreetMap",
+          "key": "o",
+          "url": "https://www.openstreetmap.org/",
+          "icon": "iconify:simple-icons:openstreetmap"
+        },
+        {
+          "id": "demo-home-e-w",
+          "name": "Wikipedia",
+          "key": "w",
+          "url": "https://en.wikipedia.org/",
+          "icon": "iconify:simple-icons:wikipedia"
+        },
+        {
+          "id": "demo-home-e-v",
+          "name": "Wikivoyage",
+          "key": "v",
+          "url": "https://en.wikivoyage.org/",
+          "icon": "lucide:compass"
+        },
+        {
+          "id": "demo-home-e-l",
+          "name": "Open Library",
+          "key": "l",
+          "url": "https://openlibrary.org/",
+          "icon": "lucide:library"
+        }
+      ]
+    },
+    {
+      "category": "Self-hosted",
+      "categoryKey": "s",
+      "icon": "lucide:server",
+      "services": [
+        {
+          "id": "demo-home-s-n",
+          "name": "Nextcloud",
+          "key": "n",
+          "url": "https://nextcloud.com/",
+          "icon": "iconify:simple-icons:nextcloud"
+        },
+        {
+          "id": "demo-home-s-i",
+          "name": "Immich",
+          "key": "i",
+          "url": "https://immich.app/",
+          "icon": "iconify:simple-icons:immich"
+        },
+        {
+          "id": "demo-home-s-p",
+          "name": "Paperless-ngx",
+          "key": "p",
+          "url": "https://docs.paperless-ngx.com/",
+          "icon": "lucide:files"
+        },
+        {
+          "id": "demo-home-s-m",
+          "name": "Mealie",
+          "key": "m",
+          "url": "https://mealie.io/",
+          "icon": "lucide:utensils"
+        }
+      ]
+    }
+  ],
+  "searchEngines": [
+    {
+      "name": "DuckDuckGo",
+      "prefix": "d",
+      "url": "https://duckduckgo.com/?q=%s",
+      "icon": "lucide:search"
+    },
+    {
+      "name": "Wikipedia",
+      "prefix": "w",
+      "url": "https://en.wikipedia.org/w/index.php?search=%s",
+      "icon": "iconify:simple-icons:wikipedia"
+    },
+    {
+      "name": "YouTube",
+      "prefix": "yt",
+      "url": "https://www.youtube.com/results?search_query=%s",
+      "icon": "iconify:simple-icons:youtube"
+    }
+  ]
+}
