@@ -2,13 +2,17 @@ import { html, LitElement } from 'lit';
 import { createBookmarklet } from '../utils/bookmarklet.js';
 import { DEFAULT_TIMINGS, normalizeTimings } from '../utils/preferences.js';
 export class ConfigGeneral extends LitElement {
-  static properties = { preferences: {}, t: {} };
+  static properties = { separateWorkspacePreferences: {}, preferences: {}, t: {} };
   createRenderRoot() { return this; }
   change(key, value) {
     this.dispatchEvent(new CustomEvent('preferences-change', { detail: normalizeTimings({ ...this.preferences, [key]: value }), bubbles: true, composed: true }));
   }
   render() {
     return html`<div class="space-y-6 text-slate-200">
+      <section class="rounded-2xl border border-slate-700/60 p-5 space-y-3">
+        <label class="flex items-center gap-3"><input type="checkbox" .checked=${Boolean(this.separateWorkspacePreferences)} @change=${e=>this.dispatchEvent(new CustomEvent('workspace-preferences-mode',{detail:e.target.checked,bubbles:true,composed:true}))}>${this.t('separateWorkspacePreferences')}</label>
+        <p class="text-sm text-slate-400">${this.t(this.separateWorkspacePreferences ? 'workspacePreferencesOn' : 'workspacePreferencesOff')}</p>
+      </section>
       <p class="text-sm text-slate-400">${this.t('localTimingHint')}</p>
       ${[['categoryTimeout',30,1], ['launchDelay',5,0.1]].map(([key,max,step]) => html`
         <section class="rounded-2xl border border-slate-700/60 p-5 space-y-3">

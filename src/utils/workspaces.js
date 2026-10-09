@@ -1,4 +1,4 @@
-import { loadWorkspacePreferences } from './workspace-preferences.js';
+import { loadWorkspacePreferences, effectivePreferencesId } from './workspace-preferences.js';
 import { loadTheme, applyTheme } from './theme.js';
 import { readJsonStorage, writeJsonStorage } from './storage.js';
 import { configRequest, setWorkspaceContext, migrateConfig } from './configuration.js';
@@ -55,9 +55,10 @@ export async function switchWorkspace(app,id,initial=false) {
    }
    writeJsonStorage(marker,true);
   }
-  const settings = loadWorkspacePreferences(app.workspaceUser,id,{
+  const settings = loadWorkspacePreferences(app.workspaceUser,effectivePreferencesId(id),{
     theme:loadTheme(), gridView:readJsonStorage('dashboard_grid_view',false), timings:readJsonStorage('dashboard_timings',{})
   });
+  keys.preferences=workspaceStorage(app.workspaceUser,effectivePreferencesId(id)).preferences;
   app.storageKeys=keys;
   app.theme=applyTheme(settings.theme);
   app.isGridView=settings.gridView;

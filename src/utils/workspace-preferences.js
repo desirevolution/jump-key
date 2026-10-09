@@ -16,3 +16,7 @@ export function loadWorkspacePreferences(user, id, legacy) {
   if (!existing) writeJsonStorage(key(id), value);
   return value;
 }
+
+export const WORKSPACE_PREFERENCES_MODE = 'jumpkey-workspace-preferences-enabled';
+export function workspacePreferencesEnabled() { return readJsonStorage(WORKSPACE_PREFERENCES_MODE, false) === true; }
+export function effectivePreferencesId(id, enabled = workspacePreferencesEnabled()) { return enabled ? id : 'default'; }

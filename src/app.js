@@ -1,4 +1,5 @@
-import { initializeWorkspaces, switchWorkspace } from './utils/workspaces.js';
+import { loadWorkspacePreferences, workspacePreferencesEnabled, effectivePreferencesId, WORKSPACE_PREFERENCES_MODE } from './utils/workspace-preferences.js';
+import { initializeWorkspaces, switchWorkspace, workspaceStorage } from './utils/workspaces.js';
 import './components/workspace-picker.js';
 import { normalizeTimings } from './utils/preferences.js';
 import './components/service-actions.js';
@@ -84,6 +85,7 @@ class DashboardApp extends LitElement {
     workspaceId: {},
     workspaceLoading: {},
     showWorkspacePicker: {},
+    separateWorkspacePreferences: { type: Boolean },
     preferences: { type: Object },
     categoryCountdown: { type: Number },
     favorites: { type: Object },
@@ -121,6 +123,7 @@ class DashboardApp extends LitElement {
     this.mobileMenuMode = 'menu';
     this.isInvalidInput = false;
     this.isValidInput = false;
+    this.separateWorkspacePreferences=workspacePreferencesEnabled();
     this.workspaces=[];
     this.workspaceId='default';
     this.storageKeys={...STORAGE_KEYS};
@@ -228,6 +231,21 @@ class DashboardApp extends LitElement {
     if(confirmed) this.switchWorkspace(target.id);
   }
   switchWorkspace(id) { this.showWorkspacePicker=false; return switchWorkspace(this,id); }
+
+  setWorkspacePreferencesMode(enabled) {
+    this.saveLocalPreferences();
+    this.separateWorkspacePreferences=enabled;
+    writeJsonStorage(WORKSPACE_PREFERENCES_MODE,enabled);
+    if (!this.storageKeys.preferences) return;
+    const id=effectivePreferencesId(this.workspaceId,enabled);
+    const settings=loadWorkspacePreferences(this.workspaceUser,id,{theme:this.theme,gridView:this.isGridView,timings:this.preferences});
+    this.storageKeys={...this.storageKeys,preferences:workspaceStorage(this.workspaceUser,id).preferences};
+    this.theme=applyTheme(settings.theme);
+    this.isGridView=settings.gridView;
+    this.preferences=settings.timings;
+    this.cancelInputResetTimer();
+    this.cancelPendingAction();
+  }
 
   saveLocalPreferences() {
     if (this.storageKeys.preferences) {
@@ -830,6 +848,8 @@ class DashboardApp extends LitElement {
         .workspaceLabel=${this.workspaceItems.find(w=>w.id===this.workspaceId)?.name || ''}
         .workspaceFile=${this.workspaces.find(w=>w.id===this.workspaceId)?.file || ''}
         .show=${this.showConfigModal}
+        .separateWorkspacePreferences=${this.separateWorkspacePreferences}
+        @workspace-preferences-mode=${e=>this.setWorkspacePreferencesMode(e.detail)}
         .preferences=${this.preferences}
         @preferences-change=${e => { this.preferences=e.detail; this.saveLocalPreferences(); this.cancelInputResetTimer(); }}
         .configuration=${this.configuration}

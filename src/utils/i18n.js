@@ -1,5 +1,9 @@
 export const translations = {
   de: {
+    separateWorkspacePreferences: "Eigene Einstellungen pro Workspace",
+    workspacePreferencesOn: "Theme, Ansicht und Verzögerungen gelten für diesen Workspace. Beim ersten Verwenden werden die Einstellungen einmalig von Standard übernommen.",
+    workspacePreferencesOff: "Alle Workspaces verwenden die Einstellungen von Standard. Änderungen gelten gemeinsam. Individuelle Einstellungen bleiben für späteres Einschalten erhalten.",
+
     workspaceDefault: "Standard",
     workspaceNext: "Nächster Workspace",
     workspace: "Workspace",
@@ -10,7 +14,7 @@ export const translations = {
     categoryTimeout: "Kategorie automatisch verlassen",
     launchDelay: "Startverzögerung bei Tastaturbedienung",
     timingSeconds: "Sekunden",
-    localTimingHint: "Gilt nur für Tastaturbedienung. Aus = 0. Änderungen werden sofort für diesen Workspace in diesem Browser gespeichert. Neue Workspaces übernehmen die Einstellungen einmalig von Standard.",
+    localTimingHint: "Gilt nur für Tastaturbedienung. Aus = 0. Änderungen werden sofort in diesem Browser gespeichert.",
 
     quickIconHelp: "Icon-Hilfe (Lucide / Iconify)",
     editSelectCategory: "Bearbeiten: Kategorie wählen (Esc: abbrechen)",
@@ -269,6 +273,10 @@ export const translations = {
     tabEditorInvalid: 'Ungültig',
   },
   fr: {
+    separateWorkspacePreferences: "Réglages propres à chaque espace",
+    workspacePreferencesOn: "Le thème, la vue et les délais concernent cet espace. Au premier usage, les réglages sont copiés une fois depuis l’espace par défaut.",
+    workspacePreferencesOff: "Tous les espaces utilisent les réglages par défaut. Les modifications sont communes. Les réglages individuels sont conservés pour une réactivation.",
+
     workspaceDefault: "Par défaut",
     workspaceNext: "Espace suivant",
     workspace: "Espace de travail",
@@ -279,7 +287,7 @@ export const translations = {
     categoryTimeout: "Quitter automatiquement la catégorie",
     launchDelay: "Délai d’ouverture au clavier",
     timingSeconds: "Secondes",
-    localTimingHint: "Uniquement pour le clavier. Désactivé = 0. Les modifications sont enregistrées immédiatement pour cet espace dans ce navigateur. Les nouveaux espaces copient une fois les réglages de l’espace par défaut.",
+    localTimingHint: "Uniquement pour le clavier. Désactivé = 0. Les modifications sont enregistrées immédiatement dans ce navigateur.",
 
     quickIconHelp: "Aide sur les icônes (Lucide / Iconify)",
     editSelectCategory: "Modifier : choisir une catégorie (Échap : annuler)",
@@ -522,6 +530,10 @@ export const translations = {
     tabEditorInvalid: 'Invalide',
   },
   es: {
+    separateWorkspacePreferences: "Ajustes propios por espacio",
+    workspacePreferencesOn: "El tema, la vista y los retardos se aplican a este espacio. Al usarlo por primera vez, se copian los ajustes del espacio predeterminado.",
+    workspacePreferencesOff: "Todos los espacios usan los ajustes predeterminados. Los cambios se aplican a todos. Los ajustes individuales se conservan para reactivarlos.",
+
     workspaceDefault: "Predeterminado",
     workspaceNext: "Siguiente espacio",
     workspace: "Espacio de trabajo",
@@ -532,7 +544,7 @@ export const translations = {
     categoryTimeout: "Salir automáticamente de la categoría",
     launchDelay: "Retardo de apertura con teclado",
     timingSeconds: "Segundos",
-    localTimingHint: "Solo para el teclado. Desactivado = 0. Los cambios se guardan inmediatamente para este espacio en este navegador. Los nuevos espacios copian una vez los ajustes del espacio predeterminado.",
+    localTimingHint: "Solo para el teclado. Desactivado = 0. Los cambios se guardan inmediatamente en este navegador.",
 
     quickIconHelp: "Ayuda de iconos (Lucide / Iconify)",
     editSelectCategory: "Editar: elegir categoría (Esc: cancelar)",
@@ -771,6 +783,10 @@ export const translations = {
     tabEditorInvalid: 'No válido',
   },
   en: {
+    separateWorkspacePreferences: "Separate settings per workspace",
+    workspacePreferencesOn: "Theme, view and delays apply to this workspace. On first use, settings are copied once from Default.",
+    workspacePreferencesOff: "All workspaces use the Default settings. Changes apply to all. Individual settings are preserved for re-enabling.",
+
     workspaceDefault: "Default",
     workspaceNext: "Next workspace",
     workspace: "Workspace",
@@ -781,7 +797,7 @@ export const translations = {
     categoryTimeout: "Automatically leave category",
     launchDelay: "Keyboard launch delay",
     timingSeconds: "Seconds",
-    localTimingHint: "Applies only to keyboard actions. Off = 0. Changes are saved immediately for this workspace in this browser. New workspaces copy the Default settings once.",
+    localTimingHint: "Applies only to keyboard actions. Off = 0. Changes are saved immediately in this browser.",
 
     quickIconHelp: "Icon help (Lucide / Iconify)",
     editSelectCategory: "Edit: choose category (Esc: cancel)",

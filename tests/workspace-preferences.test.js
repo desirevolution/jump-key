@@ -15,3 +15,17 @@ test('workspace preferences seed default first and remain independent after copy
  assert.equal(loadWorkspacePreferences('bob','work',{gridView:false}).gridView,false);
  delete globalThis.localStorage;
 });
+
+test('workspace preference mode defaults off and preserves individual settings', async () => {
+ const { effectivePreferencesId, WORKSPACE_PREFERENCES_MODE }=await import('../src/utils/workspace-preferences.js');
+ const values=new Map();
+ globalThis.localStorage={getItem:k=>values.get(k)??null,setItem:(k,v)=>values.set(k,v)};
+ assert.equal(effectivePreferencesId('work'),'default');
+ values.set(WORKSPACE_PREFERENCES_MODE,'true');
+ assert.equal(effectivePreferencesId('work'),'work');
+ const personal=loadWorkspacePreferences('a','work',{gridView:true});
+ values.set(WORKSPACE_PREFERENCES_MODE,'false');
+ assert.equal(effectivePreferencesId('work'),'default');
+ assert.deepEqual(loadWorkspacePreferences('a','work',{}),personal);
+ delete globalThis.localStorage;
+});

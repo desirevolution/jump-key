@@ -40,6 +40,7 @@ export class JkConfigModal extends LitElement {
   }
 
   static properties = {
+    separateWorkspacePreferences: {},
     workspaceLabel: {},
     workspaceFile: {},
     preferences: { type: Object },
@@ -179,7 +180,7 @@ export class JkConfigModal extends LitElement {
   _renderActiveTabContent() {
     switch (this._activeTab) {
       case 'general':
-        return html`<jk-config-general .preferences=${this.preferences} .t=${this.t}></jk-config-general>`;
+        return html`<jk-config-general .separateWorkspacePreferences=${this.separateWorkspacePreferences} .preferences=${this.preferences} .t=${this.t}></jk-config-general>`;
       case 'appearance':
         return html`
           <jk-config-appearance
