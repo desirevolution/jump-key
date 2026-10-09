@@ -35,6 +35,7 @@ import {
   Upload,
   X,
   ChevronRight,
+  ChevronDown,
 } from '@lucide/icons';
 
 export const uiIcons = {
@@ -74,4 +75,5 @@ export const uiIcons = {
   upload: Upload,
   x: X,
   'chevron-right': ChevronRight,
+  'chevron-down': ChevronDown,
 };

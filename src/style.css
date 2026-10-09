@@ -815,3 +815,26 @@ dialog.jk-service-actions::backdrop { background:transparent; backdrop-filter:no
  .jk-workspace-trigger-mobile .jk-workspace-trigger-name>span:first-child { max-width:none; }
  jk-dashboard-header .hidden.sm\:block { display:none; }
 }
+
+/* Give the workspace switcher its own button surface and responsive row. */
+.jk-workspace-trigger { min-height:44px; padding:.6rem .85rem; margin:0; font-size:.875rem; font-weight:600; color:var(--jk-text-primary); background:var(--jk-bg-surface-elevated); border:1px solid var(--jk-border-strong); border-radius:.75rem; transition:background-color 150ms,border-color 150ms; }
+.jk-workspace-trigger:hover,.jk-workspace-trigger[aria-expanded="true"] { background:var(--jk-bg-surface-hover); border-color:var(--jk-accent); }
+.jk-workspace-chevron { transition:transform 150ms; }
+.jk-workspace-trigger[aria-expanded="true"] .jk-workspace-chevron { transform:rotate(180deg); }
+@media(min-width:1280px) {
+ .jk-workspace-title { flex-direction:row; align-items:center; gap:1.25rem; }
+ .jk-workspace-trigger-desktop { min-width:8rem; max-width:16rem; }
+ .jk-workspace-trigger-desktop .jk-workspace-trigger-name { width:100%; justify-content:space-between; }
+ .jk-workspace-title>div { flex-shrink:0; }
+}
+@media(min-width:768px) and (max-width:1279px) {
+ .jk-dashboard-header-shell { display:grid; grid-template-columns:minmax(0,1fr) auto; }
+ .jk-workspace-trigger-desktop { display:none; }
+ .jk-workspace-trigger-mobile { display:flex; grid-column:1 / -1; width:100%; }
+ .jk-workspace-trigger-mobile .jk-workspace-trigger-name { width:100%; justify-content:space-between; }
+ .jk-workspace-trigger-mobile .jk-workspace-trigger-name>span:first-child { max-width:none; }
+ jk-dashboard-header .hidden.sm\:block { display:none; }
+}
+@media(prefers-reduced-motion:reduce) {
+ .jk-workspace-trigger,.jk-workspace-chevron { transition:none; }
+}

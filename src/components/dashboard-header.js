@@ -97,7 +97,7 @@ export class JkDashboardHeader extends LitElement {
 
   workspaceButton(mobile = false) {
     return html`<button type="button" class=${mobile ? 'jk-workspace-trigger jk-workspace-trigger-mobile' : 'jk-workspace-trigger jk-workspace-trigger-desktop'} aria-haspopup="dialog" aria-expanded=${String(Boolean(this.workspaceOpen))} aria-label=${this.t('workspace') + ': ' + this.workspaceName} title=${this.workspaceName} @click=${e=>this.dispatchEvent(new CustomEvent('open-workspaces',{detail:{anchor:e.currentTarget},bubbles:true,composed:true}))}>
-      <span class="jk-workspace-trigger-name"><span>${this.workspaceName}</span><span aria-hidden="true" class="jk-workspace-chevron">⌄</span></span>
+      <span class="jk-workspace-trigger-name"><span>${this.workspaceName}</span><jk-icon icon="ui:chevron-down" aria-hidden="true" class="jk-workspace-chevron size-4"></jk-icon></span>
     </button>`;
   }
 
