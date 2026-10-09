@@ -158,7 +158,6 @@ export class QuickAdd extends LitElement {
           <p class="flex flex-wrap gap-4 text-sm"><a class="underline" href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer">${this.t('browseLucide')}</a><a class="underline" href="https://icon-sets.iconify.design/" target="_blank" rel="noopener noreferrer">${this.t('browseIconify')}</a></p>
           </details>
         </fieldset>
-        <p class="hidden md:block text-xs text-slate-400 my-3">${this.t('quickKeyboardHint')}</p>
         ${this.error || (this.validationError && !quickErrorField(this.validationError, this.category)) ? html`<p role="status" class="jk-status-danger">${this.error || this.t(this.validationError)}</p>` : ''}
         <footer class="jk-form-footer">
         ${this.serviceId ? html`<button type="button" data-focus="delete" class="jk-btn jk-btn-danger jk-delete-service" ?disabled=${this.saving} @click=${()=>this.askConfirmation('delete')}><jk-icon icon="ui:trash-2" class="size-4" aria-hidden="true"></jk-icon>${this.t('deleteService')}</button>` : ''}

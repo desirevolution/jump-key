@@ -1,9 +1,11 @@
+import { loadWorkspacePreferences } from './workspace-preferences.js';
+import { loadTheme, applyTheme } from './theme.js';
 import { readJsonStorage, writeJsonStorage } from './storage.js';
 import { configRequest, setWorkspaceContext, migrateConfig } from './configuration.js';
 const base = import.meta.env.BASE_URL;
 export function workspaceStorage(user,id) {
  const scope = `jumpkey:${encodeURIComponent(user)}:${id}:`;
- return { favorites:scope+'favorites', continueHistory:scope+'history', configCache:scope+'config' };
+ return { favorites:scope+'favorites', continueHistory:scope+'history', configCache:scope+'config', preferences:scope+'preferences' };
 }
 export async function initializeWorkspaces(app) {
  let data;
@@ -53,7 +55,13 @@ export async function switchWorkspace(app,id,initial=false) {
    }
    writeJsonStorage(marker,true);
   }
+  const settings = loadWorkspacePreferences(app.workspaceUser,id,{
+    theme:loadTheme(), gridView:readJsonStorage('dashboard_grid_view',false), timings:readJsonStorage('dashboard_timings',{})
+  });
   app.storageKeys=keys;
+  app.theme=applyTheme(settings.theme);
+  app.isGridView=settings.gridView;
+  app.preferences=settings.timings;
   app.favorites=readJsonStorage(keys.favorites,{});
   app.continueHistory=readJsonStorage(keys.continueHistory,[]);
   app.workspaceId=id;

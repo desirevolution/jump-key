@@ -53,13 +53,11 @@ export class WorkspacePicker extends LitElement {
       if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom) this.close();
     }}>
       <div class="jk-workspace-sheet-handle" aria-hidden="true"></div>
-      <header class="jk-workspace-picker-header"><strong>${this.t('workspace')}</strong><jk-icon-button icon="ui:x" .label=${this.t('close')} @click=${this.close}></jk-icon-button></header>
+      <header class="jk-workspace-picker-header jk-menu-mobile-header"><strong>${this.t('workspace')}</strong><jk-icon-button icon="ui:x" .label=${this.t('close')} @click=${this.close}></jk-icon-button></header>
       <div class="jk-workspace-options">${this.items.map(w=>html`<button type="button" data-workspace class="jk-workspace-option" aria-current=${String(w.id===this.active)} @click=${()=>w.id===this.active ? this.close() : this.dispatchEvent(new CustomEvent('select',{detail:w.id}))}>
-        <span class="jk-workspace-option-avatar" aria-hidden="true">${w.name.slice(0,1).toUpperCase()}</span>
         <span class="jk-workspace-option-name">${w.name}</span>
         <span class="jk-workspace-option-check" aria-hidden="true">${w.id===this.active?'✓':''}</span>
       </button>`)}</div>
-      <footer class="jk-workspace-picker-hint"><kbd>Backspace</kbd> · ${this.t('workspaceNext')}</footer>
     </dialog>`;
   }
 }

@@ -838,3 +838,5 @@ dialog.jk-service-actions::backdrop { background:transparent; backdrop-filter:no
 @media(prefers-reduced-motion:reduce) {
  .jk-workspace-trigger,.jk-workspace-chevron { transition:none; }
 }
+
+@media(min-width:768px) { .jk-workspace-picker .jk-menu-mobile-header, .jk-service-actions .jk-menu-mobile-header { display:none; } }

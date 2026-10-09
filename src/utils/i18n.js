@@ -10,7 +10,7 @@ export const translations = {
     categoryTimeout: "Kategorie automatisch verlassen",
     launchDelay: "Startverzögerung bei Tastaturbedienung",
     timingSeconds: "Sekunden",
-    localTimingHint: "Gilt nur für Tastaturbedienung. Aus = 0. Änderungen werden sofort in diesem Browser gespeichert.",
+    localTimingHint: "Gilt nur für Tastaturbedienung. Aus = 0. Änderungen werden sofort für diesen Workspace in diesem Browser gespeichert. Neue Workspaces übernehmen die Einstellungen einmalig von Standard.",
 
     quickIconHelp: "Icon-Hilfe (Lucide / Iconify)",
     editSelectCategory: "Bearbeiten: Kategorie wählen (Esc: abbrechen)",
@@ -19,7 +19,6 @@ export const translations = {
     quickIconHint: "Leer lassen für das Standard-Icon. Lucide: lucide:house. Iconify: iconify:mdi:home (iconify: vor den kopierten Namen setzen).",
     browseLucide: "Lucide durchsuchen ↗",
     browseIconify: "Iconify durchsuchen ↗",
-    quickKeyboardHint: "Ctrl/Cmd+Enter: speichern · Esc: zurück / schließen",
 
     helpFormValidation: "Ungespeicherte Eingaben werden vor dem Schließen abgefragt. Validierungsfehler stehen direkt am betroffenen Feld.",
     quickValidationFailed: "Die Eingaben konnten nicht geprüft werden. Bitte den Dialog erneut öffnen.",
@@ -280,7 +279,7 @@ export const translations = {
     categoryTimeout: "Quitter automatiquement la catégorie",
     launchDelay: "Délai d’ouverture au clavier",
     timingSeconds: "Secondes",
-    localTimingHint: "Uniquement pour le clavier. Désactivé = 0. Les modifications sont enregistrées immédiatement dans ce navigateur.",
+    localTimingHint: "Uniquement pour le clavier. Désactivé = 0. Les modifications sont enregistrées immédiatement pour cet espace dans ce navigateur. Les nouveaux espaces copient une fois les réglages de l’espace par défaut.",
 
     quickIconHelp: "Aide sur les icônes (Lucide / Iconify)",
     editSelectCategory: "Modifier : choisir une catégorie (Échap : annuler)",
@@ -289,7 +288,6 @@ export const translations = {
     quickIconHint: "Laisser vide pour l’icône par défaut. Lucide : lucide:house. Iconify : iconify:mdi:home (ajouter iconify: devant le nom copié).",
     browseLucide: "Parcourir Lucide ↗",
     browseIconify: "Parcourir Iconify ↗",
-    quickKeyboardHint: "Ctrl/Cmd+Entrée : enregistrer · Échap : retour / fermer",
 
     helpFormValidation: "Fermer avec des modifications non enregistrées demande confirmation. Les erreurs apparaissent près du champ concerné.",
     quickValidationFailed: "Impossible de vérifier le formulaire. Rouvrez la fenêtre.",
@@ -534,7 +532,7 @@ export const translations = {
     categoryTimeout: "Salir automáticamente de la categoría",
     launchDelay: "Retardo de apertura con teclado",
     timingSeconds: "Segundos",
-    localTimingHint: "Solo para el teclado. Desactivado = 0. Los cambios se guardan inmediatamente en este navegador.",
+    localTimingHint: "Solo para el teclado. Desactivado = 0. Los cambios se guardan inmediatamente para este espacio en este navegador. Los nuevos espacios copian una vez los ajustes del espacio predeterminado.",
 
     quickIconHelp: "Ayuda de iconos (Lucide / Iconify)",
     editSelectCategory: "Editar: elegir categoría (Esc: cancelar)",
@@ -543,7 +541,6 @@ export const translations = {
     quickIconHint: "Dejar vacío para el icono predeterminado. Lucide: lucide:house. Iconify: iconify:mdi:home (añadir iconify: delante del nombre copiado).",
     browseLucide: "Explorar Lucide ↗",
     browseIconify: "Explorar Iconify ↗",
-    quickKeyboardHint: "Ctrl/Cmd+Enter: guardar · Esc: volver / cerrar",
 
     helpFormValidation: "Cerrar con cambios sin guardar requiere confirmación. Los errores aparecen junto al campo correspondiente.",
     quickValidationFailed: "No se pudo validar el formulario. Vuelve a abrir el diálogo.",
@@ -784,7 +781,7 @@ export const translations = {
     categoryTimeout: "Automatically leave category",
     launchDelay: "Keyboard launch delay",
     timingSeconds: "Seconds",
-    localTimingHint: "Applies only to keyboard actions. Off = 0. Changes are saved immediately in this browser.",
+    localTimingHint: "Applies only to keyboard actions. Off = 0. Changes are saved immediately for this workspace in this browser. New workspaces copy the Default settings once.",
 
     quickIconHelp: "Icon help (Lucide / Iconify)",
     editSelectCategory: "Edit: choose category (Esc: cancel)",
@@ -793,7 +790,6 @@ export const translations = {
     quickIconHint: "Leave empty for the default icon. Lucide: lucide:house. Iconify: iconify:mdi:home (add iconify: before the copied name).",
     browseLucide: "Browse Lucide ↗",
     browseIconify: "Browse Iconify ↗",
-    quickKeyboardHint: "Ctrl/Cmd+Enter: save · Esc: back / close",
 
     helpFormValidation: "Closing with unsaved input asks for confirmation. Validation errors appear next to the affected field.",
     quickValidationFailed: "Could not validate the form. Please reopen the dialog.",

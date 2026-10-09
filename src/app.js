@@ -19,7 +19,7 @@ import {
 } from './utils/shortcuts.js';
 import { readJsonStorage, writeJsonStorage } from './utils/storage.js';
 import { handleGlobalKeyDown } from './utils/keyboard/index.js';
-import { loadTheme, saveTheme } from './utils/theme.js';
+import { loadTheme, saveTheme, applyTheme } from './utils/theme.js';
 import { getTheme } from './themes/themes.js';
 import { ActionManager } from './utils/action-manager.js';
 
@@ -229,12 +229,24 @@ class DashboardApp extends LitElement {
   }
   switchWorkspace(id) { this.showWorkspacePicker=false; return switchWorkspace(this,id); }
 
+  saveLocalPreferences() {
+    if (this.storageKeys.preferences) {
+      writeJsonStorage(this.storageKeys.preferences,{theme:this.theme,gridView:this.isGridView,timings:this.preferences});
+    } else {
+      saveTheme(this.theme);
+      writeJsonStorage(STORAGE_KEYS.gridView,this.isGridView);
+      writeJsonStorage('dashboard_timings',this.preferences);
+    }
+  }
+
   handleThemeChange(e) {
-    this.theme = saveTheme(e.detail.theme);
+    this.theme = applyTheme(e.detail.theme);
+    this.saveLocalPreferences();
   }
 
   handleMobileThemeChange(e) {
-    this.theme = saveTheme(e.detail.theme);
+    this.theme = applyTheme(e.detail.theme);
+    this.saveLocalPreferences();
     const selectedTheme = getTheme(this.theme);
     this.showToast(this.t('themeChanged', { theme: this.t(selectedTheme.nameKey) }), 'info');
   }
@@ -400,7 +412,7 @@ class DashboardApp extends LitElement {
 
   toggleViewMode() {
     this.isGridView = !this.isGridView;
-    writeJsonStorage(STORAGE_KEYS.gridView, this.isGridView);
+    this.saveLocalPreferences();
     this.resetInput(true);
   }
 
@@ -819,7 +831,7 @@ class DashboardApp extends LitElement {
         .workspaceFile=${this.workspaces.find(w=>w.id===this.workspaceId)?.file || ''}
         .show=${this.showConfigModal}
         .preferences=${this.preferences}
-        @preferences-change=${e => { this.preferences=e.detail; writeJsonStorage('dashboard_timings',this.preferences); this.cancelInputResetTimer(); }}
+        @preferences-change=${e => { this.preferences=e.detail; this.saveLocalPreferences(); this.cancelInputResetTimer(); }}
         .configuration=${this.configuration}
         .saving=${this.savingConfig}
         .categories=${this.categories}

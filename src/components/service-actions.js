@@ -37,11 +37,11 @@ export class ServiceActions extends LitElement {
   }
   emit(action) { this.dispatchEvent(new CustomEvent('action', { detail: action })); }
   render() {
-    return html`<dialog class="jk-quick-dialog jk-service-actions" aria-labelledby="service-actions-title"
+    return html`<dialog class="jk-quick-dialog jk-service-actions" aria-label=${this.t('serviceActions') + ': ' + this.service.name}
       @keydown=${e => e.stopPropagation()}
       @cancel=${e => {e.preventDefault(); this.emit('close');}}
       @click=${e => {if (e.target === e.currentTarget) {const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)this.emit('close');}}}>
-      <header><h2 id="service-actions-title">${this.service.name}</h2><jk-icon-button icon="ui:x" .label=${this.t('close')} @click=${()=>this.emit('close')}></jk-icon-button></header>
+      <header class="jk-menu-mobile-header"><h2 id="service-actions-title">${this.service.name}</h2><jk-icon-button icon="ui:x" .label=${this.t('close')} @click=${()=>this.emit('close')}></jk-icon-button></header>
       ${[['edit','pencil','editService'],['favorite','star',this.favorite?'removeFavorite':'addFavorite'],['copy','link','copyUrl']].map(([action,icon,label])=>html`
         <button type="button" class="jk-service-action" @click=${()=>this.emit(action)}><jk-icon .icon=${'ui:'+icon} class="size-5"></jk-icon>${this.t(label)}</button>`)}
     </dialog>`;

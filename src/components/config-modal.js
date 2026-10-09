@@ -27,7 +27,6 @@ const styles = {
   sidebarBtn: `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all`,
   sidebarBtnActive: `bg-indigo-500/10 border border-indigo-500/20 text-indigo-300`,
   sidebarBtnInactive: `border border-transparent text-slate-400 hover:text-slate-50 hover:bg-slate-800/70`,
-  kbd: `ml-auto hidden sm:inline-flex text-[10px] text-slate-500`,
   contentArea: `flex-1 min-w-0 overflow-y-auto`,
   footer: `flex justify-end gap-3 mt-5 pt-4 border-t border-slate-700/50`,
   btnSecondary: `jk-btn jk-btn-secondary`,
@@ -269,14 +268,14 @@ export class JkConfigModal extends LitElement {
 
           <div class="${styles.mainArea}">
             <aside class="${styles.sidebar}">
-              <button @click=${()=>this._setActiveTab('general')} class="${styles.sidebarBtn} ${this._activeTab === 'general' ? styles.sidebarBtnActive : styles.sidebarBtnInactive}"><jk-icon icon="ui:settings-2" class="size-4"></jk-icon>${this.t('tabGeneral')}<kbd class="${styles.kbd}">1</kbd></button>
+              <button @click=${()=>this._setActiveTab('general')} class="${styles.sidebarBtn} ${this._activeTab === 'general' ? styles.sidebarBtnActive : styles.sidebarBtnInactive}"><jk-icon icon="ui:settings-2" class="size-4"></jk-icon>${this.t('tabGeneral')}</button>
               <button
                 @click="${() => this._setActiveTab('appearance')}"
                 class="${styles.sidebarBtn} ${tabAppearanceClass}"
               >
                 <jk-icon icon="ui:palette" class="size-4"></jk-icon>
                 ${this.t('tabAppearance')}
-                <kbd class="${styles.kbd}">2</kbd>
+                
               </button>
               <button
                 @click="${() => this._setActiveTab('data')}"
@@ -284,7 +283,7 @@ export class JkConfigModal extends LitElement {
               >
                 <jk-icon icon="ui:database" class="size-4"></jk-icon>
                 ${this.t('tabData')}
-                <kbd class="${styles.kbd}">3</kbd>
+                
               </button>
               <button
                 @click="${() => this._setActiveTab('editor')}"
@@ -292,7 +291,7 @@ export class JkConfigModal extends LitElement {
               >
                 <jk-icon icon="ui:code-2" class="size-4"></jk-icon>
                 ${this.t('tabEditor')}
-                <kbd class="${styles.kbd}">4</kbd>
+                
               </button>
             </aside>
 

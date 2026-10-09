@@ -284,7 +284,7 @@ If the migration cannot be saved, the app uses it locally and tries again on the
 
 The browser keeps the last loaded or saved configuration for offline use. Load the app online first. The linked services still need to be reachable; caching the dashboard does not cache those services.
 
-Favorites and Continue history stay in the browser, separately for each workspace. Theme and view mode remain browser-wide. They are not included in the JSON export or synchronized between devices.
+Favorites and Continue history stay in the browser, separately for each workspace. Theme, view mode and timing preferences are also stored per workspace. They are not included in the JSON export or synchronized between devices.
 
 Concurrent edits are not detected. If two devices save different versions, the last save wins.
 
@@ -338,7 +338,7 @@ This project was built with AI assistance. I'm a lazy dev.
 
 ### Local timing preferences
 
-Settings → General stores preferences immediately in this browser. Category timeout defaults to 3 seconds (0–30, whole seconds); keyboard launch delay defaults to 1.2 seconds (0–5, steps of 0.1). Turn either off for zero delay. Category clicks stay open and service clicks launch immediately. The category countdown never pauses on hover or focus. Use Back to overview on desktop or mobile. The bookmarklet is now at the bottom of General.
+Settings → General stores preferences immediately for the current workspace in this browser. Category timeout defaults to 3 seconds (0–30, whole seconds); keyboard launch delay defaults to 1.2 seconds (0–5, steps of 0.1). Turn either off for zero delay. Category clicks stay open and service clicks launch immediately. The category countdown never pauses on hover or focus. Use Back to overview on desktop or mobile. The bookmarklet is now at the bottom of General.
 
 ## Workspaces
 
@@ -353,7 +353,7 @@ Workspace IDs use lowercase ASCII letters, digits and single hyphens between wor
 
 With multiple workspaces, use the workspace selector in the dashboard header. Backspace previews the next workspace, wrapping around; press again to advance, Enter to switch immediately, or Esc to cancel. The keyboard launch delay also controls workspace switching; zero switches immediately. These shortcuts do not act in forms or dialogs. Mouse selection switches immediately. The default workspace comes first, followed by alphabetical IDs.
 
-The last selected workspace is remembered. `?workspace=work` selects one directly. Settings, the JSON editor and import/export act on the current workspace; its filename is shown in the editor. General preferences remain shared. Favorites, recent services and configuration caches are separated by user and workspace. Existing favorites and recent history are adopted once by the first default workspace loaded after upgrading.
+The last selected workspace is remembered. `?workspace=work` selects one directly. Settings, the JSON editor and import/export act on the current workspace; its filename is shown in the editor. Theme, view mode and timing preferences are stored per workspace. On first use, a workspace copies the current Default preferences once; later changes are independent. Existing browser preferences initialize Default, even when another workspace is opened first. PWA installation prompts remain device-wide. Favorites, recent services and configuration caches are separated by user and workspace. Existing favorites and recent history are adopted once by the first default workspace loaded after upgrading.
 
 On load errors, no other configuration is silently substituted. Offline use requires a previously loaded workspace and uses the last known user identity in that browser. Offline storage is not an authentication boundary: use separate browser profiles for separate accounts. A frontend-only deployment without the workspace endpoint keeps single-config behavior.
 
