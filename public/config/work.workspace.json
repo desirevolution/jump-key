@@ -1,0 +1,164 @@
+{
+  "categories": [
+    {
+      "category": "Development",
+      "categoryKey": "d",
+      "icon": "lucide:code",
+      "services": [
+        {
+          "id": "demo-work-d-g",
+          "name": "GitHub",
+          "key": "g",
+          "url": "https://github.com/",
+          "icon": "iconify:simple-icons:github"
+        },
+        {
+          "id": "demo-work-d-l",
+          "name": "GitLab",
+          "key": "l",
+          "url": "https://gitlab.com/",
+          "icon": "iconify:simple-icons:gitlab"
+        },
+        {
+          "id": "demo-work-d-s",
+          "name": "Stack Overflow",
+          "key": "s",
+          "url": "https://stackoverflow.com/",
+          "icon": "iconify:simple-icons:stackoverflow"
+        },
+        {
+          "id": "demo-work-d-c",
+          "name": "CodePen",
+          "key": "c",
+          "url": "https://codepen.io/",
+          "icon": "iconify:simple-icons:codepen"
+        }
+      ]
+    },
+    {
+      "category": "Documentation",
+      "categoryKey": "r",
+      "icon": "lucide:book-open",
+      "services": [
+        {
+          "id": "demo-work-r-m",
+          "name": "MDN Web Docs",
+          "key": "m",
+          "url": "https://developer.mozilla.org/",
+          "icon": "lucide:book-open"
+        },
+        {
+          "id": "demo-work-r-g",
+          "name": "Go",
+          "key": "g",
+          "url": "https://go.dev/doc/",
+          "icon": "iconify:simple-icons:go"
+        },
+        {
+          "id": "demo-work-r-d",
+          "name": "Docker Docs",
+          "key": "d",
+          "url": "https://docs.docker.com/",
+          "icon": "iconify:simple-icons:docker"
+        },
+        {
+          "id": "demo-work-r-p",
+          "name": "Python",
+          "key": "p",
+          "url": "https://docs.python.org/3/",
+          "icon": "iconify:simple-icons:python"
+        }
+      ]
+    },
+    {
+      "category": "Team & Planning",
+      "categoryKey": "t",
+      "icon": "lucide:users",
+      "services": [
+        {
+          "id": "demo-work-t-l",
+          "name": "Linear",
+          "key": "l",
+          "url": "https://linear.app/",
+          "icon": "iconify:simple-icons:linear"
+        },
+        {
+          "id": "demo-work-t-n",
+          "name": "Notion",
+          "key": "n",
+          "url": "https://www.notion.so/",
+          "icon": "iconify:simple-icons:notion"
+        },
+        {
+          "id": "demo-work-t-s",
+          "name": "Slack",
+          "key": "s",
+          "url": "https://slack.com/",
+          "icon": "lucide:messages-square"
+        },
+        {
+          "id": "demo-work-t-t",
+          "name": "Trello",
+          "key": "t",
+          "url": "https://trello.com/",
+          "icon": "iconify:simple-icons:trello"
+        }
+      ]
+    },
+    {
+      "category": "Design & Tools",
+      "categoryKey": "u",
+      "icon": "lucide:palette",
+      "services": [
+        {
+          "id": "demo-work-u-f",
+          "name": "Figma",
+          "key": "f",
+          "url": "https://www.figma.com/",
+          "icon": "iconify:simple-icons:figma"
+        },
+        {
+          "id": "demo-work-u-i",
+          "name": "Iconify",
+          "key": "i",
+          "url": "https://icon-sets.iconify.design/",
+          "icon": "lucide:shapes"
+        },
+        {
+          "id": "demo-work-u-l",
+          "name": "Lucide",
+          "key": "l",
+          "url": "https://lucide.dev/icons/",
+          "icon": "lucide:smile"
+        },
+        {
+          "id": "demo-work-u-e",
+          "name": "Excalidraw",
+          "key": "e",
+          "url": "https://excalidraw.com/",
+          "icon": "iconify:simple-icons:excalidraw"
+        }
+      ]
+    }
+  ],
+  "searchEngines": [
+    {
+      "name": "GitHub",
+      "prefix": "gh",
+      "url": "https://github.com/search?q=%s",
+      "icon": "iconify:simple-icons:github"
+    },
+    {
+      "name": "MDN",
+      "prefix": "mdn",
+      "url": "https://developer.mozilla.org/en-US/search?q=%s",
+      "icon": "lucide:book-open"
+    },
+    {
+      "name": "DuckDuckGo",
+      "prefix": "d",
+      "url": "https://duckduckgo.com/?q=%s",
+      "icon": "lucide:search"
+    }
+  ]
+}
