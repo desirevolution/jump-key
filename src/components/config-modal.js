@@ -11,8 +11,8 @@ import './config-editor.js';
 
 const styles = {
   overlay: `fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn`,
-  container: `w-full max-w-7xl h-[88vh] max-h-[900px] flex flex-col rounded-3xl border border-slate-700/70 bg-slate-900/95 jk-shadow-elevated p-5 sm:p-6`,
-  header: `flex items-center justify-between mb-5 pb-4 border-b border-slate-700/50`,
+  container: `w-full max-w-7xl h-[88dvh] max-h-[900px] min-h-0 overflow-hidden flex flex-col rounded-3xl border border-slate-700/70 bg-slate-900/95 jk-shadow-elevated p-5 sm:p-6`,
+  header: `shrink-0 flex items-center justify-between mb-5 pb-4 border-b border-slate-700/50`,
   headerLeft: `flex items-center gap-3`,
   iconBadge: `flex items-center justify-center size-10 rounded-xl bg-indigo-500/10 ring-1 ring-indigo-500/20`,
   icon: `size-5 text-indigo-300`,
@@ -27,8 +27,8 @@ const styles = {
   sidebarBtn: `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all`,
   sidebarBtnActive: `bg-indigo-500/10 border border-indigo-500/20 text-indigo-300`,
   sidebarBtnInactive: `border border-transparent text-slate-400 hover:text-slate-50 hover:bg-slate-800/70`,
-  contentArea: `flex-1 min-w-0 overflow-y-auto`,
-  footer: `flex justify-end gap-3 mt-5 pt-4 border-t border-slate-700/50`,
+  contentArea: `flex-1 min-w-0 min-h-0`,
+  footer: `shrink-0 flex justify-end gap-3 mt-5 pt-4 border-t border-slate-700/50`,
   btnSecondary: `jk-btn jk-btn-secondary`,
   btnSecondaryWhite: `jk-btn jk-btn-secondary`,
   btnPrimary: `jk-btn jk-btn-primary`,
@@ -202,7 +202,7 @@ export class JkConfigModal extends LitElement {
       case 'editor':
       default:
         return html`
-          <p class="mb-3 text-sm text-slate-400">${this.workspaceFile}</p>
+          <p class="mb-3 shrink-0 break-all text-sm text-slate-400">${this.workspaceFile}</p>
           <jk-config-editor
             .t=${this.t}
             .readOnly=${this.saving}
@@ -296,7 +296,7 @@ export class JkConfigModal extends LitElement {
               </button>
             </aside>
 
-            <main class="${styles.contentArea}">${this._renderActiveTabContent()}</main>
+            <main class="${styles.contentArea} ${this._activeTab === 'editor' ? 'jk-config-editor-panel' : 'overflow-y-auto'}">${this._renderActiveTabContent()}</main>
           </div>
 
           <div class="${styles.footer}">

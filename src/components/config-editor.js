@@ -15,7 +15,7 @@ import '../styles/jump-key-dark.css';
 
 // 1. Static styling dictionary isolating layouts from the application engine
 const styles = {
-  containerBase: `w-full h-full min-h-[400px] rounded-xl overflow-auto bg-slate-950 border shadow-inner transition-colors`,
+  containerBase: `w-full min-h-0 rounded-xl overflow-auto bg-slate-950 border shadow-inner transition-colors`,
   containerValid: `border-slate-700 focus-within:border-indigo-500`,
   containerInvalid: `jk-invalid-container`,
 };

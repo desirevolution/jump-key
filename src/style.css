@@ -685,9 +685,10 @@ kbd.jk-next-key {
   jk-mobile-menu section { padding-bottom:max(1.25rem,env(safe-area-inset-bottom)); max-height:85dvh; }
 }
 
-jk-config-editor { display:flex; flex-direction:column; height:100%; min-height:0; }
-jk-config-editor #editorContainer { height:0; min-height:160px; flex:1; overflow:auto; }
-.jk-config-errors { flex:none; max-height:9rem; overflow:auto; padding:0.75rem; margin-bottom:0.5rem; border:1px solid var(--jk-danger); border-radius:0.5rem; font-size:0.8rem; overflow-wrap:anywhere; }
+ .jk-config-editor-panel { display:flex; flex-direction:column; overflow:hidden; }
+jk-config-editor { display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden; }
+jk-config-editor #editorContainer { height:0; min-height:0; flex:1; overflow:auto; overscroll-behavior:contain; }
+.jk-config-errors { flex:0 1 auto; max-height:min(9rem,35%); overflow:auto; padding:0.75rem; margin-bottom:0.5rem; border:1px solid var(--jk-danger); border-radius:0.5rem; font-size:0.8rem; overflow-wrap:anywhere; }
 .jk-config-errors li + li { margin-top:0.4rem; }
 
 /* Actions are siblings of the launch target, so they never launch the service. */

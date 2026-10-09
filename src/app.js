@@ -852,7 +852,7 @@ class DashboardApp extends LitElement {
   templateConfigModal() {
     return html`
       <jk-config-modal
-        .workspaceLabel=${this.workspaceItems.find(w=>w.id===this.workspaceId)?.name || ''}
+        .workspaceLabel=${this.workspaces.length > 1 ? this.workspaceItems.find(w=>w.id===this.workspaceId)?.name || '' : ''}
         .workspaceFile=${this.workspaces.find(w=>w.id===this.workspaceId)?.file || ''}
         .show=${this.showConfigModal}
         .separateWorkspacePreferences=${this.separateWorkspacePreferences}
