@@ -385,6 +385,14 @@ User values may contain ASCII letters, digits, dots, underscores and hyphens. Th
 
 The authentication proxy must set the identity header itself and prevent clients from bypassing it. The header is a filename selector, not proof of authentication. With workspace support, configuration caches, favorites and history are scoped by account and workspace. Offline access uses the last known identity; use separate browser profiles when accounts must be isolated.
 
+## GitHub Pages demo
+
+The demo branch uses `src/utils/demo-backend.js` instead of a server for configuration requests. Its workspace list points to `services.json`, `home.workspace.json` and `work.workspace.json` in `public/config/`. Edit the list and files there to change the demo content.
+
+Saves stay in memory, including when switching workspaces. Reloading restores the bundled files; favorites and appearance settings still use browser storage. Loading the configuration requires a network connection. Paths follow Vite’s `base` setting for GitHub Pages.
+
+When rebasing, keep the demo adapter and its imports in `src/utils/workspaces.js` and `src/utils/configuration.js`. The regular loading, validation and saving code remains unchanged.
+
 ## Development
 
 Use Node 24 and Go 1.26, matching the Docker build and `go.mod`.
