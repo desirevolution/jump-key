@@ -211,6 +211,8 @@ class DashboardApp extends LitElement {
       this.continueLastUsedCycle = false;
     }
   }
+  get workspaceItems() { return this.workspaces.map(w => w.id === 'default' ? { ...w, name: this.t('workspaceDefault') } : w); }
+
   async cycleWorkspace() {
     const previous = this.actionManager.activeType === 'workspace' ? this.pendingWorkspace : this.workspaceLoading ? this.workspaceRequested : this.workspaceId;
     const index = this.workspaces.findIndex(w=>w.id===previous);
@@ -220,7 +222,7 @@ class DashboardApp extends LitElement {
     if (!this.preferences.launchDelay) { this.switchWorkspace(target.id); return; }
     const feedback = this.querySelector('jk-action-feedback');
     const action = this.actionManager.start({type:'workspace',cancel:()=>feedback?.cancel()});
-    const confirmed = await feedback.show({service:{name:target.name,category:this.t('workspace'),icon:'ui:layout-grid'},duration:this.preferences.launchDelay*1000});
+    const confirmed = await feedback.show({service:{name:target.id === 'default' ? this.t('workspaceDefault') : target.name,category:this.t('workspace'),icon:'ui:layout-grid'},duration:this.preferences.launchDelay*1000});
     if(!this.actionManager.isActive(action)) return;
     this.actionManager.complete(action);
     if(confirmed) this.switchWorkspace(target.id);
@@ -813,7 +815,7 @@ class DashboardApp extends LitElement {
   templateConfigModal() {
     return html`
       <jk-config-modal
-        .workspaceLabel=${this.workspaces.find(w=>w.id===this.workspaceId)?.name || ''}
+        .workspaceLabel=${this.workspaceItems.find(w=>w.id===this.workspaceId)?.name || ''}
         .workspaceFile=${this.workspaces.find(w=>w.id===this.workspaceId)?.file || ''}
         .show=${this.showConfigModal}
         .preferences=${this.preferences}
@@ -981,9 +983,9 @@ class DashboardApp extends LitElement {
       ></jk-toast>
 
 
-      ${this.showWorkspacePicker ? html`<jk-workspace-picker .items=${this.workspaces} .active=${this.workspaceId} .anchor=${this.workspaceAnchor} .t=${this.t} @cycle=${async()=>{this.showWorkspacePicker=false;await this.updateComplete;this.cycleWorkspace();}} @close=${()=>this.showWorkspacePicker=false} @select=${e=>this.switchWorkspace(e.detail)}></jk-workspace-picker>` : ''}
+      ${this.showWorkspacePicker ? html`<jk-workspace-picker .items=${this.workspaceItems} .active=${this.workspaceId} .anchor=${this.workspaceAnchor} .t=${this.t} @cycle=${async()=>{this.showWorkspacePicker=false;await this.updateComplete;this.cycleWorkspace();}} @close=${()=>this.showWorkspacePicker=false} @select=${e=>this.switchWorkspace(e.detail)}></jk-workspace-picker>` : ''}
       <jk-dashboard-header ?inert=${this.workspaceLoading}
-        .workspaceName=${this.workspaces.find(w=>w.id===this.workspaceId)?.name || '—'}
+        .workspaceName=${this.workspaceItems.find(w=>w.id===this.workspaceId)?.name || '—'}
         .hasWorkspaces=${this.workspaces.length > 1}
         .workspaceOpen=${this.showWorkspacePicker}
         @open-workspaces=${e=>{this.enterUiMode();this.workspaceAnchor=e.detail.anchor;this.showWorkspacePicker=true;}}

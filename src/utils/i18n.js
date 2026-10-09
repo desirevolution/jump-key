@@ -1,5 +1,6 @@
 export const translations = {
   de: {
+    workspaceDefault: "Standard",
     workspaceNext: "Nächster Workspace",
     workspace: "Workspace",
     workspaceFailed: "Workspace konnte nicht geladen werden. Bitte Verbindung und Konfigurationsdatei prüfen.",
@@ -269,6 +270,7 @@ export const translations = {
     tabEditorInvalid: 'Ungültig',
   },
   fr: {
+    workspaceDefault: "Par défaut",
     workspaceNext: "Espace suivant",
     workspace: "Espace de travail",
     workspaceFailed: "Impossible de charger cet espace. Vérifiez la connexion et le fichier de configuration.",
@@ -522,6 +524,7 @@ export const translations = {
     tabEditorInvalid: 'Invalide',
   },
   es: {
+    workspaceDefault: "Predeterminado",
     workspaceNext: "Siguiente espacio",
     workspace: "Espacio de trabajo",
     workspaceFailed: "No se pudo cargar el espacio. Revisa la conexión y el archivo de configuración.",
@@ -771,6 +774,7 @@ export const translations = {
     tabEditorInvalid: 'No válido',
   },
   en: {
+    workspaceDefault: "Default",
     workspaceNext: "Next workspace",
     workspace: "Workspace",
     workspaceFailed: "Could not load workspace. Check your connection and configuration file.",

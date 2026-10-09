@@ -95,15 +95,15 @@ export class JkDashboardHeader extends LitElement {
     this.dispatchEvent(new CustomEvent(eventName, { bubbles: true, composed: true }));
   }
 
-  workspaceButton() {
-    return html`<button type="button" class="jk-workspace-trigger jk-workspace-trigger-desktop" aria-haspopup="dialog" aria-expanded=${String(Boolean(this.workspaceOpen))} aria-label=${this.t('workspace') + ': ' + this.workspaceName} title=${this.workspaceName} @click=${e=>this.dispatchEvent(new CustomEvent('open-workspaces',{detail:{anchor:e.currentTarget},bubbles:true,composed:true}))}>
+  workspaceButton(mobile = false) {
+    return html`<button type="button" class=${mobile ? 'jk-workspace-trigger jk-workspace-trigger-mobile' : 'jk-workspace-trigger jk-workspace-trigger-desktop'} aria-haspopup="dialog" aria-expanded=${String(Boolean(this.workspaceOpen))} aria-label=${this.t('workspace') + ': ' + this.workspaceName} title=${this.workspaceName} @click=${e=>this.dispatchEvent(new CustomEvent('open-workspaces',{detail:{anchor:e.currentTarget},bubbles:true,composed:true}))}>
       <span class="jk-workspace-trigger-name"><span>${this.workspaceName}</span><span aria-hidden="true" class="jk-workspace-chevron">⌄</span></span>
     </button>`;
   }
 
   render() {
     return html`
-      <div class="${styles.container}">
+      <div class="${styles.container} jk-dashboard-header-shell">
         <div class="${styles.leftSection}">
           <a
             href="https://github.com/desirevolution/jump-key"
@@ -174,6 +174,7 @@ export class JkDashboardHeader extends LitElement {
             <div class="${styles.clockDate}">${this._dateString}</div>
           </div>
         </div>
+        ${this.hasWorkspaces ? this.workspaceButton(true) : ''}
       </div>
     `;
   }

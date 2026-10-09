@@ -56,7 +56,7 @@ func (s *server) handleWorkspaces(w http.ResponseWriter, r *http.Request) {
 		}
 		name := entry.Name()
 		if name == workspaceFilename("default", user) {
-			list = append(list, workspaceEntry{"default", "Standard", name})
+			list = append(list, workspaceEntry{"default", "", name})
 			continue
 		}
 		if !strings.HasSuffix(name, suffix) {
