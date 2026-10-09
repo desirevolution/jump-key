@@ -6,7 +6,7 @@ const LONG_PRESS_DURATION = 600;
 const MOVE_CANCEL_DISTANCE = 12;
 
 const styles = {
-  card: `group relative flex w-full cursor-pointer select-none items-center gap-4 overflow-hidden rounded-2xl border px-5 py-4 transition-all duration-200 ease-out touch-manipulation`,
+  card: `group relative flex w-full cursor-pointer select-none items-center gap-3 overflow-hidden rounded-2xl border px-5 py-4 transition-all duration-200 ease-out touch-manipulation`,
   cardDefault: `jk-service-card hover:-translate-y-1 active:scale-[0.98]`,
   cardPressing: `jk-service-card scale-[0.985] border-indigo-500/40 jk-shadow-inset`,
   cardReady: `jk-service-card scale-[0.99] border-indigo-400/70 ring-2 ring-indigo-400/20`,
@@ -16,7 +16,7 @@ const styles = {
   iconPressing: `scale-95`,
   iconReady: `scale-105`,
   icon: `size-8 transition-transform duration-200 group-hover:scale-105`,
-  content: `relative z-10 grid min-w-0 grow grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2`,
+  content: `relative z-10 grid min-w-0 grow grid-cols-[auto_minmax(0,1fr)] items-center gap-x-3`,
   name: `col-start-2 row-start-1 truncate text-lg font-semibold leading-tight tracking-tight transition-colors duration-200`,
   subtitle: `col-start-2 row-start-2 mt-1 truncate text-sm leading-snug text-slate-400 transition-colors duration-200 group-hover:text-slate-300`,
   badge: `col-start-1 row-start-1 row-span-2 self-center inline-flex h-7 min-w-7 items-center justify-center rounded-lg border px-2 text-xs font-semibold uppercase tracking-widest transition-all duration-200`,
