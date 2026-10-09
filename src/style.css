@@ -776,13 +776,13 @@ dialog.jk-service-actions::backdrop { background:transparent; backdrop-filter:no
 .jk-workspace-trigger { color:var(--jk-text-primary,#f8fafc); cursor:pointer; min-height:36px; border-radius:.6rem; text-align:left; }
 .jk-workspace-trigger:focus-visible,.jk-workspace-option:focus-visible { outline:2px solid var(--jk-accent-bright,#818cf8); outline-offset:2px; }
 .jk-workspace-trigger-desktop { display:flex; padding:.3rem .6rem; margin-left:-.6rem; color:var(--jk-text-secondary,#cbd5e1); font-size:.8rem; }
-.jk-workspace-trigger:hover { background:var(--jk-surface-elevated,#1e293b); }
+.jk-workspace-trigger:hover { background:var(--jk-bg-surface-elevated); }
 .jk-workspace-trigger-name { display:flex; align-items:center; gap:.6rem; min-width:0; }
 .jk-workspace-trigger-name>span:first-child { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:15rem; }
 .jk-workspace-chevron { flex-shrink:0; opacity:.7; }
 .jk-workspace-title { flex-direction:column; align-items:flex-start; gap:0; }
 .jk-workspace-trigger-mobile { display:none; }
-.jk-workspace-picker { position:fixed; margin:0; inset:auto 0 0; width:100%; max-width:none; max-height:80dvh; overflow:auto; padding:.6rem 1rem max(1rem,env(safe-area-inset-bottom)); border:1px solid var(--jk-border-strong,#334155); border-radius:1.5rem 1.5rem 0 0; background:var(--jk-surface-elevated,#0f172a); color:var(--jk-text-primary,#f8fafc); box-shadow:0 16px 50px #0005; }
+.jk-workspace-picker { position:fixed; margin:0; inset:auto 0 0; width:100%; max-width:none; max-height:80dvh; overflow:auto; padding:.6rem 1rem max(1rem,env(safe-area-inset-bottom)); border:1px solid var(--jk-border-strong,#334155); border-radius:1.5rem 1.5rem 0 0; background:var(--jk-bg-surface-elevated); color:var(--jk-text-primary,#f8fafc); box-shadow:0 16px 50px #0005; }
 .jk-workspace-picker::backdrop { background:#02061788; }
 .jk-workspace-sheet-handle { width:2rem; height:4px; margin:0 auto .5rem; border-radius:9px; background:var(--jk-border-strong,#64748b); }
 .jk-workspace-picker-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:.2rem .25rem .6rem; }

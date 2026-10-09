@@ -10,7 +10,7 @@ const styles = {
     'flex size-11 shrink-0 items-center justify-center rounded-lg border border-slate-700 bg-slate-800 text-emerald-300',
   icon: 'size-6',
   content: 'min-w-0 grow',
-  name: 'truncate text-base font-semibold text-white',
+  name: 'truncate text-base font-semibold text-slate-50',
   meta: 'mt-0.5 flex min-w-0 items-center gap-2 text-xs text-slate-400',
   category: 'truncate',
   pendingDot: 'size-2 shrink-0 rounded-full bg-emerald-400 animate-pulse',
