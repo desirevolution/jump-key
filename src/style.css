@@ -796,7 +796,7 @@ dialog.jk-service-actions::backdrop { background:transparent; backdrop-filter:no
 .jk-workspace-option-check { width:1rem; flex-shrink:0; color:var(--jk-accent-bright,#a5b4fc); }
 .jk-workspace-picker-hint { display:none; }
 @media(min-width:768px) {
- .jk-workspace-picker { inset:auto; width:19rem; max-width:calc(100vw - 24px); border-radius:1rem; padding:.6rem; }
+ .jk-workspace-picker { inset:auto; width:max-content; max-width:calc(100vw - 24px); border-radius:1rem; padding:.6rem; }
  .jk-workspace-picker::backdrop { background:transparent; }
  .jk-workspace-sheet-handle { display:none; }
  .jk-workspace-option { min-height:48px; padding:.5rem .65rem; }
@@ -823,7 +823,7 @@ dialog.jk-service-actions::backdrop { background:transparent; backdrop-filter:no
 .jk-workspace-trigger[aria-expanded="true"] .jk-workspace-chevron { transform:rotate(180deg); }
 @media(min-width:1280px) {
  .jk-workspace-title { flex-direction:row; align-items:center; gap:1.25rem; }
- .jk-workspace-trigger-desktop { min-width:8rem; max-width:16rem; }
+ .jk-workspace-trigger-desktop { min-width:0; max-width:min(28rem,35vw); }
  .jk-workspace-trigger-desktop .jk-workspace-trigger-name { width:100%; justify-content:space-between; }
  .jk-workspace-title>div { flex-shrink:0; }
 }
@@ -840,3 +840,14 @@ dialog.jk-service-actions::backdrop { background:transparent; backdrop-filter:no
 }
 
 @media(min-width:768px) { .jk-workspace-picker .jk-menu-mobile-header, .jk-service-actions .jk-menu-mobile-header { display:none; } }
+
+/* Measure every label in the same grid cell so switching does not resize the button. */
+.jk-workspace-name-stack { display:grid; min-width:0; }
+.jk-workspace-name-stack>span { grid-area:1 / 1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.jk-workspace-name-measure { visibility:hidden; pointer-events:none; }
+.jk-workspace-trigger-name>span:first-child { max-width:none; }
+@media(max-width:767px) {
+ /* Keep the row in the document to avoid scroll jumps near the bottom of short pages. */
+ .jk-header-scrolled { margin-bottom:52px; }
+ .jk-header-scrolled .jk-workspace-trigger-mobile { display:none; }
+}

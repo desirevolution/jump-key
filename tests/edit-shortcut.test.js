@@ -8,7 +8,7 @@ function setup() {
     t: key => key,
     resetInput() { this.editRecording = null; this.activeCategoryKey = ''; },
     resetKeyboardInput() { this.currentInput = ''; },
-    openQuickAdd(initial) { this.opened = initial; },
+    openQuickAdd(initial, returnToOverview) { this.opened = initial; this.returnToOverview = returnToOverview; },
   };
   const press = (key, extra = {}) => handleGlobalKeyDown({ key, target: { tagName: 'BODY' }, preventDefault() {}, ...extra }, app);
   return { app, press };
@@ -26,6 +26,7 @@ test('edit shortcut selects category and service without launching, tolerates in
   assert.equal(app.opened, undefined);
   press('a');
   assert.deepEqual(app.opened, { serviceId: 'one' });
+  assert.equal(app.returnToOverview, true);
   assert.equal(app.editRecording, null);
 });
 

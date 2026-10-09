@@ -30,6 +30,8 @@ export class JkDashboardHeader extends LitElement {
     return {
       hasWorkspaces: { type: Boolean },
       workspaceName: { type: String },
+      workspaceNames: { type: Array },
+      _scrolled: { state: true },
       workspaceOpen: { type: Boolean },
       isGridView: { type: Boolean },
       lang: { type: String },
@@ -43,6 +45,9 @@ export class JkDashboardHeader extends LitElement {
     super();
     this.isGridView = false;
     this.lang = 'en';
+    this.workspaceNames = [];
+    this._scrolled = false;
+    this._onScroll = () => { this._scrolled = window.scrollY > 1; };
     this._now = new Date();
     this._timeInterval = null;
   }
@@ -51,6 +56,8 @@ export class JkDashboardHeader extends LitElement {
   connectedCallback() {
     super.connectedCallback();
     this._now = new Date();
+    this._onScroll();
+    window.addEventListener('scroll', this._onScroll, { passive: true });
     this._timeInterval = setInterval(() => {
       this._now = new Date();
     }, 60 * 1000);
@@ -58,6 +65,7 @@ export class JkDashboardHeader extends LitElement {
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    window.removeEventListener('scroll', this._onScroll);
     if (this._timeInterval) {
       clearInterval(this._timeInterval);
     }
@@ -97,13 +105,13 @@ export class JkDashboardHeader extends LitElement {
 
   workspaceButton(mobile = false) {
     return html`<button type="button" class=${mobile ? 'jk-workspace-trigger jk-workspace-trigger-mobile' : 'jk-workspace-trigger jk-workspace-trigger-desktop'} aria-haspopup="dialog" aria-expanded=${String(Boolean(this.workspaceOpen))} aria-label=${this.t('workspace') + ': ' + this.workspaceName} title=${this.workspaceName} @click=${e=>this.dispatchEvent(new CustomEvent('open-workspaces',{detail:{anchor:e.currentTarget},bubbles:true,composed:true}))}>
-      <span class="jk-workspace-trigger-name"><span>${this.workspaceName}</span><jk-icon icon="ui:chevron-down" aria-hidden="true" class="jk-workspace-chevron size-4"></jk-icon></span>
+      <span class="jk-workspace-trigger-name"><span class="jk-workspace-name-stack"><span>${this.workspaceName}</span>${this.workspaceNames.map(name => html`<span class="jk-workspace-name-measure" aria-hidden="true">${name}</span>`)}</span><jk-icon icon="ui:chevron-down" aria-hidden="true" class="jk-workspace-chevron size-4"></jk-icon></span>
     </button>`;
   }
 
   render() {
     return html`
-      <div class="${styles.container} jk-dashboard-header-shell">
+      <div class="${styles.container} jk-dashboard-header-shell ${this._scrolled && this.hasWorkspaces ? "jk-header-scrolled" : ""}">
         <div class="${styles.leftSection}">
           <a
             href="https://github.com/desirevolution/jump-key"

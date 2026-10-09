@@ -216,5 +216,5 @@ function handleEditInput(key, app) {
   if (!service) return;
   app.editRecording = null;
   app.resetKeyboardInput();
-  app.openQuickAdd({ serviceId: service.id });
+  app.openQuickAdd({ serviceId: service.id }, true);
 }

@@ -822,7 +822,7 @@ class DashboardApp extends LitElement {
     }
   }
 
-  openQuickAdd(initial = {}) {
+  openQuickAdd(initial = {}, returnToOverview = false) {
     if (!this.configuration) return;
     this.cancelPendingAction();
     this.showSearch = false;
@@ -830,8 +830,15 @@ class DashboardApp extends LitElement {
     this.editRecording = null;
     this.favoriteRecording = null;
     this.cancelInputResetTimer();
+    this.quickReturnToOverview = returnToOverview;
     this.quickInitial = initial;
     this.showQuickAdd = true;
+  }
+
+  closeQuickAdd() {
+    this.showQuickAdd = false;
+    if (this.quickReturnToOverview) this.resetNavigationInput(true);
+    this.quickReturnToOverview = false;
   }
 
   async installApp() {
@@ -998,8 +1005,8 @@ class DashboardApp extends LitElement {
       ${this.templateSearchModal(filteredServices)} ${this.templateConfigModal()}
       ${this.templateMobileMenu()} ${this.templateDialog()}
       ${this.showQuickAdd ? html`<jk-quick-add .config=${this.configuration} .initial=${this.quickInitial} .categoryKey=${this.activeCategoryKey} .t=${this.t}
-        @close=${() => {this.showQuickAdd=false;}}
-        @saved=${e => {this.applyConfiguration(e.detail);this.showQuickAdd=false;this.showToast(this.t('editConfigSaveDone'),'success');}}
+        @close=${() => this.closeQuickAdd()}
+        @saved=${e => {this.applyConfiguration(e.detail);this.closeQuickAdd();this.showToast(this.t('editConfigSaveDone'),'success');}}
       ></jk-quick-add>` : ''}
 
       ${this.actionService ? html`<jk-service-actions .anchor=${this.actionAnchor} .service=${this.actionService}
@@ -1019,6 +1026,7 @@ class DashboardApp extends LitElement {
       <jk-dashboard-header ?inert=${this.workspaceLoading}
         .workspaceName=${this.workspaceItems.find(w=>w.id===this.workspaceId)?.name || '—'}
         .hasWorkspaces=${this.workspaces.length > 1}
+        .workspaceNames=${this.workspaceItems.map(w => w.name)}
         .workspaceOpen=${this.showWorkspacePicker}
         @open-workspaces=${e=>{this.enterUiMode();this.workspaceAnchor=e.detail.anchor;this.showWorkspacePicker=true;}}
         @quick-add=${() => this.openQuickAdd()}

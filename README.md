@@ -17,6 +17,7 @@ https://github.com/user-attachments/assets/b2c4290e-f371-44eb-b47c-44d5a73de379
 ## What it does
 
 - Two overview modes: all services, or categories with favorites.
+- Workspaces with separate configuration files for work, home or other sets of services.
 - Ten favorite slots and a Continue list of recently opened services.
 - Search by service or category name, plus custom search commands such as `:g linux`.
 - A JSON editor with configuration validation, import, export and automatic backups.
@@ -109,7 +110,7 @@ The server exposes `GET /healthz` for health checks. Configuration uploads are l
 
 Desktop content aligns with the header and uses the available width for additional tile columns. Outer margins and minimum tile width are retained.
 
-Open **⋮** on a service tile to edit it, add or remove it from favorites, or copy its URL. The button is always visible on mobile and appears on hover or keyboard focus on desktop. Use `Tab` to reach it. Actions open in a bottom sheet on mobile and beside the button on desktop. Desktop category/grid tiles show the assigned favorite number next to the star; favorite tiles already show it beside the name. Pressing and holding a tile still works as before.
+Open **⋮** on a service tile to edit it, add or remove it from favorites, or copy its URL. The button is always visible on mobile and appears on hover or keyboard focus on desktop. Use `Tab` to reach it. Actions open in a bottom sheet on mobile and beside the button on desktop. Desktop category/grid tiles show the assigned favorite number next to the star; favorite tiles already show it beside the name. Press and hold a tile to assign a favorite. Hold feedback starts after 150 ms so ordinary clicks do not flash the animation.
 
 **Edit service** opens the same form used for adding links, with the current values filled in. You can change the name, URL, icon, shortcut, or category, including creating a new destination category. The service keeps its ID, favorites, and history. The **Position** selector offers first, last, or after another service. Editing starts at the current position; adding or moving defaults to last. Duplicate URL and shortcut checks exclude the service being edited. Renaming does not replace its shortcut; conflicts in the destination category must be resolved before saving. Closing an add/edit form with unsaved changes asks before discarding them. Validation messages appear next to the affected fields.
 
@@ -129,9 +130,39 @@ The mobile installation banner can be dismissed permanently for this browser. In
 
 ## Configuration
 
-The browser loads `/config/services.json`. The server reads it from `--config-dir`, with optional filename selection through the `Remote-User` header described below.
+The server reads configuration files from `--config-dir`. The browser requests `/config/services.json`, with a `workspace` query parameter when selecting a workspace. The optional `Remote-User` header selects user-specific files; see [Authentication](#authentication-and-user-specific-files).
 
-Open settings with `Ctrl + ,`. The JSON editor and import function use the same configuration structure. Importing a file loads it into the editor; save to apply it. Export downloads the current configuration, without browser-local favorites or preferences.
+Open settings with `Ctrl + ,`. The JSON editor and import function use the same configuration structure. Importing a file loads it into the editor; save to apply it. The editor shows the current workspace’s filename. Editing, import and export apply to that workspace. Export downloads its configuration, without browser-local favorites or preferences.
+
+### Workspaces
+
+Each workspace is a complete configuration file that can also be used on its own. Create files in the config directory; the server lists them automatically.
+
+| Workspace | Without `Remote-User` | With `Remote-User: arthur` |
+| --- | --- | --- |
+| Default | `services.json` | `services.arthur.json` |
+| Work | `work.workspace.json` | `work.workspace.arthur.json` |
+
+Workspace IDs use lowercase ASCII letters, digits and single hyphens between words. `default` is reserved. Names come from filenames; the Default label is translated by the app. Default appears first, followed by the other IDs alphabetically. Backups are excluded from the list.
+
+With multiple workspaces, the header shows a selector. On mobile it is visible only at the top of the page. Click or tap a name to switch immediately, or use `Backspace` to cycle with a short delay. Press it again to advance, `Enter` to switch immediately, or `Esc` to cancel. The shortcut also works in the workspace menu, but not in other dialogs or input fields.
+
+JumpKey remembers the last workspace. A link such as `?workspace=work` opens one directly. Renaming a workspace starts a new browser storage scope. To use its configuration independently on another installation, copy the file as `services.json`; its contents need no changes. Frontend-only deployments without the workspace endpoint keep single-config behavior.
+
+### Browser preferences
+
+**Settings → General** saves changes immediately in this browser.
+
+| Setting | Default | Range |
+| --- | --- | --- |
+| Category timeout | 2 seconds | 0–30 seconds, in whole seconds |
+| Keyboard launch delay | 0.7 seconds | 0–5 seconds, in steps of 0.1 |
+
+Set either value to zero or turn it off to disable the timer. Existing saved values are kept when upgrading. The category timeout returns to the overview after keyboard selection, including the Continue view opened with `_`. Its countdown does not pause on hover or focus. Categories opened by clicking stay open. The launch delay applies to keyboard service launches and workspace cycling; clicking launches or switches immediately.
+
+**Separate workspace preferences** is off by default. All workspaces then share Default’s theme, view mode and timing settings. Enable it to keep these settings separately: a workspace without saved preferences copies Default once, then changes independently. Turning the switch off preserves individual preferences for later use. Configuration files, favorites and Continue history remain separate either way.
+
+The **Add to JumpKey** bookmarklet is at the bottom of General; see [Adding links](#adding-links).
 
 ### Configuration fields
 
@@ -225,7 +256,9 @@ Press `Space` to search service and category names. Enter `:` to list search eng
 
 | Shortcut | Action |
 | --- | --- |
-| `Ctrl+E`, category key, service key | Edit a service. `Esc` cancels the selection. |
+| `Ctrl+E`, category key, service key | Edit a service; return to the overview when the dialog closes. `Esc` cancels the selection. |
+| `+` | Add a link. |
+| `Backspace` | Cycle workspaces; `Enter` switches immediately, `Esc` cancels. |
 | `A`–`Z` | Select a category from the overview. |
 | Category letter, then service letter | Open a service in the selected category. |
 | `1`–`9`, `0` | Open a favorite from the overview. |
@@ -270,21 +303,21 @@ Dynamic icons require access to the icon provider when not already cached. A bui
 
 ## Saving and backups
 
-The server backs up the old configuration before saving a replacement. Backups are stored next to the configuration as `services.backup-<timestamp>.json`. If the backup fails, the server keeps the old file. If saving fails, the editor stays open with your changes.
+The server backs up the old configuration before saving a replacement. Backups are stored next to the configuration, using its filename stem: for example, `services.backup-<timestamp>.json` or `work.workspace.backup-<timestamp>.json`. If the backup fails, the server keeps the old file. If saving fails, the editor stays open with your changes.
 
 Backups are not deleted automatically. To restore one, stop JumpKey, copy the backup over the configuration file, restart, and reload the page while online.
 
 ### Upgrading older configurations
 
-The app adds missing service IDs when it loads a configuration and saves the result to the server. This save also creates a backup. Favorites and Continue entries stored by name are converted to IDs in each browser. If several services have the same name, the first match is used, as before. You do not need to clear browser data.
+Missing service IDs are generated when loading a configuration and included when it is saved. Keep existing IDs so favorites and Continue references stay attached to their services. Older references stored by name are converted to IDs in each browser; if several services share a name, the first match is used.
 
-If the migration cannot be saved, the app uses it locally and tries again on the next online load.
+Existing browser preferences initialize Default. Existing favorites and Continue history are adopted once by the first Default workspace loaded after upgrading. You do not need to clear browser data.
 
 ### Browser storage and offline use
 
-The browser keeps the last loaded or saved configuration for offline use. Load the app online first. The linked services still need to be reachable; caching the dashboard does not cache those services.
+The browser keeps the last loaded or saved configuration for each workspace. Load each workspace online before using it offline. A failed load never silently substitutes another workspace’s configuration. The linked services still need to be reachable; caching the dashboard does not cache those services.
 
-Favorites and Continue history stay in the browser, separately for each workspace. Theme, view mode and timing preferences are shared by default; separate workspace preferences can be enabled under General. They are not included in the JSON export or synchronized between devices.
+Favorites and Continue history stay in the browser, separately for each workspace. Theme, view mode and timing preferences are shared by default; separate workspace preferences can be enabled under General. These browser settings are not included in the JSON export or synchronized between devices. PWA installation prompts remain device-wide.
 
 Concurrent edits are not detected. If two devices save different versions, the last save wins.
 
@@ -321,13 +354,6 @@ Build the frontend before compiling or testing Go: `dist` is embedded in the exe
 
 After building the frontend, `scripts/build-release.sh VERSION` creates standalone release archives in `release`. Its optional second argument changes the output directory; the script clears that directory before building. The GitHub Pages demo is maintained separately on the `demo` branch.
 
-## Ideas / TODOs
-
-
-- Workspaces for separate work and personal links.
-- ~~Iconify icon support.~~ Implemented.
-- ~~Standalone Go server to replace the Caddy setup.~~ Implemented.
-
 ## About this project
 
 This project was built with AI assistance. I'm a lazy dev.
@@ -335,28 +361,3 @@ This project was built with AI assistance. I'm a lazy dev.
 ## License
 
 [MIT](LICENSE).
-
-### Local timing preferences
-
-Settings → General stores preferences immediately in this browser, either shared through Default or separately per workspace. Category timeout defaults to 3 seconds (0–30, whole seconds); keyboard launch delay defaults to 1.2 seconds (0–5, steps of 0.1). Turn either off for zero delay. Category clicks stay open and service clicks launch immediately. The category countdown never pauses on hover or focus. Use Back to overview on desktop or mobile. The bookmarklet is now at the bottom of General.
-
-## Workspaces
-
-Each workspace is a complete, independently usable configuration file in the config directory. Create files manually; the server lists them automatically. Existing `services.json` (or `services.<user>.json`) remains the default workspace.
-
-| Workspace | Without Remote-User | Remote-User: arthur |
-| --- | --- | --- |
-| Default | `services.json` | `services.arthur.json` |
-| Work | `work.workspace.json` | `work.workspace.arthur.json` |
-
-Workspace IDs use lowercase ASCII letters, digits and single hyphens between words. `default` is reserved. Backups are excluded. Names are derived from filenames. Renaming a workspace creates a new local storage scope. A file can be copied to another installation as `services.json` without changing its contents.
-
-With multiple workspaces, use the workspace selector in the dashboard header. Backspace previews the next workspace, wrapping around; press again to advance, Enter to switch immediately, or Esc to cancel. The keyboard launch delay also controls workspace switching; zero switches immediately. These shortcuts do not act in forms or dialogs. Mouse selection switches immediately. The default workspace comes first, followed by alphabetical IDs.
-
-The last selected workspace is remembered. `?workspace=work` selects one directly. Settings, the JSON editor and import/export act on the current workspace; its filename is shown in the editor. When separate workspace preferences are enabled, theme, view mode and timing preferences are stored per workspace. On first use, a workspace copies the current Default preferences once; later changes are independent. Existing browser preferences initialize Default, even when another workspace is opened first. PWA installation prompts remain device-wide. Favorites, recent services and configuration caches are separated by user and workspace. Existing favorites and recent history are adopted once by the first default workspace loaded after upgrading.
-
-On load errors, no other configuration is silently substituted. Offline use requires a previously loaded workspace and uses the last known user identity in that browser. Offline storage is not an authentication boundary: use separate browser profiles for separate accounts. A frontend-only deployment without the workspace endpoint keeps single-config behavior.
-
-The recent-services view opened with `_` uses the category timeout and countdown; mouse selection has no timeout. Long-press feedback appears after 150 ms without extending the total hold time.
-
-Separate workspace preferences can be enabled under General. The browser-wide switch is **off by default**: all workspaces then read and update Default’s theme, view and timing settings. Turning it on restores individual settings, or copies Default once for a workspace without settings. Turning it off preserves individual settings. Config files, favorites and recent history remain separate.
