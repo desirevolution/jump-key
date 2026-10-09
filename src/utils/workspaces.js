@@ -1,3 +1,4 @@
+import { demoFetch as fetch } from './demo-backend.js';
 import { loadWorkspacePreferences, effectivePreferencesId } from './workspace-preferences.js';
 import { loadTheme, applyTheme } from './theme.js';
 import { readJsonStorage, writeJsonStorage } from './storage.js';
