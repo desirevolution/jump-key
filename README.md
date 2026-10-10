@@ -16,7 +16,7 @@ https://github.com/user-attachments/assets/b2c4290e-f371-44eb-b47c-44d5a73de379
 
 ## What it does
 
-- Two overview modes: all services, or categories with favorites.
+- Two overview modes: all services (the default), or categories with favorites. Your selection is remembered in this browser.
 - Workspaces with separate configuration files for work, home or other sets of services.
 - Ten favorite slots and a Continue list of recently opened services.
 - Search by service or category name, plus custom search commands such as `:g linux`.

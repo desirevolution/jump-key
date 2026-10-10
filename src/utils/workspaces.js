@@ -59,7 +59,7 @@ export async function switchWorkspace(app,id,initial=false) {
    writeJsonStorage(marker,true);
   }
   const settings = loadWorkspacePreferences(app.workspaceUser,effectivePreferencesId(id),{
-    theme:loadTheme(), gridView:readJsonStorage('dashboard_grid_view',false), timings:readJsonStorage('dashboard_timings',{})
+    theme:loadTheme(), gridView:readJsonStorage('dashboard_grid_view',true), timings:readJsonStorage('dashboard_timings',{})
   });
   keys.preferences=workspaceStorage(app.workspaceUser,effectivePreferencesId(id)).preferences;
   app.storageKeys=keys;
