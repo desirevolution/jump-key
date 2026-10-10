@@ -44,14 +44,23 @@ type options struct {
 	configDir         string
 	iconsDir          string
 	copyDefaultConfig bool
+	readOnly          bool
+	publicWorkspaces  string
+	configUser        string
+	optionError       error
+	requireHTTPS      optionalBool
+	trustedProxies    string
 }
 
 type server struct {
-	configMu  sync.Mutex
-	distFS    fs.FS
-	configDir string
-	iconsDir  string
-	logger    *slog.Logger
+	configMu         sync.Mutex
+	distFS           fs.FS
+	configDir        string
+	iconsDir         string
+	logger           *slog.Logger
+	readOnly         bool
+	publicWorkspaces []string
+	configUser       string
 }
 
 func main() {
@@ -71,10 +80,13 @@ func main() {
 	}
 
 	app := &server{
-		distFS:    distFS,
-		configDir: opts.configDir,
-		iconsDir:  opts.iconsDir,
-		logger:    logger,
+		distFS:           distFS,
+		configDir:        opts.configDir,
+		iconsDir:         opts.iconsDir,
+		logger:           logger,
+		readOnly:         opts.readOnly,
+		publicWorkspaces: parseWorkspaceList(opts.publicWorkspaces),
+		configUser:       opts.configUser,
 	}
 
 	if opts.copyDefaultConfig {
@@ -93,9 +105,10 @@ func main() {
 
 	address := net.JoinHostPort(opts.host, fmt.Sprintf("%d", opts.port))
 
+	trustedProxies, _ := parseTrustedProxies(opts.trustedProxies) // Validated before startup.
 	httpServer := &http.Server{
 		Addr:              address,
-		Handler:           requestLogger(logger, mux),
+		Handler:           requestLogger(logger, enforceHTTPS(app.publicSecurity(mux), opts.httpsRequired(), trustedProxies)),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       15 * time.Second,
 		WriteTimeout:      30 * time.Second,
@@ -107,6 +120,8 @@ func main() {
 		"address", address,
 		"config_dir", opts.configDir,
 		"icons_dir", opts.iconsDir,
+		"read_only", opts.readOnly,
+		"require_https", opts.httpsRequired(),
 	)
 
 	if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -120,15 +135,22 @@ func parseOptions() options {
 
 	flag.StringVar(&opts.host, "host", defaultHost, "Host or IP address to listen on")
 	flag.IntVar(&opts.port, "port", defaultPort, "HTTP server port")
-	flag.StringVar(&opts.configDir, "config-dir", "", "Existing writable configuration directory (required)")
+	flag.StringVar(&opts.configDir, "config-dir", "", "Existing configuration directory (writable unless --read-only)")
 	flag.StringVar(&opts.iconsDir, "icons-dir", "", "Existing icons directory (required)")
 	flag.BoolVar(&opts.copyDefaultConfig, "copy-default-config", false, "Copy embedded default config when services.json does not exist")
+	opts.optionError = errors.Join(registerPublicOptions(flag.CommandLine, &opts, os.Getenv), registerHTTPSOptions(flag.CommandLine, &opts, os.Getenv))
 	flag.Parse()
 
 	return opts
 }
 
 func validateOptions(opts options) error {
+	if _, err := parseTrustedProxies(opts.trustedProxies); err != nil {
+		return err
+	}
+	if err := validatePublicOptions(opts); err != nil {
+		return err
+	}
 	if opts.configDir == "" {
 		return errors.New("--config-dir is required")
 	}
@@ -141,7 +163,7 @@ func validateOptions(opts options) error {
 	if net.ParseIP(opts.host) == nil && opts.host != "localhost" {
 		return fmt.Errorf("--host must be an IP address or localhost, got %q", opts.host)
 	}
-	if err := requireDirectory(opts.configDir, true); err != nil {
+	if err := requireDirectory(opts.configDir, !opts.readOnly); err != nil {
 		return fmt.Errorf("invalid config directory: %w", err)
 	}
 	if err := requireDirectory(opts.iconsDir, false); err != nil {
@@ -186,6 +208,9 @@ func testDirectoryWritable(directory string) error {
 }
 
 func (s *server) copyDefaultConfig() error {
+	if s.readOnly {
+		return errors.New("read-only")
+	}
 	target := filepath.Join(s.configDir, "services.json")
 
 	_, err := os.Stat(target)
@@ -252,6 +277,10 @@ func (s *server) handleHealth(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) handleConfig(w http.ResponseWriter, r *http.Request) {
+	if s.readOnly {
+		s.handlePublicConfig(w, r)
+		return
+	}
 	s.configMu.Lock()
 	defer s.configMu.Unlock()
 	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
@@ -349,6 +378,10 @@ func (s *server) serveConfigFile(w http.ResponseWriter, r *http.Request, filenam
 }
 
 func (s *server) putConfigFile(w http.ResponseWriter, r *http.Request, filename string) {
+	if s.readOnly {
+		http.Error(w, "read-only", http.StatusForbidden)
+		return
+	}
 	r.Body = http.MaxBytesReader(w, r.Body, maxConfigSize)
 	defer r.Body.Close()
 
@@ -449,6 +482,10 @@ func atomicWrite(filename string, data []byte, mode fs.FileMode) error {
 }
 
 func (s *server) handleIcons(w http.ResponseWriter, r *http.Request) {
+	if s.readOnly {
+		s.handlePublicIcon(w, r)
+		return
+	}
 	if r.Method != http.MethodGet && r.Method != http.MethodHead {
 		w.Header().Set("Allow", "GET, HEAD")
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
@@ -461,6 +498,10 @@ func (s *server) handleIcons(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) handleStatic(w http.ResponseWriter, r *http.Request) {
+	if s.readOnly && r.URL.Path == "/manifest.webmanifest" {
+		s.handlePublicManifest(w, r)
+		return
+	}
 	if r.Method != http.MethodGet && r.Method != http.MethodHead {
 		w.Header().Set("Allow", "GET, HEAD")
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)

@@ -28,6 +28,7 @@ export class JkDashboardHeader extends LitElement {
 
   static get properties() {
     return {
+      readOnly: { type: Boolean },
       hasWorkspaces: { type: Boolean },
       workspaceName: { type: String },
       workspaceNames: { type: Array },
@@ -143,7 +144,7 @@ export class JkDashboardHeader extends LitElement {
 
         <div class="${styles.rightSection}">
           <div class="${styles.actionGroup}">
-            <jk-icon-button icon="ui:plus" .desktopOnly=${true} .label=${this.t('quickAdd')} title="+" @click=${()=>this._dispatchEvent('quick-add')}></jk-icon-button>
+            ${!this.readOnly ? html`<jk-icon-button icon="ui:plus" .desktopOnly=${true} .label=${this.t('quickAdd')} title="+" @click=${()=>this._dispatchEvent('quick-add')}></jk-icon-button>` : ''}
             <jk-icon-button
               icon="${this.isGridView ? 'ui:rows-2' : 'ui:layout-grid'}"
               title="${this.t ? this.t('hkToggleView') : ''} [#]"
@@ -158,7 +159,7 @@ export class JkDashboardHeader extends LitElement {
 
             <jk-icon-button
               icon="ui:settings"
-              title="${this.t ? this.t('editConfig') : ''}"
+              title="${this.t ? this.t(this.readOnly ? 'localSettings' : 'editConfig') : ''}"
               .desktopOnly=${true}
               @click=${() => this._dispatchEvent('open-config')}
             ></jk-icon-button>

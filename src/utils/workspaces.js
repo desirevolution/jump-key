@@ -22,10 +22,13 @@ export async function initializeWorkspaces(app) {
   data=readJsonStorage('jumpkey-workspace-manifest',null);
   if (!data) throw error;
  }
+ app.readOnly=data.readOnly === true;
  app.workspaceUser=data.user;
  app.workspaces=data.workspaces;
  const explicit=new URLSearchParams(location.search).get('workspace');
- const id=explicit || readJsonStorage(`jumpkey-active:${data.user}`,'default');
+ const remembered=readJsonStorage(`jumpkey-active:${data.user}`,null);
+ const fallback=data.workspaces.find(w=>w.id==='default')?.id || data.workspaces[0]?.id;
+ const id=explicit || (data.workspaces.some(w=>w.id===remembered) ? remembered : fallback);
  await switchWorkspace(app,id,true);
  return true;
 }
@@ -66,7 +69,7 @@ export async function switchWorkspace(app,id,initial=false) {
   app.favorites=readJsonStorage(keys.favorites,{});
   app.continueHistory=readJsonStorage(keys.continueHistory,[]);
   app.workspaceId=id;
-  setWorkspaceContext({user:app.workspaceUser,id});
+  setWorkspaceContext({user:app.workspaceUser,id,readOnly:app.readOnly});
   app.resetInput(false);
   app.favoriteRecording=null;
   app.applyConfiguration(config);

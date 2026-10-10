@@ -30,6 +30,10 @@ func workspaceFilename(id, user string) string {
 	return id + ".workspace." + user + ".json"
 }
 func (s *server) handleWorkspaces(w http.ResponseWriter, r *http.Request) {
+	if s.readOnly {
+		s.handlePublicWorkspaces(w, r)
+		return
+	}
 	w.Header().Set("Cache-Control", "no-store")
 	if r.Method != http.MethodGet {
 		w.WriteHeader(http.StatusMethodNotAllowed)

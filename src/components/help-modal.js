@@ -28,6 +28,7 @@ export class JkHelpModal extends LitElement {
   }
 
   static properties = {
+    readOnly: { type: Boolean },
     show: { type: Boolean },
     isGridView: { type: Boolean },
     t: { type: Function },
@@ -50,9 +51,9 @@ export class JkHelpModal extends LitElement {
       { keys: ['Space'], desc: this.t('hkSearch') },
       { keys: [':'], desc: this.t('hkSearchEngines') },
       { keys: ['?'], desc: this.t('helpOpen') },
-      { keys: ['Ctrl', ','], desc: this.t('editConfig') },
-      { keys: ['+'], desc: this.t('quickAdd') },
-      { keys: ['Ctrl+E', 'A–Z', 'A–Z'], desc: this.t('hkEditService') },
+      { keys: ['Ctrl', ','], desc: this.t(this.readOnly ? 'localSettings' : 'editConfig') },
+      { keys: ['+'], write: true, desc: this.t('quickAdd') },
+      { keys: ['Ctrl+E', 'A–Z', 'A–Z'], write: true, desc: this.t('hkEditService') },
       { keys: ['Ctrl', '0–9'], desc: this.t('hkFavoriteRecord') },
       { keys: ['#'], desc: this.t('hkToggleView') },
     ];
@@ -70,13 +71,13 @@ export class JkHelpModal extends LitElement {
       { keys: ['Enter'], desc: this.t('hkOpenSelection') },
       { keys: ['Shift', 'Enter'], desc: this.t('hkOpenSelectionSameTab') },
       { keys: ['ESC'], desc: this.t('hkReset') },
-      { keys: ['Ctrl/Cmd', 'Enter'], desc: this.t('helpQuickSave') },
-      { keys: ['Ctrl/Cmd', '1/2/3/4'], desc: this.t('hkSwitchTabs') },
-      { keys: ['Ctrl/Cmd', 'S'], desc: this.t('helpEditorSave') },
-      { keys: ['Page Up/Down'], desc: this.t('helpEditorPage') }
+      { keys: ['Ctrl/Cmd', 'Enter'], write: true, desc: this.t('helpQuickSave') },
+      { keys: [this.readOnly ? 'Ctrl/Cmd + 1/2' : 'Ctrl/Cmd + 1/2/3/4'], desc: this.t(this.readOnly ? 'hkLocalTabs' : 'hkSwitchTabs') },
+      { keys: ['Ctrl/Cmd', 'S'], write: true, desc: this.t('helpEditorSave') },
+      { keys: ['Page Up/Down'], write: true, desc: this.t('helpEditorPage') }
     );
 
-    return shortcuts.map(
+    return shortcuts.filter(item=>!this.readOnly || !item.write).map(
       (item) => html`
         <div class="${styles.row}">
           <span class="${styles.rowDesc}">${item.desc}</span>
@@ -150,24 +151,25 @@ export class JkHelpModal extends LitElement {
                 ${this._renderActionRow('hand', this.t('helpHold'), this.t('helpTouchRemoveFavorite'))}
                 ${this._renderActionRow('search', this.t('helpSearchButton'), this.t('helpTouchSearch'))}
                 ${this._renderActionRow('layout-grid', this.t('helpViewButton'), this.t('helpTouchView'))}
-                ${this._renderActionRow('ellipsis', this.t('helpMoreButton'), this.t('helpTouchMore'))}
+                ${this._renderActionRow('ellipsis', this.t('helpMoreButton'), this.t(this.readOnly ? 'helpReadOnlyMore' : 'helpTouchMore'))}
               </div>
               <p class="px-3 pt-3 text-sm leading-relaxed text-slate-300">${this.t('helpRecentRemove')}</p>
             </div>
             <details class="space-y-3 px-3 text-sm leading-relaxed text-slate-300">
               <summary class="cursor-pointer rounded-lg py-2 font-semibold focus-visible:outline-2">${this.t('helpLinksSection')}</summary>
-              <p>${this.t('helpServiceActions')}</p>
+              <p>${this.t(this.readOnly ? 'helpReadOnlyActions' : 'helpServiceActions')}</p>
+              <p><strong>${this.t('tabGeneral')} → ${this.t('resetLocalTitle')}:</strong> ${this.t('resetLocalHelp')}</p>
               <p class="hidden md:block">${this.t('helpDesktopActions')}</p>
               <p class="md:hidden">${this.t('helpMobileLayout')}</p>
-              <p>${this.t('helpEditService')}</p>
-              <p>${this.t('helpPositionDelete')}</p>
-              <p>${this.t('helpFormValidation')}</p><p>${this.t('localTimingHint')}</p>
-              <p class="hidden md:block">${this.t('helpAddLink')}</p>
-              <p class="hidden md:block">${this.t('helpBookmarklet')}</p>
+              ${!this.readOnly ? html`<p>${this.t('helpEditService')}</p>` : ''}
+              ${!this.readOnly ? html`<p>${this.t('helpPositionDelete')}</p>` : ''}
+              ${!this.readOnly ? html`<p>${this.t('helpFormValidation')}</p>` : ''}<p>${this.t('localTimingHint')}</p>
+              ${!this.readOnly ? html`<p class="hidden md:block">${this.t('helpAddLink')}</p>` : ''}
+              ${!this.readOnly ? html`<p class="hidden md:block">${this.t('helpBookmarklet')}</p>` : ''}
               <div class="space-y-3 md:hidden">
-                <p>${this.t('helpMobileAdd')}</p>
+                ${!this.readOnly ? html`<p>${this.t('helpMobileAdd')}</p>` : ''}
                 <p>${this.t('helpInstall')}</p>
-                <p>${this.t('helpShare')}</p>
+                ${!this.readOnly ? html`<p>${this.t('helpShare')}</p>` : ''}
               </div>
             </details>
           </div>

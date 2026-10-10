@@ -31,6 +31,7 @@ export class JkMobileMenu extends LitElement {
   }
 
   static properties = {
+    readOnly: { type: Boolean },
     canInstall: { type: Boolean },
     show: { type: Boolean },
     mode: { type: String },
@@ -105,7 +106,7 @@ export class JkMobileMenu extends LitElement {
             this.mode === 'menu'
               ? html`
                   <div class="${styles.list}">
-                    <button class="${styles.action}" @click=${()=>this._emit('quick-add')}><jk-icon icon="ui:plus" class="size-5"></jk-icon>${this.t('quickAdd')}</button>
+                    ${!this.readOnly ? html`<button class="${styles.action}" @click=${()=>this._emit('quick-add')}><jk-icon icon="ui:plus" class="size-5"></jk-icon>${this.t('quickAdd')}</button>` : ''}
                     ${this.canInstall ? html`<button class="${styles.action}" @click=${()=>this._emit('install-app')}><jk-icon icon="ui:download" class="size-5"></jk-icon>${this.t('installApp')}</button>` : ''}
                     <button class="${styles.action}" @click=${() => this._emit('open-help')}>
                       <span class="${styles.actionIcon}"

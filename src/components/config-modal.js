@@ -1,3 +1,4 @@
+import { checkResetConnection, clearLocalData, resetDestination } from '../utils/reset-local-data.js';
 import { generateShortcuts } from '../utils/shortcuts.js';
 import { validateConfig } from '../utils/config-validator.js';
 import { html, LitElement } from 'lit';
@@ -40,6 +41,10 @@ export class JkConfigModal extends LitElement {
   }
 
   static properties = {
+    readOnly: { type: Boolean },
+    workspaceApi: { type: Boolean },
+    _showResetDialog: { state: true },
+    _resetting: { state: true },
     separateWorkspacePreferences: {},
     workspaceLabel: {},
     workspaceFile: {},
@@ -62,6 +67,8 @@ export class JkConfigModal extends LitElement {
   constructor() {
     super();
     this.show = false;
+    this._showResetDialog = false;
+    this._resetting = false;
     this.categories = [];
     this.searchEngines = [];
     this.theme = 'midnight';
@@ -101,7 +108,7 @@ export class JkConfigModal extends LitElement {
   }
 
   _handleKeyDown(e) {
-    if (this._showDiscardDialog) return;
+    if (this._showDiscardDialog || this._showResetDialog || this._resetting) return;
 
     if (e.ctrlKey || e.metaKey) {
       const tab = { '1': 'general', '2': 'appearance', '3': 'data', '4': 'editor' }[e.key];
@@ -128,6 +135,7 @@ export class JkConfigModal extends LitElement {
   }
 
   _setActiveTab(tab) {
+    if (this.readOnly && ['data', 'editor'].includes(tab)) return;
     this._activeTab = tab;
   }
 
@@ -139,7 +147,7 @@ export class JkConfigModal extends LitElement {
   }
 
   _handleConfigImported(e) {
-    if (this.saving) return;
+    if (this.saving || this._resetting) return;
     const importedConfig = e.detail;
     this._editorValue = JSON.stringify(importedConfig, null, 2);
     this._isEditorConfigValid = true;
@@ -148,7 +156,7 @@ export class JkConfigModal extends LitElement {
   }
 
   _handleClose() {
-    if (this.saving) return;
+    if (this.saving || this._resetting || this._showResetDialog) return;
     if (this._hasEditorConfigChanged) {
       this._showDiscardDialog = true;
     } else {
@@ -161,7 +169,25 @@ export class JkConfigModal extends LitElement {
     this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
   }
 
+  async _resetLocalData() {
+    if (this._resetting || this.saving) return;
+    this._showResetDialog = false;
+    this._resetting = true;
+    let message = 'resetUnavailable';
+    try {
+      if (navigator.onLine === false) throw new Error('offline');
+      await checkResetConnection({ base: import.meta.env.BASE_URL, workspaceApi: this.workspaceApi });
+      message = 'resetFailed';
+      clearLocalData();
+      window.location.replace(resetDestination(window.location.href));
+    } catch {
+      this._resetting = false;
+      this.dispatchEvent(new CustomEvent('notify', { detail: { type: 'error', message: this.t(message) }, bubbles: true, composed: true }));
+    }
+  }
+
   _handleSave() {
+    if (this.readOnly) return;
     if (this.saving || !this._hasEditorConfigChanged) return;
     try {
       const newConfig = JSON.parse(this._editorValue);
@@ -180,7 +206,7 @@ export class JkConfigModal extends LitElement {
   _renderActiveTabContent() {
     switch (this._activeTab) {
       case 'general':
-        return html`<jk-config-general .separateWorkspacePreferences=${this.separateWorkspacePreferences} .preferences=${this.preferences} .t=${this.t}></jk-config-general>`;
+        return html`<jk-config-general @reset-local-data=${e=>{e.stopPropagation();if(!this.saving)this._showResetDialog=true;}} .readOnly=${this.readOnly} .separateWorkspacePreferences=${this.separateWorkspacePreferences} .preferences=${this.preferences} .t=${this.t}></jk-config-general>`;
       case 'appearance':
         return html`
           <jk-config-appearance
@@ -229,7 +255,7 @@ export class JkConfigModal extends LitElement {
 
     return html`
       <div @click="${this._handleClose}" class="${styles.overlay}">
-        <div @click="${(e) => e.stopPropagation()}" class="${styles.container}">
+        <div ?inert=${this._resetting || this._showResetDialog} @click="${(e) => e.stopPropagation()}" class="${styles.container}">
           <div class="${styles.header}">
             <div class="${styles.headerLeft}">
               <div class="${styles.iconBadge}">
@@ -238,7 +264,7 @@ export class JkConfigModal extends LitElement {
               <div>
                 <h2 class="${styles.title}">JumpKey</h2>
                 <p class="${styles.subtitle}">
-                  ${this.t('configSubtitle')} ${this.workspaceLabel ? ' · ' + this.t('workspace') + ': ' + this.workspaceLabel : ''}
+                  ${this.t(this.readOnly ? 'localSettings' : 'configSubtitle')} ${this.workspaceLabel ? ' · ' + this.t('workspace') + ': ' + this.workspaceLabel : ''}
                 </p>
               </div>
             </div>
@@ -278,7 +304,7 @@ export class JkConfigModal extends LitElement {
                 ${this.t('tabAppearance')}
                 
               </button>
-              <button
+              ${!this.readOnly ? html`<button
                 @click="${() => this._setActiveTab('data')}"
                 class="${styles.sidebarBtn} ${tabDataClass}"
               >
@@ -292,8 +318,7 @@ export class JkConfigModal extends LitElement {
               >
                 <jk-icon icon="ui:code-2" class="size-4"></jk-icon>
                 ${this.t('tabEditor')}
-                
-              </button>
+              </button>` : ''}
             </aside>
 
             <main class="${styles.contentArea} ${this._activeTab === 'editor' ? 'jk-config-editor-panel' : 'overflow-y-auto'}">${this._renderActiveTabContent()}</main>
@@ -333,6 +358,14 @@ export class JkConfigModal extends LitElement {
         </div>
       </div>
 
+      ${this._resetting ? html`<div class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/80"><p role="status" class="text-slate-100">${this.t('resetLocalProgress')}</p></div>` : ''}
+      ${this._showResetDialog ? html`<jk-dialog .show=${true} .destructive=${true}
+        .title=${this.t('resetLocalTitle')}
+        .message=${this.t('resetLocalConfirm') + (this._hasEditorConfigChanged ? ' ' + this.t('resetUnsaved') : '')}
+        icon="ui:trash-2" iconColor="jk-status-warning"
+        .confirmLabel=${this.t('resetLocalConfirmButton')} .cancelLabel=${this.t('cancel')}
+        @confirm=${this._resetLocalData}
+        @cancel=${()=>this._showResetDialog=false} @close=${()=>this._showResetDialog=false}></jk-dialog>` : ''}
       ${
         this._showDiscardDialog
           ? html`

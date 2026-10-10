@@ -1,3 +1,4 @@
+import { allowedNavigation } from '../navigation-policy.js';
 // utils/keyboard/search.js
 
 import { getFilteredServices } from '../shortcuts.js';
@@ -89,10 +90,11 @@ function buildSearchItems(app) {
       action({ openInSameTab = false } = {}) {
         const url = previewEngine.url.replace('%s', encodeURIComponent(previewEngine.searchTerms));
 
+        if (!allowedNavigation(url, app.readOnly)) return;
         if (openInSameTab) {
           window.location.assign(url);
         } else {
-          window.open(url, '_blank');
+          window.open(url, '_blank', 'noopener,noreferrer');
           app.resetInput(true);
         }
       },
