@@ -1,0 +1,23 @@
+services:
+  jump-key:
+    image: ghcr.io/desirevolution/jump-key:latest
+    environment:
+      JUMPKEY_READ_ONLY: 'true'
+      JUMPKEY_REQUIRE_HTTPS: '${JUMPKEY_REQUIRE_HTTPS:-true}'
+      # Set this in .env to the immediate proxy IP/CIDR as seen by JumpKey.
+      # Empty means no forwarded headers are trusted; HTTP requests get 403.
+      JUMPKEY_TRUSTED_PROXIES: '${JUMPKEY_TRUSTED_PROXIES:-}'
+      JUMPKEY_PUBLIC_WORKSPACES: 'default,home'
+      # Optional: reads services.arthur.json and home.workspace.arthur.json.
+      # JUMPKEY_CONFIG_USER: 'arthur'
+    volumes:
+      - ./config:/app/config:ro
+      - ./icons:/app/icons:ro
+    ports:
+      - '127.0.0.1:8080:8080'
+    read_only: true
+    user: '65532:65532'
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true

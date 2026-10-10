@@ -21,9 +21,10 @@ function getDigitFromEvent(e) {
 }
 
 export function handleGlobalKeyDown(e, app) {
+  if (app.readOnly && ((e.ctrlKey && e.key.toLowerCase() === "e") || e.key === "+")) return;
   if (app.showQuickAdd || app.actionService || app.dialogConfig?.show || e.isComposing) return;
   if (e.target.closest?.('input, textarea, select, [contenteditable="true"]') && !app.showSearch) return;
-  if (e.key.toLowerCase() === 'e' && e.ctrlKey && !e.altKey && !e.metaKey && !app.showConfigModal && !app.showSearch && !app.showHelp) {
+  if (!app.readOnly && e.key.toLowerCase() === 'e' && e.ctrlKey && !e.altKey && !e.metaKey && !app.showConfigModal && !app.showSearch && !app.showHelp) {
     e.preventDefault();
     app.resetInput(false);
     app.favoriteRecording = null;
@@ -38,7 +39,7 @@ export function handleGlobalKeyDown(e, app) {
     handleEditInput(e.key.toLowerCase(), app);
     return;
   }
-  if (e.key === '+' && !e.ctrlKey && !e.altKey && !e.metaKey && !app.showConfigModal && !app.showSearch && !app.showHelp && !e.target.closest?.('input, textarea, select, [contenteditable="true"]')) {
+  if (!app.readOnly && e.key === '+' && !e.ctrlKey && !e.altKey && !e.metaKey && !app.showConfigModal && !app.showSearch && !app.showHelp && !e.target.closest?.('input, textarea, select, [contenteditable="true"]')) {
     e.preventDefault(); app.openQuickAdd(); return;
   }
   // The modal owns its shortcuts, including Escape and unsaved-change handling.

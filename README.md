@@ -99,12 +99,59 @@ Open `http://localhost:8080`. On Windows, run `jump-key.exe` with the same optio
 | --- | --- | --- |
 | `--host` | `127.0.0.1` | Listen address: an IP address or `localhost`. Docker overrides this to `0.0.0.0`. |
 | `--port` | `8080` | HTTP port, from 1 to 65535. |
-| `--config-dir` | None; required | Existing writable directory containing configuration and backups. |
+| `--config-dir` | None; required | Existing configuration directory. Must be writable unless read-only mode is enabled. |
 | `--icons-dir` | None; required | Existing directory containing custom icons. Can be empty. |
 | `--copy-default-config` | `false` | Copy the embedded example to `services.json` if missing. |
+| `--read-only` | `false` | Disable writes and publish only the workspace allowlist. Environment: `JUMPKEY_READ_ONLY`. |
+| `--public-workspaces` | Empty | Comma-separated workspace IDs, required in read-only mode. Environment: `JUMPKEY_PUBLIC_WORKSPACES`. |
+| `--config-user` | Empty | Optional fixed user for read-only file selection. Environment: `JUMPKEY_CONFIG_USER`. |
+| `--require-https` | Read-only mode: `true`; otherwise `false` | Reject insecure requests. Environment: `JUMPKEY_REQUIRE_HTTPS`. |
+| `--trusted-proxies` | Empty | Trusted immediate proxy IPs/CIDRs. Environment: `JUMPKEY_TRUSTED_PROXIES`. |
 | `--help` | — | Show command-line usage. |
 
-The server exposes `GET /healthz` for health checks. Configuration uploads are limited to 2 MiB. Settings are provided through command-line flags; there are no application-specific environment-variable equivalents.
+The server exposes `GET /healthz` for health checks. Configuration uploads are limited to 2 MiB. The read-only and HTTPS options also accept the environment variables listed above. Explicit command-line flags override their environment values. Invalid boolean environment values cause a startup error.
+
+## Public read-only installation
+
+Use a separate read-only instance to publish selected workspaces. The entire instance is read-only; there is no separate `/read-only/` route. A private instance or a local editor can maintain the files.
+
+```bash
+./jump-key --config-dir ./config --icons-dir ./icons \
+  --read-only --public-workspaces default,home --config-user arthur \
+  --trusted-proxies 127.0.0.1,::1
+```
+
+This publishes only `services.arthur.json` and `home.workspace.arthur.json`. Omit `--config-user` to use `services.json` and `home.workspace.json`. Request headers cannot change this selection: `Remote-User` is ignored. The allowlist applies to both workspace discovery and direct configuration requests; adding another file does not publish it.
+
+Read-only startup requires a non-empty allowlist and readable, regular configuration files for every listed workspace. Invalid IDs, duplicates, missing files and config symlinks cause a startup error. `--config-user` and `--public-workspaces` require `--read-only`; `--copy-default-config` is incompatible with it. No write check, automatic config save or backup creation runs in this mode. IDs missing from old files are generated in memory.
+
+On a first visit, Default opens if allowed; otherwise the first listed workspace opens. A remembered workspace is reused if it is still allowed. An explicit link to a blocked workspace fails instead of showing a different one.
+
+The UI hides adding, editing, moving, deleting, the JSON editor, import/export and the bookmarklet. Write shortcuts and incoming shared links cannot open the editor. Favorites, recent history, themes, view modes and timing preferences remain browser-local. The PWA manifest omits link sharing. Help reflects the available actions.
+
+For Docker, use [compose.read-only.yml](compose.read-only.yml):
+
+```bash
+docker compose -f compose.read-only.yml up -d
+```
+
+Set the workspace list and optional user in that file. Config and icons are mounted read-only, and the container runs without root privileges or Linux capabilities. Directories and published files must be readable by UID 65532. The example binds to localhost for a reverse proxy on the same host; adjust networking for a containerized or remote proxy. Use an image built from this version or newer.
+
+### HTTPS enforcement
+
+HTTPS is required by default in read-only mode. Writable installations keep their existing HTTP behavior unless `--require-https` is enabled. Explicit flags override environment values. For local testing, use `--require-https=false` or `JUMPKEY_REQUIRE_HTTPS=false`.
+
+JumpKey currently listens on HTTP; terminate TLS at a reverse proxy. Set `--trusted-proxies` / `JUMPKEY_TRUSTED_PROXIES` to the proxy’s immediate source IP as seen by JumpKey, or a dedicated trusted CIDR. For a proxy connecting directly over host loopback, `127.0.0.1,::1` is appropriate. Docker port publishing may instead present a bridge gateway address. Do not copy the loopback example without checking your network setup. Configure the Compose example through `.env`, for example `JUMPKEY_TRUSTED_PROXIES=192.0.2.10` with the actual proxy address replacing this documentation address.
+
+The proxy must overwrite `X-Forwarded-Proto` with the original connection protocol. JumpKey accepts exactly one value, `https`, from a listed peer. It ignores `X-Forwarded-For`, `Forwarded`, the Host header and the requested URL’s scheme for this decision. Never trust `0.0.0.0/0`, `::/0` or a network containing untrusted clients: any trusted peer can assert HTTPS. Direct TLS connections would also be recognized, but this server does not currently offer certificate/TLS listener options.
+
+With HTTPS enforcement enabled, unverified requests receive **403**; JumpKey does not redirect. Configure HTTP-to-HTTPS redirects at the proxy. An empty proxy list trusts no forwarded headers, so HTTP access is denied even if the browser reached a proxy over HTTPS. Only GET/HEAD requests to `/healthz` remain accessible over HTTP for internal health checks. The check runs on every server request; it does not erase previously cached offline dashboards.
+
+Put the public instance behind an HTTPS reverse proxy such as Caddy. Keep the private writable instance on a separate, authenticated origin and prevent direct public access to its port. Request-rate and connection limits belong at the proxy or hosting layer. JumpKey has no built-in authentication or DDoS protection.
+
+The public server rejects methods other than GET/HEAD, blocks config backup URLs, restricts icon files to supported image types and confines file reads to their configured directories. Icon directory listings and symlink escapes are blocked. Served SVG icons are sandboxed. Security headers restrict scripts and framing; service and search links accept only HTTP(S), including relative web links. Dynamic icons use Iconify’s public API hosts; remote images must use HTTPS. All supported images in the mounted icons directory are public, so mount only icons intended for this instance.
+
+**Published configuration is public data.** Visitors can download the JSON even without an export button, including custom fields. Do not include secrets or private URLs. Browsers can retain offline copies; removing a workspace from the allowlist prevents new server access but cannot revoke data already downloaded. Prefer a dedicated hostname instead of converting a previously private origin into a public one.
 
 ## Service actions and mobile layout
 
@@ -162,7 +209,9 @@ Set either value to zero or turn it off to disable the timer. Existing saved val
 
 **Separate workspace preferences** is off by default. All workspaces then share Default’s theme, view mode and timing settings. Enable it to keep these settings separately: a workspace without saved preferences copies Default once, then changes independently. Turning the switch off preserves individual preferences for later use. Configuration files, favorites and Continue history remain separate either way.
 
-The **Add to JumpKey** bookmarklet is at the bottom of General; see [Adding links](#adding-links).
+The **Add to JumpKey** bookmarklet is in General; see [Adding links](#adding-links).
+
+At the bottom of General, **Reset local data** clears JumpKey’s favorites, history, preferences, workspace selection, installation-banner dismissal and offline configurations for all workspaces and users on this browser origin. It is available in writable and read-only mode. Confirmation also warns about any unsaved JSON editor changes. Before deleting data, JumpKey requests the workspace list and initial configuration from the server; if that fails, nothing is deleted. The page then reloads with default settings and server data. Server files and backups are untouched. The PWA stays installed; application assets and image/font caches remain available. Storage belonging to other applications is not cleared. JumpKey installations sharing an origin also share the reset scope.
 
 ### Configuration fields
 
@@ -323,7 +372,7 @@ Concurrent edits are not detected. If two devices save different versions, the l
 
 ## Authentication and user-specific files
 
-JumpKey is intended for trusted environments, such as a local network or an authentication proxy setup using Authelia or Authentik. It does not provide its own authentication. Hardening it as a public Internet-facing service is outside the project's scope; if you expose it publicly, you are responsible for authentication and security.
+The writable application is intended for trusted environments, such as a local network or an authentication proxy using Authelia or Authentik. JumpKey does not provide its own authentication. For a publicly accessible dashboard, use the [read-only installation](#public-read-only-installation) with an explicit workspace allowlist.
 
 If the proxy supplies `Remote-User`, the server selects a user-specific filename:
 

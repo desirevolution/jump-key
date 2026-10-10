@@ -1,3 +1,4 @@
+import { allowedNavigation } from '../utils/navigation-policy.js';
 import { html, LitElement } from 'lit';
 import './icon.js';
 import './icon-button.js';
@@ -24,6 +25,7 @@ export class JkSearchModal extends LitElement {
   }
 
   static properties = {
+    readOnly: { type: Boolean },
     show: { type: Boolean },
     searchQuery: { type: String },
     searchEngines: { type: Array },
@@ -165,10 +167,11 @@ export class JkSearchModal extends LitElement {
             '%s',
             encodeURIComponent(searchTermsPreview.trim())
           );
+          if (!allowedNavigation(finalUrl, this.readOnly)) return;
           if (e.shiftKey) {
             window.location.assign(finalUrl);
           } else {
-            window.open(finalUrl, '_blank');
+            window.open(finalUrl, '_blank', 'noopener,noreferrer');
             this._handleClose();
           }
         }}"

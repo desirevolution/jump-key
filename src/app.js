@@ -1,3 +1,4 @@
+import { allowedNavigation } from './utils/navigation-policy.js';
 import { loadWorkspacePreferences, workspacePreferencesEnabled, effectivePreferencesId, WORKSPACE_PREFERENCES_MODE } from './utils/workspace-preferences.js';
 import { initializeWorkspaces, switchWorkspace, workspaceStorage } from './utils/workspaces.js';
 import './components/workspace-picker.js';
@@ -60,6 +61,7 @@ class DashboardApp extends LitElement {
     actionService: { type: Object },
     showQuickAdd: { type: Boolean },
     savingConfig: { type: Boolean },
+    readOnly: { type: Boolean },
     categories: { type: Array },
     searchEngines: { type: Array },
     // UI State
@@ -124,6 +126,7 @@ class DashboardApp extends LitElement {
     this.isInvalidInput = false;
     this.isValidInput = false;
     this.separateWorkspacePreferences=workspacePreferencesEnabled();
+    this.readOnly=true;
     this.workspaces=[];
     this.workspaceId='default';
     this.storageKeys={...STORAGE_KEYS};
@@ -283,7 +286,7 @@ class DashboardApp extends LitElement {
   }
 
   async handleSaveConfig(e) {
-    if (this.savingConfig) return;
+    if (this.readOnly || this.savingConfig) return;
     this.savingConfig = true;
     try {
       const config = await persistConfig(e.detail.newConfig, { base: import.meta.env.BASE_URL });
@@ -309,6 +312,7 @@ class DashboardApp extends LitElement {
     try {
       const supported = await initializeWorkspaces(this);
       if (!supported) {
+    this.readOnly=false;
     try {
       const res = await fetch(`${import.meta.env.BASE_URL}config/services.json`);
       if (!res.ok) throw new Error(`Configuration request failed: ${res.status}`);
@@ -462,6 +466,7 @@ class DashboardApp extends LitElement {
   }
 
   async trackClick(service, options = {}) {
+    if (!allowedNavigation(service.url, this.readOnly)) { this.showToast(this.t('blockedLink'), 'error'); return; }
     const {
       updateContinue = true,
       shortcutLabel = '',
@@ -510,7 +515,7 @@ class DashboardApp extends LitElement {
       return;
     }
 
-    window.open(service.url, '_blank');
+    window.open(service.url, '_blank', 'noopener,noreferrer');
   }
 
   showActionFeedback(service) {
@@ -823,6 +828,7 @@ class DashboardApp extends LitElement {
   }
 
   openQuickAdd(initial = {}, returnToOverview = false) {
+    if (this.readOnly) return;
     if (!this.configuration) return;
     this.cancelPendingAction();
     this.showSearch = false;
@@ -851,7 +857,7 @@ class DashboardApp extends LitElement {
 
   templateConfigModal() {
     return html`
-      <jk-config-modal
+      <jk-config-modal .workspaceApi=${this.workspaces.length > 0} .readOnly=${this.readOnly}
         .workspaceLabel=${this.workspaces.length > 1 ? this.workspaceItems.find(w=>w.id===this.workspaceId)?.name || '' : ''}
         .workspaceFile=${this.workspaces.find(w=>w.id===this.workspaceId)?.file || ''}
         .show=${this.showConfigModal}
@@ -875,7 +881,7 @@ class DashboardApp extends LitElement {
 
   templateMobileMenu() {
     return html`
-      <jk-mobile-menu
+      <jk-mobile-menu .readOnly=${this.readOnly}
         .show=${this.showMobileMenu}
         .mode=${this.mobileMenuMode}
         .canInstall=${this.installController.available}
@@ -927,7 +933,7 @@ class DashboardApp extends LitElement {
 
   templateHelpModal() {
     return html`
-      <jk-help-modal
+      <jk-help-modal .readOnly=${this.readOnly}
         .show=${this.showHelp}
         .isGridView=${this.isGridView}
         .t=${this.t}
@@ -938,7 +944,7 @@ class DashboardApp extends LitElement {
 
   templateSearchModal(filteredServices) {
     return html`
-      <jk-search-modal
+      <jk-search-modal .readOnly=${this.readOnly}
         .show=${this.showSearch}
         .searchQuery=${this.searchQuery}
         .searchEngines=${this.searchEngines}
@@ -1004,12 +1010,12 @@ class DashboardApp extends LitElement {
       ${this.templateKeyBadge()} ${this.templateActionFeedback()} ${this.templateHelpModal()}
       ${this.templateSearchModal(filteredServices)} ${this.templateConfigModal()}
       ${this.templateMobileMenu()} ${this.templateDialog()}
-      ${this.showQuickAdd ? html`<jk-quick-add .config=${this.configuration} .initial=${this.quickInitial} .categoryKey=${this.activeCategoryKey} .t=${this.t}
+      ${this.showQuickAdd && !this.readOnly ? html`<jk-quick-add .config=${this.configuration} .initial=${this.quickInitial} .categoryKey=${this.activeCategoryKey} .t=${this.t}
         @close=${() => this.closeQuickAdd()}
         @saved=${e => {this.applyConfiguration(e.detail);this.closeQuickAdd();this.showToast(this.t('editConfigSaveDone'),'success');}}
       ></jk-quick-add>` : ''}
 
-      ${this.actionService ? html`<jk-service-actions .anchor=${this.actionAnchor} .service=${this.actionService}
+      ${this.actionService ? html`<jk-service-actions .readOnly=${this.readOnly} .anchor=${this.actionAnchor} .service=${this.actionService}
         .favorite=${Object.values(this.favorites).includes(this.actionService.id)} .t=${this.t}
         @action=${e => this.handleServiceAction(e.detail)}></jk-service-actions>` : ''}
       <jk-toast
@@ -1023,7 +1029,7 @@ class DashboardApp extends LitElement {
 
 
       ${this.showWorkspacePicker ? html`<jk-workspace-picker .items=${this.workspaceItems} .active=${this.workspaceId} .anchor=${this.workspaceAnchor} .t=${this.t} @cycle=${async()=>{this.showWorkspacePicker=false;await this.updateComplete;this.cycleWorkspace();}} @close=${()=>this.showWorkspacePicker=false} @select=${e=>this.switchWorkspace(e.detail)}></jk-workspace-picker>` : ''}
-      <jk-dashboard-header ?inert=${this.workspaceLoading}
+      <jk-dashboard-header .readOnly=${this.readOnly} ?inert=${this.workspaceLoading}
         .workspaceName=${this.workspaceItems.find(w=>w.id===this.workspaceId)?.name || '—'}
         .hasWorkspaces=${this.workspaces.length > 1}
         .workspaceNames=${this.workspaceItems.map(w => w.name)}
