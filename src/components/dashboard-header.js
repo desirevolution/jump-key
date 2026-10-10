@@ -44,7 +44,7 @@ export class JkDashboardHeader extends LitElement {
 
   constructor() {
     super();
-    this.isGridView = false;
+    this.isGridView = true;
     this.lang = 'en';
     this.workspaceNames = [];
     this._scrolled = false;

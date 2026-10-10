@@ -130,7 +130,7 @@ class DashboardApp extends LitElement {
     this.workspaces=[];
     this.workspaceId='default';
     this.storageKeys={...STORAGE_KEYS};
-    this.isGridView = readJsonStorage(STORAGE_KEYS.gridView, false);
+    this.isGridView = readJsonStorage(STORAGE_KEYS.gridView, true);
 
     // User Data & Search
     this.favorites = readJsonStorage(this.storageKeys.favorites, {});
