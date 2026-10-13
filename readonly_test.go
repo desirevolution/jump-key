@@ -155,3 +155,29 @@ func TestPublicOptions(t *testing.T) {
 		}
 	}
 }
+
+func TestPublicWorkspaceCustomNames(t *testing.T) {
+	s, h := publicFixture(t)
+	for name, content := range map[string]string{
+		"services.arthur.json":          `{"workspaceName":"Shared Links","categories":[],"searchEngines":[]}`,
+		"home.workspace.arthur.json":    `{"workspaceName":"Home & Media","categories":[],"searchEngines":[]}`,
+		"private.workspace.arthur.json": `{"workspaceName":"Hidden","categories":[],"searchEngines":[]}`,
+	} {
+		if err := os.WriteFile(filepath.Join(s.configDir, name), []byte(content), 0600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	r := httptest.NewRequest("GET", "/api/workspaces", nil)
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, r)
+	if w.Code != 200 {
+		t.Fatal(w.Code, w.Body.String())
+	}
+	var result struct{ Workspaces []workspaceEntry }
+	if err := json.Unmarshal(w.Body.Bytes(), &result); err != nil {
+		t.Fatal(err)
+	}
+	if len(result.Workspaces) != 2 || result.Workspaces[0].Name != "Home & Media" || result.Workspaces[1].Name != "Shared Links" {
+		t.Fatalf("wrong public labels/allowlist: %+v", result.Workspaces)
+	}
+}

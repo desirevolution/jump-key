@@ -1,6 +1,7 @@
 import { allowedNavigation } from './utils/navigation-policy.js';
 import { loadWorkspacePreferences, workspacePreferencesEnabled, effectivePreferencesId, WORKSPACE_PREFERENCES_MODE } from './utils/workspace-preferences.js';
 import { initializeWorkspaces, switchWorkspace, workspaceStorage } from './utils/workspaces.js';
+import { workspaceLabel } from './utils/workspace-label.js';
 import './components/workspace-picker.js';
 import { normalizeTimings } from './utils/preferences.js';
 import './components/service-actions.js';
@@ -217,7 +218,7 @@ class DashboardApp extends LitElement {
       this.continueLastUsedCycle = false;
     }
   }
-  get workspaceItems() { return this.workspaces.map(w => w.id === 'default' ? { ...w, name: this.t('workspaceDefault') } : w); }
+  get workspaceItems() { return this.workspaces.map(w => ({ ...w, name: w.name || (w.id === 'default' ? this.t('workspaceDefault') : workspaceLabel(w.id)) })); }
 
   async cycleWorkspace() {
     const previous = this.actionManager.activeType === 'workspace' ? this.pendingWorkspace : this.workspaceLoading ? this.workspaceRequested : this.workspaceId;
@@ -228,7 +229,7 @@ class DashboardApp extends LitElement {
     if (!this.preferences.launchDelay) { this.switchWorkspace(target.id); return; }
     const feedback = this.querySelector('jk-action-feedback');
     const action = this.actionManager.start({type:'workspace',cancel:()=>feedback?.cancel()});
-    const confirmed = await feedback.show({service:{name:target.id === 'default' ? this.t('workspaceDefault') : target.name,category:this.t('workspace'),icon:'ui:layout-grid'},duration:this.preferences.launchDelay*1000});
+    const confirmed = await feedback.show({service:{name:this.workspaceItems.find(w=>w.id===target.id)?.name || target.name,category:this.t('workspace'),icon:'ui:layout-grid'},duration:this.preferences.launchDelay*1000});
     if(!this.actionManager.isActive(action)) return;
     this.actionManager.complete(action);
     if(confirmed) this.switchWorkspace(target.id);
@@ -279,6 +280,19 @@ class DashboardApp extends LitElement {
     writeJsonStorage(this.storageKeys.favorites, this.favorites);
     writeJsonStorage(this.storageKeys.continueHistory, this.continueHistory);
     this.configuration = config;
+    if (this.workspaces.some(w => w.id === this.workspaceId)) {
+      const name = workspaceLabel(this.workspaceId, config.workspaceName);
+      if (this.workspaces.find(w => w.id === this.workspaceId).name !== name) {
+        this.workspaces = this.workspaces.map(w => w.id === this.workspaceId ? { ...w, name } : w);
+        // Keep the offline workspace selector consistent after a local edit.
+        const cached = readJsonStorage('jumpkey-workspace-manifest', null);
+        if (cached?.user === this.workspaceUser && Array.isArray(cached.workspaces)) {
+          writeJsonStorage('jumpkey-workspace-manifest', {
+            ...cached, workspaces: cached.workspaces.map(w => w.id === this.workspaceId ? { ...w, name } : w)
+          });
+        }
+      }
+    }
     this.categories = generateShortcuts(config.categories);
     if (this.activeCategoryKey && !this.categories.some(c => c.categoryKey === this.activeCategoryKey)) this.resetNavigationInput(false);
     this.searchEngines = config.searchEngines;

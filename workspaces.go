@@ -2,8 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strings"
@@ -29,6 +31,31 @@ func workspaceFilename(id, user string) string {
 	}
 	return id + ".workspace." + user + ".json"
 }
+
+// Read only the optional display name; do not alter IDs or configuration filenames.
+func configuredWorkspaceName(reader io.Reader) string {
+	var config struct {
+		WorkspaceName json.RawMessage `json:"workspaceName"`
+	}
+	if err := json.NewDecoder(io.LimitReader(reader, maxConfigSize+1)).Decode(&config); err != nil {
+		return ""
+	}
+	name, valid := parseWorkspaceName(config.WorkspaceName)
+	if !valid {
+		return ""
+	}
+	return name
+}
+
+func (s *server) workspaceNameFromFile(filename string) string {
+	f, err := os.Open(filepath.Join(s.configDir, filename))
+	if err != nil {
+		return ""
+	}
+	defer f.Close()
+	return configuredWorkspaceName(f)
+}
+
 func (s *server) handleWorkspaces(w http.ResponseWriter, r *http.Request) {
 	if s.readOnly {
 		s.handlePublicWorkspaces(w, r)
@@ -60,7 +87,7 @@ func (s *server) handleWorkspaces(w http.ResponseWriter, r *http.Request) {
 		}
 		name := entry.Name()
 		if name == workspaceFilename("default", user) {
-			list = append(list, workspaceEntry{"default", "", name})
+			list = append(list, workspaceEntry{"default", s.workspaceNameFromFile(name), name})
 			continue
 		}
 		if !strings.HasSuffix(name, suffix) {
@@ -72,6 +99,9 @@ func (s *server) handleWorkspaces(w http.ResponseWriter, r *http.Request) {
 		}
 		label := strings.ReplaceAll(id, "-", " ")
 		label = strings.ToUpper(label[:1]) + label[1:]
+		if configured := s.workspaceNameFromFile(name); configured != "" {
+			label = configured
+		}
 		list = append(list, workspaceEntry{id, label, name})
 	}
 	sort.Slice(list, func(i, j int) bool {

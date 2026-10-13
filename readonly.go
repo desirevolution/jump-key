@@ -153,6 +153,13 @@ func (s *server) handlePublicWorkspaces(w http.ResponseWriter, r *http.Request) 
 		if id == "default" {
 			name = ""
 		}
+		// Only the allowlisted configuration is read, using the fixed backend user.
+		if file, err := openPublicFile(s.configDir, workspaceFilename(id, s.configUser)); err == nil {
+			if configured := configuredWorkspaceName(file); configured != "" {
+				name = configured
+			}
+			file.Close()
+		}
 		// The fixed backend user is not a visitor identity and need not be exposed.
 		list = append(list, workspaceEntry{id, name, workspaceFilename(id, "")})
 	}

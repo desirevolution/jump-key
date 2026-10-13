@@ -190,7 +190,17 @@ Each workspace is a complete configuration file that can also be used on its own
 | Default | `services.json` | `services.arthur.json` |
 | Work | `work.workspace.json` | `work.workspace.arthur.json` |
 
-Workspace IDs use lowercase ASCII letters, digits and single hyphens between words. `default` is reserved. Names come from filenames; the Default label is translated by the app. Default appears first, followed by the other IDs alphabetically. Backups are excluded from the list.
+Workspace IDs use lowercase ASCII letters, digits and single hyphens between words. `default` is reserved. By default, names come from filenames; the Default label is translated by the app. Each configuration may override its **display name** with an optional top-level `workspaceName` string, for example:
+
+```json
+{
+  "workspaceName": "My Services",
+  "categories": [],
+  "searchEngines": []
+}
+```
+
+The custom name appears in the header, workspace menu and keyboard-switch feedback. It also works in read-only mode. Omit `workspaceName` or use `""` to keep the usual label (`Standard` in German for the default workspace). Names are trimmed, limited to 64 characters and cannot contain control characters. **Only the label changes:** the workspace ID, filename (`services.json`, etc.), URLs, favorites and browser settings stay the same. The name is stored in that workspace's JSON file, so it is shared across browsers. Default appears first, followed by the other IDs alphabetically. Backups are excluded from the list.
 
 With multiple workspaces, the header shows a selector. On mobile it is visible only at the top of the page. Click or tap a name to switch immediately, or use `Backspace` to cycle with a short delay. Press it again to advance, `Enter` to switch immediately, or `Esc` to cancel. The shortcut also works in the workspace menu, but not in other dialogs or input fields.
 
@@ -217,6 +227,7 @@ At the bottom of General, **Reset local data** clears JumpKey’s favorites, his
 
 | Field | Type | Required | Description |
 | --- | --- | --- | --- |
+| `workspaceName` | String | No | Optional workspace display name (up to 64 characters). Empty/omitted uses the default label. |
 | `categories` | Array | Yes | Category objects. May be empty. |
 | `categories[].category` | String | Yes | Non-empty category name. |
 | `categories[].categoryKey` | String | No | One letter `a`–`z`, unique across categories, ignoring case. Omit or leave empty for automatic assignment. |

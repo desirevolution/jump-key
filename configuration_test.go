@@ -61,3 +61,25 @@ func TestBackupFailureDoesNotOverwrite(t *testing.T) {
 		t.Fatal("target replaced")
 	}
 }
+
+func TestWorkspaceNameValidation(t *testing.T) {
+	for _, tc := range []struct {
+		name  string
+		valid bool
+	}{
+		{``, true},
+		{`,"workspaceName":"My Services"`, true},
+		{`,"workspaceName":"  "`, true},
+		{`,"workspaceName":null`, false},
+		{`,"workspaceName":123`, false},
+		{`,"workspaceName":"First\nSecond"`, false},
+		{`,"workspaceName":"\nFirst"`, false},
+		{`,"workspaceName":"abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm"`, false},
+		{`,"workspaceName":"🦊"`, true},
+	} {
+		data := []byte(`{"categories":[],"searchEngines":[]` + tc.name + `}`)
+		if got := validateConfiguration(data) == nil; got != tc.valid {
+			t.Errorf("workspaceName %q: valid=%t, want %t", tc.name, got, tc.valid)
+		}
+	}
+}

@@ -65,3 +65,48 @@ func TestWorkspaceListAndIsolation(t *testing.T) {
 		t.Fatal("other user modified")
 	}
 }
+
+func TestWorkspaceNamesFromConfigAndFallback(t *testing.T) {
+	dir := t.TempDir()
+	for name, content := range map[string]string{
+		"services.json":           `{"workspaceName":"  My Services  ","categories":[],"searchEngines":[]}`,
+		"work.workspace.json":     `{"workspaceName":"Office","categories":[],"searchEngines":[]}`,
+		"home-lab.workspace.json": `{"categories":[],"searchEngines":[]}`,
+		"archive.workspace.json":  `{"workspaceName":"","categories":[],"searchEngines":[]}`,
+		"services.bob.json":       `{"workspaceName":"Bob's Space","categories":[],"searchEngines":[]}`,
+		"work.workspace.bob.json": `{"workspaceName":"Bob's Work","categories":[],"searchEngines":[]}`,
+	} {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte(content), 0600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	s := &server{configDir: dir}
+	check := func(user string, expected map[string]string) {
+		t.Helper()
+		r := httptest.NewRequest("GET", "/api/workspaces", nil)
+		r.Header.Set("Remote-User", user)
+		w := httptest.NewRecorder()
+		s.handleWorkspaces(w, r)
+		if w.Code != 200 {
+			t.Fatalf("list: %d", w.Code)
+		}
+		var response struct{ Workspaces []workspaceEntry }
+		if err := json.Unmarshal(w.Body.Bytes(), &response); err != nil {
+			t.Fatal(err)
+		}
+		if len(response.Workspaces) != len(expected) {
+			t.Fatalf("user=%q: %+v", user, response.Workspaces)
+		}
+		for _, item := range response.Workspaces {
+			if want, ok := expected[item.ID]; !ok || item.Name != want {
+				t.Fatalf("user=%q workspace=%q name=%q want=%q", user, item.ID, item.Name, want)
+			}
+		}
+	}
+	check("", map[string]string{"default": "My Services", "work": "Office", "home-lab": "Home lab", "archive": "Archive"})
+	check("bob", map[string]string{"default": "Bob's Space", "work": "Bob's Work"})
+	if err := os.WriteFile(filepath.Join(dir, "services.json"), []byte(`{"categories":[],"searchEngines":[]}`), 0600); err != nil {
+		t.Fatal(err)
+	}
+	check("", map[string]string{"default": "", "work": "Office", "home-lab": "Home lab", "archive": "Archive"})
+}

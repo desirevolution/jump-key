@@ -15,6 +15,7 @@ export function getConfigErrors(config) {
     else if (value) unique(value.toLowerCase(), path, seen);
   };
   if (!object(config)) return [{ path: '$', code: 'object' }];
+  if (config.workspaceName !== undefined && (typeof config.workspaceName !== 'string' || [...config.workspaceName.trim()].length > 64 || /[\u0000-\u001f\u007f]/.test(config.workspaceName))) add('workspaceName', 'workspaceName');
   const ids = new Map(), categoryKeys = new Map(), prefixes = new Map();
   if (!Array.isArray(config.categories)) add('categories', 'array');
   else config.categories.forEach((category, i) => {

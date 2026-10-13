@@ -5,12 +5,14 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"unicode/utf8"
 )
 
 // Decode only fields we validate; unknown fields remain in the original saved bytes.
 func validateConfiguration(data []byte) error {
 	var config struct {
-		Categories []struct {
+		WorkspaceName json.RawMessage `json:"workspaceName"`
+		Categories    []struct {
 			Category    string `json:"category"`
 			CategoryKey string `json:"categoryKey"`
 			Services    []struct {
@@ -29,6 +31,9 @@ func validateConfiguration(data []byte) error {
 	}
 	if err := json.Unmarshal(data, &config); err != nil {
 		return err
+	}
+	if _, ok := parseWorkspaceName(config.WorkspaceName); !ok {
+		return errors.New("invalid workspaceName: expected a string of up to 64 characters without control characters")
 	}
 	if config.Categories == nil || config.SearchEngines == nil {
 		return errors.New("categories and searchEngines must be arrays")
@@ -70,4 +75,26 @@ func validateConfiguration(data []byte) error {
 		prefixes[prefix] = true
 	}
 	return nil
+}
+
+// A blank name means the usual filename/translated Default label should be used.
+// Use the same rules in the browser's configuration validator.
+func parseWorkspaceName(raw json.RawMessage) (string, bool) {
+	if len(raw) == 0 {
+		return "", true
+	}
+	var name string
+	if string(raw) == "null" || json.Unmarshal(raw, &name) != nil {
+		return "", false
+	}
+	for _, r := range name {
+		if r <= 0x1f || r == 0x7f {
+			return "", false
+		}
+	}
+	name = strings.TrimSpace(name)
+	if utf8.RuneCountInString(name) > 64 {
+		return "", false
+	}
+	return name, true
 }
