@@ -4,13 +4,13 @@ import './icon-button.js';
 
 const styles = {
   overlay: `fixed inset-0 z-50 flex items-end justify-center bg-slate-950/70 backdrop-blur-md md:items-center md:p-4`,
-  modal: `w-full rounded-t-3xl border border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 p-5 font-mono jk-shadow-elevated md:max-w-2xl md:rounded-2xl`,
-  header: `mb-5 flex items-center justify-between`,
+  modal: `flex min-h-0 max-h-[calc(100dvh-2rem)] flex-col w-full rounded-t-3xl border border-slate-700/70 bg-gradient-to-br from-slate-800 to-slate-900 p-5 font-mono jk-shadow-elevated md:max-w-2xl md:rounded-2xl`,
+  header: `shrink-0 mb-5 flex items-center justify-between`,
   headerLeft: `flex items-center gap-3`,
   iconBadge: `flex size-9 items-center justify-center rounded-xl bg-indigo-500/10 ring-1 ring-indigo-500/20`,
   icon: `size-5 text-indigo-300`,
   title: `text-base font-semibold text-slate-50`,
-  content: `max-h-[68vh] space-y-5 overflow-y-auto pr-1`,
+  content: `min-h-0 space-y-5 overflow-y-auto overscroll-contain pr-1`,
   sectionTitle: `mb-2 px-2 text-[11px] font-bold uppercase tracking-[0.16em] text-slate-500`,
   row: `flex items-center justify-between gap-4 rounded-xl px-3 py-2.5 transition-colors hover:bg-slate-800/60`,
   rowDesc: `text-sm text-slate-300`,
@@ -19,7 +19,7 @@ const styles = {
   kbd: `inline-flex h-7 min-w-8 items-center justify-center rounded-lg border border-slate-700 bg-slate-950 px-2 text-xs font-bold text-indigo-300 jk-shadow-inset`,
   actionBadge: `inline-flex shrink-0 max-w-[45%] items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-950/70 px-2 py-1 text-xs font-semibold text-indigo-200`,
   actionIcon: `size-3.5`,
-  footer: `mt-5 text-center text-[11px] text-slate-500`,
+  footer: `shrink-0 mt-5 text-center text-[11px] text-slate-500`,
 };
 
 export class JkHelpModal extends LitElement {

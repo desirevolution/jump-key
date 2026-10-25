@@ -12,7 +12,7 @@ import './config-editor.js';
 
 const styles = {
   overlay: `fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fadeIn`,
-  container: `w-full max-w-7xl h-[88dvh] max-h-[900px] min-h-0 overflow-hidden flex flex-col rounded-3xl border border-slate-700/70 bg-slate-900/95 jk-shadow-elevated p-5 sm:p-6`,
+  container: `w-full max-w-7xl h-[88dvh] max-h-[min(900px,calc(100dvh-2rem))] min-h-0 overflow-hidden flex flex-col rounded-3xl border border-slate-700/70 bg-slate-900/95 jk-shadow-elevated p-5 sm:p-6`,
   header: `shrink-0 flex items-center justify-between mb-5 pb-4 border-b border-slate-700/50`,
   headerLeft: `flex items-center gap-3`,
   iconBadge: `flex items-center justify-center size-10 rounded-xl bg-indigo-500/10 ring-1 ring-indigo-500/20`,
