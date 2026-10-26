@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@lucide/icons": "^1.61.0",
-    "iconify-icon": "^3.0.3",
+    "iconify-icon": "^3.0.4",
     "lit": "^3.3.3",
     "prism-code-editor": "^5.4.0"
   },
