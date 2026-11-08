@@ -43,7 +43,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           # A release may point to a commit other than the default branch HEAD.
           ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.sha }}
@@ -199,7 +199,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           # A release may point to a commit other than the default branch HEAD.
           ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.sha }}
