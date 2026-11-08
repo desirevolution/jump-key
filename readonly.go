@@ -163,9 +163,7 @@ func (s *server) handlePublicWorkspaces(w http.ResponseWriter, r *http.Request) 
 		// The fixed backend user is not a visitor identity and need not be exposed.
 		list = append(list, workspaceEntry{id, name, workspaceFilename(id, "")})
 	}
-	if meta, err := s.readWorkspaceMetadata(s.configUser); err == nil {
-		list = reconcileWorkspaceOrder(meta, list)
-	}
+	// Public workspace order follows the explicit allowlist, not private user metadata.
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodHead {
 		json.NewEncoder(w).Encode(struct {

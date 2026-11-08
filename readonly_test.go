@@ -181,3 +181,28 @@ func TestPublicWorkspaceCustomNames(t *testing.T) {
 		t.Fatalf("wrong public labels/allowlist: %+v", result.Workspaces)
 	}
 }
+
+// An explicit public allowlist defines both visibility and order. The private
+// user's workspace-order metadata must not reorder public workspaces.
+func TestPublicWorkspaceOrderIgnoresPrivateMetadata(t *testing.T) {
+	s, h := publicFixture(t)
+	metadata := `{"order":["default","private","home"]}`
+	if err := os.WriteFile(filepath.Join(s.configDir, metadataFilename(s.configUser)), []byte(metadata), 0600); err != nil {
+		t.Fatal(err)
+	}
+	w := httptest.NewRecorder()
+	h.ServeHTTP(w, httptest.NewRequest(http.MethodGet, "/api/workspaces", nil))
+	if w.Code != http.StatusOK {
+		t.Fatalf("unexpected status %d: %s", w.Code, w.Body.String())
+	}
+	var result struct{ Workspaces []workspaceEntry }
+	if err := json.Unmarshal(w.Body.Bytes(), &result); err != nil {
+		t.Fatal(err)
+	}
+	if len(result.Workspaces) != 2 || result.Workspaces[0].ID != "home" || result.Workspaces[1].ID != "default" {
+		t.Fatalf("public allowlist order was changed: %+v", result.Workspaces)
+	}
+	if strings.Contains(w.Body.String(), "private") || strings.Contains(w.Body.String(), "arthur") {
+		t.Fatalf("private workspace metadata leaked: %s", w.Body.String())
+	}
+}
