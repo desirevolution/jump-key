@@ -13,7 +13,7 @@ const displayVersion = resolveDisplayVersion({
 
 export default defineConfig({
   define: { __APP_VERSION__: JSON.stringify(displayVersion) },
-  base: "/jump-key",
+  base: "/jump-key/",
   plugins: [
     tailwindcss(),
     VitePWA({
@@ -31,11 +31,11 @@ export default defineConfig({
       },
 
       manifest: {
-        id: '/',
-        start_url: '/',
-        scope: '/',
+        id: '/jump-key/',
+        start_url: '/jump-key/',
+        scope: '/jump-key/',
         share_target: {
-          action: '/?share=1', method: 'GET', enctype: 'application/x-www-form-urlencoded',
+          action: '/jump-key/?share=1', method: 'GET', enctype: 'application/x-www-form-urlencoded',
           params: { title: 'title', text: 'text', url: 'url' },
         },
         name: 'JumpKey Dashboard',
@@ -44,12 +44,12 @@ export default defineConfig({
         display: 'standalone',
         icons: [
           {
-            src: '/jump-key-192.png',
+            src: '/jump-key/jump-key-192.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: '/jump-key-512.png',
+            src: '/jump-key/jump-key-512.png',
             sizes: '512x512',
             type: 'image/png',
           },

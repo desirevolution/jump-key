@@ -1,4 +1,3 @@
-import { demoFetch as fetch } from './demo-backend.js';
 let workspaceContext = null;
 export function setWorkspaceContext(context) { workspaceContext = context ? { ...context } : null; }
 export function getWorkspaceContext() { return workspaceContext ? { ...workspaceContext } : null; }
@@ -47,9 +46,6 @@ export function migrateReferences(config, favorites, history) {
 }
 
 export async function persistConfig(config, { base = '/', fetcher = fetch } = {}) {
-  if (import.meta.env?.VITE_DEMO_MODE === 'true') {
-    return migrateConfig(config);
-  }
   if (workspaceContext?.readOnly) throw new Error('Read-only configuration');
   const normalized = migrateConfig(config);
 

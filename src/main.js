@@ -1,8 +1,16 @@
 import './style.css';
-import './app.js';
 
 import { registerSW } from 'virtual:pwa-register';
 import { pwaUpdates } from './utils/pwa-updates.js';
+import { createDemoFetch } from './utils/demo-backend.js';
+
+// Install the demo API before importing the app: its initial workspace load
+// and management views must see the same mocked backend.
+if (import.meta.env.VITE_DEMO_MODE === 'true') {
+  const nativeFetch = globalThis.fetch.bind(globalThis);
+  globalThis.fetch = createDemoFetch(import.meta.env.BASE_URL, nativeFetch);
+}
+await import('./app.js');
 
 let acceptedUpdateInThisTab = false;
 const activateUpdate = registerSW({
