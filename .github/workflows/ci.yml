@@ -1,0 +1,74 @@
+name: Quality gates
+
+on:
+  pull_request:
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  frontend:
+    name: JavaScript tests and production build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.sha }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Verify JavaScript syntax
+        run: npm run check:syntax
+      - name: Run unit tests
+        run: npm test
+      - name: Check dependency vulnerabilities
+        run: npm audit --audit-level=high
+      - name: Build frontend
+        env:
+          JUMPKEY_RELEASE_TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || '' }}
+        run: npm run build
+      - name: Verify embedded frontend files
+        run: |
+          test -f dist/index.html
+          test -f dist/config/services.json
+      - name: Upload frontend for Go checks
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+          if-no-files-found: error
+          retention-days: 1
+
+  backend:
+    name: Go tests, vet, race detector and build
+    needs: frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.sha }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist/
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+      - name: Check Go formatting
+        run: |
+          if [ -n "$(gofmt -l ./*.go)" ]; then
+            gofmt -l ./*.go
+            exit 1
+          fi
+      - name: Run Go vet
+        run: go vet ./...
+      - name: Run Go tests with race detector
+        run: go test -race ./...
+      - name: Build standalone Go binary
+        run: CGO_ENABLED=0 go build -trimpath -o /tmp/jump-key-server .
