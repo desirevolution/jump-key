@@ -31,7 +31,11 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm run build
+
+      - name: Build GitHub Pages Demo
+        run: npm run build
+        env:
+          VITE_DEMO_MODE: "true"
 
       - uses: actions/upload-pages-artifact@v3
         with:
