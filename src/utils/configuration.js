@@ -66,7 +66,7 @@ export async function persistConfig(config, { base = '/', fetcher = fetch } = {}
     error.code = payload?.error?.code;
     throw error;
   }
-  setWorkspaceETag(response.headers?.get('ETag') || null, currentContext);
   */
+  setWorkspaceETag(response.headers?.get('ETag') || null, currentContext);
   return normalized;
 }
