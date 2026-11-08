@@ -18,7 +18,7 @@ const styles = {
   previewAccent: 'h-3 w-16 rounded-full',
   previewLine: 'mt-3 h-2 w-4/5 rounded-full',
   previewLineShort: 'mt-2 h-2 w-1/2 rounded-full',
-  previewFavorite: 'absolute right-3 top-3 size-3 rounded-full',
+  previewFavorite: 'jk-theme-preview-star absolute right-3 top-3 size-4',
   details: 'mt-3 flex items-start justify-between gap-3 px-1',
   name: 'font-medium text-slate-50',
   desc: 'mt-0.5 text-xs leading-relaxed text-slate-400',
@@ -71,7 +71,7 @@ export class JkConfigAppearance extends LitElement {
           class="${styles.preview}"
           style="background:${theme.preview.background};border-color:${previewBorder}"
         >
-          <div class="${styles.previewFavorite}" style="background:${theme.preview.favorite}"></div>
+          <jk-icon icon="ui:star" class="${styles.previewFavorite}" style="color:${theme.preview.accent}" aria-hidden="true"></jk-icon>
           <div
             class="${styles.previewSurface}"
             style="background:${theme.preview.surface};border-color:${previewBorder}"

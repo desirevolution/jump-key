@@ -21,6 +21,7 @@ export class JkIcon extends LitElement {
     _dynamicIconName: { state: true },
     _dynamicIconData: { state: true },
     _dynamicIconStatus: { state: true },
+    _imageFailed: { state: true },
   };
 
   constructor() {
@@ -30,6 +31,7 @@ export class JkIcon extends LitElement {
     this._dynamicIconName = '';
     this._dynamicIconData = null;
     this._dynamicIconStatus = 'idle';
+    this._imageFailed = false;
     this._dynamicIconRequestId = 0;
   }
 
@@ -39,6 +41,10 @@ export class JkIcon extends LitElement {
 
   get hostClasses() {
     return this.getAttribute('class') || styles.defaultIconSize;
+  }
+
+  willUpdate(changedProperties) {
+    if (changedProperties.has('icon')) this._imageFailed = false;
   }
 
   updated(changedProperties) {
@@ -114,8 +120,10 @@ export class JkIcon extends LitElement {
     if (parsed.type === 'empty') return html``;
 
     if (parsed.type === 'image') {
+      if (this._imageFailed) return this.renderUiIcon('icon-fallback');
       const src = IMAGE_URL_PATTERN.test(parsed.name) ? parsed.name : `./icons/${parsed.name}`;
-      return html`<img src=${src} alt=${this.alt} class="${styles.image} ${this.hostClasses}" />`;
+      return html`<img src=${src} alt=${this.alt} class="${styles.image} ${this.hostClasses}"
+        @error=${()=>this._imageFailed=true} />`;
     }
 
     if (parsed.type === 'ui') {

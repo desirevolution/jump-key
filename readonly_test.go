@@ -114,7 +114,7 @@ func TestPublicRoutes(t *testing.T) {
 }
 func TestPublicOptions(t *testing.T) {
 	s, _ := publicFixture(t)
-	valid := options{readOnly: true, publicWorkspaces: "home,default", configUser: "arthur", configDir: s.configDir, iconsDir: s.iconsDir, host: "127.0.0.1", port: 8080}
+	valid := options{authMode: "local", backupKeep: 20, readOnly: true, publicWorkspaces: "home,default", configUser: "arthur", configDir: s.configDir, iconsDir: s.iconsDir, host: "127.0.0.1", port: 8080}
 	if err := validateOptions(valid); err != nil {
 		t.Fatal(err)
 	}

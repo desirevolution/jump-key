@@ -1,5 +1,6 @@
 import { html, LitElement } from 'lit';
 import { getConfigErrors } from '../utils/config-validator.js';
+import { jsonSyntaxLocation } from '../utils/json-error.js';
 
 import { createEditor } from 'prism-code-editor';
 import { defaultCommands } from 'prism-code-editor/commands';
@@ -103,7 +104,8 @@ export class JkConfigEditor extends LitElement {
             this.errors = getConfigErrors(parsed);
             valid = this.errors.length === 0;
           } catch (err) {
-            this.errors = [{ path: '$', code: 'syntax', detail: err.message }];
+            this.errors = [{ path: '$', code: 'syntax', detail: err.message,
+              position: jsonSyntaxLocation(err.message, val) }];
             valid = false;
           }
 
@@ -125,7 +127,9 @@ export class JkConfigEditor extends LitElement {
       },
       () => {
         requestAnimationFrame(() => {
-          this._editorInstance?.textarea?.focus();
+          if (window.matchMedia('(min-width: 768px) and (pointer: fine)').matches) {
+            this._editorInstance?.textarea?.focus({ preventScroll: true });
+          }
         });
       },
       defaultCommands(),
@@ -136,11 +140,22 @@ export class JkConfigEditor extends LitElement {
     );
   }
 
+  focusError(position) {
+    const input = this._editorInstance?.textarea;
+    if (!input || position === null) return;
+    input.focus({ preventScroll: true });
+    input.setSelectionRange(position, position);
+    const before = input.value.slice(0, position);
+    const row = before.split('\n').length - 1;
+    const height = parseFloat(getComputedStyle(input).lineHeight) || 20;
+    this.querySelector('#editorContainer')?.scrollTo({ top: Math.max(0, row * height - 2 * height), behavior: 'instant' });
+  }
+
   render() {
     const stateClass = this.isValid ? styles.containerValid : styles.containerInvalid;
 
     return html`
-      ${this.errors.length ? html`<ul class="jk-config-errors" aria-live="polite">${this.errors.map(error => html`<li><code>${error.path}</code>: ${this.t('validation_' + error.code)} ${error.other || error.detail || ''}</li>`)}</ul>` : ''}
+      ${this.errors.length ? html`<ul class="jk-config-errors" aria-live="polite">${this.errors.map(error => html`<li><code>${error.path}</code>: ${this.t('validation_' + error.code)} ${error.other || error.detail || ''}${error.position != null ? html` <button class="jk-json-error-jump" type="button" @click=${()=>this.focusError(error.position)}>↗</button>` : ''}</li>`)}</ul>` : ''}
       <div id="editorContainer" class="${styles.containerBase} ${stateClass}"></div>`;
   }
 }

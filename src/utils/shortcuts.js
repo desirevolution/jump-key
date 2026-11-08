@@ -2,6 +2,11 @@ const ALPHABET = [...'abcdefghijklmnopqrstuvwxyz'];
 
 export const FAVORITE_SLOTS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
 export const CONTINUE_SLOTS = FAVORITE_SLOTS;
+// Categories without keyboard shortcuts still need a stable navigation/collapse identifier.
+export function categorySelectionKey(category) {
+  return category.categoryKey || `category-name:${encodeURIComponent(category.category)}`;
+}
+
 const RESERVED_KEYS = new Set(['space', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '?']);
 
 function pickKey(preferredChars, usedKeys) {
@@ -11,20 +16,20 @@ function pickKey(preferredChars, usedKeys) {
 }
 
 export function generateShortcuts(data) {
-  const usedCategoryKeys = new Set([...RESERVED_KEYS, ...data.map(c => c.categoryKey?.toLowerCase()).filter(Boolean)]);
+  const usedCategoryKeys = new Set([...RESERVED_KEYS, ...data.filter(c => !c.shortcutDisabled).map(c => c.categoryKey?.toLowerCase()).filter(Boolean)]);
 
   return data.map((cat) => {
-    let categoryKey = cat.categoryKey?.toLowerCase() ?? '';
-    if (!categoryKey) {
+    let categoryKey = cat.shortcutDisabled ? '' : (cat.categoryKey?.toLowerCase() ?? '');
+    if (!categoryKey && !cat.shortcutDisabled) {
       const cleanName = cat.category.toLowerCase().replace(/[^a-z]/g, '');
       categoryKey = pickKey(cleanName, usedCategoryKeys);
     }
     if (categoryKey) usedCategoryKeys.add(categoryKey);
 
-    const usedServiceKeys = new Set((cat.services ?? []).map(s => s.key?.toLowerCase()).filter(Boolean));
+    const usedServiceKeys = new Set((cat.services ?? []).filter(s => !s.shortcutDisabled).map(s => s.key?.toLowerCase()).filter(Boolean));
     const services = (cat.services ?? []).map((service) => {
-      let serviceKey = service.key?.toLowerCase() ?? '';
-      if (!serviceKey) {
+      let serviceKey = service.shortcutDisabled ? '' : (service.key?.toLowerCase() ?? '');
+      if (!serviceKey && !service.shortcutDisabled) {
         const cleanName = service.name.toLowerCase().replace(/[^a-z]/g, '');
         serviceKey = pickKey(cleanName, usedServiceKeys);
       }

@@ -1,8 +1,18 @@
 import { defineConfig } from 'vite';
+import { readFileSync } from 'node:fs';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { resolveDisplayVersion } from './scripts/build-version.mjs';
+
+const packageVersion = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version;
+const displayVersion = resolveDisplayVersion({
+  releaseTag: process.env.JUMPKEY_RELEASE_TAG,
+  commitSha: process.env.GITHUB_SHA,
+  fallbackVersion: packageVersion,
+});
 
 export default defineConfig({
+  define: { __APP_VERSION__: JSON.stringify(displayVersion) },
   plugins: [
     tailwindcss(),
     VitePWA({
@@ -11,8 +21,9 @@ export default defineConfig({
       srcDir: 'src',
       filename: 'sw.js',
 
-      registerType: 'autoUpdate',
-      injectRegister: 'inline',
+      registerType: 'prompt',
+      // The virtual:register module registers the worker exactly once.
+      injectRegister: null,
 
       injectManifest: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],

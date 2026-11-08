@@ -1,14 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"net/http"
-	"os"
-	"path/filepath"
 	"regexp"
-	"sort"
-	"strings"
 )
 
 var workspacePattern = regexp.MustCompile(`^[a-z0-9]+(?:-[a-z0-9]+)*$`)
@@ -48,12 +45,11 @@ func configuredWorkspaceName(reader io.Reader) string {
 }
 
 func (s *server) workspaceNameFromFile(filename string) string {
-	f, err := os.Open(filepath.Join(s.configDir, filename))
+	data, err := s.readConfig(filename)
 	if err != nil {
 		return ""
 	}
-	defer f.Close()
-	return configuredWorkspaceName(f)
+	return configuredWorkspaceName(bytes.NewReader(data))
 }
 
 func (s *server) handleWorkspaces(w http.ResponseWriter, r *http.Request) {
@@ -62,60 +58,40 @@ func (s *server) handleWorkspaces(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Cache-Control", "no-store")
-	if r.Method != http.MethodGet {
-		w.WriteHeader(http.StatusMethodNotAllowed)
+	if r.Method == http.MethodPost {
+		s.createWorkspace(w, r)
 		return
 	}
-	user := r.Header.Get("Remote-User")
+	if !requireMethod(w, r.Method, http.MethodGet, http.MethodHead) {
+		return
+	}
+	user := requestUser(r)
 	if user != "" && !validUserPattern.MatchString(user) {
-		http.Error(w, "invalid user", http.StatusBadRequest)
+		writeAPIError(w, 400, "invalid_user", "Invalid user")
 		return
 	}
-	entries, err := os.ReadDir(s.configDir)
+	s.workspaceMu.Lock()
+	defer s.workspaceMu.Unlock()
+	meta, err := s.readWorkspaceMetadata(user)
 	if err != nil {
-		http.Error(w, "cannot list workspaces", http.StatusInternalServerError)
+		writeAPIError(w, 500, "read_failed", "Cannot read workspace order")
 		return
 	}
-	list := []workspaceEntry{}
-	suffix := ".workspace.json"
-	if user != "" {
-		suffix = ".workspace." + user + ".json"
+	entries, err := s.listUserWorkspaces(user)
+	if err != nil {
+		writeAPIError(w, 500, "read_failed", "Cannot list workspaces")
+		return
 	}
-	for _, entry := range entries {
-		if !entry.Type().IsRegular() {
-			continue
-		}
-		name := entry.Name()
-		if name == workspaceFilename("default", user) {
-			list = append(list, workspaceEntry{"default", s.workspaceNameFromFile(name), name})
-			continue
-		}
-		if !strings.HasSuffix(name, suffix) {
-			continue
-		}
-		id := strings.TrimSuffix(name, suffix)
-		if id == "default" || !workspacePattern.MatchString(id) {
-			continue
-		}
-		label := strings.ReplaceAll(id, "-", " ")
-		label = strings.ToUpper(label[:1]) + label[1:]
-		if configured := s.workspaceNameFromFile(name); configured != "" {
-			label = configured
-		}
-		list = append(list, workspaceEntry{id, label, name})
-	}
-	sort.Slice(list, func(i, j int) bool {
-		if list[i].ID == "default" {
-			return true
-		}
-		if list[j].ID == "default" {
-			return false
-		}
-		return list[i].ID < list[j].ID
-	})
+	list := reconcileWorkspaceOrder(meta, entries)
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(struct {
-		User       string           `json:"user"`
-		Workspaces []workspaceEntry `json:"workspaces"`
-	}{user, list})
+	w.Header().Set("ETag", metadataETag(meta))
+	if r.Method == http.MethodHead {
+		return
+	}
+	_ = json.NewEncoder(w).Encode(struct {
+		User       string            `json:"user"`
+		Workspaces []workspaceEntry  `json:"workspaces"`
+		OrderETag  string            `json:"orderETag"`
+		Renames    map[string]string `json:"renames"`
+	}{user, list, metadataETag(meta), meta.Renames})
 }

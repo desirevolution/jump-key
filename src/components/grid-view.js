@@ -1,5 +1,6 @@
 import { html, LitElement } from 'lit';
 import './service-group.js';
+import { categorySelectionKey } from '../utils/shortcuts.js';
 
 // 1. Static styling dictionary isolating layouts from the rendering engine
 const styles = {
@@ -19,6 +20,8 @@ export class JkGridView extends LitElement {
     categories: { type: Array },
     activeCategoryKey: { type: String },
     renderIcon: { type: Function },
+    collapsed: { type: Object },
+    canReorder: { type: Boolean },
     t: { type: Function },
   };
 
@@ -39,7 +42,7 @@ export class JkGridView extends LitElement {
     */
     if (this.activeCategoryKey) {
       const activeGroup = this.categories.find(
-        (category) => category.categoryKey === this.activeCategoryKey
+        (category) => categorySelectionKey(category) === this.activeCategoryKey
       );
 
       if (!activeGroup) {
@@ -65,13 +68,20 @@ export class JkGridView extends LitElement {
     return html`
       <div class="${styles.fullDashboardWrapper}">
         ${this.categories.map(
-          (cat) => html`
+          (cat, index) => html`
             <jk-service-group
               .title=${cat.category}
               .icon=${cat.icon}
               .badgeText=${cat.categoryKey}
+              .collapseId=${categorySelectionKey(cat)}
               .services=${cat.services}
               .highlightCategoryKey=${true}
+              .collapsible=${true}
+              .collapsed=${Boolean(this.collapsed?.[categorySelectionKey(cat)])}
+              .canReorder=${this.canReorder}
+              .categoryIndex=${index}
+              .categoryCount=${this.categories.length}
+              .t=${this.t}
             ></jk-service-group>
           `
         )}

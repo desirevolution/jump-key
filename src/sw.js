@@ -1,6 +1,7 @@
 /// <reference lib="webworker" />
 
 import { clientsClaim } from 'workbox-core';
+
 import {
   cleanupOutdatedCaches,
   createHandlerBoundToURL,
@@ -14,7 +15,11 @@ import { CacheFirst } from 'workbox-strategies';
 
 import { ExpirationPlugin } from 'workbox-expiration';
 
-self.skipWaiting();
+// The new worker waits until the user explicitly accepts the update.
+self.addEventListener('message', event => {
+  if (event.data?.type === 'SKIP_WAITING') self.skipWaiting();
+});
+// Claim once the user has approved activation; do not skip the waiting phase.
 clientsClaim();
 
 cleanupOutdatedCaches();
@@ -33,7 +38,11 @@ registerRoute(new NavigationRoute(navigationHandler, { denylist: [/\/api\//, /\/
 // Bilder
 //
 registerRoute(
-  ({ request }) => request.destination === 'image',
+  ({ request, url }) => request.destination === 'image'
+    && url.origin === self.location.origin
+    && !url.pathname.includes('/icons/')
+    && !url.pathname.includes('/config/')
+    && !url.pathname.includes('/api/'),
   new CacheFirst({
     cacheName: 'images',
 
@@ -59,5 +68,5 @@ registerRoute(
 // Personal configuration has one authoritative offline cache, owned by the app.
 // Remove the old duplicate cache so a saved configuration cannot revert offline.
 self.addEventListener('activate', event => {
-  event.waitUntil(caches.delete('services'));
+  event.waitUntil(Promise.all([caches.delete('services'), caches.delete('images')]));
 });

@@ -14,7 +14,7 @@ export function sharedLink(params) {
   return { url: '', name: params.get('title') || '' };
 }
 
-export function buildQuickConfig(config, { url, name, category, newCategory, key, icon, position }) {
+export function buildQuickConfig(config, { url, name, category, newCategory, key = '', icon = '', position = 'bottom', keyMode }) {
   let parsed;
   try { parsed = new URL(url.trim()); } catch { throw new Error('quickInvalidUrl'); }
   if (!['http:', 'https:'].includes(parsed.protocol)) throw new Error('quickInvalidUrl');
@@ -29,7 +29,9 @@ export function buildQuickConfig(config, { url, name, category, newCategory, key
   if (!target) throw new Error('quickCategoryRequired');
   if (target.services.some(s => { try { return new URL(s.url, globalThis.location?.origin || 'https://jumpkey.invalid').href === parsed.href; } catch { return s.url === url.trim(); } })) throw new Error('quickDuplicate');
   const service = { name: name.trim() || parsed.hostname, url: parsed.href };
-  if (key.trim()) {
+  if (keyMode === 'manual' && !key.trim()) throw new Error('quickInvalidKey');
+  if (keyMode === 'none') { service.shortcutDisabled = true; }
+  if (keyMode !== 'none' && keyMode !== 'auto' && key.trim()) {
     if (!/^[a-z]$/i.test(key.trim())) throw new Error('quickInvalidKey');
     const generated = generateShortcuts([target])[0];
     if (generated.services.some(s => s.key === key.trim().toLowerCase())) throw new Error('quickKeyUsed');
@@ -59,13 +61,14 @@ export function buildEditConfig(config, input) {
   next.categories = generateShortcuts(next.categories);
   next.categories[sourceIndex].services.splice(position, 1);
   // Lit form properties are prototype accessors, not enumerable own fields.
-  const { url, name, category, newCategory, key, icon } = input;
-  const updated = buildQuickConfig(next, { url, name, category, newCategory, key, icon, position: 'bottom' });
+  const { url, name, category, newCategory, key, icon, keyMode } = input;
+  const updated = buildQuickConfig(next, { url, name, category, newCategory, key, icon, keyMode, position: 'bottom' });
   const targetIndex = input.category === 'new' ? updated.categories.length - 1 : Number(input.category);
   const target = updated.categories[targetIndex];
   const edited = { ...original, ...target.services.pop(), id: original.id };
   if (!input.icon.trim()) delete edited.icon;
-  if (!input.key.trim()) delete edited.key;
+  if (keyMode !== 'none') delete edited.shortcutDisabled;
+  if (keyMode === 'none' || keyMode === 'auto' || !input.key.trim()) delete edited.key;
   const destination = input.position === undefined && targetIndex === sourceIndex
     ? position : insertionIndex(target.services, input.position);
   target.services.splice(destination, 0, edited);
@@ -98,7 +101,7 @@ export function buildDeleteConfig(config, serviceId, removeEmptyCategory = false
 }
 
 export function quickFormSnapshot(form) {
-  return JSON.stringify(['url', 'name', 'category', 'position', 'key', 'icon'].map(key => form[key] ?? '')
+  return JSON.stringify(['url', 'name', 'category', 'position', 'key', 'icon', 'keyMode'].map(key => form[key] ?? '')
     .concat(form.category === 'new' ? form.newCategory ?? '' : ''));
 }
 

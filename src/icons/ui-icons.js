@@ -1,8 +1,11 @@
 import {
   Pencil,
+  Copy,
   Plus,
   Link,
   ArrowLeft,
+  ArrowUp,
+  ArrowDown,
   Check,
   CircleCheck,
   CircleHelp,
@@ -36,13 +39,17 @@ import {
   X,
   ChevronRight,
   ChevronDown,
+  ChevronUp,
 } from '@lucide/icons';
 
 export const uiIcons = {
   pencil: Pencil,
+  copy: Copy,
   plus: Plus,
   link: Link,
   'arrow-left': ArrowLeft,
+  'arrow-up': ArrowUp,
+  'arrow-down': ArrowDown,
   check: Check,
   'circle-check': CircleCheck,
   'circle-help': CircleHelp,
@@ -76,4 +83,5 @@ export const uiIcons = {
   x: X,
   'chevron-right': ChevronRight,
   'chevron-down': ChevronDown,
+  'chevron-up': ChevronUp,
 };

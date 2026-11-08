@@ -33,6 +33,8 @@ export class JkMobileMenu extends LitElement {
   static properties = {
     readOnly: { type: Boolean },
     canInstall: { type: Boolean },
+    hasWorkspaces: { type: Boolean },
+    workspaceName: { type: String },
     show: { type: Boolean },
     mode: { type: String },
     theme: { type: String },
@@ -106,7 +108,20 @@ export class JkMobileMenu extends LitElement {
             this.mode === 'menu'
               ? html`
                   <div class="${styles.list}">
+                    ${this.hasWorkspaces ? html`<button class="${styles.action}" @click=${()=>this._emit('open-workspaces')}>
+                      <span class="${styles.actionIcon}"><jk-icon icon="ui:layout-grid" class="size-5"></jk-icon></span>
+                      <span class="${styles.actionText}"><span class="${styles.actionTitle}">${this.t('mobileWorkspaces')}</span>
+                        <span class="${styles.actionDesc}">${this.workspaceName}</span></span>
+                      <jk-icon icon="ui:chevron-right" class="${styles.chevron}"></jk-icon>
+                    </button>` : ''}
                     ${!this.readOnly ? html`<button class="${styles.action}" @click=${()=>this._emit('quick-add')}><jk-icon icon="ui:plus" class="size-5"></jk-icon>${this.t('quickAdd')}</button>` : ''}
+                    <div class="${styles.groupTitle}">${this.t('mobileSettings')}</div>
+                    <button class="${styles.action}" @click=${()=>this._emit('open-config')}>
+                      <span class="${styles.actionIcon}"><jk-icon icon="ui:settings" class="size-5"></jk-icon></span>
+                      <span class="${styles.actionText}"><span class="${styles.actionTitle}">${this.t('mobileSettings')}</span>
+                        <span class="${styles.actionDesc}">${this.t(this.readOnly ? 'localSettings' : 'configSubtitle')}</span></span>
+                      <jk-icon icon="ui:chevron-right" class="${styles.chevron}"></jk-icon>
+                    </button>
                     ${this.canInstall ? html`<button class="${styles.action}" @click=${()=>this._emit('install-app')}><jk-icon icon="ui:download" class="size-5"></jk-icon>${this.t('installApp')}</button>` : ''}
                     <button class="${styles.action}" @click=${() => this._emit('open-help')}>
                       <span class="${styles.actionIcon}"

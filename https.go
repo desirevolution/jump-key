@@ -3,7 +3,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"net"
 	"net/http"
 	"net/netip"
 	"strconv"
@@ -30,7 +29,7 @@ func (o options) httpsRequired() bool {
 	if o.requireHTTPS.set {
 		return o.requireHTTPS.value
 	}
-	return o.readOnly
+	return o.readOnly || o.authMode == "proxy"
 }
 func registerHTTPSOptions(flags *flag.FlagSet, opts *options, env func(string) string) error {
 	var err error
@@ -73,23 +72,7 @@ func requestIsHTTPS(r *http.Request, trusted []netip.Prefix) bool {
 	if r.TLS != nil {
 		return true
 	}
-	host, _, err := net.SplitHostPort(r.RemoteAddr)
-	if err != nil {
-		return false
-	}
-	peer, err := netip.ParseAddr(host)
-	if err != nil {
-		return false
-	}
-	peer = peer.Unmap()
-	allowed := false
-	for _, prefix := range trusted {
-		if prefix.Contains(peer) {
-			allowed = true
-			break
-		}
-	}
-	if !allowed {
+	if !trustedPeer(r.RemoteAddr, trusted) {
 		return false
 	}
 	// Trust only the immediate peer's single value. Never infer trust from XFF,

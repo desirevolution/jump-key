@@ -22,9 +22,16 @@ export class JkServiceGroup extends LitElement {
     title: { type: String },
     icon: { type: String },
     badgeText: { type: String },
+    collapseId: { type: String },
     highlightKeys: { type: Boolean },
     highlightCategoryKey: { type: Boolean },
     services: { type: Array },
+    collapsible: { type: Boolean },
+    collapsed: { type: Boolean },
+    canReorder: { type: Boolean },
+    categoryIndex: { type: Number },
+    categoryCount: { type: Number },
+    t: { type: Function },
   };
 
   _handleCardClick(event, service) {
@@ -51,6 +58,12 @@ export class JkServiceGroup extends LitElement {
     );
   }
 
+  _moveCategory(direction) {
+    this.dispatchEvent(new CustomEvent('move-category', {
+      detail: { index: this.categoryIndex, direction }, bubbles: true, composed: true,
+    }));
+  }
+
   render() {
     return html`
       <section class="${styles.section}">
@@ -67,14 +80,21 @@ export class JkServiceGroup extends LitElement {
             }
             <h2 class="${styles.title}">${this.title}</h2>
           </div>
-          ${this.badgeText ? html`<span class="ml-auto text-sm text-slate-400 md:hidden">${this.services?.length ?? 0}</span>` : ''}
+          ${this.collapsible ? html`<div class="ml-auto flex shrink-0 items-center gap-2">
+            <span class="text-xs text-slate-400">${this.services?.length ?? 0}</span>
+
+            <button type="button" class="jk-category-collapse" aria-expanded=${String(!this.collapsed)} aria-label=${this.t(this.collapsed ? 'expandCategory' : 'collapseCategory')}
+              @click=${()=>this.dispatchEvent(new CustomEvent('toggle-category', { detail: this.collapseId || this.badgeText, bubbles: true, composed: true }))}>
+              <jk-icon .icon=${this.collapsed ? 'ui:chevron-down' : 'ui:chevron-up'} class="size-4"></jk-icon>
+            </button>
+          </div>` : this.badgeText ? html`<span class="ml-auto text-sm text-slate-400 md:hidden">${this.services?.length ?? 0}</span>` : ''}
         </div>
 
-        <div class="${styles.grid}">
+        ${this.collapsed ? '' : html`<div class="${styles.grid}">
           ${(this.services ?? []).map(
             (service) => html`
               <jk-service-card
-                .serviceId=${service.id}
+                .serviceId=${service.id || (service.type === 'category' ? 'cat:' + (service.navigationKey || service.key) : '')}
                 .name=${service.name}
                 .subtitle=${service.url}
                 .icon=${service.icon}
@@ -87,7 +107,7 @@ export class JkServiceGroup extends LitElement {
               ></jk-service-card>
             `
           )}
-        </div>
+        </div>`}
       </section>
     `;
   }

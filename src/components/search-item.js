@@ -1,5 +1,6 @@
 import { html, LitElement } from 'lit';
 import { classMap } from 'lit/directives/class-map.js';
+import { highlightParts } from '../utils/highlight.js';
 import './icon.js';
 
 // 1. Externalized static base style configurations
@@ -34,6 +35,7 @@ export class JkDashboardSearchItem extends LitElement {
     type: { type: String }, // engine | preview | service
     data: { type: Object },
     t: { type: Function },
+    query: { type: String },
   };
 
   constructor() {
@@ -42,6 +44,12 @@ export class JkDashboardSearchItem extends LitElement {
     this.type = 'service';
     this.data = {};
     this.t = (key) => key;
+  }
+
+  _marked(text) {
+    return highlightParts(text, this.query?.startsWith(':') ? '' : this.query).map(part =>
+      part.match ? html`<mark class="jk-search-highlight">${part.text}</mark>` : part.text
+    );
   }
 
   render() {
@@ -55,7 +63,7 @@ export class JkDashboardSearchItem extends LitElement {
       : 'ring-slate-600/70 text-indigo-400 group-hover:text-slate-50 group-hover:bg-indigo-500/15';
 
     return html`
-      <button class="${styles.itemBase} ${buttonActiveClasses}">
+      <button class="${styles.itemBase} ${buttonActiveClasses} ${this.active ? 'search-item-active' : ''}" aria-current=${String(this.active)}>
         ${this.active ? html`<div class="${styles.accentBar}"></div>` : ''}
 
         <div class="${styles.layoutWrapper}">
@@ -82,7 +90,7 @@ export class JkDashboardSearchItem extends LitElement {
       case 'engine':
         return html`
           <div class="min-w-0">
-            <div class="${styles.engineTitle}">${this.data.name}</div>
+            <div class="${styles.engineTitle}">${this._marked(this.data.name)}</div>
             <div class="${styles.engineUrl}">${this.data.url}</div>
           </div>
         `;
@@ -104,8 +112,8 @@ export class JkDashboardSearchItem extends LitElement {
       default:
         return html`
           <div class="min-w-0">
-            <div class="${styles.serviceTitle}">${this.data.name}</div>
-            <div class="${styles.serviceCategory}">${this.data.category}</div>
+            <div class="${styles.serviceTitle}">${this._marked(this.data.name)}</div>
+            <div class="${styles.serviceCategory}">${this._marked(this.data.category)}</div>
           </div>
         `;
     }

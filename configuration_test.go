@@ -21,7 +21,9 @@ func TestSaveBacksUpPreviousBytesAndRejectsInvalid(t *testing.T) {
 	}
 	s := &server{configDir: dir, logger: slog.New(slog.NewTextHandler(io.Discard, nil))}
 	w := httptest.NewRecorder()
-	s.handleConfig(w, httptest.NewRequest(http.MethodPut, "/config/services.json", bytes.NewReader(next)))
+	request := httptest.NewRequest(http.MethodPut, "/config/services.json", bytes.NewReader(next))
+	request.Header.Set("If-Match", configETag(previous))
+	s.handleConfig(w, request)
 	if w.Code != 204 {
 		t.Fatalf("save: %d %s", w.Code, w.Body.String())
 	}
@@ -34,7 +36,9 @@ func TestSaveBacksUpPreviousBytesAndRejectsInvalid(t *testing.T) {
 		t.Fatal("backup did not preserve original bytes")
 	}
 	w = httptest.NewRecorder()
-	s.handleConfig(w, httptest.NewRequest(http.MethodPut, "/config/services.json", bytes.NewBufferString(`{"categories":[null],"searchEngines":[]}`)))
+	request = httptest.NewRequest(http.MethodPut, "/config/services.json", bytes.NewBufferString(`{"categories":[null],"searchEngines":[]}`))
+	request.Header.Set("If-Match", configETag(next))
+	s.handleConfig(w, request)
 	if w.Code != 400 {
 		t.Fatalf("invalid config accepted: %d", w.Code)
 	}
@@ -52,7 +56,9 @@ func TestBackupFailureDoesNotOverwrite(t *testing.T) {
 	}
 	s := &server{configDir: dir, logger: slog.New(slog.NewTextHandler(io.Discard, nil))}
 	w := httptest.NewRecorder()
-	s.handleConfig(w, httptest.NewRequest(http.MethodPut, "/config/services.json", bytes.NewBufferString(`{"categories":[],"searchEngines":[]}`)))
+	request := httptest.NewRequest(http.MethodPut, "/config/services.json", bytes.NewBufferString(`{"categories":[],"searchEngines":[]}`))
+	request.Header.Set("If-Match", `"sha256-test"`)
+	s.handleConfig(w, request)
 	if w.Code != 500 {
 		t.Fatalf("expected backup failure: %d", w.Code)
 	}

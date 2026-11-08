@@ -32,6 +32,7 @@ export class JkHelpModal extends LitElement {
     show: { type: Boolean },
     isGridView: { type: Boolean },
     t: { type: Function },
+    mode: { type: String },
   };
 
   constructor() {
@@ -39,55 +40,73 @@ export class JkHelpModal extends LitElement {
     this.show = false;
     this.isGridView = false;
     this.t = (key) => key;
+    this.mode = 'keyboard';
   }
 
   _handleClose() {
     this.dispatchEvent(new CustomEvent('close', { bubbles: true, composed: true }));
   }
 
+  willUpdate(changed) {
+    if (changed.has('show') && this.show) {
+      this.mode = window.matchMedia('(max-width:767px)').matches ? 'touch' : 'keyboard';
+    } else if (changed.has('show') && !this.show) {
+      this.querySelector('dialog')?.close();
+    }
+  }
+
+  updated(changed) {
+    if (changed.has('show') && this.show) {
+      const dialog = this.querySelector('dialog');
+      if (!dialog?.open) dialog?.showModal();
+      this.querySelector('jk-icon-button button')?.focus({ preventScroll: true });
+    }
+  }
+
   _renderKeyboardRows() {
-    const shortcuts = [
-      { keys: ['Backspace'], desc: this.t('hkWorkspace') },
-      { keys: ['Space'], desc: this.t('hkSearch') },
-      { keys: [':'], desc: this.t('hkSearchEngines') },
-      { keys: ['?'], desc: this.t('helpOpen') },
-      { keys: ['Ctrl', ','], desc: this.t(this.readOnly ? 'localSettings' : 'editConfig') },
-      { keys: ['+'], write: true, desc: this.t('quickAdd') },
-      { keys: ['Ctrl+E', 'A–Z', 'A–Z'], write: true, desc: this.t('hkEditService') },
-      { keys: ['Ctrl', '0–9'], desc: this.t('hkFavoriteRecord') },
-      { keys: ['#'], desc: this.t('hkToggleView') },
+    const groups = [
+      { title: 'helpGroupSearch', rows: [
+        { keys: ['Space'], desc: 'hkSearch' },
+        { keys: [':'], desc: 'hkSearchEngines' },
+      ] },
+      { title: 'helpGroupNavigation', rows: [
+        { keys: ['Backspace'], desc: 'hkWorkspace' },
+        { keys: ['A–Z'], desc: 'hkCat' },
+        { keys: ['A–Z'], desc: 'hkService', context: true },
+        { keys: ['↑', '↓'], desc: 'hkNavigate' },
+        { keys: ['Enter'], desc: 'hkOpenSelection' },
+        { keys: ['Shift', 'Enter'], desc: 'hkOpenSelectionSameTab' },
+        { keys: ['ESC'], desc: 'hkReset' },
+        { keys: ['#'], desc: 'hkToggleView' },
+      ] },
+      { title: 'helpGroupFavorites', rows: [
+        { keys: ['0–9'], desc: 'hkFavs' },
+        { keys: ['Ctrl', '0–9'], desc: 'hkFavoriteRecord' },
+        { keys: ['Shift', '0–9'], desc: 'hkContinue' },
+        { keys: ['-'], desc: 'hkToggleLast' },
+        { keys: ['_'], desc: 'hkOpenContinue' },
+      ] },
+      { title: 'helpGroupEditing', rows: [
+        { keys: ['?'], desc: 'helpOpen' },
+        { keys: ['Ctrl', ','], desc: this.readOnly ? 'localSettings' : 'editConfig' },
+        { keys: ['+'], write: true, desc: 'quickAdd' },
+        { keys: ['Ctrl+E', 'A–Z', 'A–Z'], write: true, desc: 'hkEditService' },
+        { keys: ['Ctrl/Cmd', 'Enter'], write: true, desc: 'helpQuickSave' },
+        { keys: [this.readOnly ? 'Ctrl/Cmd + 1/2' : 'Ctrl/Cmd + 1/2/3/4'], desc: this.readOnly ? 'hkLocalTabs' : 'hkSwitchTabs' },
+        { keys: ['Ctrl/Cmd', 'S'], write: true, desc: 'helpEditorSave' },
+        { keys: ['Page Up/Down'], write: true, desc: 'helpEditorPage' },
+      ] },
     ];
-
-    shortcuts.push({ keys: ['0-9'], desc: this.t('hkFavs') });
-    shortcuts.push({ keys: ['Shift', '0-9'], desc: this.t('hkContinue') });
-
-    shortcuts.push({ keys: ['-'], desc: this.t('hkToggleLast') });
-    shortcuts.push({ keys: ['_'], desc: this.t('hkOpenContinue') });
-
-    shortcuts.push(
-      { keys: ['A-Z'], desc: this.t('hkCat') },
-      { keys: ['A-Z'], desc: this.t('hkService'), context: true },
-      { keys: ['↑', '↓'], desc: this.t('hkNavigate') },
-      { keys: ['Enter'], desc: this.t('hkOpenSelection') },
-      { keys: ['Shift', 'Enter'], desc: this.t('hkOpenSelectionSameTab') },
-      { keys: ['ESC'], desc: this.t('hkReset') },
-      { keys: ['Ctrl/Cmd', 'Enter'], write: true, desc: this.t('helpQuickSave') },
-      { keys: [this.readOnly ? 'Ctrl/Cmd + 1/2' : 'Ctrl/Cmd + 1/2/3/4'], desc: this.t(this.readOnly ? 'hkLocalTabs' : 'hkSwitchTabs') },
-      { keys: ['Ctrl/Cmd', 'S'], write: true, desc: this.t('helpEditorSave') },
-      { keys: ['Page Up/Down'], write: true, desc: this.t('helpEditorPage') }
-    );
-
-    return shortcuts.filter(item=>!this.readOnly || !item.write).map(
-      (item) => html`
+    return groups.map(group => html`<section class="mb-4">
+      <h4 class="${styles.sectionTitle}">${this.t(group.title)}</h4>
+      ${group.rows.filter(item => !this.readOnly || !item.write).map(item => html`
         <div class="${styles.row}">
-          <span class="${styles.rowDesc}">${item.desc}</span>
+          <span class="${styles.rowDesc}">${this.t(item.desc)}</span>
           <div class="${styles.keysContainer}">
             ${item.context ? html`<span class="${styles.contextBadge}">${this.t('contextInCat')}</span>` : ''}
-            ${item.keys.map((key) => html`<kbd class="${styles.kbd}">${key}</kbd>`)}
+            ${item.keys.map(key => html`<kbd class="${styles.kbd}">${key}</kbd>`)}
           </div>
-        </div>
-      `
-    );
+        </div>`)}</section>`);
   }
 
   _renderActionRow(icon, label, desc) {
@@ -105,12 +124,11 @@ export class JkHelpModal extends LitElement {
     if (!this.show) return html``;
 
     return html`
-      <div @click=${this._handleClose} class="${styles.overlay}">
+      <dialog class="jk-help-dialog" aria-label=${this.t('helpTitleDesktop')}
+        @click=${e => { if (e.target === e.currentTarget) this._handleClose(); }} @cancel=${e => { e.preventDefault(); this._handleClose(); }}>
         <div
           @click=${(e) => e.stopPropagation()}
           class="${styles.modal}"
-          role="dialog"
-          aria-modal="true"
         >
           <div class="${styles.header}">
             <div class="${styles.headerLeft}">
@@ -129,24 +147,25 @@ export class JkHelpModal extends LitElement {
             ></jk-icon-button>
           </div>
 
+          <div class="flex gap-2 mb-3" role="group" aria-label=${this.t('helpTitleDesktop')}>
+            <button type="button" class="jk-btn ${this.mode === 'keyboard' ? 'jk-btn-primary' : 'jk-btn-secondary'}" aria-pressed=${String(this.mode === 'keyboard')} @click=${()=>this.mode='keyboard'}>${this.t('helpKeyboardMode')}</button>
+            <button type="button" class="jk-btn ${this.mode === 'touch' ? 'jk-btn-primary' : 'jk-btn-secondary'}" aria-pressed=${String(this.mode === 'touch')} @click=${()=>this.mode='touch'}>${this.t('helpTouchMode')}</button>
+          </div>
           <div class="${styles.content}">
-            <div class="hidden md:block">
+            <div ?hidden=${this.mode !== 'keyboard'}>
               <div class="${styles.sectionTitle}">${this.t('helpKeyboardSection')}</div>
               ${this._renderKeyboardRows()}
             </div>
 
-            <div>
-              <div class="${styles.sectionTitle}">
-                <span class="hidden md:inline">${this.t('helpMouseTouchSection')}</span>
-                <span class="md:hidden">${this.t('helpTouchSection')}</span>
-              </div>
+            <div ?hidden=${this.mode !== 'touch'}>
+              <div class="${styles.sectionTitle}">${this.t('helpMouseTouchSection')}</div>
               ${this._renderActionRow('mouse-pointer-click', this.t('helpClick'), this.t('helpClickAction'))}
-              <div class="hidden md:block">
+              <div>
                 ${this._renderActionRow('mouse-pointer-click', this.t('helpShiftClick'), this.t('helpShiftClickAction'))}
                 ${this._renderActionRow('hand', this.t('helpLongPress'), this.t('helpLongPressFavorite'))}
                 ${this._renderActionRow('hand', this.t('helpLongPress'), this.t('helpLongPressRemoveFavorite'))}
               </div>
-              <div class="md:hidden">
+              <div>
                 ${this._renderActionRow('hand', this.t('helpHold'), this.t('helpTouchAddFavorite'))}
                 ${this._renderActionRow('hand', this.t('helpHold'), this.t('helpTouchRemoveFavorite'))}
                 ${this._renderActionRow('search', this.t('helpSearchButton'), this.t('helpTouchSearch'))}
@@ -159,9 +178,11 @@ export class JkHelpModal extends LitElement {
               <summary class="cursor-pointer rounded-lg py-2 font-semibold focus-visible:outline-2">${this.t('helpLinksSection')}</summary>
               <p>${this.t(this.readOnly ? 'helpReadOnlyActions' : 'helpServiceActions')}</p>
               <p><strong>${this.t('tabGeneral')} → ${this.t('resetLocalTitle')}:</strong> ${this.t('resetLocalHelp')}</p>
-              <p class="hidden md:block">${this.t('helpDesktopActions')}</p>
-              <p class="md:hidden">${this.t('helpMobileLayout')}</p>
+              <p>${this.t('helpDesktopActions')}</p>
+              <p>${this.t('helpMobileLayout')}</p>
               ${!this.readOnly ? html`<p>${this.t('helpEditService')}</p>` : ''}
+              ${!this.readOnly ? html`<p>${this.t('helpManageWorkspaces')}</p><p>${this.t('helpReorderCategories')}</p>` : ''}
+              <p>${this.t('helpCollapseCategories')}</p>
               ${!this.readOnly ? html`<p>${this.t('helpPositionDelete')}</p>` : ''}
               ${!this.readOnly ? html`<p>${this.t('helpFormValidation')}</p>` : ''}<p>${this.t('localTimingHint')}</p>
               ${!this.readOnly ? html`<p class="hidden md:block">${this.t('helpAddLink')}</p>` : ''}
@@ -179,7 +200,7 @@ export class JkHelpModal extends LitElement {
             <span class="md:hidden">${this.t('helpExitMobile')}</span>
           </div>
         </div>
-      </div>
+      </dialog>
     `;
   }
 }

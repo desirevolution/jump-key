@@ -1,5 +1,12 @@
 let workspaceContext = null;
-export function setWorkspaceContext(context) { workspaceContext = context; }
+export function setWorkspaceContext(context) { workspaceContext = context ? { ...context } : null; }
+export function getWorkspaceContext() { return workspaceContext ? { ...workspaceContext } : null; }
+export function setWorkspaceETag(etag, { user, id }) {
+  if (workspaceContext?.user === user && workspaceContext?.id === id) {
+    workspaceContext = { ...workspaceContext, etag };
+  }
+}
+
 export function configRequest(base = '/', context = workspaceContext) {
   return { url: `${base}config/services.json${context ? '?workspace=' + encodeURIComponent(context.id) : ''}`, headers: context ? { 'X-JumpKey-User': context.user } : {} };
 }
@@ -41,11 +48,21 @@ export function migrateReferences(config, favorites, history) {
 export async function persistConfig(config, { base = '/', fetcher = fetch } = {}) {
   if (workspaceContext?.readOnly) throw new Error('Read-only configuration');
   const normalized = migrateConfig(config);
-  const request = configRequest(base);
+  if (!workspaceContext?.etag) throw new Error('Configuration version missing. Reload the workspace before saving.');
+  const currentContext = workspaceContext;
+  const request = configRequest(base, currentContext);
   const response = await fetcher(request.url, {
-    method: 'PUT', headers: { ...request.headers, 'Content-Type': 'application/json' },
+    method: 'PUT', headers: { ...request.headers, 'Content-Type': 'application/json', 'If-Match': currentContext.etag },
     body: JSON.stringify(normalized, null, 2),
   });
-  if (!response.ok) throw new Error(`Configuration save failed: ${response.status}`);
+  if (!response.ok) {
+    let payload;
+    try { payload = await response.json(); } catch {}
+    const error = new Error(payload?.error?.message || `Configuration save failed: ${response.status}`);
+    error.status = response.status;
+    error.code = payload?.error?.code;
+    throw error;
+  }
+  setWorkspaceETag(response.headers?.get('ETag') || null, currentContext);
   return normalized;
 }

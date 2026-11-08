@@ -1,4 +1,4 @@
-import { getFavoriteService } from '../shortcuts.js';
+import { getFavoriteService, categorySelectionKey } from '../shortcuts.js';
 
 /**
  * Navigation innerhalb des Dashboards
@@ -58,9 +58,8 @@ function handleRootNavigation(key, app) {
  */
 function handleCategoryNavigation(key, app) {
   // Baut den String sauber als "KAT → SERVICE" auf (ohne doppelte Pfeile)
-  app.currentInput = `${app.activeCategoryKey.toUpperCase()} → ${key.toUpperCase()}`;
-
-  const category = app.categories.find((cat) => cat.categoryKey === app.activeCategoryKey);
+  const category = app.categories.find((cat) => categorySelectionKey(cat) === app.activeCategoryKey);
+  app.currentInput = `${(category?.categoryKey || category?.category || '').toUpperCase()} → ${key.toUpperCase()}`;
 
   const service = category?.services?.find((service) => service.key === key);
 
@@ -100,7 +99,8 @@ function openCategory(category, app) {
 function showInvalidInput(key, app) {
   // Falls bereits eine Kategorie aktiv ist, behalten wir die Struktur "KAT → FALSCH" bei
   if (app.activeCategoryKey) {
-    app.currentInput = `${app.activeCategoryKey.toUpperCase()} → ${key.toUpperCase()}`;
+    const category = app.categories.find(cat => categorySelectionKey(cat) === app.activeCategoryKey);
+    app.currentInput = `${(category?.categoryKey || category?.category || '').toUpperCase()} → ${key.toUpperCase()}`;
   } else {
     app.currentInput = key.toUpperCase();
   }

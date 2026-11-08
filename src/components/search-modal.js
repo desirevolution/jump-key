@@ -45,6 +45,13 @@ export class JkSearchModal extends LitElement {
   }
 
   updated(changedProperties) {
+    if (changedProperties.has('show')) {
+      const dialog = this.querySelector('dialog');
+      if (this.show && dialog && !dialog.open) {
+        dialog.showModal();
+        this.querySelector('#searchInput')?.focus({ preventScroll: true });
+      }
+    }
     if (changedProperties.has('selectedIndex')) {
       requestAnimationFrame(() => {
         // FIX: Sicherstellen, dass wir das Element über die dedizierte ID/Klasse finden
@@ -80,6 +87,10 @@ export class JkSearchModal extends LitElement {
         }
       });
     }
+  }
+
+  willUpdate(changed) {
+    if (changed.has('show') && !this.show) this.querySelector('dialog')?.close();
   }
 
   _handleClose() {
@@ -184,6 +195,7 @@ export class JkSearchModal extends LitElement {
       <jk-dashboard-search-item
         type="service"
         .active=${active}
+        .query=${this.searchQuery}
         .data=${s}
         @click=${(e) => this._triggerServiceClick(s, e.shiftKey)}
       ></jk-dashboard-search-item>
@@ -257,8 +269,11 @@ export class JkSearchModal extends LitElement {
     const { items, showAllEngines, isFilteringEngines } = this._buildItems();
 
     return html`
-      <div @click=${this._handleClose} class="${styles.overlay}">
-        <div @click=${(e) => e.stopPropagation()} class="${styles.modal}">
+      <dialog class="jk-search-dialog" aria-label=${this.t('searchPlaceholder')}
+        @click=${e => { if (e.target === e.currentTarget) this._handleClose(); }}
+        @cancel=${e => { e.preventDefault(); this._handleClose(); }}
+        @keydown=${e => { if (e.key === 'Tab') e.stopPropagation(); }}>
+        <div class="${styles.modal} jk-search-panel">
           <div class="${styles.header}">
             <div class="${styles.iconBadge}">
               <jk-icon icon="ui:search" class="size-5"></jk-icon>
@@ -293,26 +308,27 @@ export class JkSearchModal extends LitElement {
             <jk-icon-button icon="ui:x" .label=${this.t('close')} @click=${this._handleClose}></jk-icon-button>
           </div>
 
-          <div id="searchResults" class="${styles.resultsContainer}">
+          <div id="searchResults" class="${styles.resultsContainer}" role="group" aria-label=${this.t('searchServicesTitle')}>
             ${
               (showAllEngines || isFilteringEngines) && items.length > 0
                 ? html`<div class="${styles.engineHeader}">${this.t('searchEnginesTitle')}</div>`
                 : ''
             }
+            ${items.length > 0 && !showAllEngines && !isFilteringEngines && !this.searchQuery.startsWith(':') ? html`<div class="${styles.engineHeader}">${this.t('searchServicesTitle')}</div>` : ''}
             ${items.map((item, i) => item.render(i === this.selectedIndex))}
             ${
               this.searchQuery && items.length === 0
                 ? html`
                     <div class="${styles.emptyState}">
                       <jk-icon icon="ui:search-x" class="${styles.emptyIcon}"></jk-icon>
-                      <span class="${styles.emptyText}">${this.t('noServices')}</span>
+                      <span class="${styles.emptyText}">${this.t('searchNoResults')}</span>
                     </div>
                   `
                 : ''
             }
           </div>
         </div>
-      </div>
+      </dialog>
     `;
   }
 }

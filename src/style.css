@@ -251,7 +251,6 @@
   --jk-card-border: #aeb9c8;
   --jk-card-shadow-color: rgb(71 85 105 / 0.17);
   --jk-card-icon-bg: #d7e0ea;
-  --jk-favorite: #9a4d08;
   --jk-success: #15803d;
   --jk-warning: #a16207;
   --jk-danger: #b91c1c;
@@ -285,7 +284,6 @@
   --jk-card-border: #a8b3c1;
   --jk-card-shadow-color: rgb(76 86 106 / 0.18);
   --jk-card-icon-bg: #d2dbe5;
-  --jk-favorite: #865b00;
   --jk-success: #2f7d52;
   --jk-warning: #946200;
   --jk-danger: #b43a45;
@@ -319,7 +317,6 @@
   --jk-card-border: #b4aa92;
   --jk-card-shadow-color: rgb(88 110 117 / 0.17);
   --jk-card-icon-bg: #d9cfb5;
-  --jk-favorite: #765700;
   --jk-success: #587f00;
   --jk-warning: #8a6500;
   --jk-danger: #c23b35;
@@ -359,35 +356,6 @@
   --jk-card-icon-border: color-mix(in srgb, var(--jk-card-border) 78%, var(--jk-accent) 22%);
   --jk-card-icon-color: var(--jk-accent-bright);
 
-  --jk-card-favorite-top: color-mix(
-    in srgb,
-    var(--jk-card-gradient-top) 93%,
-    var(--jk-favorite) 7%
-  );
-  --jk-card-favorite-bottom: color-mix(
-    in srgb,
-    var(--jk-card-gradient-bottom) 96%,
-    var(--jk-favorite) 4%
-  );
-  --jk-card-favorite-background: linear-gradient(
-    145deg,
-    var(--jk-card-favorite-top),
-    var(--jk-card-favorite-bottom)
-  );
-  --jk-card-favorite-border: color-mix(in srgb, var(--jk-card-border) 76%, var(--jk-favorite) 24%);
-  --jk-card-favorite-shadow: 0 10px 27px
-    color-mix(in srgb, var(--jk-card-shadow-color) 88%, var(--jk-favorite) 12%);
-  --jk-card-favorite-inset: color-mix(in srgb, var(--jk-favorite) 42%, transparent);
-  --jk-card-favorite-icon-bg: color-mix(
-    in srgb,
-    var(--jk-card-icon-bg) 88%,
-    var(--jk-favorite) 12%
-  );
-  --jk-card-favorite-icon-border: color-mix(
-    in srgb,
-    var(--jk-card-icon-border) 72%,
-    var(--jk-favorite) 28%
-  );
 
   --jk-accent-soft: color-mix(in srgb, var(--jk-accent-hover) 18%, transparent);
   --jk-accent-border: color-mix(in srgb, var(--jk-accent-hover) 38%, transparent);
@@ -395,14 +363,6 @@
   --jk-accent-highlight: color-mix(in srgb, var(--jk-accent-bright) 20%, transparent);
   --jk-accent-glow: color-mix(in srgb, var(--jk-accent-bright) 65%, transparent);
   --jk-accent-glow-soft: color-mix(in srgb, var(--jk-accent-hover) 34%, transparent);
-
-  --jk-favorite: #fbbf24;
-  --jk-favorite-text: var(--jk-favorite);
-  --jk-favorite-soft: color-mix(in srgb, var(--jk-favorite) 20%, transparent);
-  --jk-favorite-border: color-mix(in srgb, var(--jk-favorite) 42%, transparent);
-  --jk-favorite-glow: color-mix(in srgb, var(--jk-favorite) 20%, transparent);
-  --jk-favorite-glow-hover: color-mix(in srgb, var(--jk-favorite) 30%, transparent);
-  --jk-favorite-edge: var(--jk-favorite);
 
   /* Status colors are intentionally independent from favorites. */
   --jk-success: #34d399;
@@ -520,15 +480,27 @@
 }
 
 .jk-favorite-color {
-  color: var(--jk-favorite);
+  color: var(--jk-accent-text);
 }
 
 .jk-favorite-badge {
-  color: var(--jk-favorite-text);
-  background: var(--jk-favorite-soft);
-  border-color: var(--jk-favorite-border);
-  box-shadow: 0 4px 12px var(--jk-favorite-glow);
+  color: var(--jk-accent-text);
+  background: transparent;
+  border-color: var(--jk-card-border);
+  box-shadow: none;
 }
+
+/* Favorites are marked by their star, never by a separate card aura.
+   The focus/selection styling remains independent. */
+.jk-card-favorite,
+.jk-favorite-star { color:var(--jk-accent-text); }
+.jk-card-favorite svg,
+.jk-favorite-star svg,
+.jk-theme-preview-star svg { fill:currentColor; }
+.jk-card-favorite > jk-icon {display:inline-flex;align-items:center;justify-content:center;flex:none;}
+.jk-card-favorite span {font-variant-numeric:tabular-nums;color:var(--jk-text-secondary-strong);}
+.jk-favorites-section {border-color:var(--jk-card-border);background:var(--jk-surface-subtle);}
+.jk-favorites-icon-badge {background:var(--jk-accent-soft);--tw-ring-color:var(--jk-accent-border);}
 
 .jk-service-card {
   background: var(--jk-card-background);
@@ -554,41 +526,6 @@
   border-color: color-mix(in srgb, var(--jk-card-icon-border) 55%, var(--jk-accent) 45%);
 }
 
-.jk-favorite-card {
-  background: var(--jk-card-favorite-background);
-  border-color: var(--jk-card-favorite-border);
-  box-shadow:
-    var(--jk-card-favorite-shadow),
-    inset 1px 0 0 var(--jk-card-favorite-inset);
-}
-
-.jk-favorite-card::after {
-  content: '';
-  position: absolute;
-  inset: 9px auto 9px 0;
-  width: 2px;
-  border-radius: 0 999px 999px 0;
-  background: var(--jk-favorite);
-  opacity: 0.42;
-  pointer-events: none;
-}
-
-.jk-favorite-card:hover {
-  background: linear-gradient(
-    145deg,
-    color-mix(in srgb, var(--jk-card-favorite-top) 94%, var(--jk-accent) 6%),
-    color-mix(in srgb, var(--jk-card-favorite-bottom) 96%, var(--jk-accent) 4%)
-  );
-  border-color: color-mix(in srgb, var(--jk-card-favorite-border) 75%, var(--jk-accent) 25%);
-  box-shadow:
-    0 16px 34px color-mix(in srgb, var(--jk-card-shadow-color) 78%, var(--jk-favorite) 22%),
-    inset 1px 0 0 var(--jk-card-favorite-inset);
-}
-
-.jk-favorite-card .jk-service-card-icon {
-  background: var(--jk-card-favorite-icon-bg);
-  border-color: var(--jk-card-favorite-icon-border);
-}
 
 .jk-danger-action:hover {
   color: var(--jk-danger);
@@ -615,19 +552,12 @@
 }
 
 [data-color-scheme='light'] {
-  --jk-favorite-text: color-mix(in srgb, var(--jk-favorite) 82%, black);
-  --jk-favorite-soft: color-mix(in srgb, var(--jk-favorite) 13%, white);
-  --jk-favorite-border: color-mix(in srgb, var(--jk-favorite) 45%, white);
-  --jk-favorite-glow: color-mix(in srgb, var(--jk-favorite) 11%, transparent);
-  --jk-favorite-glow-hover: color-mix(in srgb, var(--jk-favorite) 16%, transparent);
   --jk-shadow-card: var(--jk-card-shadow);
   --jk-shadow-elevated: 0 24px 70px rgb(15 23 42 / 0.18);
   --jk-shadow-inset: inset 0 1px 4px rgb(15 23 42 / 0.12);
 }
 
 [data-theme='daylight'] {
-  --jk-favorite: #b45309;
-  --jk-favorite-edge: #c56516;
   --jk-success: #15803d;
   --jk-warning: #a16207;
   --jk-danger: #b91c1c;
@@ -635,8 +565,6 @@
 }
 
 [data-theme='nord-light'] {
-  --jk-favorite: #9a6700;
-  --jk-favorite-edge: #b07a17;
   --jk-success: #2f7d52;
   --jk-warning: #946200;
   --jk-danger: #b43a45;
@@ -644,8 +572,6 @@
 }
 
 [data-theme='solarized-light'] {
-  --jk-favorite: #8a6500;
-  --jk-favorite-edge: #b58900;
   --jk-success: #587f00;
   --jk-warning: #8a6500;
   --jk-danger: #c23b35;
@@ -852,3 +778,381 @@ dialog.jk-service-actions::backdrop { background:transparent; backdrop-filter:no
  .jk-header-scrolled { margin-bottom:52px; }
  .jk-header-scrolled .jk-workspace-trigger-mobile { display:none; }
 }
+
+/* Phase 3: workspace management uses the same modal on desktop and touch. */
+/* A secondary navigation link, not another primary workspace choice. */
+.jk-workspace-management { display:flex; padding:.4rem .25rem 0; margin-top:.45rem; border-top:1px solid var(--jk-border-strong); }
+.jk-workspace-management-link { min-height:44px; border-radius:.55rem; padding:.55rem .65rem; color:var(--jk-text-secondary); font-size:.78rem; font-weight:500; background:transparent; text-align:left; transition:color 150ms,background-color 150ms; }
+.jk-workspace-management-link:hover { color:var(--jk-text-primary); background:var(--jk-bg-surface-hover); }
+.jk-workspace-management-link:focus-visible { outline:2px solid var(--jk-accent); outline-offset:2px; }
+.jk-workspace-field { display:flex; flex-direction:column; gap:.4rem; font-size:.85rem; font-weight:600; }
+.jk-workspace-field input { background:var(--jk-bg-surface-elevated); border:1px solid var(--jk-border-strong); border-radius:.75rem; min-height:44px; padding:.65rem .8rem; width:100%; color:var(--jk-text-primary); }
+.jk-workspace-field input:focus-visible { outline:2px solid var(--jk-accent); outline-offset:2px; }
+.jk-category-collapse,.jk-category-menu summary { display:grid; place-items:center; cursor:pointer; min-height:40px; min-width:40px; border-radius:.65rem; color:var(--jk-text-primary); border:1px solid var(--jk-border-strong); background:var(--jk-bg-surface-elevated); }
+.jk-category-menu { position:relative; }
+.jk-category-menu summary { list-style:none; font-size:1.3rem; }
+.jk-category-menu summary::-webkit-details-marker { display:none; }
+.jk-category-menu-items { position:absolute; right:0; top:calc(100% + .3rem); z-index:12; display:flex; flex-direction:column; gap:.2rem; min-width:150px; border:1px solid var(--jk-border-strong); border-radius:.75rem; background:var(--jk-bg-surface); padding:.35rem; box-shadow:0 8px 30px #0009; }
+.jk-category-menu-items button { min-height:42px; padding:.5rem .7rem; border-radius:.5rem; text-align:start; }
+.jk-category-menu-items button:hover:not(:disabled) { background:var(--jk-bg-surface-hover); }
+.jk-category-menu-items button:disabled { opacity:.45; }
+
+/* Mobile-first settings panel. Dialog stays usable with a virtual keyboard. */
+/* Keep the management actions clear of the scrollbar and the dialog edge. */
+.jk-config-shell { outline:0; min-width:0; }
+.jk-config-main { min-width:0; }
+.jk-config-content { min-width:0; padding-inline-end:clamp(.75rem,1.2vw,1.25rem); scrollbar-gutter:stable; }
+.jk-config-tabs { min-width:0; }
+
+.jk-config-save-error { color:var(--jk-danger); display:flex; flex-direction:column; align-items:flex-start; gap:.5rem; padding:.7rem; margin-bottom:.7rem; border:1px solid var(--jk-danger); border-radius:.7rem; font-size:.85rem; }
+.jk-config-server-comparison { padding:.65rem; border:1px solid var(--jk-border-strong); border-radius:.7rem; margin-bottom:.7rem; font-size:.85rem; }
+.jk-config-server-comparison pre { white-space:pre; overflow:auto; max-height:180px; margin:.5rem 0; background:var(--jk-bg-surface); font-size:.75rem; padding:.5rem; }
+.jk-config-server-comparison button { margin-top:.5rem; }
+@media (max-width:767px) {
+  .jk-config-overlay { padding:0; align-items:stretch; }
+  .jk-config-shell { border-radius:0; border:0; width:100%; height:100dvh; max-height:100dvh; min-height:0; padding: max(.75rem,env(safe-area-inset-top)) .8rem max(.5rem,env(safe-area-inset-bottom)); }
+  .jk-config-shell > div:first-child { margin-bottom:.65rem; padding-bottom:.65rem; }
+  .jk-config-main { flex-direction:column; gap:.5rem; }
+  /* All settings tabs stay visible; no inaccessible off-screen end of a scroller. */
+  .jk-config-tabs { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; flex-shrink:0; gap:.35rem; overflow:visible; padding:.15rem 0; }
+  .jk-config-tabs button { display:flex; min-width:0; width:100%; min-height:44px; justify-content:center; flex-wrap:wrap; gap:.4rem; text-align:center; padding:.55rem .35rem; font-size:.8rem; }
+  .jk-config-content { min-height:0; flex:1; padding-inline-end:0; scrollbar-gutter:auto; overscroll-behavior:contain; }
+  .jk-config-footer { margin-top:.35rem; padding-top:.5rem; flex-wrap:wrap; }
+  .jk-config-footer .jk-btn { min-height:44px; flex:1; }
+  .jk-config-editor-panel { overflow-y:auto; }
+  jk-config-editor #editorContainer { min-height:180px; }
+  jk-config-editor .pce { min-width:0; }
+}
+@media (min-width:480px) and (max-width:767px) {
+  .jk-config-tabs { grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+.jk-search-dialog { padding:0; margin: min(10dvh,6rem) auto auto; width:min(100% - 2rem,768px); max-height:80dvh; color:var(--jk-text-primary); border:1px solid var(--jk-border-strong); border-radius:1rem; background:transparent; box-shadow:0 16px 90px #0009; overflow:hidden; }
+.jk-search-dialog::backdrop { background:#020617bb; backdrop-filter:blur(5px); }
+.jk-search-panel { max-height:80dvh; border:0; }
+.jk-search-highlight { background:var(--jk-accent-soft); color:var(--jk-text-high-contrast); border-radius:.2rem; font-weight:800; }
+@media (max-width:767px) { .jk-search-dialog { width:100%; margin:0; max-height:100dvh; height:100dvh; border-radius:0; border:0; } .jk-search-panel { height:100%; max-height:100dvh; border-radius:0; } }
+.jk-json-error-jump { border:1px solid var(--jk-border-strong); border-radius:.4rem; min-width:32px; min-height:32px; color:var(--jk-text-primary); }
+.jk-help-dialog { width:min(100% - 2rem,640px); max-height:min(90dvh,850px); overflow:hidden; margin:auto; border:0; padding:0; border-radius:1.2rem; background:transparent; color:var(--jk-text-primary); box-shadow:0 16px 90px #000a; }
+.jk-help-dialog::backdrop { background:#020617c9; backdrop-filter:blur(4px); }
+.jk-help-dialog > div { max-height:90dvh; border-radius:1.2rem; }
+.jk-help-dialog [hidden] { display:none!important; }
+@media (max-width:767px) { .jk-help-dialog { width:100%; max-height:94dvh; margin:auto 0 0; border-radius:1.5rem 1.5rem 0 0; } .jk-help-dialog > div { max-height:94dvh; border-radius:1.5rem 1.5rem 0 0; } }
+
+/* Unified management: workspace / category / service */
+.jk-manager { display:flex;flex-direction:column;gap:1rem;color:var(--jk-text-primary);min-width:0;padding:.2rem .1rem 1rem; }
+.jk-manager-workspace-link { min-height:44px; padding:.5rem .65rem; border-radius:.55rem; color:var(--jk-text-secondary); font-size:.78rem; font-weight:500; background:transparent; text-align:left; }
+.jk-manager-workspace-link:hover { color:var(--jk-text-primary); background:var(--jk-bg-surface-hover); }
+.jk-manager-workspace-link:focus-visible { outline:2px solid var(--jk-accent); outline-offset:2px; }
+.jk-manager-tabs {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.35rem;padding:.3rem;background:var(--jk-bg-surface-elevated);border-radius:.85rem;}
+.jk-manager-tabs button {min-height:44px;border-radius:.65rem;color:var(--jk-text-secondary);font-weight:600;font-size:.85rem;}
+.jk-manager-tabs button.selected {background:var(--jk-bg-surface-hover);color:var(--jk-text-primary);outline:1px solid var(--jk-border-strong);}
+.jk-manager-heading {display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.75rem;}
+.jk-manager-heading h3 {font-size:1rem;font-weight:700;}
+.jk-manager-select {display:flex;flex-direction:column;gap:.35rem;font-size:.85rem;color:var(--jk-text-secondary);}
+.jk-manager-select select,.jk-manager-form input,.jk-quick-inline input,.jk-quick-inline select,.jk-icon-picker input {width:100%;min-height:44px;border:1px solid var(--jk-border-strong);border-radius:.65rem;background:var(--jk-bg-surface-elevated);color:var(--jk-text-primary);padding:.65rem .75rem;min-width:0;max-width:100%;}
+.jk-sort-list {display:flex;flex-direction:column;gap:.45rem;min-width:0;}
+.jk-sort-row {display:flex;align-items:center;gap:.65rem;min-height:62px;padding:.45rem .6rem;border:1px solid var(--jk-border-strong);border-radius:.85rem;background:var(--jk-bg-surface-elevated);transition:border-color 90ms,background 90ms;}
+.jk-sort-row.jk-sort-target {border-color:var(--jk-accent);background:color-mix(in srgb,var(--jk-accent) 13%,var(--jk-bg-surface));}
+.jk-sort-description {min-width:0;flex:1;display:flex;flex-direction:column;gap:.18rem;}
+.jk-sort-description strong {font-weight:600;font-size:.88rem;overflow-wrap:anywhere;}
+.jk-sort-description small {font-size:.73rem;color:var(--jk-text-secondary);overflow-wrap:anywhere;}
+.jk-sort-handle {display:grid;place-items:center;touch-action:none;cursor:grab;user-select:none;min-width:44px;min-height:44px;font-size:1.6rem;border-radius:.6rem;color:var(--jk-text-secondary);}
+.jk-sort-handle[aria-pressed="true"] {cursor:grabbing;color:var(--jk-accent-bright);background:var(--jk-bg-surface-hover);}
+.jk-sort-handle:disabled {opacity:.3;cursor:default;}
+.jk-sort-actions {display:flex;gap:.3rem;align-items:center;flex-wrap:wrap;justify-content:flex-end;}
+.jk-manager-action {font-size:.79rem;min-height:38px;padding:.35rem .55rem;color:var(--jk-text-secondary);border-radius:.5rem;}
+.jk-manager-action:hover {color:var(--jk-text-primary);background:var(--jk-bg-surface-hover);}
+.jk-manager-footer {display:flex;align-items:center;justify-content:flex-end;gap:.55rem;flex-wrap:wrap;padding:.85rem 0;margin-top:.3rem;position:sticky;bottom:0;background:var(--jk-bg-surface);z-index:1;}
+.jk-manager-footer span {margin-right:auto;font-size:.78rem;color:var(--jk-text-secondary);}
+.jk-manager-warning {padding:1rem;border-radius:.85rem;border:1px solid var(--jk-border-strong);background:var(--jk-bg-surface-elevated);display:flex;flex-direction:column;gap:.6rem;font-size:.84rem;}
+.jk-manager-hint {font-size:.8rem;color:var(--jk-text-secondary);line-height:1.45;}
+.jk-manager-subview {display:flex;flex-direction:column;gap:1rem;min-width:0;}
+.jk-manager-subview h3 {font-size:1.05rem;font-weight:700;}
+.jk-manager-back {align-self:flex-start;min-height:44px;color:var(--jk-accent-bright);font-size:.85rem;}
+.jk-manager-form {display:flex;flex-direction:column;gap:1rem;}
+.jk-manager-form label {display:flex;flex-direction:column;gap:.35rem;font-size:.83rem;font-weight:600;}
+.jk-quick-inline {display:block;min-width:0;}
+.jk-quick-inline form {display:flex;flex-direction:column;gap:1rem;}
+.jk-quick-inline form header {display:flex;justify-content:space-between;align-items:center;}
+.jk-quick-inline form header h2 {font-size:1.05rem;font-weight:700;}
+.jk-quick-inline fieldset {display:flex;flex-direction:column;gap:.85rem;min-width:0;}
+.jk-quick-inline fieldset label {display:flex;flex-direction:column;gap:.35rem;}
+.jk-quick-inline footer {display:flex;justify-content:flex-end;gap:.5rem;position:sticky;bottom:0;background:var(--jk-bg-surface);padding:.8rem 0;}
+.jk-quick-inline .jk-form-footer-actions {display:flex;gap:.6rem;}
+.jk-icon-details {border:1px solid var(--jk-border-strong);border-radius:.75rem;padding:.7rem;}
+.jk-icon-details summary {cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:.5rem;min-height:36px;font-weight:600;}
+.jk-advanced {font-size:.8rem;color:var(--jk-text-secondary);}
+.jk-advanced summary {cursor:pointer;font-weight:600;min-height:36px;}
+.jk-icon-picker {display:flex;flex-direction:column;gap:.75rem;margin-top:.7rem;}
+.jk-icon-picker label {display:flex;flex-direction:column;gap:.3rem;font-size:.8rem;}
+.jk-icon-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:.4rem;max-height:220px;overflow:auto;}
+.jk-icon-grid button {display:grid;place-items:center;min-height:44px;border-radius:.6rem;background:var(--jk-bg-surface-elevated);border:1px solid var(--jk-border-strong);}
+.jk-icon-grid button[aria-pressed="true"] {border-color:var(--jk-accent);background:var(--jk-bg-surface-hover);}
+.jk-icon-preview {display:flex;align-items:center;gap:.65rem;padding:.65rem;background:var(--jk-bg-surface-elevated);border-radius:.65rem;}
+.jk-icon-preview>span {min-width:0;flex:1;display:flex;flex-direction:column;}
+.jk-icon-preview small {font-size:.72rem;color:var(--jk-text-secondary);overflow-wrap:anywhere;}
+.jk-icon-links {display:flex;flex-wrap:wrap;gap:.85rem;font-size:.78rem;color:var(--jk-accent-bright);text-decoration:underline;}
+.jk-sr-only {position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+@media(max-width:640px) {
+ .jk-manager-tabs button{font-size:.73rem;padding:.4rem .1rem;}
+ .jk-sort-row{gap:.3rem;padding:.3rem;}
+ .jk-sort-handle{min-width:44px;}
+ .jk-sort-actions{flex-direction:column;align-items:flex-end;}
+ .jk-manager-action{min-height:36px;padding:.25rem .4rem;font-size:.75rem;}
+ .jk-manager-heading .jk-btn{min-height:44px;}
+ .jk-quick-dialog{max-height:100dvh;}
+}
+@media(prefers-reduced-motion:reduce) {.jk-sort-row{transition:none;}}
+.jk-shortcut-grid {display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:.3rem;}
+.jk-shortcut-grid button {border-radius:.45rem;background:var(--jk-bg-surface-elevated);border:1px solid var(--jk-border-strong);min-height:40px;font-size:.76rem;}
+.jk-shortcut-grid button:disabled {opacity:.35;cursor:not-allowed;}
+.jk-shortcut-grid button[aria-pressed="true"] {border-color:var(--jk-accent);color:var(--jk-accent-bright);}
+
+/* UX 54a: settings and service editor are application views, not nested modals. */
+.jk-settings-page {
+  position:fixed; inset:0; z-index:40; display:block; overflow:auto;
+  background:var(--jk-bg-surface); color:var(--jk-text-primary);
+  overscroll-behavior:contain;
+}
+.jk-settings-page[hidden] { display:none !important; }
+.jk-settings-page .jk-settings-shell {
+  box-sizing:border-box; width:min(100%,1580px); height:auto; max-height:none;
+  min-height:100dvh; padding:clamp(1rem,2.6vw,2.2rem);
+  margin-inline:auto; overflow:visible; border:0; border-radius:0; background:transparent;
+}
+.jk-settings-page .jk-config-main { display:grid; grid-template-columns:172px minmax(0,1fr); gap:clamp(1rem,2vw,2rem); align-items:start; flex:1; }
+.jk-settings-page .jk-config-tabs { display:flex; flex-direction:column; gap:.35rem; width:172px; overflow:visible; }
+.jk-settings-page .jk-config-tabs button { width:100%; min-width:0; text-align:left; justify-content:flex-start; white-space:normal; }
+.jk-settings-page .jk-config-content { min-width:0; min-height:0; padding:0; overflow:visible; scrollbar-gutter:auto; }
+.jk-settings-page .jk-config-content:not(:has(jk-management)):not(.jk-config-editor-panel) > * { max-width:760px; }
+.jk-settings-page .jk-config-editor-panel { height:min(72dvh,820px); overflow:hidden; }
+.jk-settings-page .jk-config-footer { margin-top:1.2rem; }
+.jk-settings-page .jk-config-footer:has(.jk-btn:only-child) { display:none; }
+.jk-manager { container-type:inline-size; width:100%; gap:.9rem; }
+.jk-manager-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.38fr); align-items:start; gap:clamp(.6rem,1vw,1rem); }
+.jk-manager-panel { min-width:0; padding:.7rem; border:1px solid var(--jk-border-strong); background:var(--jk-bg-surface-elevated); border-radius:1rem; }
+.jk-manager-panel-header { min-height:46px; margin-bottom:.5rem; display:flex; align-items:center; justify-content:space-between; gap:.4rem; }
+.jk-manager-panel-header h3 { font-size:1rem; font-weight:700; }
+.jk-manager-plus { font-weight:600; font-size:1.3rem; width:44px; height:44px; border-radius:.6rem; color:var(--jk-accent-bright); }
+.jk-manager-plus:hover,.jk-manager-edit:hover {background:var(--jk-bg-surface-hover);}
+.jk-manager-plus:disabled {opacity:.4;}
+.jk-manager-panel .jk-sort-row { padding:.25rem .3rem; gap:.25rem; min-width:0; background:var(--jk-bg-surface); }
+.jk-manager-panel .jk-sort-description {min-width:0; text-align:left; padding:.25rem .15rem;}
+.jk-manager-panel .jk-sort-description strong { display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; overflow-wrap:normal; }
+.jk-manager-panel .jk-sort-description small { display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.jk-manager-panel .jk-sort-select { cursor:pointer; border-radius:.55rem; min-height:44px; }
+.jk-manager-panel .jk-sort-select:hover {background:var(--jk-bg-surface-hover);}
+.jk-manager-panel .jk-sort-selected {outline:2px solid var(--jk-accent); outline-offset:-2px; padding-inline:.4rem; background:var(--jk-bg-surface-hover);}
+.jk-manager-panel .jk-sort-actions { flex-wrap:nowrap; gap:0; }
+.jk-manager-edit { flex:0 0 44px; display:grid; place-items:center; min-width:44px; min-height:44px; border-radius:.6rem; color:var(--jk-text-secondary); font-size:1.25rem; }
+.jk-manager-panel .jk-sort-handle {flex:0 0 44px;}
+.jk-manager-panel .jk-manager-action-menu { flex:0 0 44px; }
+.jk-manager-context,.jk-manager-mobile-header { display:none; }
+.jk-manager-empty { font-size:.85rem; line-height:1.5; padding:1rem .5rem; color:var(--jk-text-secondary); }
+.jk-manager-savebar { position:sticky; bottom:0; z-index:5; display:flex; flex-wrap:wrap; align-items:center; gap:.7rem;
+  padding:1rem; border:1px solid var(--jk-border-strong); border-radius:.85rem; background:var(--jk-bg-surface); box-shadow:0 -8px 30px #0004; }
+.jk-manager-savebar>div { flex:1; display:flex; min-width:170px; flex-direction:column; gap:.15rem; }
+.jk-manager-savebar small { font-size:.77rem; color:var(--jk-text-secondary); }
+.jk-manager-subview { margin:0 auto; width:min(100%,700px); }
+.jk-manager-subview h2 {font-size:1.3rem; font-weight:700;}
+.jk-manager-form-width {max-width:650px;}
+.jk-change-guard-backdrop {position:fixed; inset:0; z-index:150; background:rgb(2 6 23 / .78); display:flex; align-items:center; justify-content:center; padding:1rem; backdrop-filter:blur(3px);}
+.jk-change-guard {width:min(100%,560px); padding:clamp(1.1rem,2vw,2rem); background:var(--jk-bg-surface); color:var(--jk-text-primary); border:1px solid var(--jk-border-strong); border-radius:1.2rem; box-shadow:0 20px 60px #0009; display:flex; flex-direction:column; gap:.9rem;}
+.jk-change-guard h2 {font-size:1.2rem; font-weight:700;}
+.jk-change-guard p {font-size:.91rem; line-height:1.55; color:var(--jk-text-secondary);}
+.jk-change-guard-actions {display:flex; gap:.6rem; justify-content:flex-end; flex-wrap:wrap; margin-top:.7rem;}
+.jk-change-guard-actions .jk-btn {min-height:44px;}
+.jk-standalone-editor {position:fixed; inset:0; z-index:60; overflow:auto; background:var(--jk-bg-surface); color:var(--jk-text-primary);}
+.jk-standalone-editor-shell {width:min(100%,730px); min-height:100dvh; margin:0 auto; padding:clamp(1rem,3vw,2.3rem);}
+.jk-editor-breadcrumb {padding-bottom:1.1rem; margin-bottom:1.3rem; border-bottom:1px solid var(--jk-border-strong);}
+.jk-standalone-editor .jk-quick-inline form header {padding:0 0 .5rem;}
+.jk-standalone-editor .jk-quick-inline form header h2 {font-size:1.3rem;}
+@media(max-width:760px) {
+  .jk-settings-page .jk-settings-shell {padding:max(.8rem,env(safe-area-inset-top)) .8rem max(1rem,env(safe-area-inset-bottom));}
+  .jk-settings-page .jk-config-main {display:flex; flex-direction:column; gap:1rem;}
+  .jk-settings-page .jk-config-tabs {display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); width:100%; gap:.4rem;}
+  .jk-settings-page .jk-config-tabs button {width:100%; min-width:0; min-height:44px; display:flex; justify-content:center; flex-wrap:wrap; padding:.65rem .45rem; text-align:center;}
+  .jk-settings-page .jk-config-content {width:100%;}
+  .jk-settings-page .jk-config-editor-panel {height:65dvh;}
+  .jk-settings-page .jk-config-footer {padding-bottom:max(.5rem,env(safe-area-inset-bottom));}
+  .jk-change-guard-actions {flex-direction:column;}
+  .jk-change-guard-actions button {width:100%;}
+}
+@container (max-width:1010px) {
+  .jk-manager-grid {grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);}
+  .jk-manager-panel-workspaces {display:none;}
+  .jk-manager-context {display:flex; gap:.65rem; align-items:end; flex-wrap:wrap;}
+  .jk-manager-context label {flex:1; min-width:170px; display:flex; flex-direction:column; gap:.3rem; font-size:.82rem;}
+  .jk-manager-context select {min-height:44px; max-width:100%; padding:.55rem; border:1px solid var(--jk-border-strong); border-radius:.55rem; background:var(--jk-bg-surface-elevated);}
+  .jk-manager-context button {min-height:44px;}
+  .jk-manager[data-workspace-pane] .jk-manager-panel-categories,
+  .jk-manager[data-workspace-pane] .jk-manager-panel-services {display:none;}
+  .jk-manager[data-workspace-pane] .jk-manager-panel-workspaces {display:block;grid-column:1/-1;}
+  .jk-manager[data-workspace-pane] .jk-manager-mobile-header {display:flex; justify-content:flex-start; align-items:center; gap:1rem;}
+}
+@container (max-width:610px) {
+  .jk-manager-grid {display:block;}
+  .jk-manager-panel {padding:.45rem;}
+  .jk-manager-mobile-header {display:flex; align-items:center; gap:1rem; min-height:44px;}
+  .jk-manager-mobile-header strong {font-size:1.1rem;}
+  .jk-manager:not([data-workspace-pane]) .jk-manager-panel-workspaces {display:none;}
+  .jk-manager:not([data-workspace-pane]) .jk-manager-panel-categories {display:block;}
+  .jk-manager:not([data-workspace-pane]) .jk-manager-panel-services {display:none;}
+  .jk-manager[data-mobile-step="services"]:not([data-workspace-pane]) .jk-manager-panel-categories {display:none;}
+  .jk-manager[data-mobile-step="services"]:not([data-workspace-pane]) .jk-manager-panel-services {display:block;}
+  .jk-manager[data-workspace-pane] .jk-manager-panel-workspaces {display:block;}
+  .jk-manager-context {flex-wrap:wrap;}
+  .jk-manager-context label {min-width:130px;}
+  .jk-manager-savebar {padding:.65rem;bottom:env(safe-area-inset-bottom);}
+  .jk-manager-savebar .jk-btn {flex:1;}
+  .jk-manager-panel .jk-sort-actions {flex-direction:row;}
+}
+
+/* UX follow-up 55–59: consistent edit actions, unified editor shell and visible reorder feedback. */
+.jk-settings-page .jk-settings-back[hidden],
+.jk-settings-page .jk-config-footer[hidden],
+.jk-settings-page .jk-settings-background-content[hidden] {display:none !important;}
+.jk-settings-background-content {min-width:0;}
+.jk-settings-service-editor {width:min(100%,700px); margin-inline:auto; min-width:0; display:flex; flex-direction:column; gap:1rem;}
+.jk-editor-title {display:flex;flex-direction:column;gap:.2rem;margin-bottom:.2rem;}
+.jk-editor-title h2 {font-size:1.35rem;line-height:1.35;font-weight:700;}
+.jk-editor-title p {font-size:.8rem;color:var(--jk-text-secondary);}
+.jk-manager-subview {gap:.8rem;}
+.jk-manager-form-width {width:100%;max-width:650px;}
+/* Editor cards use the same outlined surface as the other settings sections.
+   The action buttons belong to the card, not to a floating secondary card. */
+.jk-settings-service-editor .jk-quick-inline form,
+.jk-settings-service-editor .jk-quick-inline .jk-service-delete-confirm,
+.jk-manager-subview .jk-manager-form {
+  min-width:0;
+  padding:clamp(1rem,2vw,1.4rem);
+  border:1px solid color-mix(in srgb,var(--jk-border-strong) 52%,transparent);
+  border-radius:1rem;
+  background:color-mix(in srgb,var(--jk-bg-surface-elevated) 10%,var(--jk-bg-surface));
+}
+.jk-settings-service-editor .jk-quick-inline footer,
+.jk-manager-subview .jk-manager-footer {
+  position:sticky;
+  bottom:max(.5rem,env(safe-area-inset-bottom));
+  z-index:5;
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:.65rem;
+  min-height:52px;
+  margin-top:.25rem;
+  padding:.6rem 0 0;
+  border:0;
+  border-radius:0;
+  box-shadow:none;
+  background:color-mix(in srgb,var(--jk-bg-surface-elevated) 10%,var(--jk-bg-surface));
+}
+.jk-settings-service-editor .jk-quick-inline fieldset {gap:1rem;}
+.jk-manager-panel .jk-sort-row:has(.jk-sort-selected) {background:color-mix(in srgb,var(--jk-accent) 9%,var(--jk-bg-surface));
+  border-color:color-mix(in srgb,var(--jk-accent) 40%,var(--jk-border-strong));}
+.jk-manager-panel .jk-sort-selected {outline:0;outline-offset:0;padding-inline:.15rem;background:transparent;}
+.jk-manager-panel .jk-sort-select:focus-visible {outline:2px solid var(--jk-accent-bright);outline-offset:2px;}
+.jk-manager-panel .jk-sort-actions {flex-wrap:nowrap;gap:0;}
+.jk-manager-panel .jk-manager-edit {flex:0 0 38px;min-width:38px;min-height:44px;border-radius:.6rem;}
+.jk-manager-panel .jk-manager-edit:focus-visible {outline:2px solid var(--jk-accent-bright);outline-offset:-2px;}
+.jk-manager-delete-action:hover {color:var(--jk-danger, #fda4af);background:color-mix(in srgb,#f87171 13%,var(--jk-bg-surface));}
+.jk-manager-direct-action:disabled {opacity:.3;cursor:not-allowed;}
+.jk-sort-list {position:relative;}
+.jk-sort-row {will-change:auto;}
+.jk-sort-row.jk-sort-placeholder {border:1px dashed var(--jk-accent);background:color-mix(in srgb,var(--jk-accent) 8%,var(--jk-bg-surface));}
+.jk-sort-placeholder .jk-sort-description,.jk-sort-placeholder .jk-sort-actions {visibility:hidden;}
+.jk-sort-placeholder .jk-sort-handle {opacity:.35;pointer-events:none;}
+.jk-sort-row.jk-sort-keyboard-source {border:2px dashed var(--jk-accent);background:color-mix(in srgb,var(--jk-accent) 13%,var(--jk-bg-surface));}
+.jk-sort-row.jk-sort-landed {animation:jk-sort-drop 220ms ease-out;}
+.jk-sort-floating {position:fixed;z-index:120;pointer-events:none;display:flex;align-items:center;gap:.8rem;
+  box-sizing:border-box;padding:.5rem .7rem;border-radius:.85rem;border:1px solid var(--jk-accent);
+  background:var(--jk-bg-surface-elevated);color:var(--jk-text-primary);
+  box-shadow:0 14px 36px rgb(0 0 0 / .35),0 0 0 1px color-mix(in srgb,var(--jk-accent) 25%,transparent);
+  transform:scale(1.015);overflow:hidden;}
+.jk-sort-floating-grip {min-width:30px;text-align:center;font-size:1.5rem;color:var(--jk-accent-bright);}
+.jk-sort-floating-description {min-width:0;display:flex;flex-direction:column;gap:.2rem;}
+.jk-sort-floating-description strong {font-weight:600;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.jk-sort-floating-description small {font-size:.73rem;color:var(--jk-text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.jk-sort-floating-outside {opacity:.55;border-style:dashed;}
+@keyframes jk-sort-drop {from {transform:scale(1.013);border-color:var(--jk-accent);} to {transform:scale(1);}}
+.jk-icon-picker {display:flex;flex-direction:column;gap:.4rem;margin-top:0;min-width:0;}
+.jk-icon-picker>label {font-size:.83rem;font-weight:600;}
+.jk-icon-input-row {display:flex;align-items:center;gap:.55rem;min-width:0;}
+.jk-icon-preview-small {display:grid;place-items:center;flex:0 0 48px;width:48px;height:48px;
+  background:var(--jk-bg-surface-elevated);border:1px solid var(--jk-border-strong);border-radius:.7rem;overflow:hidden;}
+.jk-icon-input-row>input {min-width:0;flex:1;}
+.jk-icon-input-row>.jk-icon-clear {flex:0 0 44px;min-width:44px;min-height:44px;display:grid;place-items:center;
+  border-radius:.6rem;color:var(--jk-text-secondary);}
+.jk-icon-input-row>.jk-icon-clear:disabled {opacity:.3;cursor:default;}
+.jk-icon-picker .jk-manager-hint a {text-decoration:underline;color:var(--jk-accent-bright);}
+@media (max-width:760px) {
+  .jk-settings-service-editor {width:100%;}
+  .jk-settings-service-editor .jk-quick-inline footer,.jk-manager-subview .jk-manager-footer {
+    bottom:max(.35rem,env(safe-area-inset-bottom));
+  }
+  .jk-manager-panel .jk-sort-actions {flex-direction:row;}
+}
+@media (prefers-reduced-motion:reduce) {
+  .jk-sort-floating {transform:none;}
+  .jk-sort-row.jk-sort-landed {animation:none;}
+}
+
+/* Keep the shortcut visible when long service URLs are truncated. */
+.jk-manager-panel .jk-sort-description small.jk-sort-meta {display:flex;align-items:center;gap:.3rem;min-width:0;white-space:nowrap;}
+.jk-sort-meta-primary {min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.jk-sort-meta-shortcut {flex:0 0 auto;white-space:nowrap;}
+
+
+/* The same Back control occupies the same position for settings and every editor. */
+.jk-settings-nav-row {display:flex;align-items:center;min-height:44px;margin:-.2rem 0 1.15rem;}
+.jk-nav-back {display:inline-flex;align-items:center;gap:.55rem;min-height:44px;}
+.jk-nav-back:focus-visible {outline:2px solid var(--jk-accent-bright);outline-offset:2px;}
+/* Reestablish the Prism editor's flex/scroll chain after the settings content wrapper. */
+.jk-settings-page .jk-config-editor-panel {display:flex;flex-direction:column;min-width:0;min-height:0;}
+.jk-settings-page .jk-config-editor-panel .jk-settings-json-content {
+  flex:1 1 auto;display:flex;flex-direction:column;min-height:0;min-width:0;
+}
+.jk-settings-page .jk-config-editor-panel .jk-settings-json-content > jk-config-editor {
+  flex:1 1 0;min-height:0;min-width:0;overflow:hidden;
+}
+.jk-settings-page .jk-config-editor-panel .jk-settings-json-content > jk-config-editor #editorContainer {
+  flex:1 1 0;height:0;min-height:0;overflow:auto;
+}
+.jk-settings-page .jk-config-editor-panel .jk-json-footer {
+  flex:0 0 auto;display:flex;justify-content:flex-end;align-items:center;gap:.65rem;
+  margin-top:.75rem;padding:0;border:0;min-height:44px;
+}
+@media (max-width:760px) {
+  .jk-settings-nav-row {margin:0 0 .7rem;}
+  .jk-settings-page .jk-config-editor-panel .jk-json-footer .jk-btn {min-height:44px;flex:1;}
+}
+
+/* Service editor: destructive action is separate from save/cancel. */
+.jk-service-form-footer {justify-content:space-between;flex-wrap:wrap;}
+.jk-service-delete-confirm {display:flex;flex-direction:column;gap:.5rem;}
+.jk-service-delete-confirm header h2 {font-size:1.15rem;font-weight:700;}
+.jk-service-delete-confirm footer {display:flex;align-items:center;justify-content:flex-end;gap:.75rem;flex-wrap:wrap;margin-top:1rem;}
+.jk-service-delete-trigger {margin-right:auto;}
+.jk-service-delete-trigger:focus-visible {outline:2px solid var(--jk-danger);outline-offset:2px;}
+@media (max-width:479px) {
+  .jk-service-form-footer .jk-service-delete-trigger {margin-right:auto;}
+}
+/* Phase 4 – self-hosted PWA feedback; uses the active theme tokens. */
+.jk-update-banner {
+  position:fixed;z-index:90;inset:auto max(1rem,env(safe-area-inset-right)) max(1rem,env(safe-area-inset-bottom)) auto;
+  width:min(100% - 2rem,460px);box-sizing:border-box;
+  display:flex;align-items:center;flex-wrap:wrap;gap:.7rem;
+  padding:1rem;border:1px solid var(--jk-accent-border);border-radius:1rem;
+  background:var(--jk-bg-surface);color:var(--jk-text-primary);
+  box-shadow:0 10px 35px rgba(0,0,0,.3);
+}
+.jk-update-banner div { flex:1 1 180px;min-width:0; }
+.jk-update-banner p { font-size:.78rem;opacity:.8;margin-top:.25rem; }
+.jk-update-banner .jk-btn { flex-shrink:0; }
+.jk-offline-banner { position:relative;display:flex;gap:.5rem;align-items:center;margin:0 0 .65rem;padding:.7rem 1rem;border-radius:.75rem;border:1px solid var(--jk-accent-border);background:var(--jk-bg-surface);font-size:.85rem; }
+@media(max-width:500px) {
+  .jk-update-banner {inset:auto .75rem max(.75rem,env(safe-area-inset-bottom)) .75rem;width:auto;}
+  .jk-update-banner .jk-btn {flex:1;min-height:44px;}
+}
+
+.jk-header-version { font-size:.67rem; color:var(--jk-text-muted); font-family:ui-monospace,monospace; white-space:nowrap; }

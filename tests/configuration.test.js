@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { migrateConfig, migrateReferences, persistConfig } from '../src/utils/configuration.js';
+import { migrateConfig, migrateReferences, persistConfig, setWorkspaceContext } from '../src/utils/configuration.js';
 import { validateConfig } from '../src/utils/config-validator.js';
 import { generateShortcuts, getFavorites, getContinueServices } from '../src/utils/shortcuts.js';
 const legacy = () => ({ categories: [{ category: 'Tools', services: [{ name: 'One', url: '/one' }, { name: 'One', url: '/two' }] }], searchEngines: [] });
@@ -43,22 +43,47 @@ test('explicit shortcuts are reserved before automatic assignment', () => {
   assert.notEqual(result[0].categoryKey, 'a');
   assert.notEqual(result[0].services[0].key, 'a');
 });
-test('save awaits server confirmation and rejects failed writes', async () => {
-  let captured;
-  const result = await persistConfig(legacy(), { base: '/jump-key/', fetcher: async (...args) => { captured = args; return { ok: true }; } });
-  assert.equal(captured[0], '/jump-key/config/services.json');
-  assert.deepEqual(JSON.parse(captured[1].body), result);
-  await assert.rejects(persistConfig(legacy(), { fetcher: async () => ({ ok: false, status: 500 }) }), /500/);
+test('save includes the loaded ETag, awaits confirmation, and rejects failed writes', async () => {
+  setWorkspaceContext({ user: '', id: 'default', etag: '"v1"' });
+  try {
+    let captured;
+    const result = await persistConfig(legacy(), { base: '/jump-key/', fetcher: async (...args) => {
+      captured = args;
+      return { ok: true, headers: { get: () => '"v2"' } };
+    } });
+    assert.equal(captured[0], '/jump-key/config/services.json?workspace=default');
+    assert.equal(captured[1].headers['If-Match'], '"v1"');
+    assert.deepEqual(JSON.parse(captured[1].body), result);
+    await assert.rejects(persistConfig(legacy(), { fetcher: async (_url, options) => {
+      assert.equal(options.headers['If-Match'], '"v2"');
+      return { ok: false, status: 500, json: async () => ({error:{code:'write_failed',message:'failed to write'}}) };
+    } }), /failed to write/);
+  } finally { setWorkspaceContext(null); }
+});
+
+test('conflicts retain the original revision and include structured error details', async () => {
+  setWorkspaceContext({user:'', id:'default', etag:'"v1"'});
+  try {
+    await assert.rejects(persistConfig(legacy(), { fetcher: async (_url, options) => {
+      assert.equal(options.headers['If-Match'], '"v1"');
+      return { ok:false, status:412, json:async()=>({error:{code:'precondition_failed',message:'Configuration changed'}}) };
+    }}), error => error.status===412 && error.code==='precondition_failed');
+    await assert.rejects(persistConfig(legacy(), { fetcher: async (_url, options) => {
+      assert.equal(options.headers['If-Match'], '"v1"');
+      return { ok:false, status:428, json:async()=>({error:{code:'precondition_required',message:'Reload required'}}) };
+    }}), error => error.status===428 && error.code==='precondition_required');
+  } finally { setWorkspaceContext(null); }
 });
 
 test('workspace persistence uses the selected workspace and expected user', async () => {
   const { setWorkspaceContext, persistConfig } = await import('../src/utils/configuration.js');
-  setWorkspaceContext({ id: 'work', user: 'arthur' });
+  setWorkspaceContext({ id: 'work', user: 'arthur', etag: '"work-v1"' });
   try {
     await persistConfig({ categories: [], searchEngines: [] }, { fetcher: async (url, options) => {
       assert.equal(url, '/config/services.json?workspace=work');
       assert.equal(options.headers['X-JumpKey-User'], 'arthur');
-      return { ok: true };
+      assert.equal(options.headers['If-Match'], '"work-v1"');
+      return { ok: true, headers: { get: () => '"work-v2"' } };
     }});
   } finally { setWorkspaceContext(null); }
 });

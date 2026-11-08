@@ -1,18 +1,24 @@
 import { allowedNavigation } from './utils/navigation-policy.js';
 import { loadWorkspacePreferences, workspacePreferencesEnabled, effectivePreferencesId, WORKSPACE_PREFERENCES_MODE } from './utils/workspace-preferences.js';
-import { initializeWorkspaces, switchWorkspace, workspaceStorage } from './utils/workspaces.js';
+import { initializeWorkspaces, reconnectWorkspaces, startWorkspacePrefetch, switchWorkspace, workspaceStorage, migrateWorkspaceIDs } from './utils/workspaces.js';
+import {cleanupRemovedWorkspaceCaches} from './utils/workspace-migration.js';
+import { cacheWorkspace, cacheManifest, reconcileOfflineCache } from './utils/offline-cache.js';
+import { pwaUpdates, APP_VERSION } from './utils/pwa-updates.js';
 import { workspaceLabel } from './utils/workspace-label.js';
+import { servicePosition } from './utils/reorder.js';
+import { reorderCategory, reorderService, toggleCategory, compareServerConfiguration, acceptServerRevision } from './utils/dashboard-actions.js';
 import './components/workspace-picker.js';
 import { normalizeTimings } from './utils/preferences.js';
 import './components/service-actions.js';
 import './components/quick-add.js';
 import { InstallController } from './utils/install.js';
 import { sharedLink, hasSharedInput } from './utils/quick-add.js';
-import { migrateConfig, migrateReferences, persistConfig } from './utils/configuration.js';
+import { migrateConfig, migrateReferences, persistConfig, setWorkspaceETag, setWorkspaceContext } from './utils/configuration.js';
 import { html, LitElement } from 'lit';
 import { detectLang, t } from './utils/i18n.js';
 import {
   generateShortcuts,
+  categorySelectionKey,
   getFavorites,
   addFavoriteSlots,
   getFilteredServices,
@@ -25,10 +31,12 @@ import { handleGlobalKeyDown } from './utils/keyboard/index.js';
 import { loadTheme, saveTheme, applyTheme } from './utils/theme.js';
 import { getTheme } from './themes/themes.js';
 import { ActionManager } from './utils/action-manager.js';
+import { renderDashboardContent } from './views/dashboard-content.js';
 
 // Import Sub-Components
 import './components/dashboard-header.js';
 import './components/config-modal.js';
+import './components/change-guard.js';
 import './components/search-modal.js';
 import './components/service-card.js';
 import './components/help-modal.js';
@@ -41,10 +49,6 @@ import './components/toast.js';
 import './components/keystroke-badge.js';
 import './components/action-feedback.js';
 import './components/mobile-menu.js';
-
-const styles = {
-  mainContent: 'w-full pt-4 pb-6 md:pt-8',
-};
 
 const STORAGE_KEYS = {
   configCache: 'services-cache',
@@ -61,8 +65,13 @@ class DashboardApp extends LitElement {
   static properties = {
     actionService: { type: Object },
     showQuickAdd: { type: Boolean },
+    _quickExitPrompt: { type: Boolean },
     savingConfig: { type: Boolean },
     readOnly: { type: Boolean },
+    offlineMode: { type: Boolean },
+    offlineCacheStatus: { type: Object },
+    pwaState: { type: Object },
+    pwaNoticeDismissed: { type: Boolean },
     categories: { type: Array },
     searchEngines: { type: Array },
     // UI State
@@ -88,6 +97,9 @@ class DashboardApp extends LitElement {
     workspaceId: {},
     workspaceLoading: {},
     showWorkspacePicker: {},
+    collapsedCategories: { type: Object },
+    configSaveError: {},
+    serverSnapshot: {},
     separateWorkspacePreferences: { type: Boolean },
     preferences: { type: Object },
     categoryCountdown: { type: Number },
@@ -99,6 +111,7 @@ class DashboardApp extends LitElement {
     dialogConfig: { type: Object },
     toastConfig: { type: Object },
     actionFeedbackVisible: { type: Boolean },
+    categoryActionIndex: {},
   };
 
   get searchInput() {
@@ -120,6 +133,10 @@ class DashboardApp extends LitElement {
 
     // UI & Layout State
     this.showConfigModal = false;
+    this._quickExitPrompt = false;
+    this.quickReturnToSettings = false;
+    this.quickSaveConfig = null;
+    this.quickConfig = null;
     this.showSearch = false;
     this.showHelp = false;
     this.showMobileMenu = false;
@@ -128,8 +145,19 @@ class DashboardApp extends LitElement {
     this.isValidInput = false;
     this.separateWorkspacePreferences=workspacePreferencesEnabled();
     this.readOnly=true;
+    this.serverReadOnly=true;
+    this.offlineMode=false;
+    this.offlineCacheStatus={available:0,total:0,failures:[]};
+    this.pwaState={...pwaUpdates.state};
+    this.pwaNoticeDismissed=false;
+    this._reconnectInFlight=null;
+    this._lastReconnectAttempt=0;
     this.workspaces=[];
+    this.configInitialTab='general';
     this.workspaceId='default';
+    this.collapsedCategories = {};
+    this.configSaveError = null;
+    this.serverSnapshot = null;
     this.storageKeys={...STORAGE_KEYS};
     this.isGridView = readJsonStorage(STORAGE_KEYS.gridView, true);
 
@@ -171,11 +199,15 @@ class DashboardApp extends LitElement {
     };
 
     this.actionFeedbackVisible = false;
+    this.categoryActionIndex = null;
 
     // Bindings
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handlePopState = this.handlePopState.bind(this);
+    this._handleBeforeUnload = this._handleBeforeUnload.bind(this);
     this.t = this.t.bind(this);
+    this._handleNetworkOffline = this._handleNetworkOffline.bind(this);
+    this._handleNetworkOnline = this._handleNetworkOnline.bind(this);
   }
 
   t(key, params) {
@@ -218,6 +250,10 @@ class DashboardApp extends LitElement {
       this.continueLastUsedCycle = false;
     }
   }
+  _handleBeforeUnload(event) {
+    if (!this.showQuickAdd || !this.querySelector('jk-quick-add')?.hasChanges) return;
+    event.preventDefault();event.returnValue='';
+  }
   get workspaceItems() { return this.workspaces.map(w => ({ ...w, name: w.name || (w.id === 'default' ? this.t('workspaceDefault') : workspaceLabel(w.id)) })); }
 
   async cycleWorkspace() {
@@ -234,7 +270,7 @@ class DashboardApp extends LitElement {
     this.actionManager.complete(action);
     if(confirmed) this.switchWorkspace(target.id);
   }
-  switchWorkspace(id) { this.showWorkspacePicker=false; return switchWorkspace(this,id); }
+  switchWorkspace(id) { this.showWorkspacePicker=false; this.configSaveError = null; this.serverSnapshot = null; return switchWorkspace(this,id); }
 
   setWorkspacePreferencesMode(enabled) {
     this.saveLocalPreferences();
@@ -294,22 +330,35 @@ class DashboardApp extends LitElement {
       }
     }
     this.categories = generateShortcuts(config.categories);
-    if (this.activeCategoryKey && !this.categories.some(c => c.categoryKey === this.activeCategoryKey)) this.resetNavigationInput(false);
+    if (this.activeCategoryKey && !this.categories.some(c => categorySelectionKey(c) === this.activeCategoryKey)) this.resetNavigationInput(false);
     this.searchEngines = config.searchEngines;
     writeJsonStorage(this.storageKeys.configCache, config);
+    if (this.workspaces.some(w => w.id === this.workspaceId)) {
+      void cacheWorkspace(this.workspaceUser, this.workspaceId, config).catch(() => {});
+    }
   }
+
+  reorderCategory(index, direction) { return reorderCategory(this, index, direction); }
+  reorderService(id, direction) { return reorderService(this, id, direction); }
+  toggleCategory(category) { return toggleCategory(this, category); }
+
+  compareServerConfiguration() { return compareServerConfiguration(this); }
+  acceptServerRevision() { return acceptServerRevision(this); }
 
   async handleSaveConfig(e) {
     if (this.readOnly || this.savingConfig) return;
     this.savingConfig = true;
+    this.configSaveError = null;
+    this.serverSnapshot = null;
     try {
       const config = await persistConfig(e.detail.newConfig, { base: import.meta.env.BASE_URL });
       this.applyConfiguration(config);
-      this.showConfigModal = false;
+      this.querySelector('jk-config-modal')?.configSaved(config);
       this.showToast(this.t('editConfigSaveDone'), 'success');
     } catch (error) {
       console.error('Configuration save failed:', error);
-      this.showToast(this.t('editConfigSaveFailed'), 'error');
+      this.configSaveError = error.status === 412 ? this.t('configConflict') : error.status === 428 ? this.t('configReloadRequired') : this.t('editConfigSaveFailed');
+      this.showToast(this.configSaveError, 'error');
     } finally {
       this.savingConfig = false;
     }
@@ -331,6 +380,7 @@ class DashboardApp extends LitElement {
       const res = await fetch(`${import.meta.env.BASE_URL}config/services.json`);
       if (!res.ok) throw new Error(`Configuration request failed: ${res.status}`);
       const data = await res.json();
+      setWorkspaceContext({ user: '', id: 'default', readOnly: false, etag: res.headers.get('ETag') });
       const config = migrateConfig(data);
       if (JSON.stringify(data) !== JSON.stringify(config)) {
         try {
@@ -362,16 +412,65 @@ class DashboardApp extends LitElement {
       history.replaceState(history.state, '', location.pathname + (params.size ? '?' + params : '') + location.hash);
     }
 
+    this._unsubscribePwa = pwaUpdates.subscribe(state => {
+      this.pwaState = state;
+      if (state.available && !this._previousPwaAvailable) this.pwaNoticeDismissed=false;
+      this._previousPwaAvailable=state.available;
+    });
+    window.addEventListener('offline', this._handleNetworkOffline);
+    window.addEventListener('online', this._handleNetworkOnline);
+    window.addEventListener('focus', this._handleNetworkOnline);
     window.addEventListener('keydown', this.handleKeyDown);
     window.addEventListener('popstate', this.handlePopState);
+    window.addEventListener('beforeunload', this._handleBeforeUnload);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
+    this._unsubscribePwa?.();
+    window.removeEventListener('offline', this._handleNetworkOffline);
+    window.removeEventListener('online', this._handleNetworkOnline);
+    window.removeEventListener('focus', this._handleNetworkOnline);
     window.removeEventListener('keydown', this.handleKeyDown);
     window.removeEventListener('popstate', this.handlePopState);
+    window.removeEventListener('beforeunload', this._handleBeforeUnload);
     clearTimeout(this.resetTimeout);
     this.cancelPendingAction();
+  }
+
+  get hasUnsavedDrafts() {
+    const settings=this.querySelector('jk-config-modal');
+    const manager=settings?.querySelector('jk-management');
+    return Boolean(this.savingConfig || settings?._resetting || manager?._busy || this.showQuickAdd && (this.querySelector('jk-quick-add')?.hasChanges || this.querySelector('jk-quick-add')?.saving) ||
+      this.showConfigModal && (settings?._hasEditorConfigChanged || manager?.hasUnsavedChanges ||
+        settings?.serviceEditor && settings.querySelector('jk-quick-add')?.hasChanges));
+  }
+
+  async checkPwaUpdates() {
+    this.pwaNoticeDismissed=false;
+    await pwaUpdates.check();
+  }
+
+  applyPwaUpdate() {
+    if (this.hasUnsavedDrafts) {
+      this.showToast(this.t('pwaSaveFirst'), 'warn');
+      return;
+    }
+    if (!pwaUpdates.apply()) this.showToast(this.t('pwaUpdateUnavailable'), 'info');
+  }
+
+  _handleNetworkOffline() {
+    this.offlineMode=true;
+    this.readOnly=true;
+    const context=this.workspaceUser ? {user:this.workspaceUser,id:this.workspaceId,readOnly:true,etag:null} : null;
+    if(context)setWorkspaceContext(context);
+  }
+
+  _handleNetworkOnline() {
+    if (!this.offlineMode || this.hasUnsavedDrafts || this._reconnectInFlight || navigator.onLine === false) return;
+    if (Date.now()-this._lastReconnectAttempt < 10000) return;
+    this._lastReconnectAttempt=Date.now();
+    this._reconnectInFlight = reconnectWorkspaces(this).catch(() => false).finally(() => { this._reconnectInFlight=null; });
   }
 
   // --------------------------------------------------
@@ -496,7 +595,7 @@ class DashboardApp extends LitElement {
       if (shortcutLabel) {
         this.currentInput = shortcutLabel;
       } else if (this.activeCategoryKey && service.key) {
-        this.currentInput = `${this.activeCategoryKey.toUpperCase()} → ${service.key.toUpperCase()}`;
+        this.currentInput = `${(this.categories.find(c=>categorySelectionKey(c)===this.activeCategoryKey)?.categoryKey || this.categories.find(c=>categorySelectionKey(c)===this.activeCategoryKey)?.category || '').toUpperCase()} → ${service.key.toUpperCase()}`;
       } else if (service.key || service.favSlot) {
         this.currentInput = (service.favSlot || service.key).toUpperCase();
       }
@@ -680,7 +779,10 @@ class DashboardApp extends LitElement {
     this.showHelp = true;
   }
 
-  openConfig() {
+  openConfig(tab='general') {
+    this.configInitialTab=typeof tab==='string'?tab:'general';
+    this.configSaveError = null;
+    this.serverSnapshot = null;
     this.enterUiMode();
     this.showSearch = false;
     this.showHelp = false;
@@ -824,14 +926,12 @@ class DashboardApp extends LitElement {
   async handleServiceAction(action) {
     const service = this.actionService;
     if (!service) return;
-    if (action === 'copy') {
-      try {
-        await navigator.clipboard.writeText(service.url);
-        this.showToast(this.t('urlCopied'), 'success');
-      } catch {
-        this.showToast(this.t('urlCopyFailed'), 'error');
-        return;
-      }
+    if (this.categoryActionIndex !== null) {
+      const index = this.categoryActionIndex;
+      this.actionService = null;
+      this.categoryActionIndex = null;
+      if(action==='manage')this.openConfig('manage');
+      return;
     }
     this.actionService = null;
     if (action === 'favorite') this.handleServiceLongPress(service);
@@ -851,14 +951,59 @@ class DashboardApp extends LitElement {
     this.favoriteRecording = null;
     this.cancelInputResetTimer();
     this.quickReturnToOverview = returnToOverview;
+    this.quickReturnToSettings = false;
+    this.quickSaveConfig = null;
+    this.quickConfig = null;
+    this._quickExitPrompt = false;
     this.quickInitial = initial;
+    this._quickPendingTab = null;
     this.showQuickAdd = true;
   }
 
+  openManagedServiceEditor(detail) {
+    this.quickReturnFocus=document.activeElement;
+    this.openQuickAdd(detail.initial);
+    this.quickReturnToSettings = true;
+    this.quickSaveConfig = detail.saveConfig;
+    this.quickConfig = detail.config;
+    this.quickCategoryIndex = detail.initialCategoryIndex;
+    this.quickWorkspaceId = detail.workspaceId;
+  }
+
+  requestCloseQuickAdd(targetTab=null) {
+    if (this.querySelector('jk-quick-add')?.saving) return;
+    this._quickPendingTab=targetTab;
+    if (this.querySelector('jk-quick-add')?.hasChanges) this._quickExitPrompt=true;
+    else this.closeQuickAdd();
+  }
+
+  savedQuickAdd(config) {
+    if (!this.quickReturnToSettings || this.quickWorkspaceId===this.workspaceId) this.applyConfiguration(config);
+    this.closeQuickAdd();
+    this.showToast(this.t('editConfigSaveDone'),'success');
+  }
+
   closeQuickAdd() {
+    const destinationTab=this._quickPendingTab;
+    this._quickPendingTab=null;
+    const restoreFocus=this.quickReturnToSettings?this.quickReturnFocus:null;
     this.showQuickAdd = false;
+    this._quickExitPrompt = false;
     if (this.quickReturnToOverview) this.resetNavigationInput(true);
     this.quickReturnToOverview = false;
+    this.quickReturnToSettings = false;
+    this.quickSaveConfig = null;
+    this.quickConfig = null;
+    this.quickWorkspaceId = null;
+    this.quickCategoryIndex = -1;
+    this.quickReturnFocus=null;
+    if(destinationTab){
+      this.showConfigModal=true;
+      this.configInitialTab=destinationTab;
+      const settings=this.querySelector('jk-config-modal');
+      if(settings)settings._activeTab=destinationTab;
+    }
+    if(restoreFocus?.isConnected)this.updateComplete.then(()=>this.querySelector('jk-config-modal')?.updateComplete.then(()=>restoreFocus.focus({preventScroll:true})));
   }
 
   async installApp() {
@@ -869,18 +1014,58 @@ class DashboardApp extends LitElement {
       confirmLabel: this.t('close'), onConfirm: null };
   }
 
+  handleWorkspaceManifest(data) {
+    if(data.user!==this.workspaceUser)return;
+    const previousManifest=readJsonStorage('jumpkey-workspace-manifest',null);
+    migrateWorkspaceIDs(data.user,data.renames);
+    cleanupRemovedWorkspaceCaches(previousManifest,data);
+    this.workspaces=data.workspaces;
+    this.workspaceOrderETag=data.orderETag;
+    writeJsonStorage('jumpkey-workspace-manifest',data);
+    void cacheManifest(data).then(() => reconcileOfflineCache(data.user, data.workspaces.map(w=>w.id), data.renames)).catch(() => {});
+    startWorkspacePrefetch(this,data);
+    if(!data.workspaces.some(w=>w.id===this.workspaceId)) {
+      const newId=data.renames?.[this.workspaceId] || data.workspaces[0]?.id;
+      if(newId)this.switchWorkspace(newId);
+    }
+  }
+  handleManagementSaved({id,config,etag}) {
+    // A management save may target a workspace different from the dashboard.
+    // Refresh that user's offline copy as well, not just the active workspace.
+    writeJsonStorage(workspaceStorage(this.workspaceUser,id).configCache,config);
+    void cacheWorkspace(this.workspaceUser,id,config,etag).catch(()=>{});
+    if(id!==this.workspaceId)return;
+    setWorkspaceETag(etag,{id,user:this.workspaceUser});
+    this.applyConfiguration(config);
+  }
+
   templateConfigModal() {
     return html`
       <jk-config-modal .workspaceApi=${this.workspaces.length > 0} .readOnly=${this.readOnly}
+        .workspaceUser=${this.workspaceUser} .activeWorkspace=${this.workspaceId} .initialTab=${this.showConfigModal?this.configInitialTab:'manage'}
         .workspaceLabel=${this.workspaces.length > 1 ? this.workspaceItems.find(w=>w.id===this.workspaceId)?.name || '' : ''}
         .workspaceFile=${this.workspaces.find(w=>w.id===this.workspaceId)?.file || ''}
-        .show=${this.showConfigModal}
+        .show=${this.showConfigModal||this.showQuickAdd}
+        .serviceEditor=${this.showQuickAdd}
+        .serviceConfig=${this.quickConfig}
+        .serviceSaveConfig=${this.quickSaveConfig}
+        .serviceInitial=${this.quickInitial}
+        .serviceCategoryIndex=${this.quickCategoryIndex}
+        .serviceReturnToSettings=${this.quickReturnToSettings}
+        .serviceWorkspaceLabel=${this.workspaceItems.find(w=>w.id===(this.quickReturnToSettings?this.quickWorkspaceId:this.workspaceId))?.name||(this.quickReturnToSettings?this.quickWorkspaceId:this.workspaceId)}
+        .suspended=${false}
         .separateWorkspacePreferences=${this.separateWorkspacePreferences}
         @workspace-preferences-mode=${e=>this.setWorkspacePreferencesMode(e.detail)}
         .preferences=${this.preferences}
+        .pwaState=${this.pwaState} .appVersion=${APP_VERSION}
+        .offlineMode=${this.offlineMode} .offlineCacheStatus=${this.offlineCacheStatus}
+        @pwa-check=${()=>this.checkPwaUpdates()}
+        @pwa-apply=${()=>this.applyPwaUpdate()}
         @preferences-change=${e => { this.preferences=e.detail; this.saveLocalPreferences(); this.cancelInputResetTimer(); }}
         .configuration=${this.configuration}
         .saving=${this.savingConfig}
+        .saveError=${this.configSaveError}
+        .serverSnapshot=${this.serverSnapshot}
         .categories=${this.categories}
         .searchEngines=${this.searchEngines}
         .theme=${this.theme}
@@ -888,6 +1073,16 @@ class DashboardApp extends LitElement {
         @notify=${this.handleNotification}
         @theme-change=${this.handleThemeChange}
         @save=${this.handleSaveConfig}
+        @dismiss-error=${() => { this.configSaveError = null; }}
+        @compare-server=${this.compareServerConfiguration}
+        @accept-server-revision=${this.acceptServerRevision}
+        @workspaces-refreshed=${e=>this.handleWorkspaceManifest(e.detail)}
+        @management-config-saved=${e=>this.handleManagementSaved(e.detail)}
+        @open-service-editor=${e=>this.openManagedServiceEditor(e.detail)}
+        @service-close-request=${e=>e.detail?.force?this.closeQuickAdd():this.requestCloseQuickAdd()}
+        @service-nav-request=${e=>this.requestCloseQuickAdd(e.detail.tab)}
+        @service-saved=${e=>this.savedQuickAdd(e.detail)}
+        @service-save-error=${()=>{this._quickExitPrompt=false;this._quickPendingTab=null;}}
         @close=${() => (this.showConfigModal = false)}
       ></jk-config-modal>
     `;
@@ -900,6 +1095,10 @@ class DashboardApp extends LitElement {
         .mode=${this.mobileMenuMode}
         .canInstall=${this.installController.available}
         @install-app=${this.installApp}
+        .hasWorkspaces=${this.workspaces.length > 0}
+        .workspaceName=${this.workspaceItems.find(w => w.id === this.workspaceId)?.name || ''}
+        @open-workspaces=${() => { this.showMobileMenu = false; this.showWorkspacePicker = true; this.workspaceAnchor = null; }}
+        @open-config=${() => { this.showMobileMenu = false; this.openConfig(); }}
         @quick-add=${() => this.openQuickAdd()}
         .theme=${this.theme}
         .t=${this.t}
@@ -1021,31 +1220,34 @@ class DashboardApp extends LitElement {
       !this.showConfigModal;
 
     return html`
+      ${this.templateConfigModal()}
+      ${this.offlineMode ? html`<aside class="jk-offline-banner" role="status"><jk-icon icon="ui:wifi-off" class="size-4"></jk-icon><span>${this.t('pwaOfflineBanner')}</span></aside>` : ''}
+      ${this.pwaState.available && !this.pwaNoticeDismissed ? html`
+        <aside class="jk-update-banner" role="status" aria-live="polite">
+          <div><strong>${this.t('pwaUpdateAvailable')}</strong><p>${this.t('pwaUpdateHint')}</p></div>
+          <button type="button" class="jk-btn jk-btn-primary" @click=${()=>this.applyPwaUpdate()}>${this.t('pwaUpdateNow')}</button>
+          <button type="button" class="jk-btn jk-btn-secondary" @click=${()=>this.pwaNoticeDismissed=true}>${this.t('pwaUpdateLater')}</button>
+        </aside>` : ''}
+      ${this.showQuickAdd && this._quickExitPrompt?html`<jk-change-guard .subject=${'Die Service-Eingaben'}
+        .destination=${this._quickPendingTab?'zu den Einstellungen wechselst':this.quickReturnToSettings?'zur Verwaltung zurückkehrst':'zum Dashboard zurückkehrst'}
+        .busy=${this.querySelector('jk-quick-add')?.saving||false}
+        .saveDisabled=${Boolean(this.querySelector('jk-quick-add')?.validationError)}
+        @guard-stay=${()=>{this._quickExitPrompt=false;this._quickPendingTab=null;}}
+        @guard-discard=${()=>this.closeQuickAdd()}
+        @guard-save=${()=>this.querySelector('jk-quick-add')?.save()}></jk-change-guard>`:''}
+      ${!this.showConfigModal && !this.showQuickAdd ? html`
       ${this.templateKeyBadge()} ${this.templateActionFeedback()} ${this.templateHelpModal()}
-      ${this.templateSearchModal(filteredServices)} ${this.templateConfigModal()}
+      ${this.templateSearchModal(filteredServices)}
       ${this.templateMobileMenu()} ${this.templateDialog()}
-      ${this.showQuickAdd && !this.readOnly ? html`<jk-quick-add .config=${this.configuration} .initial=${this.quickInitial} .categoryKey=${this.activeCategoryKey} .t=${this.t}
-        @close=${() => this.closeQuickAdd()}
-        @saved=${e => {this.applyConfiguration(e.detail);this.closeQuickAdd();this.showToast(this.t('editConfigSaveDone'),'success');}}
-      ></jk-quick-add>` : ''}
-
       ${this.actionService ? html`<jk-service-actions .readOnly=${this.readOnly} .anchor=${this.actionAnchor} .service=${this.actionService}
-        .favorite=${Object.values(this.favorites).includes(this.actionService.id)} .t=${this.t}
+        .favorite=${Object.values(this.favorites).includes(this.actionService.id)}
+        .categoryMode=${this.categoryActionIndex !== null}
+        .position=${this.categoryActionIndex !== null ? {index:this.categoryActionIndex, count:this.categories.length} : servicePosition(this.configuration, this.actionService.id)} .t=${this.t}
         @action=${e => this.handleServiceAction(e.detail)}></jk-service-actions>` : ''}
-      <jk-toast
-        .show=${this.toastConfig.show}
-        .message=${this.toastConfig.message}
-        .type=${this.toastConfig.type}
-        @toast-closed=${() => {
-          this.toastConfig = { ...this.toastConfig, show: false };
-        }}
-      ></jk-toast>
-
-
-      ${this.showWorkspacePicker ? html`<jk-workspace-picker .items=${this.workspaceItems} .active=${this.workspaceId} .anchor=${this.workspaceAnchor} .t=${this.t} @cycle=${async()=>{this.showWorkspacePicker=false;await this.updateComplete;this.cycleWorkspace();}} @close=${()=>this.showWorkspacePicker=false} @select=${e=>this.switchWorkspace(e.detail)}></jk-workspace-picker>` : ''}
-      <jk-dashboard-header .readOnly=${this.readOnly} ?inert=${this.workspaceLoading}
+      ${this.showWorkspacePicker ? html`<jk-workspace-picker .readOnly=${this.readOnly} .items=${this.workspaceItems} .active=${this.workspaceId} .anchor=${this.workspaceAnchor} .t=${this.t} @cycle=${async()=>{this.showWorkspacePicker=false;await this.updateComplete;this.cycleWorkspace();}} @close=${()=>this.showWorkspacePicker=false} @select=${e=>this.switchWorkspace(e.detail)} @manage=${()=>{this.showWorkspacePicker=false;this.openConfig('manage');}}></jk-workspace-picker>` : ''}
+      <jk-dashboard-header .appVersion=${APP_VERSION} .readOnly=${this.readOnly} ?inert=${this.workspaceLoading}
         .workspaceName=${this.workspaceItems.find(w=>w.id===this.workspaceId)?.name || '—'}
-        .hasWorkspaces=${this.workspaces.length > 1}
+        .hasWorkspaces=${this.workspaces.length > 1 || (!this.readOnly && this.workspaces.length > 0)}
         .workspaceNames=${this.workspaceItems.map(w => w.name)}
         .workspaceOpen=${this.showWorkspacePicker}
         @open-workspaces=${e=>{this.enterUiMode();this.workspaceAnchor=e.detail.anchor;this.showWorkspacePicker=true;}}
@@ -1072,113 +1274,18 @@ class DashboardApp extends LitElement {
           <button class="jk-btn jk-btn-primary" @click=${this.installApp}>${this.t('installAction')}</button>
           <jk-icon-button icon="ui:x" .label=${this.t('close')} @click=${()=>this.installController.dismiss()}></jk-icon-button>
         </aside>` : ''}
-      <main ?inert=${this.workspaceLoading} class="${styles.mainContent}" @service-actions=${e => {
-        this.cancelPendingAction();
-        this.cancelInputResetTimer();
-        this.actionAnchor = e.detail.anchor;
-        this.actionService = this.categories.flatMap(c => c.services).find(s => s.id === e.detail.id);
-      }}>
-        ${this.activeCategoryKey || this.showContinueView ? html`<button type="button" class="mb-3 flex min-h-11 items-center gap-2 text-sm text-indigo-300" @click=${()=>this.resetNavigationInput(true)}><jk-icon icon="ui:arrow-left" class="size-4"></jk-icon>${this.t('backOverview')}</button>${this.categoryCountdown ? html`<div class="mb-3 h-0.5 w-40 overflow-hidden rounded bg-slate-700" aria-hidden="true"><div data-category-countdown class="h-full origin-left bg-indigo-400"></div></div>` : ''}` : ''}
-        ${
-          showMain && !this.isGridView
-            ? html`
-                <jk-favorites-view
-                  .favorites=${favs}
-                  .t=${this.t}
-                  @service-click=${(e) => {
-                    this.trackClick(e.detail.service, {
-                      openInSameTab: e.detail.shiftKey,
-                      keyboardFeedback: false,
-                    });
-                  }}
-                  @clear-favorites=${this.clearFavorites}
-                  @delete-favorite-slot=${(e) => {
-                    this.handleDeleteFavoriteSlot(e.detail.slot);
-                  }}
-                ></jk-favorites-view>
+      ${renderDashboardContent(this, { favs, continueServices, categoriesWithFavorites, showMain })}
+      ` : ''}
+            <jk-toast
+        .show=${this.toastConfig.show}
+        .message=${this.toastConfig.message}
+        .type=${this.toastConfig.type}
+        @toast-closed=${() => {
+          this.toastConfig = { ...this.toastConfig, show: false };
+        }}
+      ></jk-toast>
 
-                <jk-service-group
-                  title="${this.t('categories')}"
-                  .highlightKeys=${true}
-                  icon="ui:folder"
-                  .services=${[
-                    ...(continueServices.length
-                      ? [
-                          {
-                            name: this.t('continue'),
-                            url: `${continueServices.length} ${this.t('serviceCount')}`,
-                            icon: 'ui:history',
-                            key: '⇧-',
-                            type: 'continue',
-                            isCategory: true,
-                          },
-                        ]
-                      : []),
-                    ...this.categories.map((cat) => ({
-                      name: cat.category,
-                      url: `${cat.services?.length ?? 0} ${this.t('serviceCount')}`,
-                      icon: cat.icon,
-                      key: cat.categoryKey,
-                      type: 'category',
-                      isCategory: true,
-                    })),
-                  ]}
-                  @service-click=${(e) => {
-                    const item = e.detail.service;
-                    if (item.type === 'continue') {
-                      this.openContinueView();
-                      return;
-                    }
 
-                    const key = item.key;
-                    this.activeCategoryKey = key;
-                    this.showContinueView = false;
-                    this.currentInput = key.toUpperCase();
-
-                    this.cancelInputResetTimer();
-
-                    window.history.pushState({ view: 'category', key }, '');
-                  }}
-                  @card-long-press=${this.handleCardLongPress}
-                ></jk-service-group>
-              `
-            : this.showContinueView
-              ? html`
-                  <jk-favorites-view
-                    .favorites=${[]}
-                    .continueServices=${continueServices}
-                    .t=${this.t}
-                    @continue-click=${(e) => {
-                      this.trackClick(e.detail.service, {
-                        updateContinue: false,
-                        openInSameTab: e.detail.shiftKey,
-                        keyboardFeedback: false,
-                      });
-                    }}
-                    @clear-continue=${this.clearContinue}
-                    @delete-continue-entry=${(e) => {
-                      this.removeContinueService(e.detail.service);
-                    }}
-                  ></jk-favorites-view>
-                `
-              : html`
-                <jk-grid-view
-                  .categories=${categoriesWithFavorites}
-                  .activeCategoryKey=${this.activeCategoryKey}
-                  .t=${this.t}
-                  @service-click=${(e) => {
-                    this.trackClick(e.detail.service, {
-                      openInSameTab: e.detail.shiftKey,
-                      keyboardFeedback: false,
-                    });
-                  }}
-                  @card-long-press=${(e) => {
-                    this.handleServiceLongPress(e.detail.service);
-                  }}
-                ></jk-grid-view>
-              `
-        }
-      </main>
     `;
   }
 }

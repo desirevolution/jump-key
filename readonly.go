@@ -163,6 +163,7 @@ func (s *server) handlePublicWorkspaces(w http.ResponseWriter, r *http.Request) 
 		// The fixed backend user is not a visitor identity and need not be exposed.
 		list = append(list, workspaceEntry{id, name, workspaceFilename(id, "")})
 	}
+ if meta,err:=s.readWorkspaceMetadata(s.configUser);err==nil{list=reconcileWorkspaceOrder(meta,list)}
 	w.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodHead {
 		json.NewEncoder(w).Encode(struct {
@@ -217,7 +218,12 @@ func (s *server) handlePublicManifest(w http.ResponseWriter, r *http.Request) {
 }
 func (s *server) publicSecurity(next http.Handler) http.Handler {
 	if !s.readOnly {
-		return next
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("X-Content-Type-Options", "nosniff")
+			w.Header().Set("Referrer-Policy", "no-referrer")
+			w.Header().Set("X-Frame-Options", "DENY")
+			next.ServeHTTP(w, r)
+		})
 	}
 	// Hash trusted inline scripts in the compiled HTML; never allow arbitrary inline JS.
 	scripts := "'self'"

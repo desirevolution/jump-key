@@ -3,20 +3,17 @@ package main
 import (
 	"bytes"
 	"embed"
-	"encoding/json"
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"io/fs"
 	"log/slog"
 	"mime"
 	"net"
 	"net/http"
+	"net/netip"
 	"os"
 	"path"
-	"path/filepath"
-	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -33,11 +30,6 @@ const (
 	defaultPort   = 8080
 )
 
-var (
-	validUserPattern = regexp.MustCompile(`^[A-Za-z0-9._-]+$`)
-	backupPattern    = regexp.MustCompile(`^services\.backup-([A-Za-z0-9._:-]+)\.json$`)
-)
-
 type options struct {
 	host              string
 	port              int
@@ -50,10 +42,15 @@ type options struct {
 	optionError       error
 	requireHTTPS      optionalBool
 	trustedProxies    string
+	authMode          string
+	backupKeep        int
 }
 
 type server struct {
-	configMu         sync.Mutex
+	workspaceMu      sync.Mutex
+	configLockMu     sync.Mutex
+	configLocks      map[string]*configLock
+	backupKeep       int
 	distFS           fs.FS
 	configDir        string
 	iconsDir         string
@@ -61,6 +58,8 @@ type server struct {
 	readOnly         bool
 	publicWorkspaces []string
 	configUser       string
+	authMode         string
+	trustedProxies   []netip.Prefix
 }
 
 func main() {
@@ -87,6 +86,8 @@ func main() {
 		readOnly:         opts.readOnly,
 		publicWorkspaces: parseWorkspaceList(opts.publicWorkspaces),
 		configUser:       opts.configUser,
+		backupKeep:       opts.backupKeep,
+		authMode:         opts.authMode,
 	}
 
 	if opts.copyDefaultConfig {
@@ -99,6 +100,17 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", app.handleHealth)
 	mux.HandleFunc("/api/workspaces", app.handleWorkspaces)
+	mux.HandleFunc("/api/workspaces/", app.handleWorkspaceDetail)
+	mux.HandleFunc("/api/workspace-order", func(w http.ResponseWriter, r *http.Request) {
+		if app.readOnly {
+			writeAPIError(w, 405, "read_only", "Read-only workspace")
+			return
+		}
+		if !requireMethod(w, r.Method, http.MethodPut) {
+			return
+		}
+		app.putWorkspaceOrder(w, r)
+	})
 	mux.HandleFunc("/config/", app.handleConfig)
 	mux.HandleFunc("/icons/", app.handleIcons)
 	mux.HandleFunc("/", app.handleStatic)
@@ -106,9 +118,10 @@ func main() {
 	address := net.JoinHostPort(opts.host, fmt.Sprintf("%d", opts.port))
 
 	trustedProxies, _ := parseTrustedProxies(opts.trustedProxies) // Validated before startup.
+	app.trustedProxies = trustedProxies
 	httpServer := &http.Server{
 		Addr:              address,
-		Handler:           requestLogger(logger, enforceHTTPS(app.publicSecurity(mux), opts.httpsRequired(), trustedProxies)),
+		Handler:           requestLogger(logger, enforceHTTPS(app.authenticate(app.publicSecurity(mux)), opts.httpsRequired(), trustedProxies)),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       15 * time.Second,
 		WriteTimeout:      30 * time.Second,
@@ -122,6 +135,8 @@ func main() {
 		"icons_dir", opts.iconsDir,
 		"read_only", opts.readOnly,
 		"require_https", opts.httpsRequired(),
+		"auth_mode", opts.authMode,
+		"backup_keep", opts.backupKeep,
 	)
 
 	if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -138,13 +153,40 @@ func parseOptions() options {
 	flag.StringVar(&opts.configDir, "config-dir", "", "Existing configuration directory (writable unless --read-only)")
 	flag.StringVar(&opts.iconsDir, "icons-dir", "", "Existing icons directory (required)")
 	flag.BoolVar(&opts.copyDefaultConfig, "copy-default-config", false, "Copy embedded default config when services.json does not exist")
-	opts.optionError = errors.Join(registerPublicOptions(flag.CommandLine, &opts, os.Getenv), registerHTTPSOptions(flag.CommandLine, &opts, os.Getenv))
+	flag.StringVar(&opts.authMode, "auth-mode", getenvDefault("JUMPKEY_AUTH_MODE", "local"), "Authentication mode: local or proxy (requires trusted proxies)")
+	backupValue, backupErr := parseBackupKeep(os.Getenv("JUMPKEY_BACKUP_KEEP"))
+	opts.backupKeep = backupValue
+	flag.IntVar(&opts.backupKeep, "backup-keep", backupValue, "Number of per-config backups to retain after successful saves (1-1000)")
+	opts.optionError = errors.Join(registerPublicOptions(flag.CommandLine, &opts, os.Getenv), registerHTTPSOptions(flag.CommandLine, &opts, os.Getenv), backupErr)
 	flag.Parse()
 
 	return opts
 }
 
 func validateOptions(opts options) error {
+	if opts.optionError != nil {
+		return opts.optionError
+	}
+	if opts.backupKeep < 1 || opts.backupKeep > 1000 {
+		return errors.New("--backup-keep must be between 1 and 1000")
+	}
+	if opts.authMode != "local" && opts.authMode != "proxy" {
+		return errors.New("--auth-mode must be local or proxy")
+	}
+	if opts.readOnly && opts.authMode == "proxy" {
+		return errors.New("--auth-mode=proxy is not available in public read-only mode")
+	}
+	if opts.authMode == "proxy" {
+		trusted, err := parseTrustedProxies(opts.trustedProxies)
+		if err != nil || len(trusted) == 0 {
+			return errors.New("--auth-mode=proxy requires --trusted-proxies with immediate proxy IPs/CIDRs")
+		}
+		for _, prefix := range trusted {
+			if prefix.Bits() == 0 {
+				return errors.New("--auth-mode=proxy must not trust all addresses (0.0.0.0/0 or ::/0)")
+			}
+		}
+	}
 	if _, err := parseTrustedProxies(opts.trustedProxies); err != nil {
 		return err
 	}
@@ -207,60 +249,6 @@ func testDirectoryWritable(directory string) error {
 	return nil
 }
 
-func (s *server) copyDefaultConfig() error {
-	if s.readOnly {
-		return errors.New("read-only")
-	}
-	target := filepath.Join(s.configDir, "services.json")
-
-	_, err := os.Stat(target)
-	switch {
-	case err == nil:
-		s.logger.Info("default configuration already exists", "path", target)
-		return nil
-	case !errors.Is(err, os.ErrNotExist):
-		return fmt.Errorf("inspect target configuration: %w", err)
-	}
-
-	data, err := fs.ReadFile(s.distFS, "config/services.json")
-	if err != nil {
-		return fmt.Errorf("read embedded default configuration: %w", err)
-	}
-	if !json.Valid(data) {
-		return errors.New("embedded default configuration is invalid JSON")
-	}
-
-	file, err := os.OpenFile(target, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o644)
-	if err != nil {
-		if errors.Is(err, os.ErrExist) {
-			return nil
-		}
-		return fmt.Errorf("create default configuration: %w", err)
-	}
-
-	success := false
-	defer func() {
-		_ = file.Close()
-		if !success {
-			_ = os.Remove(target)
-		}
-	}()
-
-	if _, err := file.Write(data); err != nil {
-		return fmt.Errorf("write default configuration: %w", err)
-	}
-	if err := file.Sync(); err != nil {
-		return fmt.Errorf("sync default configuration: %w", err)
-	}
-	if err := file.Close(); err != nil {
-		return fmt.Errorf("close default configuration: %w", err)
-	}
-
-	success = true
-	s.logger.Info("default configuration copied", "path", target)
-	return nil
-}
-
 func (s *server) handleHealth(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet && r.Method != http.MethodHead {
 		w.Header().Set("Allow", "GET, HEAD")
@@ -276,211 +264,6 @@ func (s *server) handleHealth(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (s *server) handleConfig(w http.ResponseWriter, r *http.Request) {
-	if s.readOnly {
-		s.handlePublicConfig(w, r)
-		return
-	}
-	s.configMu.Lock()
-	defer s.configMu.Unlock()
-	w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate")
-
-	filename, err := resolveConfigFilename(r.URL.Path, r.Header.Get("Remote-User"))
-	if err != nil {
-		http.NotFound(w, r)
-		return
-	}
-
-	if expected, ok := r.Header["X-Jumpkey-User"]; ok && (len(expected) != 1 || expected[0] != r.Header.Get("Remote-User")) {
-		http.Error(w, "user changed; reload required", http.StatusConflict)
-		return
-	}
-	if id := r.URL.Query().Get("workspace"); id != "" && id != "default" {
-		if r.URL.Path != "/config/services.json" || !workspacePattern.MatchString(id) {
-			http.NotFound(w, r)
-			return
-		}
-		filename = workspaceFilename(id, r.Header.Get("Remote-User"))
-	}
-	target := filepath.Join(s.configDir, filename)
-
-	switch r.Method {
-	case http.MethodGet, http.MethodHead:
-		s.serveConfigFile(w, r, target)
-	case http.MethodPut:
-		s.putConfigFile(w, r, target)
-	default:
-		w.Header().Set("Allow", "GET, HEAD, PUT")
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-	}
-}
-
-func resolveConfigFilename(requestPath, user string) (string, error) {
-	const prefix = "/config/"
-
-	if !strings.HasPrefix(requestPath, prefix) {
-		return "", errors.New("invalid config path")
-	}
-
-	requestName := strings.TrimPrefix(requestPath, prefix)
-	if requestName == "" || requestName != path.Base(requestName) {
-		return "", errors.New("invalid config filename")
-	}
-
-	if user != "" && !validUserPattern.MatchString(user) {
-		return "", errors.New("invalid Remote-User value")
-	}
-
-	if requestName == "services.json" {
-		if user == "" {
-			return "services.json", nil
-		}
-		return "services." + user + ".json", nil
-	}
-
-	match := backupPattern.FindStringSubmatch(requestName)
-	if match == nil {
-		return "", errors.New("unsupported config filename")
-	}
-
-	if user == "" {
-		return "services.backup-" + match[1] + ".json", nil
-	}
-
-	return "services." + user + ".backup-" + match[1] + ".json", nil
-}
-
-func (s *server) serveConfigFile(w http.ResponseWriter, r *http.Request, filename string) {
-	file, err := os.Open(filename)
-	if err != nil {
-		if errors.Is(err, os.ErrNotExist) {
-			http.NotFound(w, r)
-			return
-		}
-		s.logger.Error("failed to open configuration", "path", filename, "error", err)
-		http.Error(w, "failed to read configuration", http.StatusInternalServerError)
-		return
-	}
-	defer file.Close()
-
-	info, err := file.Stat()
-	if err != nil {
-		http.Error(w, "failed to inspect configuration", http.StatusInternalServerError)
-		return
-	}
-	if !info.Mode().IsRegular() {
-		http.NotFound(w, r)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	http.ServeContent(w, r, info.Name(), info.ModTime(), file)
-}
-
-func (s *server) putConfigFile(w http.ResponseWriter, r *http.Request, filename string) {
-	if s.readOnly {
-		http.Error(w, "read-only", http.StatusForbidden)
-		return
-	}
-	r.Body = http.MaxBytesReader(w, r.Body, maxConfigSize)
-	defer r.Body.Close()
-
-	data, err := io.ReadAll(r.Body)
-	if err != nil {
-		var maxBytesError *http.MaxBytesError
-		if errors.As(err, &maxBytesError) {
-			http.Error(w, "configuration exceeds 2 MiB", http.StatusRequestEntityTooLarge)
-			return
-		}
-		http.Error(w, "failed to read request body", http.StatusBadRequest)
-		return
-	}
-
-	if len(data) == 0 {
-		http.Error(w, "request body is empty", http.StatusBadRequest)
-		return
-	}
-	if err := validateConfiguration(data); err != nil {
-		http.Error(w, "invalid configuration: "+err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	_, statErr := os.Stat(filename)
-	created := errors.Is(statErr, os.ErrNotExist)
-	if statErr != nil && !created {
-		http.Error(w, "failed to inspect target file", http.StatusInternalServerError)
-		return
-	}
-
-	if !created && !strings.Contains(filepath.Base(filename), ".backup-") {
-		previous, err := os.ReadFile(filename)
-		if err != nil {
-			http.Error(w, "failed to read configuration for backup", http.StatusInternalServerError)
-			return
-		}
-		backup := strings.TrimSuffix(filename, ".json") + ".backup-" + time.Now().UTC().Format("2006-01-02T15-04-05.000000000") + ".json"
-		if err := atomicWrite(backup, previous, 0o644); err != nil {
-			s.logger.Error("backup failed", "error", err)
-			http.Error(w, "failed to back up configuration", http.StatusInternalServerError)
-			return
-		}
-	}
-	if err := atomicWrite(filename, data, 0o644); err != nil {
-		s.logger.Error("failed to write configuration", "path", filename, "error", err)
-		http.Error(w, "failed to save configuration", http.StatusInternalServerError)
-		return
-	}
-
-	s.logger.Info(
-		"configuration saved",
-		"path", filename,
-		"bytes", len(data),
-		"remote_user", r.Header.Get("Remote-User"),
-	)
-
-	if created {
-		w.WriteHeader(http.StatusCreated)
-		return
-	}
-	w.WriteHeader(http.StatusNoContent)
-}
-
-func atomicWrite(filename string, data []byte, mode fs.FileMode) error {
-	directory := filepath.Dir(filename)
-	tempFile, err := os.CreateTemp(directory, ".jump-key-*.tmp")
-	if err != nil {
-		return fmt.Errorf("create temporary file: %w", err)
-	}
-
-	tempName := tempFile.Name()
-	success := false
-	defer func() {
-		_ = tempFile.Close()
-		if !success {
-			_ = os.Remove(tempName)
-		}
-	}()
-
-	if err := tempFile.Chmod(mode); err != nil {
-		return fmt.Errorf("set temporary file permissions: %w", err)
-	}
-	if _, err := tempFile.Write(data); err != nil {
-		return fmt.Errorf("write temporary file: %w", err)
-	}
-	if err := tempFile.Sync(); err != nil {
-		return fmt.Errorf("sync temporary file: %w", err)
-	}
-	if err := tempFile.Close(); err != nil {
-		return fmt.Errorf("close temporary file: %w", err)
-	}
-	if err := os.Rename(tempName, filename); err != nil {
-		return fmt.Errorf("replace target file: %w", err)
-	}
-
-	success = true
-	return nil
-}
-
 func (s *server) handleIcons(w http.ResponseWriter, r *http.Request) {
 	if s.readOnly {
 		s.handlePublicIcon(w, r)
@@ -492,7 +275,7 @@ func (s *server) handleIcons(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("Cache-Control", "public, max-age=3600")
+	w.Header().Set("Cache-Control", "private, max-age=300, must-revalidate")
 	handler := http.StripPrefix("/icons/", http.FileServer(http.Dir(s.iconsDir)))
 	handler.ServeHTTP(w, r)
 }
@@ -539,12 +322,12 @@ func (s *server) serveEmbeddedFile(w http.ResponseWriter, r *http.Request, name 
 
 func setStaticCacheHeader(w http.ResponseWriter, name string) {
 	switch {
-	case name == "index.html":
-		w.Header().Set("Cache-Control", "no-cache")
+	case name == "index.html" || name == "sw.js" || name == "manifest.webmanifest" || name == "registerSW.js" || strings.HasPrefix(name, "workbox-"):
+		w.Header().Set("Cache-Control", "no-cache, must-revalidate")
 	case strings.HasPrefix(name, "assets/"):
 		w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 	default:
-		w.Header().Set("Cache-Control", "public, max-age=3600")
+		w.Header().Set("Cache-Control", "private, max-age=300, must-revalidate")
 	}
 }
 
@@ -585,7 +368,6 @@ func requestLogger(logger *slog.Logger, next http.Handler) http.Handler {
 			"method", r.Method,
 			"path", r.URL.Path,
 			"status", status,
-			"remote_user", r.Header.Get("Remote-User"),
 			"duration_ms", time.Since(start).Milliseconds(),
 		)
 	})

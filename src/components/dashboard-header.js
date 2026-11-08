@@ -30,6 +30,7 @@ export class JkDashboardHeader extends LitElement {
   static get properties() {
     return {
       readOnly: { type: Boolean },
+      appVersion: { type: String },
       hasWorkspaces: { type: Boolean },
       workspaceName: { type: String },
       workspaceNames: { type: Array },
@@ -131,6 +132,7 @@ export class JkDashboardHeader extends LitElement {
               <span class="${styles.brandKey}">Key</span>
             </div>
 
+            ${this.appVersion ? html`<span class="jk-header-version hidden lg:inline" title=${this.appVersion}>${/^\d/.test(this.appVersion) ? `v${this.appVersion.split(' ')[0]}` : this.appVersion.split(' ')[0]}</span>` : ''}
             <button
               @click=${() => this._dispatchEvent('open-help')}
               title="${this.t ? this.t('helpHint') : ''}"

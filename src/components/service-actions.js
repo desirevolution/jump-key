@@ -3,12 +3,12 @@ import './icon.js';
 import './icon-button.js';
 
 export class ServiceActions extends LitElement {
-  static properties = { readOnly: {}, anchor: {}, service: {}, favorite: {}, t: {} };
+  static properties = { readOnly: {}, anchor: {}, service: {}, favorite: {}, position: {}, categoryMode: {}, t: {} };
   createRenderRoot() { return this; }
   firstUpdated() {
     this.querySelector('dialog').showModal();
-    this._position = () => this.position();
-    this.position();
+    this._position = () => this.updateDialogPosition();
+    this.updateDialogPosition();
     window.addEventListener('resize', this._position);
     window.addEventListener('scroll', this._position, true);
   }
@@ -17,7 +17,7 @@ export class ServiceActions extends LitElement {
     window.removeEventListener('scroll', this._position, true);
     super.disconnectedCallback();
   }
-  position() {
+  updateDialogPosition() {
     const dialog = this.querySelector('dialog');
     if (!dialog) return;
     if (window.innerWidth < 768) {
@@ -42,7 +42,8 @@ export class ServiceActions extends LitElement {
       @cancel=${e => {e.preventDefault(); this.emit('close');}}
       @click=${e => {if (e.target === e.currentTarget) {const r=e.currentTarget.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)this.emit('close');}}}>
       <header class="jk-menu-mobile-header"><h2 id="service-actions-title">${this.service.name}</h2><jk-icon-button icon="ui:x" .label=${this.t('close')} @click=${()=>this.emit('close')}></jk-icon-button></header>
-      ${[['edit','pencil','editService'],['favorite','star',this.favorite?'removeFavorite':'addFavorite'],['copy','link','copyUrl']].filter(([action])=>!this.readOnly || action!=='edit').map(([action,icon,label])=>html`
+      ${(this.categoryMode ? [['manage','settings','mobileSettings']] :
+        [['favorite','star',this.favorite?'removeFavorite':'addFavorite'],['edit','pencil','editService']]).filter(([action])=>!this.readOnly || !['edit','delete'].includes(action)).map(([action,icon,label])=>html`
         <button type="button" class="jk-service-action" @click=${()=>this.emit(action)}><jk-icon .icon=${'ui:'+icon} class="size-5"></jk-icon>${this.t(label)}</button>`)}
     </dialog>`;
   }

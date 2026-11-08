@@ -219,7 +219,7 @@ export class JkServiceCard extends LitElement {
   _getCardClasses() {
     if (this.isReady) return styles.cardReady;
     if (this.isPressing) return styles.cardPressing;
-    return `${styles.cardDefault} ${this.isFavorite ? 'jk-favorite-card' : ''}`;
+    return styles.cardDefault;
   }
 
   _getIconClasses() {
@@ -231,10 +231,6 @@ export class JkServiceCard extends LitElement {
   _getBadgeClasses() {
     if (this.isReady) {
       return 'border-indigo-400/60 bg-indigo-500/30 text-slate-50 shadow-md shadow-indigo-500/20';
-    }
-
-    if (this.isFavorite) {
-      return 'border-indigo-500 bg-indigo-500/20 text-indigo-200 shadow-lg shadow-indigo-500/20';
     }
 
     return 'border-slate-600 bg-slate-900/80 text-slate-300';
@@ -304,9 +300,9 @@ export class JkServiceCard extends LitElement {
           <span class="jk-card-subtitle ${styles.subtitle}"> ${displaySubtitle} </span>
         </div>
 
-        ${this.isFavorite ? html`<span class="jk-card-favorite ${this.badgeText ? '' : 'md:hidden'} inline-flex shrink-0 items-center gap-1 text-sm text-indigo-300" aria-label=${t(detectLang(), 'favorites')}>
-          <jk-icon icon="ui:star" class="size-3.5" aria-hidden="true"></jk-icon>
-          ${this.badgeText && this.favoriteSlot ? html`<span class="hidden md:inline">${this.favoriteSlot}</span>` : ''}
+        ${this.isFavorite ? html`<span class="jk-card-favorite inline-flex shrink-0 items-center gap-1 text-sm" aria-label=${t(detectLang(), 'favorites')}>
+          <jk-icon icon="ui:star" class="size-[18px]" aria-hidden="true"></jk-icon>
+          ${this.favoriteSlot ? html`<span>${this.favoriteSlot}</span>` : ''}
         </span>` : ''}
 
         <style>

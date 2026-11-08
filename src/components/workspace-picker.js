@@ -2,7 +2,7 @@ import { html, LitElement } from 'lit';
 import './icon-button.js';
 
 export class WorkspacePicker extends LitElement {
-  static properties = { items: {}, active: {}, t: {}, anchor: {} };
+  static properties = { items: {}, active: {}, t: {}, anchor: {}, readOnly: { type: Boolean } };
   createRenderRoot() { return this; }
   constructor() { super(); this.position = this.position.bind(this); }
   firstUpdated() {
@@ -58,6 +58,7 @@ export class WorkspacePicker extends LitElement {
         <span class="jk-workspace-option-name">${w.name}</span>
         <span class="jk-workspace-option-check" aria-hidden="true">${w.id===this.active?'✓':''}</span>
       </button>`)}</div>
+      <div class="jk-workspace-management"><button type="button" class="jk-workspace-management-link" @click=${()=>this.dispatchEvent(new CustomEvent('manage'))}>Workspaces verwalten</button></div>
     </dialog>`;
   }
 }

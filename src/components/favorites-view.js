@@ -4,12 +4,12 @@ import './icon.js';
 import './icon-button.js';
 
 const styles = {
-  section: `jk-mobile-group mb-8 rounded-2xl border border-amber-500/20 bg-slate-900/20 p-4 sm:p-5`,
+  section: `jk-favorites-section jk-mobile-group mb-8 rounded-2xl border p-4 sm:p-5`,
   continueSection: `jk-mobile-group mb-8 rounded-2xl border border-slate-700/60 bg-slate-900/20 p-4 sm:p-5`,
   header: `flex items-center gap-3 mb-4`,
-  iconBadge: `flex items-center justify-center size-8 rounded-xl bg-amber-500/10 ring-1 ring-amber-500/20`,
+  iconBadge: `jk-favorites-icon-badge flex items-center justify-center size-8 rounded-xl ring-1`,
   continueIconBadge: `flex items-center justify-center size-8 rounded-xl bg-indigo-500/10 ring-1 ring-indigo-500/20`,
-  icon: `size-4 text-amber-400`,
+  icon: `jk-favorite-star size-4`,
   continueIcon: `size-4 text-indigo-300`,
   title: `text-sm font-semibold tracking-wide text-slate-200`,
   resetButton: `ml-auto`,

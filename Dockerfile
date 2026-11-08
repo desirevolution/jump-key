@@ -1,11 +1,14 @@
-FROM node:24-alpine AS node-builder
+FROM node:26-alpine AS node-builder
 WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
+# Build-time metadata is embedded into the frontend; do not require Git in the image.
+ARG JUMPKEY_RELEASE_TAG=""
+ARG GITHUB_SHA=""
 RUN npm run build
 
-FROM golang:1.26-alpine AS builder
+FROM golang:1.27-alpine AS builder
 
 RUN apk add --no-cache ca-certificates tzdata
 
