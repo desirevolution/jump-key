@@ -47,6 +47,9 @@ export function migrateReferences(config, favorites, history) {
 }
 
 export async function persistConfig(config, { base = '/', fetcher = fetch } = {}) {
+  if (import.meta.env?.VITE_DEMO_MODE === 'true') {
+    return migrateConfig(config);
+  }
   if (workspaceContext?.readOnly) throw new Error('Read-only configuration');
   const normalized = migrateConfig(config);
 
