@@ -4,6 +4,7 @@ import { migrateConfig } from '../utils/configuration.js';
 import { workspaceSlug, workspaceError, createWorkspaceRequest, workspaceHeaders } from '../utils/workspace-management.js';
 import { reorderItems, reorderConfiguration, addCategory, editCategory, deleteCategory, suggestCategoryShortcut, categoryError } from '../utils/management.js';
 import { buildDeleteConfig } from '../utils/quick-add.js';
+import { prepareSortSave } from '../utils/sort-save.js';
 import { draftKind, selectionAfterRemoval, workspaceIndexById, categoryIndexByName, serviceIndexById } from '../utils/management-draft.js';
 import './sortable-list.js';
 import './change-guard.js';
@@ -51,11 +52,14 @@ export class JkManagement extends LitElement {
       const next=this._workspaces.find(w=>w.id===(prefer||this._selected))?.id
         || this._workspaces[this._preferredIndex===null?0:Math.min(this._preferredIndex,this._workspaces.length-1)]?.id;
       this._preferredIndex=null;
-      if(next && (next!==this._selected || !this._config)) await this._loadConfig(next);
+      // Reload the selected config too: its ETag may have changed since the
+      // management view was opened (e.g. a save from another editor/tab).
+      if(next) await this._loadConfig(next);
       if(!next) {this._selected='';this._config=null;this._configDraft=null;}
     }catch(error){this._error=error.message||'Workspaces konnten nicht geladen werden.';}
   }
   async _loadConfig(id) {
+    const categoryName=id===this._selected?this._activeCategory?.category:null;
     this._busy=true; this._error='';
     try {
       const response=await fetch(`${base}config/services.json?workspace=${encodeURIComponent(id)}`,{
@@ -64,20 +68,22 @@ export class JkManagement extends LitElement {
       if(!response.ok)throw await workspaceError(response);
       const config=migrateConfig(await response.json());
       this._selected=id; this._config=config; this._configDraft=structuredClone(config);
-      this._configETag=response.headers.get('ETag'); this._selectedCategory=0;
+      this._configETag=response.headers.get('ETag');
+      const index=categoryIndexByName(config,categoryName);
+      this._selectedCategory=index>=0?index:0;
     }catch(error){this._error=error.message||'Workspace konnte nicht geladen werden.';}
     finally{this._busy=false;}
   }
-  async _saveConfig(next) {
-    if(this.readOnly || !this._configETag)throw new Error('Konfigurationsversion fehlt; bitte neu laden.');
+  async _saveConfig(next, { expectedETag = this._configETag, workspaceId = this._selected } = {}) {
+    if(this.readOnly || !expectedETag)throw new Error('Konfigurationsversion fehlt; bitte neu laden.');
     const config=migrateConfig(next);
-    const response=await fetch(`${base}config/services.json?workspace=${encodeURIComponent(this._selected)}`,{
-      method:'PUT',headers:workspaceHeaders(this.user,{'If-Match':this._configETag}),body:JSON.stringify(config,null,2),
+    const response=await fetch(`${base}config/services.json?workspace=${encodeURIComponent(workspaceId)}`,{
+      method:'PUT',headers:workspaceHeaders(this.user,{'If-Match':expectedETag}),body:JSON.stringify(config,null,2),
     });
     if(!response.ok)throw await workspaceError(response);
     this._configETag=response.headers.get('ETag');
     this._config=config; this._configDraft=structuredClone(config);
-    this._emit('management-config-saved',{id:this._selected,config,etag:this._configETag});
+    this._emit('management-config-saved',{id:workspaceId,config,etag:this._configETag});
     return config;
   }
   async _saveSort() {
@@ -96,7 +102,13 @@ export class JkManagement extends LitElement {
         this._workspaces=[...this._workspaceDraft];
         this._orderETag=response.headers.get('ETag')||this._orderETag;
         await this._refreshWorkspaces(this._selected);
-      }else await this._saveConfig(this._configDraft);
+      } else {
+        // A sorter can be based on an old manager ETag after a dashboard edit.
+        // Rebase only ordering on fresh data, never overwrite other edits.
+        const workspaceId=this._selected;
+        const prepared=await prepareSortSave({base,user:this.user,id:workspaceId,baseline:this._config,draft:this._configDraft});
+        await this._saveConfig(prepared.config,{expectedETag:prepared.etag,workspaceId});
+      }
       this._emit('notify',{type:'success',message:'Reihenfolge gespeichert.'});
       return true;
     }catch(error){this._error=error.status===412?'Versionskonflikt: Der Serverstand hat sich geändert. Bitte Änderungen vergleichen.':error.message;return false;}
@@ -140,6 +152,7 @@ export class JkManagement extends LitElement {
   _stay(){this._promptNav=false;this._next=null;}
   discardChanges(){this._discardSort();this._formDirty=false;this._view='list';this._confirm=null;this._stay();}
   _selectWorkspace(id) {
+    if(this._busy)return;
     if(id===this._selected){this._mobileStep='categories';this._workspacePane=false;return;}
     // Selecting a workspace is allowed with an open *workspace-order* draft.
     const change=()=>{this._loadConfig(id);this._mobileStep='categories';this._workspacePane=false;};
@@ -147,6 +160,7 @@ export class JkManagement extends LitElement {
     else change();
   }
   _selectCategory(index) {
+    if(this._busy)return;
     this._selectedCategory=index;
     this._mobileStep='services';
   }
