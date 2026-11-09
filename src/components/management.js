@@ -9,6 +9,7 @@ import { draftKind, selectionAfterRemoval, workspaceIndexById, categoryIndexByNa
 import './sortable-list.js';
 import './change-guard.js';
 import './icon.js';
+import './icon-picker.js';
 
 const base = import.meta.env.BASE_URL;
 const titles = { workspace: 'Workspace', category: 'Kategorie', service: 'Service' };
@@ -23,10 +24,10 @@ export class JkManagement extends LitElement {
     _mobileStep: {state:true}, _workspacePane: {state:true}, _view: {state:true},
     _error: {state:true}, _busy: {state:true}, _promptNav: {state:true},
     _formDirty: {state:true}, _formValid: {state:true}, _categoryError: {state:true},
-    _categoryKeyMode: {state:true}, _categoryKey: {state:true}, _categoryName: {state:true}, _confirm: {state:true},
+    _categoryKeyMode: {state:true}, _categoryKey: {state:true}, _categoryName: {state:true}, _categoryIcon: {state:true}, _confirm: {state:true},
   };
   constructor() {
-    super(); this._categoryKeyMode='auto'; this._categoryKey=''; this._categoryName=''; this._categoryError=''; this.t = k=>k; this._workspaces=[]; this._workspaceDraft=[];
+    super(); this._categoryKeyMode='auto'; this._categoryKey=''; this._categoryName=''; this._categoryIcon=''; this._categoryError=''; this.t = k=>k; this._workspaces=[]; this._workspaceDraft=[];
     this._selected=''; this._selectedCategory=0; this._config=null; this._configDraft=null;
     this._mobileStep='categories'; this._workspacePane=false; this._view='list';
     this._error=''; this._busy=false; this._promptNav=false; this._formDirty=false; this._confirm=null;
@@ -194,6 +195,7 @@ export class JkManagement extends LitElement {
         this._categoryKeyMode=this._formInitial.keyMode;
         this._categoryKey=this._formInitial.shortcut||'';
         this._categoryName=this._formInitial.name;
+        this._categoryIcon=this._formInitial.icon||'';
       }
     },`„${titles[type]} bearbeiten“ öffnest`);
   }
@@ -208,9 +210,9 @@ export class JkManagement extends LitElement {
       const category=this._config?.categories[index];
       const key=category?.categoryKey||'';
       const keyMode=category?.shortcutDisabled?'none':key?'manual':'auto';
-      return {name:category?.category||'',keyMode,...(keyMode==='manual'?{shortcut:key}:{})};
+      return {name:category?.category||'',keyMode,...(keyMode==='manual'?{shortcut:key}:{}),icon:category?.icon||''};
     }
-    return {name:'',keyMode:'auto'};
+    return {name:'',keyMode:'auto',icon:''};
   }
   _formChanged(){
     const form=this.querySelector('.jk-manager-form');
@@ -272,8 +274,8 @@ export class JkManagement extends LitElement {
         }
       }else if(this._view==='category'){
         const next=this._formMode==='create'
-          ?addCategory(this._config,values.name,values.keyMode,values.shortcut?.trim()||'')
-          :editCategory(this._config,this._formIndex,values.name,values.shortcut?.trim()||'',values.keyMode);
+          ?addCategory(this._config,values.name,values.keyMode,values.shortcut?.trim()||'',values.icon||'')
+          :editCategory(this._config,this._formIndex,values.name,values.shortcut?.trim()||'',values.keyMode,values.icon||'');
         await this._saveConfig(next);
         this._selectedCategory=this._formMode==='create'?next.categories.length-1:Math.min(this._selectedCategory,next.categories.length-1);
       }
@@ -393,6 +395,10 @@ export class JkManagement extends LitElement {
               : 'Kein freier Shortcut vorhanden.')
             : 'Kategoriename eingeben, um einen Shortcut vorzuschlagen.'
         }</p>`:''}
+      <jk-icon-picker .value=${this._categoryIcon} @change-icon=${e=>{
+        this._categoryIcon=e.detail;
+        this.updateComplete.then(()=>this._formChanged());
+      }}></jk-icon-picker>
       ${this._categoryError&&this._formDirty?html`<p class="jk-status-danger" role="status">${this._categoryError}</p>`:''}
       <div class="jk-manager-footer"><button type="button" class="jk-btn jk-btn-secondary" @click=${this._back}>Abbrechen</button><button class="jk-btn jk-btn-primary" ?disabled=${this._busy||!this._formValid||(this._formMode==='edit'&&!this._formDirty)}>Speichern</button></div>
     </form>`;

@@ -101,3 +101,29 @@ test('keyboard can open a service after selecting a no-shortcut category by clic
   assert.equal(app.opened,'docs');
   assert.equal(app.currentInput,'DOCS → X');
 });
+
+
+test('category editor exposes the same compact icon picker as the service editor',()=>{
+  const manager=readFileSync(new URL('../src/components/management.js',import.meta.url),'utf8');
+  assert.match(manager, /import '\.\/icon-picker\.js'/);
+  assert.match(manager, /<jk-icon-picker \.value=\$\{this\._categoryIcon\}/);
+  assert.match(manager, /_formInitial\.icon/);
+  assert.match(manager, /editCategory\(this\._config,this\._formIndex,values\.name,[^;]*values\.icon/);
+});
+
+test('category icons can be set and cleared without changing other attributes',()=>{
+  const original=config();
+  original.categories[0].icon='lucide:folder-code';
+  const edited=editCategory(original,0,'Development','d','manual','https://example.org/icon.svg');
+  assert.equal(edited.categories[0].icon,'https://example.org/icon.svg');
+  assert.equal(edited.categories[0].categoryKey,'d');
+  assert.deepEqual(edited.categories[0].services,original.categories[0].services);
+  assert.equal(original.categories[0].icon,'lucide:folder-code');
+  const cleared=editCategory(edited,0,'Development','d','manual','');
+  assert.equal(Object.hasOwn(cleared.categories[0],'icon'),false);
+  const untouched=editCategory(original,0,'Development','d');
+  assert.equal(untouched.categories[0].icon,'lucide:folder-code');
+  const created=addCategory(original,'Tools','none','','server');
+  assert.equal(created.categories.at(-1).icon,'server');
+  assert.equal(validateConfig(created),true);
+});

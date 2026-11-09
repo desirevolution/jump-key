@@ -45,7 +45,7 @@ export function categoryError(config, name, shortcut, excludeIndex = -1, keyMode
   return '';
 }
 
-export function editCategory(config, index, name, shortcut, keyMode = 'manual') {
+export function editCategory(config, index, name, shortcut, keyMode = 'manual', icon = undefined) {
   const next = structuredClone(config);
   next.categories = generateShortcuts(next.categories);
   if (!next.categories[index]) throw new Error('Kategorie nicht vorhanden');
@@ -53,6 +53,10 @@ export function editCategory(config, index, name, shortcut, keyMode = 'manual') 
   if (error) throw new Error(error);
   const cat = next.categories[index];
   cat.category = name.trim();
+  if (icon !== undefined) {
+    if (icon.trim()) cat.icon = icon.trim();
+    else delete cat.icon;
+  }
   if (keyMode === 'none') {
     delete cat.categoryKey;
     cat.shortcutDisabled = true;
@@ -63,12 +67,13 @@ export function editCategory(config, index, name, shortcut, keyMode = 'manual') 
   return next;
 }
 
-export function addCategory(config, name, keyMode = 'auto', shortcut = '') {
+export function addCategory(config, name, keyMode = 'auto', shortcut = '', icon = '') {
   const next = structuredClone(config);
   next.categories = generateShortcuts(next.categories);
   const error = categoryError(next, name, shortcut, -1, keyMode);
   if (error) throw new Error(error);
   const cat = { category: name.trim(), services: [] };
+  if (icon.trim()) cat.icon = icon.trim();
   if (keyMode === 'none') cat.shortcutDisabled = true;
   else cat.categoryKey = keyMode === 'auto' ? suggestCategoryShortcut(next, name) : shortcut.toLowerCase();
   next.categories.push(cat);
