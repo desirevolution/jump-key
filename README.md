@@ -24,8 +24,6 @@ https://github.com/user-attachments/assets/b2c4290e-f371-44eb-b47c-44d5a73de379
 - **Installable PWA:** user-approved update prompts, release version in **Settings → Info**, and locally cached accessible workspaces for read-only offline use.
 - **Small deployment:** Lit frontend embedded in a Go executable; Docker image for linux/amd64 and linux/arm64. No database required on the server.
 
-For implementation details and acceptance scenarios, see the [phase 1](docs/phase-1-status.md), [phase 2](docs/phase-2-backend.md), [phase 3](docs/phase-3-management.md) and [phase 4](docs/phase-4-pwa-offline.md) notes. Those are historical implementation notes; this README describes the **current** behavior.
-
 ## Screenshots
 
 <p align="center">
