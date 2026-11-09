@@ -42,6 +42,14 @@ export function buildQuickConfig(config, { url, name, category, newCategory, key
   return next;
 }
 
+// Show insertion points of the selected category. When editing, exclude the
+// current service so that its own position cannot become its drop target.
+export function servicePositionTargets(config, category, serviceId) {
+  if (!/^\d+$/.test(category ?? '')) return [];
+  return (config?.categories?.[Number(category)]?.services ?? [])
+    .filter(service => service.id && service.id !== serviceId);
+}
+
 export function suggestKey(config, category, name) {
   if (category !== 'new' && !/^\d+$/.test(category ?? '')) return '';
   const target = category === 'new' ? { category: 'New', services: [] } : config?.categories[Number(category)];

@@ -111,7 +111,7 @@ export const translations = {
     confirmMoveService: "„{name}“ verschieben? Die bisherige Kategorie ist danach leer.",
     removeEmptyCategory: "Leere Kategorie „{category}“ ebenfalls löschen",
     quickPositionInvalid: "Bitte eine gültige Position wählen.",
-    helpPositionDelete: "Die Position änderst du in Einstellungen → Verwaltung → Services per Drag & Drop. Löschen ist im Service-Editor oder der Verwaltung möglich.",
+    helpPositionDelete: "Die Position legst du im Service-Editor fest oder änderst sie per Drag & Drop in Einstellungen → Verwaltung. Löschen ist im Service-Editor oder der Verwaltung möglich.",
 
     serviceActions: "Service-Aktionen",
     editService: "Service bearbeiten",
@@ -460,7 +460,7 @@ export const translations = {
     confirmMoveService: "Déplacer « {name} » ? Sa catégorie d’origine sera alors vide.",
     removeEmptyCategory: "Supprimer aussi la catégorie vide « {category} »",
     quickPositionInvalid: "Choisissez une position valide.",
-    helpPositionDelete: "Réorganisez les services dans Paramètres → Gestion → Services par glisser-déposer. Supprimez-les depuis l’éditeur ou la gestion, après confirmation.",
+    helpPositionDelete: "Choisissez la position dans l’éditeur de service ou réorganisez par glisser-déposer dans Paramètres → Gestion. Supprimez un service dans l’éditeur ou la gestion, après confirmation.",
 
     serviceActions: "Actions du service",
     editService: "Modifier le service",
@@ -793,7 +793,7 @@ export const translations = {
     confirmMoveService: "¿Mover «{name}»? Su categoría original quedará vacía.",
     removeEmptyCategory: "Eliminar también la categoría vacía «{category}»",
     quickPositionInvalid: "Selecciona una posición válida.",
-    helpPositionDelete: "Ordena los servicios arrastrándolos en Ajustes → Administración → Servicios. Elimínalos desde el editor o la administración, con confirmación.",
+    helpPositionDelete: "Elige la posición en el editor de servicios o reordena arrastrando en Ajustes → Administración. Elimina un servicio desde el editor o la administración, con confirmación.",
 
     serviceActions: "Acciones del servicio",
     editService: "Editar servicio",
@@ -1122,7 +1122,7 @@ export const translations = {
     confirmMoveService: "Move “{name}”? Its original category will then be empty.",
     removeEmptyCategory: "Also delete the empty category “{category}”",
     quickPositionInvalid: "Please select a valid position.",
-    helpPositionDelete: "Reorder services using drag and drop under Settings → Management → Services. Delete a service in the editor or management, with confirmation.",
+    helpPositionDelete: "Choose a service’s position in its editor, or reorder by drag and drop under Settings → Management. Delete in the editor or management, with confirmation.",
 
     serviceActions: "Service actions",
     editService: "Edit service",

@@ -1,5 +1,5 @@
 import { html, LitElement } from 'lit';
-import { buildQuickConfig, buildEditConfig, buildDeleteConfig, suggestKey, quickFormSnapshot, quickErrorField } from '../utils/quick-add.js';
+import { buildQuickConfig, buildEditConfig, buildDeleteConfig, suggestKey, servicePositionTargets, quickFormSnapshot, quickErrorField } from '../utils/quick-add.js';
 import { generateShortcuts, categorySelectionKey } from '../utils/shortcuts.js';
 import { persistConfig } from '../utils/configuration.js';
 import './icon.js';
@@ -50,6 +50,15 @@ export class QuickAdd extends LitElement {
       const select = this.querySelector(`select[name="${name}"]`);
       if (select) select.value = this[name];
     }
+  }
+  changeCategory(category) {
+    this.category = category;
+    // Returning to the original category restores the existing position.
+    // New/different categories default to appending at the end.
+    this.position = this.serviceId && category === String(this.sourceIndex)
+      ? (this.originalPosition ?? 'bottom') : 'bottom';
+    this.removeEmptyCategory = false;
+    this.suggest();
   }
   suggest() { if (!this.keyEdited && this.keyMode==='auto') this.key = suggestKey(this.config, this.category, this.name.trim() || this.hostName()); }
   hostName() { try { return new URL(this.url).hostname; } catch { return ''; } }
@@ -140,12 +149,17 @@ export class QuickAdd extends LitElement {
           ${field(this.t('quickName'), this.name, e => {this.name=e.target.value; this.suggest();})}
           ${field('URL', this.url, e => {this.url=e.target.value; this.suggest();}, {required:true,type:'url',name:'url'})}
           ${!this.name.trim() ? html`<p class="text-xs text-slate-400">${this.t('quickNameHint')} ${this.hostName()}</p>` : ''}
-          <label>${this.t('quickCategory')}<select name="category" required aria-invalid=${this.fieldError('category') ? 'true' : 'false'} aria-describedby="quick-error-category" @change=${e => {this.category=e.target.value;this.position='bottom';this.removeEmptyCategory=false;this.suggest();}}>
+          <label>${this.t('quickCategory')}<select name="category" required aria-invalid=${this.fieldError('category') ? 'true' : 'false'} aria-describedby="quick-error-category" @change=${e => this.changeCategory(e.target.value)}>
             <option value="" disabled>${this.t('selectCategory')}</option>
             ${this.config?.categories.map((c,i)=>html`<option value=${String(i)}>${c.category}</option>`)}
             <option value="new">${this.t('quickNewCategory')}</option>
           </select>${this.renderFieldError('category')}</label>
           ${this.category === 'new' ? field(this.t('quickNewCategory'), this.newCategory, e=>this.newCategory=e.target.value, {required:true,name:'newCategory'}) : ''}
+          <label>${this.t('servicePosition')}<select name="position" .value=${this.position} ?disabled=${!this.category} aria-invalid=${this.fieldError('position') ? 'true' : 'false'} aria-describedby=${this.fieldError('position') ? 'quick-error-position' : ''} @change=${e=>this.position=e.target.value}>
+            <option value="top">${this.t('positionTop')}</option>
+            ${servicePositionTargets(this.config, this.category, this.serviceId).map(s=>html`<option value=${'after:'+s.id}>${this.t('positionAfter', { name:s.name })}</option>`)}
+            <option value="bottom">${this.t('positionBottom')}</option>
+          </select>${this.renderFieldError('position')}</label>
           <label>Shortcut-Vergabe<select name="key-mode" .value=${this.keyMode} @change=${e=>{this.keyMode=e.target.value;this.keyEdited=this.keyMode!=='auto';this.suggest();}}>
             <option value="auto">Automatisch</option><option value="manual">Manuell</option><option value="none">Kein Shortcut</option>
           </select></label>

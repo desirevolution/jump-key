@@ -1,7 +1,7 @@
 import { migrateReferences } from '../src/utils/configuration.js';
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import {quickFormSnapshot, quickErrorField, buildDeleteConfig, buildEditConfig, buildQuickConfig, suggestKey, sharedLink, hasSharedInput} from '../src/utils/quick-add.js';
+import {quickFormSnapshot, quickErrorField, buildDeleteConfig, buildEditConfig, buildQuickConfig, suggestKey, servicePositionTargets, sharedLink, hasSharedInput} from '../src/utils/quick-add.js';
 const config={categories:[{category:'Tools',services:[{name:'Alpha',url:'https://example.com/',id:'old'}]},{category:'Other',services:[]}],searchEngines:[]};
 const input={url:'https://new.example',name:'Another',category:'0',newCategory:'',key:'',icon:''};
 test('suggestion reserves generated keys and same-category duplicates fail',()=>{
@@ -130,4 +130,31 @@ test('validation errors target the relevant form control', () => {
  assert.equal(quickErrorField('quickCategoryExists','new'),'newCategory');
  assert.equal(quickErrorField('quickPositionInvalid','0'),'position');
  assert.equal(quickErrorField('quickServiceMissing','0'),'');
+});
+
+
+test('position choices include only other services in the target category', () => {
+ const source = {categories:[
+  {category:'Tools',services:[{id:'first',name:'First'},{id:'middle',name:'Middle'},{id:'last',name:'Last'}]},
+  {category:'Empty',services:[]},
+ ],searchEngines:[]};
+ assert.deepEqual(servicePositionTargets(source,'0','middle').map(s=>s.id),['first','last']);
+ assert.deepEqual(servicePositionTargets(source,'0').map(s=>s.id),['first','middle','last']);
+ assert.deepEqual(servicePositionTargets(source,'1','middle'),[]);
+ assert.deepEqual(servicePositionTargets(source,'new','middle'),[]);
+ assert.deepEqual(servicePositionTargets(source,'','middle'),[]);
+ assert.deepEqual(servicePositionTargets(source,'2','middle'),[]);
+});
+
+test('editor can place a service precisely in a different category', () => {
+ const source={categories:[
+  {category:'A',services:[{id:'moving',name:'Moving',url:'https://m.example',key:'m'}]},
+  {category:'B',services:[{id:'first',name:'First',url:'https://a.example'},{id:'second',name:'Second',url:'https://b.example'}]},
+ ],searchEngines:[]};
+ const edit={...input,serviceId:'moving',url:'https://m.example',name:'Moving',category:'1',key:'m'};
+ const ids=position=>buildEditConfig(source,{...edit,position}).categories[1].services.map(s=>s.id);
+ assert.deepEqual(ids('top'),['moving','first','second']);
+ assert.deepEqual(ids('after:first'),['first','moving','second']);
+ assert.deepEqual(ids('bottom'),['first','second','moving']);
+ assert.deepEqual(source.categories[0].services.map(s=>s.id),['moving']);
 });
