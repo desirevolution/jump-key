@@ -116,17 +116,6 @@ Open `http://localhost:8080`. On Windows, run `jump-key.exe` with the same optio
 | `--backup-keep` | `20` | Number of previous configuration backups retained after saves (1–1000). Environment: `JUMPKEY_BACKUP_KEEP`. |
 | `--help` | — | Show command-line usage. |
 
-### Notes when upgrading from earlier phases
-
-- **Phase 1:** CI checks, declared Node 26 / Go 1.27 toolchains, dependency maintenance and multi-architecture publishing.
-- **Phase 2:** explicit proxy authentication, trusted-proxy HTTPS enforcement, ETag/`If-Match` writes, structured errors, backups and modular Go backend. Old custom API clients must send the returned ETag on writes (`428` missing, `412` stale).
-- **Phase 3:** centralized responsive management, staged drag-and-drop ordering, workspace creation/duplication/renaming/deletion and a unified editor. Workspace ordering is stored in per-user server metadata rather than browser settings.
-- **Phase 4:** PWA update prompts, a version/update section under **Settings → Info**, and browser-local offline copies of accessible workspaces. Editing remains online-only.
-
-Existing JSON configurations require no database migration. Preserve service IDs when changing entries, and verify filesystem permissions and backup access after updating.
-
-The server exposes `GET /healthz` for health checks. Configuration uploads are limited to 2 MiB. The read-only and HTTPS options also accept the environment variables listed above. Explicit command-line flags override their environment values. Invalid boolean environment values cause a startup error.
-
 ## Public read-only installation
 
 Use a separate read-only instance to publish selected workspaces. The entire instance is read-only; there is no separate `/read-only/` route. A private instance or a local editor can maintain the files.
@@ -393,7 +382,7 @@ Missing service IDs are generated when loading a configuration and included when
 
 Existing browser preferences initialize Default. Existing favorites and Continue history are adopted once by the first Default workspace loaded after upgrading. You do not need to clear browser data.
 
-### Offline PWA and updates (phase 4)
+### Offline PWA and updates
 
 With a successful authenticated workspace-list request, JumpKey **prefetches all accessible workspace configurations** (two at a time) into browser-local storage. IndexedDB is used when available, with localStorage as a fallback. The **Settings → Info** page shows the available offline copies and the installed app version.
 
@@ -403,7 +392,7 @@ When connectivity returns, JumpKey checks the authenticated server workspace lis
 
 The service worker checks for app updates on startup, when the tab becomes active, approximately hourly while visible, and on request under **Settings → Info**. New versions offer **Update now / Later** rather than an automatic reload; unsaved forms or sort drafts block an unsafe reload. Version display comes from the GitHub Release tag for release builds, `dev-<short-sha>` for `main` builds, or `package.json` for local builds. PWA updates are detected from changed application assets, independently of the version label.
 
-Concurrent writes remain protected by ETags: a save must include `If-Match` from the current server response. Missing revision yields HTTP `428`, stale revision yields `412`. In either case, unsaved edits must not be silently overwritten. See the [phase 4 guide](docs/phase-4-pwa-offline.md) for a browser-level acceptance checklist.
+Concurrent writes remain protected by ETags: a save must include `If-Match` from the current server response. Missing revision yields HTTP `428`, stale revision yields `412`. In either case, unsaved edits must not be silently overwritten.
 
 ## Proxy authentication and migration
 
