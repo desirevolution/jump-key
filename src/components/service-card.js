@@ -216,6 +216,19 @@ export class JkServiceCard extends LitElement {
     };
   }
 
+  _handleCardKeyDown(event) {
+    // Space is JumpKey's global search shortcut, even while a card has focus.
+    // Enter is the keyboard activation key for this navigational card.
+    if (event.key !== 'Enter') return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.dispatchEvent(new CustomEvent('card-click', {
+      detail: { service: this._getServiceData(), shiftKey: event.shiftKey },
+      bubbles: true,
+      composed: true,
+    }));
+  }
+
   _getCardClasses() {
     if (this.isReady) return styles.cardReady;
     if (this.isPressing) return styles.cardPressing;
@@ -264,7 +277,7 @@ export class JkServiceCard extends LitElement {
     return html`
       <div class="jk-card-shell relative">
       <div
-        role="button"
+        role="link"
         tabindex="0"
         aria-label=${this.name}
         @pointerdown=${this._handlePointerDown}
@@ -272,12 +285,7 @@ export class JkServiceCard extends LitElement {
         @pointerup=${this._handlePointerUp}
         @pointercancel=${this._handlePointerCancel}
         @lostpointercapture=${this._handleLostPointerCapture}
-        @keydown=${e => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault(); e.stopPropagation();
-            this.dispatchEvent(new CustomEvent('card-click', { detail: { service: this._getServiceData(), shiftKey: e.shiftKey }, bubbles: true, composed: true }));
-          }
-        }}
+        @keydown=${e => this._handleCardKeyDown(e)}
         @click=${this._handleNativeClick}
         class="${styles.card} ${this._getCardClasses()} ${this.serviceId ? 'jk-card-has-actions' : ''}"
       >
