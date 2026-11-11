@@ -11,15 +11,15 @@
     "check": "npm run check:syntax && npm test && npm run build"
   },
   "dependencies": {
-    "@lucide/icons": "^1.65.0",
-    "iconify-icon": "^3.0.4",
+    "@lucide/icons": "^1.69.0",
+    "iconify-icon": "^3.0.5",
     "lit": "^3.3.3",
     "prism-code-editor": "^5.4.0"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.3.3",
+    "@tailwindcss/vite": "^4.3.4",
     "tailwindcss": "^4.3.3",
-    "vite": "^8.3.5",
+    "vite": "^8.3.6",
     "vite-plugin-pwa": "^2.0.0"
   },
   "engines": {
