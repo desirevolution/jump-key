@@ -1,8 +1,8 @@
 import { LitElement, html } from 'lit';
 import { generateShortcuts } from '../utils/shortcuts.js';
-import { migrateConfig } from '../utils/configuration.js';
+import { migrateConfig, loadCurrentConfig } from '../utils/configuration.js';
 import { workspaceSlug, workspaceError, createWorkspaceRequest, workspaceHeaders } from '../utils/workspace-management.js';
-import { reorderItems, reorderConfiguration, addCategory, editCategory, deleteCategory, suggestCategoryShortcut, categoryError } from '../utils/management.js';
+import { reorderItems, reorderConfiguration, addCategory, editCategory, deleteCategory, suggestCategoryShortcut, categoryError, rebaseCategoryEdit } from '../utils/management.js';
 import { buildDeleteConfig } from '../utils/quick-add.js';
 import { prepareSortSave } from '../utils/sort-save.js';
 import { draftKind, selectionAfterRemoval, workspaceIndexById, categoryIndexByName, serviceIndexById } from '../utils/management-draft.js';
@@ -86,6 +86,16 @@ export class JkManagement extends LitElement {
     this._config=config; this._configDraft=structuredClone(config);
     this._emit('management-config-saved',{id:workspaceId,config,etag:this._configETag});
     return config;
+  }
+  /** Commit one operation against the latest config without discarding other edits. */
+  async _saveMutation(mutate) {
+    const workspaceId = this._selected;
+    const current = await loadCurrentConfig({
+      base, context: { user: this.user, id: workspaceId },
+    });
+    return this._saveConfig(mutate(current.config), {
+      expectedETag: current.etag, workspaceId,
+    });
   }
   async _saveSort() {
     const kind=this._draftKind();
@@ -239,7 +249,7 @@ export class JkManagement extends LitElement {
       this._emit('open-service-editor',{
         initial:serviceId?{serviceId}:{},config:this._config,
         initialCategoryIndex:categoryIndex,
-        saveConfig:next=>this._saveConfig(next),workspaceId:this._selected,
+        saveConfig:(next,{mutate}={})=>mutate?this._saveMutation(mutate):this._saveConfig(next),workspaceId:this._selected,
       });
     },'den Service-Editor öffnest');
   }
@@ -273,11 +283,17 @@ export class JkManagement extends LitElement {
           if(id!==this._selected)await this._loadConfig(id);
         }
       }else if(this._view==='category'){
-        const next=this._formMode==='create'
-          ?addCategory(this._config,values.name,values.keyMode,values.shortcut?.trim()||'',values.icon||'')
-          :editCategory(this._config,this._formIndex,values.name,values.shortcut?.trim()||'',values.keyMode,values.icon||'');
-        await this._saveConfig(next);
-        this._selectedCategory=this._formMode==='create'?next.categories.length-1:Math.min(this._selectedCategory,next.categories.length-1);
+        const original=this._formMode==='edit'?this._config?.categories[this._formIndex]:null;
+        const next=await this._saveMutation(fresh=>{
+          if(this._formMode==='create') {
+            return addCategory(fresh,values.name,values.keyMode,values.shortcut?.trim()||'',this._categoryIcon||'');
+          }
+          return rebaseCategoryEdit(this._config,this._formIndex,fresh,{
+            name:values.name,shortcut:values.shortcut?.trim()||'',
+            keyMode:values.keyMode,icon:this._categoryIcon||'',
+          });
+        });
+        this._selectedCategory=this._formMode==='create'?next.categories.length-1:Math.max(0,categoryIndexByName(next,values.name.trim()));
       }
       this._view='list';this._formDirty=false;
       this._emit('notify',{type:'success',message:'Änderungen gespeichert.'});

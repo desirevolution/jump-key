@@ -45,24 +45,56 @@ export function migrateReferences(config, favorites, history) {
   };
 }
 
-export async function persistConfig(config, { base = '/', fetcher = fetch } = {}) {
+/**
+ * Read the current server version immediately before a narrowly-scoped edit.
+ * This allows creation actions to preserve unrelated writes made since the UI
+ * was opened, while the subsequent PUT still uses an atomic If-Match check.
+ */
+export async function loadCurrentConfig({ base = '/', context = workspaceContext, fetcher = fetch } = {}) {
+  if (!context) throw new Error('Workspace context missing. Reload before saving.');
+  const request = configRequest(base, context);
+  const response = await fetcher(request.url, {
+    headers: request.headers, cache: 'no-store',
+  });
+  if (!response.ok) throw await configResponseError(response);
+  const etag = response.headers?.get('ETag');
+  if (!etag) throw new Error('Configuration version missing. Reload the workspace before saving.');
+  return { config: migrateConfig(await response.json()), etag };
+}
+
+async function configResponseError(response) {
+  let payload;
+  try { payload = await response.json(); } catch {}
+  const error = new Error(payload?.error?.message || `Configuration request failed: ${response.status}`);
+  error.status = response.status;
+  error.code = payload?.error?.code;
+  return error;
+}
+
+/**
+ * A mutate callback applies one intentional change to freshly fetched data.
+ * Ordinary full-document saves still require the original loaded ETag; never
+ * silently rebase a JSON-editor write or a user-editable stale draft.
+ */
+export async function persistConfig(config, { base = '/', fetcher = fetch, mutate = null } = {}) {
   if (workspaceContext?.readOnly) throw new Error('Read-only configuration');
-  const normalized = migrateConfig(config);
   if (!workspaceContext?.etag) throw new Error('Configuration version missing. Reload the workspace before saving.');
   const currentContext = workspaceContext;
   const request = configRequest(base, currentContext);
+  let etag = currentContext.etag;
+  let normalized;
+  if (mutate) {
+    const current = await loadCurrentConfig({ base, context: currentContext, fetcher });
+    etag = current.etag;
+    normalized = migrateConfig(mutate(current.config));
+  } else {
+    normalized = migrateConfig(config);
+  }
   const response = await fetcher(request.url, {
-    method: 'PUT', headers: { ...request.headers, 'Content-Type': 'application/json', 'If-Match': currentContext.etag },
+    method: 'PUT', headers: { ...request.headers, 'Content-Type': 'application/json', 'If-Match': etag },
     body: JSON.stringify(normalized, null, 2),
   });
-  if (!response.ok) {
-    let payload;
-    try { payload = await response.json(); } catch {}
-    const error = new Error(payload?.error?.message || `Configuration save failed: ${response.status}`);
-    error.status = response.status;
-    error.code = payload?.error?.code;
-    throw error;
-  }
+  if (!response.ok) throw await configResponseError(response);
   setWorkspaceETag(response.headers?.get('ETag') || null, currentContext);
   return normalized;
 }

@@ -86,3 +86,19 @@ export function deleteCategory(config, index) {
   next.categories.splice(index, 1);
   return next;
 }
+
+/** Update just the category metadata on the newest config revision. */
+export function rebaseCategoryEdit(baseline, baselineIndex, fresh, { name, shortcut, keyMode, icon }) {
+  const original = baseline.categories[baselineIndex];
+  const index = fresh.categories.findIndex(cat => cat.category === original?.category);
+  const target = fresh.categories[index];
+  if (index < 0 || original.categoryKey !== target.categoryKey
+    || Boolean(original.shortcutDisabled) !== Boolean(target.shortcutDisabled)
+    || (original.icon || '') !== (target.icon || '')) {
+    const error = new Error('Die Kategorie wurde zwischenzeitlich verändert. Bitte Serverstand neu laden.');
+    error.status = 412;
+    error.code = 'precondition_failed';
+    throw error;
+  }
+  return editCategory(fresh, index, name, shortcut, keyMode, icon);
+}

@@ -42,6 +42,27 @@ export function buildQuickConfig(config, { url, name, category, newCategory, key
   return next;
 }
 
+/**
+ * Replay only a new-service insertion on the current server version. Category
+ * indexes from the original editor cannot be trusted after another tab
+ * reorders categories, so match the original category by its stable name.
+ */
+export function rebaseQuickCreate(baseline, fresh, values) {
+  let category = values.category;
+  if (/^\d+$/.test(category ?? '')) {
+    const originalName = baseline.categories[Number(category)]?.category;
+    const index = fresh.categories.findIndex(c => c.category === originalName);
+    if (!originalName || index < 0) {
+      const error = new Error('Die Zielkategorie wurde zwischenzeitlich entfernt oder umbenannt.');
+      error.status = 412;
+      error.code = 'precondition_failed';
+      throw error;
+    }
+    category = String(index);
+  }
+  return buildQuickConfig(fresh, { ...values, category });
+}
+
 // Show insertion points of the selected category. When editing, exclude the
 // current service so that its own position cannot become its drop target.
 export function servicePositionTargets(config, category, serviceId) {

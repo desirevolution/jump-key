@@ -19,7 +19,8 @@ test('category form mirrors service shortcut modes and A-Z manual picker',()=>{
   assert.match(manager, /\?disabled=\$\{taken\}/);
   assert.match(manager, /_categoryKeyMode: \{state:true\}/);
   assert.match(manager, /_categoryError=categoryError/);
-  assert.match(manager, /addCategory\(this\._config,values\.name,values\.keyMode/);
+  assert.match(manager, /_saveMutation\(fresh=>/);
+  assert.match(manager, /addCategory\(fresh,values\.name,values\.keyMode/);
 });
 
 test('create with automatic shortcut chooses next available letter and validates',()=>{
@@ -108,7 +109,8 @@ test('category editor exposes the same compact icon picker as the service editor
   assert.match(manager, /import '\.\/icon-picker\.js'/);
   assert.match(manager, /<jk-icon-picker \.value=\$\{this\._categoryIcon\}/);
   assert.match(manager, /_formInitial\.icon/);
-  assert.match(manager, /editCategory\(this\._config,this\._formIndex,values\.name,[^;]*values\.icon/);
+  assert.match(manager, /rebaseCategoryEdit\(this\._config,this\._formIndex,fresh/);
+  assert.match(manager, /icon:this\._categoryIcon/);
 });
 
 test('category icons can be set and cleared without changing other attributes',()=>{

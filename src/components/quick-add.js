@@ -1,5 +1,5 @@
 import { html, LitElement } from 'lit';
-import { buildQuickConfig, buildEditConfig, buildDeleteConfig, suggestKey, servicePositionTargets, quickFormSnapshot, quickErrorField } from '../utils/quick-add.js';
+import { buildQuickConfig, rebaseQuickCreate, buildEditConfig, buildDeleteConfig, suggestKey, servicePositionTargets, quickFormSnapshot, quickErrorField } from '../utils/quick-add.js';
 import { generateShortcuts, categorySelectionKey } from '../utils/shortcuts.js';
 import { persistConfig } from '../utils/configuration.js';
 import './icon.js';
@@ -118,10 +118,23 @@ export class QuickAdd extends LitElement {
         ? buildDeleteConfig(this.config, this.serviceId, this.removeEmptyCategory)
         : (this.serviceId ? buildEditConfig : buildQuickConfig)(this.config, this);
       this.saving = true;
-      const config = await (this.saveConfig ? this.saveConfig(next) : persistConfig(next, { base: import.meta.env.BASE_URL }));
+      // Creation is a small, replayable operation rather than a replacement of
+      // the entire config snapshot held by an editor opened earlier.
+      const values = {
+        url:this.url, name:this.name, category:this.category,
+        newCategory:this.newCategory, key:this.key, keyMode:this.keyMode,
+        icon:this.icon, position:this.position,
+      };
+      const mutate = action === 'save' && !this.serviceId
+        ? fresh => rebaseQuickCreate(this.config, fresh, values)
+        : null;
+      const options = { mutate };
+      const config = await (this.saveConfig
+        ? this.saveConfig(next, options)
+        : persistConfig(next, { base: import.meta.env.BASE_URL, ...options }));
       this.dispatchEvent(new CustomEvent('saved', { detail: config }));
     } catch (error) {
-      this.error = this.t(error.message.startsWith('quick') ? error.message : 'editConfigSaveFailed');
+      this.error = this.t(error.status === 412 ? 'configConflict' : error.message.startsWith('quick') ? error.message : 'editConfigSaveFailed');
       this.dispatchEvent(new CustomEvent('save-error', { detail: this.error, bubbles:true, composed:true }));
     } finally { this.saving = false; }
   }
