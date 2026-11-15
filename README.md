@@ -394,6 +394,9 @@ The service worker checks for app updates on startup, when the tab becomes activ
 
 Concurrent writes remain protected by ETags: a save must include `If-Match` from the current server response. Missing revision yields HTTP `428`, stale revision yields `412`. In either case, unsaved edits must not be silently overwritten.
 
+**Reverse-proxy compression:** Caddy’s `encode` handler may change a strong JSON ETag such as `"sha256-…"` into `"sha256-…-gzip"` or `"sha256-…-zstd"`. Unlike `If-None-Match`, Caddy does not remove that suffix from `If-Match` when forwarding a write. JumpKey accepts these two encoded representations **only if the underlying SHA-256 revision still matches**; stale or weak ETags still produce `412`. Keep the backend and frontend on the same updated version. If you see repeatable `412` errors behind another proxy, compare the GET response `ETag` with the subsequent PUT request’s `If-Match` in the browser developer tools. In Caddy, excluding `/config/*` and `/api/*` from `encode` is also a possible workaround, but is not required with this fix.
+
+
 ## Proxy authentication and migration
 
 > [!CAUTION]

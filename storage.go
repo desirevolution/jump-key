@@ -22,6 +22,22 @@ func configETag(data []byte) string {
 	return `"sha256-` + hex.EncodeToString(sum[:]) + `"`
 }
 
+// matchesConfigETag compares the exact underlying configuration revision.
+// Caddy's `encode` handler appends -gzip or -zstd to strong response ETags,
+// but (unlike If-None-Match) does not strip that suffix from If-Match on PUT.
+// Accept only those known representation variants of the current strong tag.
+// Never accept weak, malformed, or stale tags.
+func matchesConfigETag(received, current string) bool {
+	if received == current {
+		return true
+	}
+	if !strings.HasPrefix(current, `"sha256-`) || !strings.HasSuffix(current, `"`) {
+		return false
+	}
+	prefix := strings.TrimSuffix(current, `"`)
+	return received == prefix+`-gzip"` || received == prefix+`-zstd"`
+}
+
 // A per-file writer lock protects compare-and-swap, backup and rename as one operation.
 // Readers need no lock because writes replace a fully synced temporary file atomically.
 type configLock struct {
@@ -80,7 +96,7 @@ func (s *server) saveConfig(name string, next []byte, ifMatch, ifNoneMatch strin
 		if ifNoneMatch != "*" || ifMatch != "" {
 			return "", false, 412, "precondition_failed", errors.New("new configuration requires If-None-Match: *")
 		}
-	} else if ifMatch != configETag(previous) || ifNoneMatch != "" {
+	} else if !matchesConfigETag(ifMatch, configETag(previous)) || ifNoneMatch != "" {
 		return "", false, 412, "precondition_failed", errors.New("configuration changed; reload or reconcile edits")
 	}
 	target := filepath.Join(s.configDir, name)

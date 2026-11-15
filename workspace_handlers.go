@@ -210,7 +210,7 @@ func (s *server) handleWorkspaceDetail(w http.ResponseWriter, r *http.Request) {
 		writeAPIError(w, 404, "not_found", "Workspace not found")
 		return
 	}
-	if configETag(original) != match[0] {
+	if !matchesConfigETag(match[0], configETag(original)) {
 		writeAPIError(w, 412, "precondition_failed", "Workspace changed; reload required")
 		return
 	}
@@ -350,7 +350,7 @@ func (s *server) deleteWorkspace(w http.ResponseWriter, r *http.Request, id stri
 		writeAPIError(w, 404, "not_found", "Workspace not found")
 		return
 	}
-	if configETag(data) != match[0] {
+	if !matchesConfigETag(match[0], configETag(data)) {
 		writeAPIError(w, 412, "precondition_failed", "Workspace changed; reload required")
 		return
 	}

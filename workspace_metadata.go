@@ -178,7 +178,7 @@ func (s *server) putWorkspaceOrder(w http.ResponseWriter, r *http.Request) {
 		writeAPIError(w, 500, "read_failed", "Cannot read workspace order")
 		return
 	}
-	if metadataETag(meta) != match[0] {
+	if !matchesConfigETag(match[0], metadataETag(meta)) {
 		writeAPIError(w, 412, "precondition_failed", "Workspace order changed; reload required")
 		return
 	}
