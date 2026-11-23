@@ -37,7 +37,7 @@ jobs:
           test -f dist/index.html
           test -f dist/config/services.json
       - name: Upload frontend for Go checks
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: frontend-dist
           path: dist/
