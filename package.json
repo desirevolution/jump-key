@@ -11,7 +11,7 @@
     "check": "npm run check:syntax && npm test && npm run build"
   },
   "dependencies": {
-    "@lucide/icons": "^1.72.0",
+    "@lucide/icons": "^1.76.0",
     "iconify-icon": "^3.0.5",
     "lit": "^3.3.3",
     "prism-code-editor": "^5.4.0"
